@@ -1,0 +1,29 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+	<PropertyGroup>
+		<TargetFramework>net9.0</TargetFramework>
+		<ImplicitUsings>disable</ImplicitUsings>
+		<Nullable>enable</Nullable>
+		<AllowUnsafeBlocks>True</AllowUnsafeBlocks>
+		<Authors>Kuroki-Narumi</Authors>
+		<Company>LivreNoir</Company>
+		<RepositoryUrl>https://github.com/Kuroki-Narumi/LivreNoirLibrary10</RepositoryUrl>
+		<RootNamespace>LivreNoirLibrary.Media</RootNamespace>
+		<EmitCompilerGeneratedFiles>true</EmitCompilerGeneratedFiles>
+		<BaseOutputPath>..\bin</BaseOutputPath>
+	</PropertyGroup>
+
+	<ItemGroup>
+	  <ProjectReference Include="..\LivreNoirLibrary.Core\LivreNoirLibrary.Core.csproj" />
+	  <ProjectReference Include="..\LivreNoirLibrary.FFmpeg\LivreNoirLibrary.FFmpeg.csproj" />
+		<ProjectReference Include="..\LivreNoirLibrary.SourceGenerator\LivreNoirLibrary.SourceGenerator.csproj">
+			<OutputItemType>Analyzer</OutputItemType>
+			<ReferenceOutputAssembly>false</ReferenceOutputAssembly>
+		</ProjectReference>
+	</ItemGroup>
+
+	<ItemGroup>
+	  <PackageReference Include="NAudio" Version="2.2.1" />
+	</ItemGroup>
+
+</Project>

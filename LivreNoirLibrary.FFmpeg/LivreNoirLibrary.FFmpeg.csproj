@@ -1,0 +1,57 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net9.0</TargetFramework>
+    <ImplicitUsings>disable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <AllowUnsafeBlocks>True</AllowUnsafeBlocks>
+    <Authors>Kuroki-Narumi</Authors>
+    <Company>LivreNoir</Company>
+    <RepositoryUrl>https://github.com/Kuroki-Narumi/LivreNoirLibrary10</RepositoryUrl>
+    <RootNamespace>LivreNoirLibrary.Media</RootNamespace>
+    <BaseOutputPath>..\bin</BaseOutputPath>
+  </PropertyGroup>
+
+	<ItemGroup>
+		<PackageReference Include="FFmpeg.AutoGen" Version="7.0.0" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<Using Include="FFmpeg.AutoGen" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<ProjectReference Include="..\LivreNoirLibrary.Core\LivreNoirLibrary.Core.csproj" />
+		<ProjectReference Include="..\LivreNoirLibrary.SourceGenerator\LivreNoirLibrary.SourceGenerator.csproj">
+			<OutputItemType>Analyzer</OutputItemType>
+			<ReferenceOutputAssembly>false</ReferenceOutputAssembly>
+		</ProjectReference>
+	</ItemGroup>
+
+	<ItemGroup>
+		<None Update="DLL\avcodec-61.dll">
+			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+		</None>
+		<None Update="DLL\avdevice-61.dll">
+			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+		</None>
+		<None Update="DLL\avfilter-10.dll">
+			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+		</None>
+		<None Update="DLL\avformat-61.dll">
+			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+		</None>
+		<None Update="DLL\avutil-59.dll">
+			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+		</None>
+		<None Update="DLL\postproc-58.dll">
+			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+		</None>
+		<None Update="DLL\swresample-5.dll">
+			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+		</None>
+		<None Update="DLL\swscale-8.dll">
+			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+		</None>
+	</ItemGroup>
+</Project>

@@ -3,24 +3,31 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using LivreNoirLibrary.Observable;
+using System.Windows;
+using LivreNoirLibrary.Numerics;
+using LivreNoirLibrary.ObjectModel;
+using LivreNoirLibrary.Windows;
 
 namespace LivreNoirLibrary.Sandbox
 {
-    public partial class TestClass : ObservableObjectBase
+    public partial class TestClass : DependencyObject
     {
+        public const string DefaultName = "Name";
 
-        [ObservableProperty(Related = [nameof(UpperName)])]
-        private string _name = "";
+        [DependencyProperty]
+        private string _name = DefaultName;
 
-        [ObservableProperty]
-        private int _number;
+        [DependencyProperty]
+        private int _number = 14;
 
-        [ObservableProperty(SetterScope = Scope.Protected)]
-        private int _value;
+        [DependencyProperty(SetterScope = Scope.Protected)]
+        private string? _value;
+
+        [DependencyProperty]
+        private Rational _ratValue = Rational.One;
 
         public string UpperName => _name.ToUpper();
 
-        private static int ValidateNumber(int value) => Math.Clamp(value, 0, 100);
+        private static int CoerceNumber(int value) => Math.Clamp(value, 0, 100);
     }
 }

@@ -1,0 +1,33 @@
+﻿<local:FollowOwnerWindow x:Class="LivreNoirLibrary.Windows.Controls.JsonViewWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:LivreNoirLibrary.Windows.Controls"
+        mc:Ignorable="d" ShowInTaskbar="False" WindowStyle="None" AllowsTransparency="True" ResizeMode="CanResizeWithGrip" BorderThickness="8"
+        d:DataContext="{d:DesignInstance Type=local:JsonViewWindow}"
+        Title="JsonView" Height="320" Width="480">
+    <Window.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="pack://application:,,,/LivreNoirLibrary.Wpf;component/Themes/Generic.xaml"/>
+            </ResourceDictionary.MergedDictionaries>
+            <Style TargetType="local:Button">
+                <Setter Property="BorderThickness" Value="0"/>
+                <Setter Property="Margin" Value="4,0"/>
+            </Style>
+        </ResourceDictionary>
+    </Window.Resources>
+    <Window.Effect>
+        <DropShadowEffect BlurRadius="8" Opacity="0.5" ShadowDepth="0"/>
+    </Window.Effect>
+    <DockPanel>
+        <local:TitleBar DockPanel.Dock="Top" IsMinimizeVisible="False">
+            <local:TitleBar.RightPanelItems>
+                <local:Button Style="{StaticResource TitleBar_Button}" Icon="{x:Static local:Icons.Copy}" Content="{Binding CopyText}" Command="ApplicationCommands.Copy"/>
+                <local:Button Style="{StaticResource TitleBar_Button}" Icon="{x:Static local:Icons.SaveAs}" Content="{Binding SaveAsText}" Command="ApplicationCommands.Save"/>
+            </local:TitleBar.RightPanelItems>
+        </local:TitleBar>
+        <local:JsonView x:Name="JsonView" Source="{Binding Source}"/>
+    </DockPanel>
+</local:FollowOwnerWindow>

@@ -5,16 +5,21 @@
     <TargetFramework>net9.0-windows</TargetFramework>
     <Nullable>enable</Nullable>
     <UseWPF>true</UseWPF>
-	<AllowUnsafeBlocks>True</AllowUnsafeBlocks>
-	<BaseOutputPath>..\bin</BaseOutputPath>
-	<Authors>Kuroki-Narumi</Authors>
-	<Company>LivreNoir</Company>
-	<RepositoryUrl>https://github.com/Kuroki-Narumi/LivreNoirLibrary10</RepositoryUrl>
-	<RootNamespace>LivreNoirLibrary</RootNamespace>
+    <AllowUnsafeBlocks>True</AllowUnsafeBlocks>
+    <BaseOutputPath>..\bin</BaseOutputPath>
+    <Authors>Kuroki-Narumi</Authors>
+    <Company>LivreNoir</Company>
+    <RepositoryUrl>https://github.com/Kuroki-Narumi/LivreNoirLibrary10</RepositoryUrl>
+    <RootNamespace>LivreNoirLibrary</RootNamespace>
   </PropertyGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\LivreNoirLibrary.Core\LivreNoirLibrary.Core.csproj" />
+    <ProjectReference Include="..\LivreNoirLibrary.SourceGenerator\LivreNoirLibrary.SourceGenerator.csproj">
+        <OutputItemType>Analyzer</OutputItemType>
+        <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
+    </ProjectReference>
+    <ProjectReference Include="..\LivreNoirLibrary.Wpf\LivreNoirLibrary.Wpf.csproj" />
   </ItemGroup>
 
 </Project>

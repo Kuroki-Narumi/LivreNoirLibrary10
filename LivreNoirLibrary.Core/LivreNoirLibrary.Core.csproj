@@ -10,10 +10,19 @@
     <RepositoryUrl>https://github.com/Kuroki-Narumi/LivreNoirLibrary10</RepositoryUrl>
     <RootNamespace>LivreNoirLibrary</RootNamespace>
     <EmitCompilerGeneratedFiles>true</EmitCompilerGeneratedFiles>
+    <BaseOutputPath>..\bin</BaseOutputPath>
   </PropertyGroup>
 
   <ItemGroup>
-	  <ProjectReference Include="..\LivreNoirLibrary.Core.SourceGenerator\LivreNoirLibrary.Core.SourceGenerator.csproj">
+    <PackageReference Include="System.Text.Encoding.CodePages" Version="9.0.5" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\LivreNoirLibrary.Core.Generator\LivreNoirLibrary.Core.Generator.csproj">
+        <OutputItemType>Analyzer</OutputItemType>
+        <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
+    </ProjectReference>
+	  <ProjectReference Include="..\LivreNoirLibrary.SourceGenerator\LivreNoirLibrary.SourceGenerator.csproj">
 		  <OutputItemType>Analyzer</OutputItemType>
 		  <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
 	  </ProjectReference>

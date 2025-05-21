@@ -5,9 +5,19 @@ VisualStudioVersion = 17.13.35931.197
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LivreNoirLibrary.Core", "LivreNoirLibrary.Core\LivreNoirLibrary.Core.csproj", "{6D918484-F1EE-4793-AA47-EDCD27671EB1}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LivreNoirLibrary.Core.SourceGenerator", "LivreNoirLibrary.Core.SourceGenerator\LivreNoirLibrary.Core.SourceGenerator.csproj", "{C4CD6A94-FB71-42B7-B274-B415F2A72310}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LivreNoirLibrary.SourceGenerator", "LivreNoirLibrary.SourceGenerator\LivreNoirLibrary.SourceGenerator.csproj", "{C4CD6A94-FB71-42B7-B274-B415F2A72310}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LivreNoirLibrary.Sandbox", "LivreNoirLibrary.Sandbox\LivreNoirLibrary.Sandbox.csproj", "{02797F65-39CD-474F-8CB8-129B45CE5977}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LivreNoirLibrary.Core.Generator", "LivreNoirLibrary.Core.Generator\LivreNoirLibrary.Core.Generator.csproj", "{748A6814-53C6-41E5-ABBB-D632EF20B98B}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LivreNoirLibrary.FFmpeg", "LivreNoirLibrary.FFmpeg\LivreNoirLibrary.FFmpeg.csproj", "{BD23E30E-5A4F-40CB-B4A0-24B08554CC29}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LivreNoirLibrary.Updater", "LivreNoirLibrary.Updater\LivreNoirLibrary.Updater.csproj", "{126042D9-607E-0B3E-AADC-C93571149F64}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LivreNoirLibrary.Media", "LivreNoirLibrary.Media\LivreNoirLibrary.Media.csproj", "{53F55AFD-1471-40D6-8CC4-81AD3009C76F}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LivreNoirLibrary.Wpf", "LivreNoirLibrary.Wpf\LivreNoirLibrary.Wpf.csproj", "{AB5711C4-C05D-4124-9B49-69D6FFAF6B10}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -27,6 +37,26 @@ Global
 		{02797F65-39CD-474F-8CB8-129B45CE5977}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{02797F65-39CD-474F-8CB8-129B45CE5977}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{02797F65-39CD-474F-8CB8-129B45CE5977}.Release|Any CPU.Build.0 = Release|Any CPU
+		{748A6814-53C6-41E5-ABBB-D632EF20B98B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{748A6814-53C6-41E5-ABBB-D632EF20B98B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{748A6814-53C6-41E5-ABBB-D632EF20B98B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{748A6814-53C6-41E5-ABBB-D632EF20B98B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{BD23E30E-5A4F-40CB-B4A0-24B08554CC29}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BD23E30E-5A4F-40CB-B4A0-24B08554CC29}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BD23E30E-5A4F-40CB-B4A0-24B08554CC29}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{BD23E30E-5A4F-40CB-B4A0-24B08554CC29}.Release|Any CPU.Build.0 = Release|Any CPU
+		{126042D9-607E-0B3E-AADC-C93571149F64}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{126042D9-607E-0B3E-AADC-C93571149F64}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{126042D9-607E-0B3E-AADC-C93571149F64}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{126042D9-607E-0B3E-AADC-C93571149F64}.Release|Any CPU.Build.0 = Release|Any CPU
+		{53F55AFD-1471-40D6-8CC4-81AD3009C76F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{53F55AFD-1471-40D6-8CC4-81AD3009C76F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{53F55AFD-1471-40D6-8CC4-81AD3009C76F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{53F55AFD-1471-40D6-8CC4-81AD3009C76F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{AB5711C4-C05D-4124-9B49-69D6FFAF6B10}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{AB5711C4-C05D-4124-9B49-69D6FFAF6B10}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{AB5711C4-C05D-4124-9B49-69D6FFAF6B10}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{AB5711C4-C05D-4124-9B49-69D6FFAF6B10}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

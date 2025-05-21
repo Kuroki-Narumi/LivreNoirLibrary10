@@ -1,0 +1,1632 @@
+<ResourceDictionary
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:po="http://schemas.microsoft.com/winfx/2006/xaml/presentation/options"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:theme="clr-namespace:Microsoft.Windows.Themes;assembly=PresentationFramework.Aero2"
+    mc:Ignorable="po"
+    xmlns:local="clr-namespace:LivreNoirLibrary.Windows.Controls"
+    xmlns:wpf="clr-namespace:LivreNoirLibrary.Windows" 
+    xmlns:input="clr-namespace:LivreNoirLibrary.Windows.Input"
+    xmlns:text="clr-namespace:LivreNoirLibrary.Text;assembly=LivreNoirLibrary.Core"
+    >
+    <SolidColorBrush x:Key="Brush_5000" po:Freeze="True" Color="#5000"/>
+    <SolidColorBrush x:Key="Brush_8000" po:Freeze="True" Color="#8000"/>
+    <SolidColorBrush x:Key="Brush_222" po:Freeze="True" Color="#222"/>
+    <SolidColorBrush x:Key="Brush_444" po:Freeze="True" Color="#444"/>
+    <SolidColorBrush x:Key="Brush_666" po:Freeze="True" Color="#666"/>
+    <SolidColorBrush x:Key="Brush_888" po:Freeze="True" Color="#888"/>
+    <SolidColorBrush x:Key="Brush_aaa" po:Freeze="True" Color="#aaa"/>
+    <SolidColorBrush x:Key="Brush_ccc" po:Freeze="True" Color="#ccc"/>
+    <SolidColorBrush x:Key="Brush_eee" po:Freeze="True" Color="#eee"/>
+    <SolidColorBrush x:Key="Brush_420" po:Freeze="True" Color="#420"/>
+    <SolidColorBrush x:Key="Brush_800" po:Freeze="True" Color="#800"/>
+    <SolidColorBrush x:Key="Brush_822" po:Freeze="True" Color="#822"/>
+    <SolidColorBrush x:Key="Brush_a55" po:Freeze="True" Color="#a55"/>
+    <SolidColorBrush x:Key="Brush_c00" po:Freeze="True" Color="#c00"/>
+    <SolidColorBrush x:Key="Brush_e44" po:Freeze="True" Color="#e44"/>
+    <SolidColorBrush x:Key="Brush_f66" po:Freeze="True" Color="#f66"/>
+    <SolidColorBrush x:Key="Brush_f88" po:Freeze="True" Color="#f88"/>
+    <SolidColorBrush x:Key="Brush_ea6" po:Freeze="True" Color="#ea6"/>
+    <SolidColorBrush x:Key="Brush_edb6b6" po:Freeze="True" Color="#edb6b6"/>
+    <SolidColorBrush x:Key="Brush_fc8" po:Freeze="True" Color="#fc8"/>
+    <SolidColorBrush x:Key="Brush_8ff0" po:Freeze="True" Color="#8ff0"/>
+    <SolidColorBrush x:Key="Brush_040" po:Freeze="True" Color="#040"/>
+    <SolidColorBrush x:Key="Brush_044" po:Freeze="True" Color="#044"/>
+    <SolidColorBrush x:Key="Brush_070" po:Freeze="True" Color="#070"/>
+    <SolidColorBrush x:Key="Brush_272" po:Freeze="True" Color="#272"/>
+    <SolidColorBrush x:Key="Brush_0a0" po:Freeze="True" Color="#0a0"/>
+    <SolidColorBrush x:Key="Brush_4e0" po:Freeze="True" Color="#4e0"/>
+    <SolidColorBrush x:Key="Brush_4fc" po:Freeze="True" Color="#4fc"/>
+    <SolidColorBrush x:Key="Brush_8fc" po:Freeze="True" Color="#8fc"/>
+    <SolidColorBrush x:Key="Brush_cfc" po:Freeze="True" Color="#cfc"/>
+    <SolidColorBrush x:Key="Brush_0fe" po:Freeze="True" Color="#0fe"/>
+    <SolidColorBrush x:Key="Brush_89b" po:Freeze="True" Color="#89b"/>
+    <SolidColorBrush x:Key="Brush_448" po:Freeze="True" Color="#448"/>
+    <SolidColorBrush x:Key="Brush_44a" po:Freeze="True" Color="#44a"/>
+    <SolidColorBrush x:Key="Brush_44e" po:Freeze="True" Color="#44e"/>
+    <SolidColorBrush x:Key="Brush_48c" po:Freeze="True" Color="#48c"/>
+    <SolidColorBrush x:Key="Brush_8cf" po:Freeze="True" Color="#8cf"/>
+    <SolidColorBrush x:Key="Brush_ccf" po:Freeze="True" Color="#ccf"/>
+    <SolidColorBrush x:Key="Brush_def" po:Freeze="True" Color="#def"/>
+    <SolidColorBrush x:Key="Brush_407" po:Freeze="True" Color="#407"/>
+    <SolidColorBrush x:Key="Brush_86e" po:Freeze="True" Color="#86e"/>
+    <SolidColorBrush x:Key="Brush_704" po:Freeze="True" Color="#704"/>
+    <SolidColorBrush x:Key="Brush_e68" po:Freeze="True" Color="#e68"/>
+
+    <Pen x:Key="Pen_8000_10" po:Freeze="True" Brush="{StaticResource Brush_8000}" Thickness="1"/>
+    <Pen x:Key="Pen_444_10" po:Freeze="True" Brush="{StaticResource Brush_444}" Thickness="1"/>
+    <Pen x:Key="Pen_444_15" po:Freeze="True" Brush="{StaticResource Brush_444}" Thickness="1.5"/>
+    <Pen x:Key="Pen_420_10" po:Freeze="True" Brush="{StaticResource Brush_420}" Thickness="1"/>
+    <Pen x:Key="Pen_420_15" po:Freeze="True" Brush="{StaticResource Brush_420}" Thickness="1.5"/>
+    <Pen x:Key="Pen_040_15" po:Freeze="True" Brush="{StaticResource Brush_040}" Thickness="1.5"/>
+    <Pen x:Key="Pen_407_15" po:Freeze="True" Brush="{StaticResource Brush_407}" Thickness="1.5"/>
+    <Pen x:Key="Pen_704_15" po:Freeze="True" Brush="{StaticResource Brush_704}" Thickness="1.5"/>
+
+    <BooleanToVisibilityConverter x:Key="BVConv"/>
+    <wpf:BooleanConverter x:Key="BooleanConverter"/>
+    <wpf:BooleanInvertConverter x:Key="InvertConverter"/>
+    <wpf:ToVisibilityConverter x:Key="TVConv"/>
+    <wpf:ToVisibilityConverter x:Key="TVConvI" IsInverted="True"/>
+    <wpf:ComboItemConverter x:Key="ComboItemConverter"/>
+
+    <SolidColorBrush x:Key="Brush_Background" po:Freeze="True" Color="White"/>
+    <SolidColorBrush x:Key="Brush_Border" po:Freeze="True" Color="#808080"/>
+    <SolidColorBrush x:Key="Brush_Background_MouseOver" po:Freeze="True" Color="#bee6fd"/>
+    <SolidColorBrush x:Key="Brush_Border_MouseOver" po:Freeze="True" Color="#3C7FB1"/>
+    <SolidColorBrush x:Key="Brush_Background_Pressed" po:Freeze="True" Color="#aed6ff"/>
+    <SolidColorBrush x:Key="Brush_Border_Pressed" po:Freeze="True" Color="#467Dc5"/>
+    <SolidColorBrush x:Key="Brush_Background_Checked" po:Freeze="True" Color="#c0e0ff"/>
+    <SolidColorBrush x:Key="Brush_Border_Checked" po:Freeze="True" Color="#808080"/>
+    <SolidColorBrush x:Key="Brush_MouseOver_Content" po:Freeze="True" Color="#7eb4ea"/>
+    <SolidColorBrush x:Key="Brush_Focused_Content" po:Freeze="True" Color="#569de5"/>
+    <LinearGradientBrush x:Key="Brush_MouseOver_Gradient" po:Freeze="True" StartPoint="0,0" EndPoint="0,1">
+        <LinearGradientBrush.GradientStops>
+            <GradientStop po:Freeze="True" Color="#ecf4fc" Offset="0"/>
+            <GradientStop po:Freeze="True" Color="#dcecfc" Offset="1"/>
+        </LinearGradientBrush.GradientStops>
+    </LinearGradientBrush>
+    <SolidColorBrush x:Key="Brush_WindowButton_Foreground" po:Freeze="True" Color="#777"/>
+    <SolidColorBrush x:Key="Brush_WindowButton_MouseOver_Background" po:Freeze="True" Color="#ccc"/>
+    <SolidColorBrush x:Key="Brush_WindowButton_MouseOver_Foreground" po:Freeze="True" Color="#000"/>
+    <SolidColorBrush x:Key="Brush_WindowButton_Close_MouseOver_Background" po:Freeze="True" Color="#f00"/>
+    <SolidColorBrush x:Key="Brush_WindowButton_Close_MouseOver_Foreground" po:Freeze="True" Color="#fff"/>
+    <SolidColorBrush x:Key="Brush_Popup_Border" po:Freeze="True" Color="#767676"/>
+    <SolidColorBrush x:Key="Brush_Popup_Background" po:Freeze="True" Color="#f1f2f7"/>
+    <SolidColorBrush x:Key="Brush_Popup_Foreground" po:Freeze="True" Color="#575757"/>
+
+    <DrawingBrush po:Freeze="True" x:Key="Brush_TransparentChecker" Viewport="0,0,16,16" TileMode="Tile" ViewportUnits="Absolute">
+        <DrawingBrush.Drawing>
+            <DrawingGroup po:Freeze="True">
+                <GeometryDrawing po:Freeze="True" Brush="{StaticResource Brush_eee}" Geometry="M0,0 v2 h2 v-2"/>
+                <GeometryDrawing po:Freeze="True" RenderOptions.EdgeMode="Aliased" Brush="{StaticResource Brush_ccc}" Geometry="M0,0 v1 h1 v-1Z M1,1 v1 h1 v-1Z"/>
+            </DrawingGroup>
+        </DrawingBrush.Drawing>
+    </DrawingBrush>
+
+    <SolidColorBrush po:Freeze="True" x:Key="ComboBox.Static.Glyph" Color="#FF606060"/>
+    <LinearGradientBrush po:Freeze="True" x:Key="ComboBox.MouseOver.Background" EndPoint="0,1" StartPoint="0,0">
+        <GradientStop po:Freeze="True" Color="#FFECF4FC" Offset="0.0"/>
+        <GradientStop po:Freeze="True" Color="#FFDCECFC" Offset="1.0"/>
+    </LinearGradientBrush>
+    <SolidColorBrush po:Freeze="True" x:Key="ComboBox.MouseOver.Border" Color="#FF7EB4EA"/>
+    <SolidColorBrush po:Freeze="True" x:Key="ComboBox.MouseOver.Glyph" Color="#FF000000"/>
+    <LinearGradientBrush po:Freeze="True" x:Key="ComboBox.Pressed.Background" EndPoint="0,1" StartPoint="0,0">
+        <GradientStop po:Freeze="True" Color="#FFDAECFC" Offset="0.0"/>
+        <GradientStop po:Freeze="True" Color="#FFC4E0FC" Offset="1.0"/>
+    </LinearGradientBrush>
+    <SolidColorBrush po:Freeze="True" x:Key="ComboBox.Pressed.Border" Color="#FF569DE5"/>
+    <SolidColorBrush po:Freeze="True" x:Key="ComboBox.Pressed.Glyph" Color="#FF000000"/>
+
+    <Style x:Key="KeyGestureTextStyle" TargetType="TextBlock">
+        <Setter Property="Margin" Value="2,0,0,0"/>
+        <Setter Property="Opacity" Value="0.56"/>
+        <Setter Property="FontSize" Value="11"/>
+    </Style>
+
+    <Style x:Key="DDMB_Popup" TargetType="Popup">
+        <Setter Property="AllowsTransparency" Value="True"/>
+        <Setter Property="Placement" Value="Bottom"/>
+        <Setter Property="PopupAnimation" Value="{DynamicResource {x:Static SystemParameters.ComboBoxPopupAnimationKey}}"/>
+    </Style>
+    <Style x:Key="DDMB_DropShadowChrome" TargetType="theme:SystemDropShadowChrome">
+        <Setter Property="Margin" Value="0,0,5,5"/>
+        <Setter Property="Color" Value="#71000000"/>
+    </Style>
+    <Style x:Key="DDMB_Border" TargetType="Border">
+        <Setter Property="Background" Value="{DynamicResource {x:Static SystemColors.WindowBrushKey}}"/>
+        <Setter Property="BorderBrush" Value="{DynamicResource {x:Static SystemColors.WindowFrameBrushKey}}"/>
+        <Setter Property="BorderThickness" Value="1"/>
+    </Style>
+    <Style x:Key="ComboBoxToggleButton" TargetType="local:ToggleButton">
+        <Setter Property="BorderThickness" Value="1"/>
+        <Setter Property="OverridesDefaultStyle" Value="true"/>
+        <Setter Property="IsTabStop" Value="false"/>
+        <Setter Property="Focusable" Value="false"/>
+        <Setter Property="ClickMode" Value="Press"/>
+        <Setter Property="CornerRadius" Value="0"/>
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="local:ToggleButton">
+                    <Border x:Name="templateRoot" Background="{TemplateBinding Background}" BorderThickness="{TemplateBinding BorderThickness}" BorderBrush="{TemplateBinding BorderBrush}" CornerRadius="{TemplateBinding CornerRadius}" SnapsToDevicePixels="true">
+                        <Grid SnapsToDevicePixels="True">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="0.000001*" MinWidth="{DynamicResource {x:Static SystemParameters.VerticalScrollBarWidthKey}}"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+                            <Path x:Name="arrow" Data="F1 M 0,0 L 2.667,2.66665 L 5.3334,0 L 5.3334,-1.78168 L 2.6667,0.88501 L0,-1.78168 L0,0 Z" Fill="{StaticResource ComboBox.Static.Glyph}" VerticalAlignment="Center" HorizontalAlignment="Center" Margin="0"/>
+                            <ContentPresenter Grid.Column="1" VerticalAlignment="Center" Margin="0,0,4,0"/>
+                        </Grid>
+                    </Border>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsMouseOver" Value="true">
+                            <Setter Property="Fill" TargetName="arrow" Value="{StaticResource ComboBox.MouseOver.Glyph}"/>
+                            <Setter Property="Background" TargetName="templateRoot" Value="{StaticResource ComboBox.MouseOver.Background}"/>
+                            <Setter Property="BorderBrush" TargetName="templateRoot" Value="{StaticResource ComboBox.MouseOver.Border}"/>
+                        </Trigger>
+                        <Trigger Property="IsPressed" Value="true">
+                            <Setter Property="Fill" TargetName="arrow" Value="{StaticResource ComboBox.Pressed.Glyph}"/>
+                            <Setter Property="Background" TargetName="templateRoot" Value="{StaticResource ComboBox.Pressed.Background}"/>
+                            <Setter Property="BorderBrush" TargetName="templateRoot" Value="{StaticResource ComboBox.Pressed.Border}"/>
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <Style TargetType="ComboBox" x:Key="ComboBoxBase">
+        <Setter Property="Margin" Value="0"/>
+        <Setter Property="Padding" Value="0,2,6,2"/>
+        <Setter Property="VerticalAlignment" Value="Stretch"/>
+        <Setter Property="VerticalContentAlignment" Value="Center"/>
+        <Setter Property="Background" Value="White"/>
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="ComboBox">
+                    <Grid x:Name="templateRoot" SnapsToDevicePixels="true">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition MinWidth="{DynamicResource {x:Static SystemParameters.VerticalScrollBarWidthKey}}" Width="0"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+                        <Popup x:Name="PART_Popup" AllowsTransparency="true" Grid.ColumnSpan="2" IsOpen="{Binding IsDropDownOpen, Mode=TwoWay, RelativeSource={RelativeSource Mode=TemplatedParent}}" Margin="1" Placement="Bottom" PopupAnimation="{DynamicResource {x:Static SystemParameters.ComboBoxPopupAnimationKey}}">
+                            <theme:SystemDropShadowChrome x:Name="shadow" Color="Transparent" MinWidth="{Binding ActualWidth, ElementName=templateRoot}" MaxHeight="{TemplateBinding MaxDropDownHeight}">
+                                <Border x:Name="dropDownBorder" Style="{StaticResource DDMB_Border}">
+                                    <ScrollViewer x:Name="DropDownScrollViewer">
+                                        <Grid x:Name="grid" RenderOptions.ClearTypeHint="Enabled">
+                                            <Canvas x:Name="canvas" HorizontalAlignment="Left" VerticalAlignment="Top" Width="0" Height="0">
+                                                <Rectangle x:Name="opaqueRect" Fill="{Binding Background, ElementName=dropDownBorder}" Height="{Binding ActualHeight, ElementName=dropDownBorder}" Width="{Binding ActualWidth, ElementName=dropDownBorder}"/>
+                                            </Canvas>
+                                            <ItemsPresenter x:Name="ItemsPresenter" KeyboardNavigation.DirectionalNavigation="Contained" SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}"/>
+                                        </Grid>
+                                    </ScrollViewer>
+                                </Border>
+                            </theme:SystemDropShadowChrome>
+                        </Popup>
+                        <local:ToggleButton x:Name="toggleButton" Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" Grid.ColumnSpan="2" IsChecked="{Binding IsDropDownOpen, Mode=TwoWay, RelativeSource={RelativeSource Mode=TemplatedParent}}" Style="{StaticResource ComboBoxToggleButton}"/>
+                        <ContentPresenter Grid.Column="1" x:Name="contentPresenter" ContentStringFormat="{TemplateBinding SelectionBoxItemStringFormat}" ContentTemplate="{TemplateBinding SelectionBoxItemTemplate}" Content="{TemplateBinding SelectionBoxItem}" ContentTemplateSelector="{TemplateBinding ItemTemplateSelector}" HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}" IsHitTestVisible="false" Margin="{TemplateBinding Padding}" SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}" VerticalAlignment="{TemplateBinding VerticalContentAlignment}"/>
+                    </Grid>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="HasDropShadow" SourceName="PART_Popup" Value="true">
+                            <Setter Property="Margin" TargetName="shadow" Value="0,0,5,5"/>
+                            <Setter Property="Color" TargetName="shadow" Value="#71000000"/>
+                        </Trigger>
+                        <Trigger Property="HasItems" Value="false">
+                            <Setter Property="Height" TargetName="dropDownBorder" Value="95"/>
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <Style TargetType="local:DropDownMenuButton">
+        <Setter Property="Background" Value="{DynamicResource {x:Static SystemColors.WindowBrushKey}}"/>
+        <Setter Property="BorderBrush" Value="Transparent"/>
+        <Setter Property="BorderThickness" Value="1"/>
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="local:DropDownMenuButton">
+                    <Grid x:Name="templateRoot" SnapsToDevicePixels="True">
+                        <Popup x:Name="PART_Popup" Style="{StaticResource DDMB_Popup}" IsOpen="{Binding IsDropDownOpen, Mode=TwoWay, RelativeSource={RelativeSource Mode=TemplatedParent}}" Placement="{TemplateBinding Placement}">
+                            <theme:SystemDropShadowChrome Style="{StaticResource DDMB_DropShadowChrome}" MinWidth="{Binding ActualWidth, ElementName=templateRoot}">
+                                <Border x:Name="dropDownBorder" Style="{StaticResource DDMB_Border}">
+                                    <ContentPresenter RenderOptions.ClearTypeHint="Enabled" Content="{TemplateBinding DropDownContent}"/>
+                                </Border>
+                            </theme:SystemDropShadowChrome>
+                        </Popup>
+                        <local:ToggleButton x:Name="PART_Button" Style="{StaticResource ComboBoxToggleButton}" Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" CornerRadius="{TemplateBinding CornerRadius}" IsChecked="{Binding IsDropDownOpen, Mode=TwoWay, RelativeSource={RelativeSource Mode=TemplatedParent}}" Command="{TemplateBinding Command}" CommandParameter="{TemplateBinding CommandParameter}" CommandTarget="{TemplateBinding CommandTarget}">
+                            <ContentPresenter Content="{TemplateBinding Content}" ContentTemplate="{TemplateBinding ContentTemplate}"/>
+                        </local:ToggleButton>
+                    </Grid>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsEnabled" Value="false">
+                            <Setter TargetName="templateRoot" Property="Opacity" Value="0.56"/>
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <Style x:Key="ConsoleText" TargetType="local:EditableTextBlock">
+        <Setter Property="FontSize" Value="14"/>
+        <Setter Property="FontFamily" Value="Consolas"/>
+        <Setter Property="VerticalContentAlignment" Value="Center"/>
+        <Setter Property="IsClearButtonVisible" Value="False"/>
+    </Style>
+
+    <wpf:StarGridLengthConverter x:Key="SGL_Conv"/>
+
+    <Style TargetType="local:ColorPicker">
+        <Setter Property="Height" Value="24"/>
+        <Setter Property="IndicatorWidth" Value="72"/>
+        <Setter Property="SeparatorWidth" Value="4"/>
+        <Setter Property="BorderThickness" Value="1"/>
+        <Setter Property="BorderBrush" Value="Black"/>
+        <Setter Property="Focusable" Value="False"/>
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="local:ColorPicker">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+                        <Popup x:Name="PART_Popup" IsOpen="{Binding IsDropDownOpen, Mode=TwoWay, RelativeSource={RelativeSource Mode=TemplatedParent}}" PlacementTarget="{Binding ElementName=rect}">
+                            <Border x:Name="PART_PopupContent" Padding="4" Background="White" BorderThickness="1" BorderBrush="{StaticResource Brush_Popup_Border}"/>
+                        </Popup>
+                        <Grid>
+                            <Rectangle Fill="{StaticResource Brush_TransparentChecker}" IsHitTestVisible="False"/>
+                            <Rectangle x:Name="rect" Stroke="{TemplateBinding BorderBrush}" StrokeThickness="{TemplateBinding BorderThickness}">
+                                <Rectangle.Fill>
+                                    <SolidColorBrush x:Name="PART_Indicator" Color="{TemplateBinding SelectedColor}"/>
+                                </Rectangle.Fill>
+                            </Rectangle>
+                            <ToggleButton Focusable="{TemplateBinding IsPickerEnabled}" IsHitTestVisible="{TemplateBinding IsPickerEnabled}" IsChecked="{Binding IsDropDownOpen, Mode=TwoWay, RelativeSource={RelativeSource Mode=TemplatedParent}}">
+                                <ToggleButton.Template>
+                                    <ControlTemplate>
+                                        <Border Background="Transparent"/>
+                                    </ControlTemplate>
+                                </ToggleButton.Template>
+                            </ToggleButton>
+                        </Grid>
+                        <StackPanel Grid.Column="1" Orientation="Horizontal" Visibility="{TemplateBinding IsTextBoxVisible, Converter={StaticResource BVConv}}">
+                            <Border x:Name="separator" Width="{TemplateBinding SeparatorWidth}"/>
+                            <local:EditableTextBlock x:Name="PART_TextBox" Style="{StaticResource ConsoleText}" Width="76"/>
+                        </StackPanel>
+                    </Grid>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsAlphaEnabled" Value="False">
+                            <Setter TargetName="PART_TextBox" Property="Width" Value="60"/>
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <Style TargetType="local:Button">
+        <Setter Property="Padding" Value="4,2"/>
+        <Setter Property="MinWidth" Value="24"/>
+        <Setter Property="MinHeight" Value="24"/>
+        <Setter Property="Background" Value="{StaticResource Brush_Background}"/>
+        <Setter Property="BorderBrush" Value="{StaticResource Brush_Border}"/>
+        <Setter Property="BorderThickness" Value="1"/>
+        <Setter Property="CornerRadius" Value="4"/>
+        <Setter Property="VerticalContentAlignment" Value="Center"/>
+        <Setter Property="HorizontalContentAlignment" Value="Center"/>
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="local:Button">
+                    <Border x:Name="templateRoot" CornerRadius="{TemplateBinding CornerRadius}" Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}">
+                        <Grid Margin="{TemplateBinding Padding}" VerticalAlignment="{TemplateBinding VerticalContentAlignment}" HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+                            <local:IconPresenter x:Name="icon" Grid.Column="0" VerticalAlignment="Center" Width="{TemplateBinding IconSize}" Source="{TemplateBinding Icon}" Stretch="{TemplateBinding IconStretch}" FontFamily="{TemplateBinding IconFontFamily}" Foreground="{TemplateBinding Foreground}"/>
+                            <Rectangle x:Name="padding" Grid.Column="1" Width="{TemplateBinding IconPadding}"/>
+                            <StackPanel Orientation="Vertical" Grid.Column="2" VerticalAlignment="Center">
+                                <ContentPresenter x:Name="content"/>
+                                <TextBlock x:Name="keyGesture" Text="{TemplateBinding KeyGestureText}" Style="{StaticResource KeyGestureTextStyle}"/>
+                            </StackPanel>
+                        </Grid>
+                    </Border>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsEnabled" Value="false">
+                            <Setter TargetName="templateRoot" Property="Opacity" Value="0.56"/>
+                        </Trigger>
+                        <Trigger Property="Icon" Value="{x:Null}">
+                            <Setter TargetName="icon" Property="Visibility" Value="Collapsed"/>
+                            <Setter TargetName="padding" Property="Visibility" Value="Collapsed"/>
+                        </Trigger>
+                        <Trigger Property="Content" Value="{x:Null}">
+                            <Setter TargetName="content" Property="Visibility" Value="Collapsed"/>
+                            <Setter TargetName="padding" Property="Visibility" Value="Collapsed"/>
+                            <Setter TargetName="keyGesture" Property="Visibility" Value="Collapsed"/>
+                        </Trigger>
+                        <Trigger Property="DisplayKeyGesture" Value="False">
+                            <Setter TargetName="keyGesture" Property="Visibility" Value="Collapsed"/>
+                        </Trigger>
+                        <Trigger Property="KeyGestureText" Value="{x:Null}">
+                            <Setter TargetName="keyGesture" Property="Visibility" Value="Collapsed"/>
+                        </Trigger>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter TargetName="templateRoot" Property="Background" Value="{StaticResource Brush_Background_MouseOver}"/>
+                            <Setter TargetName="templateRoot" Property="BorderBrush" Value="{StaticResource Brush_Border_MouseOver}"/>
+                        </Trigger>
+                        <Trigger Property="IsPressed" Value="True">
+                            <Setter TargetName="templateRoot" Property="Background" Value="{StaticResource Brush_Background_Pressed}"/>
+                            <Setter TargetName="templateRoot" Property="BorderBrush" Value="{StaticResource Brush_Border_Pressed}"/>
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <SolidColorBrush x:Key="OptionMark.Static.Glyph" po:Freeze="True" Color="#FF212121"/>
+
+    <Style TargetType="local:ToggleButton">
+        <Setter Property="Padding" Value="4,2"/>
+        <Setter Property="MinWidth" Value="24"/>
+        <Setter Property="MinHeight" Value="24"/>
+        <Setter Property="Background" Value="{StaticResource Brush_Background}"/>
+        <Setter Property="BorderBrush" Value="{StaticResource Brush_Border}"/>
+        <Setter Property="BorderThickness" Value="1"/>
+        <Setter Property="CornerRadius" Value="4"/>
+        <Setter Property="ClickMode" Value="Press"/>
+        <Setter Property="VerticalContentAlignment" Value="Center"/>
+        <Setter Property="HorizontalContentAlignment" Value="Left"/>
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="local:ToggleButton">
+                    <Border x:Name="templateRoot" CornerRadius="{TemplateBinding CornerRadius}" Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}">
+                        <Grid Margin="{TemplateBinding Padding}" VerticalAlignment="{TemplateBinding VerticalContentAlignment}" HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+                            <Border x:Name="border_option" Background="{TemplateBinding Background}" BorderBrush="{StaticResource Brush_Border}" BorderThickness="1" VerticalAlignment="Center" Margin="0,0,2,0">
+                                <Grid>
+                                    <Path x:Name="optionMark" Data="F1 M 9.97498,1.22334L 4.6983,9.09834L 4.52164,9.09834L 0,5.19331L 1.27664,3.52165L 4.255,6.08833L 8.33331,1.52588e-005L 9.97498,1.22334 Z " Fill="{StaticResource OptionMark.Static.Glyph}" Margin="1" Opacity="0" Stretch="None"/>
+                                    <Rectangle x:Name="indeterminateMark" Fill="{StaticResource OptionMark.Static.Glyph}" Margin="2" Opacity="0"/>
+                                </Grid>
+                            </Border>
+                            <local:IconPresenter x:Name="icon" Grid.Column="1" VerticalAlignment="Center" Width="{TemplateBinding IconSize}" Source="{TemplateBinding Icon}" Stretch="{TemplateBinding IconStretch}" FontFamily="{TemplateBinding IconFontFamily}" Foreground="{TemplateBinding Foreground}"/>
+                            <Rectangle x:Name="padding" Grid.Column="2" Width="{TemplateBinding IconPadding}"/>
+                            <StackPanel Orientation="Vertical" Grid.Column="3" VerticalAlignment="Center">
+                                <ContentPresenter x:Name="content"/>
+                                <TextBlock x:Name="keyGesture" Text="{TemplateBinding KeyGestureText}" Style="{StaticResource KeyGestureTextStyle}"/>
+                            </StackPanel>
+                        </Grid>
+                    </Border>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsEnabled" Value="false">
+                            <Setter TargetName="templateRoot" Property="Opacity" Value="0.56"/>
+                        </Trigger>
+                        <Trigger Property="Icon" Value="{x:Null}">
+                            <Setter TargetName="icon" Property="Visibility" Value="Collapsed"/>
+                            <Setter TargetName="padding" Property="Visibility" Value="Collapsed"/>
+                        </Trigger>
+                        <Trigger Property="Content" Value="{x:Null}">
+                            <Setter TargetName="content" Property="Visibility" Value="Collapsed"/>
+                            <Setter TargetName="padding" Property="Visibility" Value="Collapsed"/>
+                            <Setter TargetName="keyGesture" Property="Visibility" Value="Collapsed"/>
+                        </Trigger>
+                        <Trigger Property="KeyGestureText" Value="{x:Null}">
+                            <Setter TargetName="keyGesture" Property="Visibility" Value="Collapsed"/>
+                        </Trigger>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter TargetName="templateRoot" Property="Background" Value="{StaticResource Brush_Background_MouseOver}"/>
+                            <Setter TargetName="templateRoot" Property="BorderBrush" Value="{StaticResource Brush_Border_MouseOver}"/>
+                        </Trigger>
+                        <Trigger Property="IsPressed" Value="True">
+                            <Setter TargetName="templateRoot" Property="Background" Value="{StaticResource Brush_Background_Pressed}"/>
+                            <Setter TargetName="templateRoot" Property="BorderBrush" Value="{StaticResource Brush_Border_Pressed}"/>
+                        </Trigger>
+                        <Trigger Property="IsChecked" Value="True">
+                            <Setter TargetName="templateRoot" Property="Background" Value="{StaticResource Brush_Background_Checked}"/>
+                            <Setter TargetName="templateRoot" Property="BorderBrush" Value="{StaticResource Brush_Border_Checked}"/>
+                            <Setter TargetName="optionMark" Property="Opacity" Value="1"/>
+                            <Setter TargetName="indeterminateMark" Property="Opacity" Value="0"/>
+                        </Trigger>
+                        <Trigger Property="IsChecked" Value="{x:Null}">
+                            <Setter TargetName="optionMark" Property="Opacity" Value="0"/>
+                            <Setter TargetName="indeterminateMark" Property="Opacity" Value="1"/>
+                        </Trigger>
+                        <Trigger Property="IsOptionMarkVisible" Value="False">
+                            <Setter TargetName="border_option" Property="Visibility" Value="Collapsed"/>
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <Style TargetType="local:RadioButton">
+        <Setter Property="Padding" Value="4,2"/>
+        <Setter Property="MinWidth" Value="24"/>
+        <Setter Property="MinHeight" Value="24"/>
+        <Setter Property="Background" Value="{StaticResource Brush_Background}"/>
+        <Setter Property="BorderBrush" Value="{StaticResource Brush_Border}"/>
+        <Setter Property="BorderThickness" Value="1"/>
+        <Setter Property="CornerRadius" Value="4"/>
+        <Setter Property="ClickMode" Value="Press"/>
+        <Setter Property="VerticalContentAlignment" Value="Center"/>
+        <Setter Property="HorizontalContentAlignment" Value="Left"/>
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="local:RadioButton">
+                    <Border x:Name="templateRoot" CornerRadius="{TemplateBinding CornerRadius}" Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}">
+                        <Grid Margin="{TemplateBinding Padding}" VerticalAlignment="{TemplateBinding VerticalContentAlignment}" HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+                            <Border x:Name="border_option" Background="{TemplateBinding Background}" BorderBrush="{StaticResource Brush_Border}" BorderThickness="1" CornerRadius="100" Margin="0,0,2,0" VerticalAlignment="Center">
+                                <Ellipse x:Name="optionMark" Margin="2" Fill="{StaticResource OptionMark.Static.Glyph}" MinWidth="6" MinHeight="6" Opacity="0"/>
+                            </Border>
+                            <local:IconPresenter x:Name="icon" Grid.Column="1" VerticalAlignment="Center" Width="{TemplateBinding IconSize}" Source="{TemplateBinding Icon}" Stretch="{TemplateBinding IconStretch}" FontFamily="{TemplateBinding IconFontFamily}" Foreground="{TemplateBinding Foreground}"/>
+                            <Rectangle x:Name="padding" Grid.Column="2" Width="{TemplateBinding IconPadding}"/>
+                            <StackPanel Orientation="Vertical" Grid.Column="3" VerticalAlignment="Center">
+                                <ContentPresenter x:Name="content"/>
+                                <TextBlock x:Name="keyGesture" Text="{TemplateBinding KeyGestureText}" Style="{StaticResource KeyGestureTextStyle}"/>
+                            </StackPanel>
+                        </Grid>
+                    </Border>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsEnabled" Value="false">
+                            <Setter TargetName="templateRoot" Property="Opacity" Value="0.56"/>
+                        </Trigger>
+                        <Trigger Property="Icon" Value="{x:Null}">
+                            <Setter TargetName="icon" Property="Visibility" Value="Collapsed"/>
+                            <Setter TargetName="padding" Property="Visibility" Value="Collapsed"/>
+                        </Trigger>
+                        <Trigger Property="Content" Value="{x:Null}">
+                            <Setter TargetName="content" Property="Visibility" Value="Collapsed"/>
+                            <Setter TargetName="padding" Property="Visibility" Value="Collapsed"/>
+                            <Setter TargetName="keyGesture" Property="Visibility" Value="Collapsed"/>
+                        </Trigger>
+                        <Trigger Property="KeyGestureText" Value="{x:Null}">
+                            <Setter TargetName="keyGesture" Property="Visibility" Value="Collapsed"/>
+                        </Trigger>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter TargetName="templateRoot" Property="Background" Value="{StaticResource Brush_Background_MouseOver}"/>
+                            <Setter TargetName="templateRoot" Property="BorderBrush" Value="{StaticResource Brush_Border_MouseOver}"/>
+                        </Trigger>
+                        <Trigger Property="IsPressed" Value="True">
+                            <Setter TargetName="templateRoot" Property="Background" Value="{StaticResource Brush_Background_Pressed}"/>
+                            <Setter TargetName="templateRoot" Property="BorderBrush" Value="{StaticResource Brush_Border_Pressed}"/>
+                        </Trigger>
+                        <Trigger Property="IsChecked" Value="True">
+                            <Setter TargetName="templateRoot" Property="Background" Value="{StaticResource Brush_Background_Checked}"/>
+                            <Setter TargetName="templateRoot" Property="BorderBrush" Value="{StaticResource Brush_Border_Checked}"/>
+                            <Setter TargetName="optionMark" Property="Opacity" Value="1"/>
+                        </Trigger>
+                        <Trigger Property="IsChecked" Value="{x:Null}">
+                            <Setter TargetName="optionMark" Property="Opacity" Value="0.56"/>
+                        </Trigger>
+                        <Trigger Property="IsOptionMarkVisible" Value="False">
+                            <Setter TargetName="border_option" Property="Visibility" Value="Collapsed"/>
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <Style TargetType="local:PopupHelpButton">
+        <Setter Property="Padding" Value="4,0"/>
+        <Setter Property="IconSize" Value="16"/>
+        <Setter Property="IconPadding" Value="2"/>
+        <Setter Property="Background" Value="Transparent"/>
+        <Setter Property="BorderThickness" Value="0"/>
+        <Setter Property="CornerRadius" Value="4"/>
+        <Setter Property="VerticalAlignment" Value="Center"/>
+        <Setter Property="HorizontalAlignment" Value="Center"/>
+        <Setter Property="FontSize" Value="12"/>
+        <Setter Property="Focusable" Value="False"/>
+        <Setter Property="IsTabStop" Value="False"/>
+        <Setter Property="Foreground" Value="{StaticResource Brush_Popup_Foreground}"/>
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="local:PopupHelpButton">
+                    <Grid>
+                        <Border x:Name="templateRoot" CornerRadius="{TemplateBinding CornerRadius}" Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}">
+                            <local:IconPresenter Margin="{TemplateBinding IconPadding}" VerticalAlignment="{TemplateBinding VerticalContentAlignment}" HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}" Width="{TemplateBinding IconSize}" Source="{x:Static local:Icons.Help}"/>
+                        </Border>
+                        <Popup x:Name="popup" PlacementTarget="{Binding ElementName=templateRoot}" Placement="{TemplateBinding PopupPlacement}">
+                            <Border BorderThickness="1" BorderBrush="{StaticResource Brush_Popup_Border}" Background="{StaticResource Brush_Popup_Background}">
+                                <Grid Margin="{TemplateBinding Padding}">
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="Auto"/>
+                                        <RowDefinition Height="Auto"/>
+                                    </Grid.RowDefinitions>
+                                    <TextBlock Text="{TemplateBinding HeaderText}" Margin="0,4" Visibility="{Binding Text, RelativeSource={RelativeSource Mode=Self}, Converter={StaticResource TVConv}}"/>
+                                    <ContentPresenter Grid.Row="1" Content="{TemplateBinding Content}"/>
+                                </Grid>
+                            </Border>
+                        </Popup>
+                    </Grid>
+                    <ControlTemplate.Triggers>
+                        <Trigger SourceName="templateRoot" Property="IsMouseOver" Value="True">
+                            <Setter TargetName="templateRoot" Property="Background" Value="{StaticResource Brush_Background_MouseOver}"/>
+                            <Setter TargetName="popup" Property="IsOpen" Value="True"/>
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <Style x:Key="MenuItemIconStyle" TargetType="local:IconPresenter">
+        <Style.Triggers>
+            <Trigger Property="IsEnabled" Value="False">
+                <Setter Property="Opacity" Value="0.5"/>
+            </Trigger>
+        </Style.Triggers>
+    </Style>
+
+    <Style x:Key="AlignSelector_RadioButton" TargetType="local:RadioButton">
+        <Setter Property="IsOptionMarkVisible" Value="False"/>
+        <Setter Property="BorderBrush" Value="{x:Null}"/>
+        <Setter Property="Margin" Value="0"/>
+        <Setter Property="Padding" Value="2"/>
+        <Setter Property="MinHeight" Value="22"/>
+        <Setter Property="MinWidth" Value="22"/>
+    </Style>
+    <Style TargetType="local:AlignSelector">
+        <Setter Property="Focusable" Value="False"/>
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="local:AlignSelector">
+                    <Border x:Name="PART_Border" Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" Padding="{TemplateBinding Padding}">
+                        <StackPanel Orientation="{TemplateBinding Orientation}">
+                            <StackPanel x:Name="PART_Vertical" Orientation="Horizontal">
+                                <StackPanel.Resources>
+                                    <Style TargetType="local:RadioButton" BasedOn="{StaticResource AlignSelector_RadioButton}">
+                                        <Setter Property="GroupName" Value="VerticalAlignment"/>
+                                    </Style>
+                                </StackPanel.Resources>
+                                <local:RadioButton x:Name="Button_V1" Icon="{x:Static local:Icons.VerticalAlign_Top}"/>
+                                <local:RadioButton x:Name="Button_V2" Icon="{x:Static local:Icons.VerticalAlign_Center}"/>
+                                <local:RadioButton x:Name="Button_V3" Icon="{x:Static local:Icons.VerticalAlign_Bottom}"/>
+                                <local:RadioButton x:Name="Button_V4" Icon="{x:Static local:Icons.VerticalAlign_Stretch}" Visibility="{TemplateBinding IsVerticalStretchEnabled, Converter={StaticResource BVConv}}"/>
+                            </StackPanel>
+                            <Border x:Name="Padding" Width="8" Height="4" Visibility="Collapsed"/>
+                            <StackPanel x:Name="PART_Horizontal" Orientation="Horizontal">
+                                <StackPanel.Resources>
+                                    <Style TargetType="local:RadioButton" BasedOn="{StaticResource AlignSelector_RadioButton}">
+                                        <Setter Property="GroupName" Value="HorizontalAlignment"/>
+                                    </Style>
+                                </StackPanel.Resources>
+                                <local:RadioButton x:Name="Button_H1" Icon="{x:Static local:Icons.HorizontalAlign_Left}"/>
+                                <local:RadioButton x:Name="Button_H2" Icon="{x:Static local:Icons.HorizontalAlign_Center}"/>
+                                <local:RadioButton x:Name="Button_H3" Icon="{x:Static local:Icons.HorizontalAlign_Right}"/>
+                                <local:RadioButton x:Name="Button_H4" Icon="{x:Static local:Icons.HorizontalAlign_Stretch}" Visibility="{TemplateBinding IsHorizontalStretchEnabled, Converter={StaticResource BVConv}}"/>
+                            </StackPanel>
+                        </StackPanel>
+                    </Border>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="SelectionMode" Value="Both">
+                            <Setter TargetName="Padding" Property="Visibility" Value="Visible"/>
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <Style TargetType="TextBlock" x:Key="DefaultTextBox_DefaultTextBlock">
+        <Setter Property="Opacity" Value="0.5"/>
+        <Setter Property="Margin" Value="2,0"/>
+        <Setter Property="Visibility" Value="Collapsed"/>
+        <Setter Property="IsHitTestVisible" Value="False"/>
+    </Style>
+
+    <SolidColorBrush po:Freeze="true" x:Key="TextBox.Static.Border" Color="#FFABAdB3"/>
+    <SolidColorBrush po:Freeze="true" x:Key="TextBox.MouseOver.Border" Color="#FF7EB4EA"/>
+    <SolidColorBrush po:Freeze="true" x:Key="TextBox.Focus.Border" Color="#FF569DE5"/>
+    <Style TargetType="local:DefaultTextBox">
+        <Setter Property="Background" Value="{DynamicResource {x:Static SystemColors.WindowBrushKey}}"/>
+        <Setter Property="BorderBrush" Value="{StaticResource TextBox.Static.Border}"/>
+        <Setter Property="Foreground" Value="{DynamicResource {x:Static SystemColors.ControlTextBrushKey}}"/>
+        <Setter Property="BorderThickness" Value="1"/>
+        <Setter Property="KeyboardNavigation.TabNavigation" Value="None"/>
+        <Setter Property="VerticalContentAlignment" Value="Top"/>
+        <Setter Property="HorizontalContentAlignment" Value="Left"/>
+        <Setter Property="FocusVisualStyle" Value="{x:Null}"/>
+        <Setter Property="AllowDrop" Value="true"/>
+        <Setter Property="ScrollViewer.PanningMode" Value="VerticalFirst"/>
+        <Setter Property="Stylus.IsFlicksEnabled" Value="False"/>
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="local:DefaultTextBox">
+                    <Border x:Name="templateRoot" Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" SnapsToDevicePixels="True">
+                        <Grid>
+                            <ScrollViewer x:Name="PART_ContentHost" Focusable="false" HorizontalScrollBarVisibility="Hidden" VerticalScrollBarVisibility="Hidden"/>
+                            <TextBlock x:Name="DefaultText" Style="{StaticResource DefaultTextBox_DefaultTextBlock}" Text="{TemplateBinding DefaultText}" Padding="{TemplateBinding Padding}" VerticalAlignment="{TemplateBinding VerticalContentAlignment}" HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"/>
+                        </Grid>
+                    </Border>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsEnabled" Value="false">
+                            <Setter Property="Opacity" TargetName="templateRoot" Value="0.56"/>
+                        </Trigger>
+                        <Trigger Property="Text" Value="">
+                            <Setter Property="Visibility" TargetName="DefaultText" Value="Visible"/>
+                        </Trigger>
+                        <Trigger Property="Text" Value="{x:Null}">
+                            <Setter TargetName="DefaultText" Property="Visibility" Value="Visible"/>
+                        </Trigger>
+                        <Trigger Property="IsMouseOver" Value="true">
+                            <Setter Property="BorderBrush" TargetName="templateRoot" Value="{StaticResource TextBox.MouseOver.Border}"/>
+                        </Trigger>
+                        <Trigger Property="IsKeyboardFocused" Value="true">
+                            <Setter Property="BorderBrush" TargetName="templateRoot" Value="{StaticResource TextBox.Focus.Border}"/>
+                        </Trigger>
+                        <Trigger Property="IsTextValid" Value="False">
+                            <Setter TargetName="templateRoot" Property="BorderBrush" Value="{StaticResource Brush_e44}"/>
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+        <Style.Triggers>
+            <MultiTrigger>
+                <MultiTrigger.Conditions>
+                    <Condition Property="IsInactiveSelectionHighlightEnabled" Value="true"/>
+                    <Condition Property="IsSelectionActive" Value="false"/>
+                </MultiTrigger.Conditions>
+                <Setter Property="SelectionBrush" Value="{DynamicResource {x:Static SystemColors.InactiveSelectionHighlightBrushKey}}"/>
+            </MultiTrigger>
+        </Style.Triggers>
+    </Style>
+
+    <Style TargetType="Button" x:Key="EditableTextBlock_Button">
+        <Setter Property="Margin" Value="0"/>
+        <Setter Property="Padding" Value="2,0"/>
+        <Setter Property="Focusable" Value="False"/>
+        <Setter Property="IsTabStop" Value="False"/>
+        <Setter Property="Cursor" Value="IBeam"/>
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="Button">
+                    <Border x:Name="templateRoot" Background="Transparent" BorderThickness="0">
+                        <ContentPresenter x:Name="content" Margin="{TemplateBinding Padding}" VerticalAlignment="{TemplateBinding VerticalContentAlignment}" HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"/>
+                    </Border>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+    <Style TargetType="TextBox" x:Key="EditableTextBlock_TextBox">
+        <Setter Property="Focusable" Value="True"/>
+        <Setter Property="IsTabStop" Value="False"/>
+        <Setter Property="Visibility" Value="Collapsed"/>
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="TextBox">
+                    <Border x:Name="templateRoot" Background="{TemplateBinding Background}" BorderThickness="0" SnapsToDevicePixels="True">
+                        <ScrollViewer x:Name="PART_ContentHost" Focusable="false" HorizontalScrollBarVisibility="Hidden" VerticalScrollBarVisibility="Hidden"/>
+                    </Border>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+    <Style TargetType="local:EditableTextBlock">
+        <Setter Property="Background" Value="{DynamicResource {x:Static SystemColors.WindowBrushKey}}"/>
+        <Setter Property="BorderBrush" Value="{StaticResource TextBox.Static.Border}"/>
+        <Setter Property="Foreground" Value="{DynamicResource {x:Static SystemColors.ControlTextBrushKey}}"/>
+        <Setter Property="BorderThickness" Value="1"/>
+        <Setter Property="KeyboardNavigation.TabNavigation" Value="None"/>
+        <Setter Property="VerticalContentAlignment" Value="Top"/>
+        <Setter Property="HorizontalContentAlignment" Value="Left"/>
+        <Setter Property="UseLayoutRounding" Value="True"/>
+        <Setter Property="ScrollViewer.PanningMode" Value="VerticalFirst"/>
+        <Setter Property="Stylus.IsFlicksEnabled" Value="False"/>
+        <Setter Property="Focusable" Value="True"/>
+        <Setter Property="TextTrimming" Value="CharacterEllipsis"/>
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="local:EditableTextBlock">
+                    <Border x:Name="templateRoot" SnapsToDevicePixels="True" Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}">
+                        <Grid>
+                            <TextBlock x:Name="DefaultText" Style="{StaticResource DefaultTextBox_DefaultTextBlock}" Text="{TemplateBinding DefaultText}" Padding="{TemplateBinding Padding}" VerticalAlignment="{TemplateBinding VerticalContentAlignment}" HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}" TextTrimming="{TemplateBinding TextTrimming}"/>
+                            <TextBlock Text="{TemplateBinding Text}" Margin="2,0" IsHitTestVisible="False" Padding="{TemplateBinding Padding}" VerticalAlignment="{TemplateBinding VerticalContentAlignment}" HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}" TextTrimming="{TemplateBinding TextTrimming}"/>
+                            <Border Margin="2,0" Cursor="IBeam" Background="Transparent"/>
+                            <TextBox x:Name="PART_TextBox" Style="{StaticResource EditableTextBlock_TextBox}" HorizontalContentAlignment="{TemplateBinding HorizontalContentAlignment}" VerticalContentAlignment="{TemplateBinding VerticalContentAlignment}" Padding="{TemplateBinding Padding}" Background="{TemplateBinding Background}" AcceptsReturn="{TemplateBinding AcceptsReturn}"/>
+                            <Popup x:Name="PART_Popup" AllowsTransparency="True" IsOpen="{TemplateBinding IsEditing}">
+                                <Grid MinWidth="{Binding ActualWidth, ElementName=templateRoot}">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="Auto"/>
+                                    </Grid.ColumnDefinitions>
+                                    <Border Grid.Column="1" Background="White" CornerRadius="4">
+                                        <StackPanel RenderOptions.ClearTypeHint="Enabled" Orientation="Horizontal">
+                                            <StackPanel.Resources>
+                                                <Style TargetType="local:Button">
+                                                    <Setter Property="Margin" Value="2,0,0,0"/>
+                                                    <Setter Property="Padding" Value="4,2"/>
+                                                    <Setter Property="CornerRadius" Value="4"/>
+                                                    <Setter Property="Background" Value="White"/>
+                                                </Style>
+                                            </StackPanel.Resources>
+                                            <local:Button Icon="{x:Static local:Icons.Check_Green}" Content="{TemplateBinding DecideText}" Command="local:EditableTextCommands.Decide" Margin="0"/>
+                                            <local:Button Icon="{x:Static local:Icons.Cross_Red}" Content="{TemplateBinding CancelText}" Command="local:EditableTextCommands.Cancel"/>
+                                            <local:Button Icon="{x:Static local:Icons.Delete}" Content="{TemplateBinding ClearText}" Command="local:EditableTextCommands.Clear" x:Name="clearButton"/>
+                                        </StackPanel>
+                                    </Border>
+                                </Grid>
+                            </Popup>
+                        </Grid>
+                    </Border>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsEnabled" Value="false">
+                            <Setter TargetName="templateRoot" Property="Opacity" Value="0.56"/>
+                        </Trigger>
+                        <Trigger Property="Text" Value="">
+                            <Setter TargetName="DefaultText" Property="Visibility" Value="Visible"/>
+                        </Trigger>
+                        <Trigger Property="Text" Value="{x:Null}">
+                            <Setter TargetName="DefaultText" Property="Visibility" Value="Visible"/>
+                        </Trigger>
+                        <Trigger Property="IsClearButtonVisible" Value="False">
+                            <Setter TargetName="clearButton" Property="Visibility" Value="Collapsed"/>
+                        </Trigger>
+                        <Trigger Property="IsMouseOver" Value="true">
+                            <Setter Property="BorderBrush" TargetName="templateRoot" Value="{StaticResource TextBox.MouseOver.Border}"/>
+                        </Trigger>
+                        <Trigger Property="IsKeyboardFocused" Value="true">
+                            <Setter Property="BorderBrush" TargetName="templateRoot" Value="{StaticResource TextBox.Focus.Border}"/>
+                        </Trigger>
+                        <Trigger Property="IsTextValid" Value="False">
+                            <Setter TargetName="templateRoot" Property="BorderBrush" Value="{StaticResource Brush_e44}"/>
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <Style x:Key="DTPicker_ComboBoxToggleButton" TargetType="ToggleButton">
+        <Setter Property="BorderThickness" Value="0"/>
+        <Setter Property="OverridesDefaultStyle" Value="true"/>
+        <Setter Property="IsTabStop" Value="false"/>
+        <Setter Property="Focusable" Value="false"/>
+        <Setter Property="ClickMode" Value="Press"/>
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="ToggleButton">
+                    <Border x:Name="templateRoot" Background="Transparent" BorderThickness="{TemplateBinding BorderThickness}" BorderBrush="{TemplateBinding BorderBrush}" SnapsToDevicePixels="true">
+                        <ContentPresenter VerticalAlignment="Center" Margin="0"/>
+                    </Border>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsMouseOver" Value="true">
+                            <Setter Property="Background" TargetName="templateRoot" Value="{StaticResource ComboBox.MouseOver.Background}"/>
+                            <Setter Property="BorderBrush" TargetName="templateRoot" Value="{StaticResource ComboBox.MouseOver.Border}"/>
+                        </Trigger>
+                        <Trigger Property="IsPressed" Value="true">
+                            <Setter Property="Background" TargetName="templateRoot" Value="{StaticResource ComboBox.Pressed.Background}"/>
+                            <Setter Property="BorderBrush" TargetName="templateRoot" Value="{StaticResource ComboBox.Pressed.Border}"/>
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+    <Style x:Key="DTPicker_ComboBox" TargetType="ComboBox">
+        <Setter Property="Margin" Value="0"/>
+        <Setter Property="Padding" Value="0"/>
+        <Setter Property="BorderBrush" Value="Transparent"/>
+        <Setter Property="BorderThickness" Value="1"/>
+        <Setter Property="VerticalAlignment" Value="Stretch"/>
+        <Setter Property="VerticalContentAlignment" Value="Center"/>
+        <Setter Property="HorizontalAlignment" Value="Stretch"/>
+        <Setter Property="HorizontalContentAlignment" Value="Center"/>
+        <Setter Property="Focusable" Value="False"/>
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="ComboBox">
+                    <Grid x:Name="templateRoot" SnapsToDevicePixels="true">
+                        <Popup x:Name="PART_Popup" AllowsTransparency="true" Grid.ColumnSpan="2" IsOpen="{Binding IsDropDownOpen, Mode=TwoWay, RelativeSource={RelativeSource Mode=TemplatedParent}}" Margin="1" Placement="Bottom" PopupAnimation="{DynamicResource {x:Static SystemParameters.ComboBoxPopupAnimationKey}}">
+                            <theme:SystemDropShadowChrome x:Name="shadow" Color="Transparent" MinWidth="{Binding ActualWidth, ElementName=templateRoot}" MaxHeight="{TemplateBinding MaxDropDownHeight}">
+                                <Border x:Name="dropDownBorder" Style="{StaticResource DDMB_Border}">
+                                    <ScrollViewer x:Name="DropDownScrollViewer">
+                                        <Grid x:Name="grid" RenderOptions.ClearTypeHint="Enabled">
+                                            <Canvas x:Name="canvas" HorizontalAlignment="Left" VerticalAlignment="Top" Width="0" Height="0">
+                                                <Rectangle x:Name="opaqueRect" Fill="{Binding Background, ElementName=dropDownBorder}" Height="{Binding ActualHeight, ElementName=dropDownBorder}" Width="{Binding ActualWidth, ElementName=dropDownBorder}"/>
+                                            </Canvas>
+                                            <ItemsPresenter x:Name="ItemsPresenter" KeyboardNavigation.DirectionalNavigation="Contained" SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}"/>
+                                        </Grid>
+                                    </ScrollViewer>
+                                </Border>
+                            </theme:SystemDropShadowChrome>
+                        </Popup>
+                        <ToggleButton x:Name="toggleButton" Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" IsChecked="{Binding IsDropDownOpen, Mode=TwoWay, RelativeSource={RelativeSource Mode=TemplatedParent}}" Style="{StaticResource DTPicker_ComboBoxToggleButton}"/>
+                        <ContentPresenter x:Name="contentPresenter" ContentStringFormat="{TemplateBinding SelectionBoxItemStringFormat}" ContentTemplate="{TemplateBinding SelectionBoxItemTemplate}" Content="{TemplateBinding SelectionBoxItem}" ContentTemplateSelector="{TemplateBinding ItemTemplateSelector}" HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}" IsHitTestVisible="false" Margin="{TemplateBinding Padding}" SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}" VerticalAlignment="{TemplateBinding VerticalContentAlignment}"/>
+                    </Grid>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="HasDropShadow" SourceName="PART_Popup" Value="true">
+                            <Setter Property="Margin" TargetName="shadow" Value="0,0,5,5"/>
+                            <Setter Property="Color" TargetName="shadow" Value="#71000000"/>
+                        </Trigger>
+                        <Trigger Property="HasItems" Value="false">
+                            <Setter Property="Height" TargetName="dropDownBorder" Value="95"/>
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+    <Style x:Key="DTPicker_TextBlock" TargetType="TextBlock">
+        <Setter Property="Margin" Value="0"/>
+        <Setter Property="Padding" Value="0"/>
+        <Setter Property="VerticalAlignment" Value="Center"/>
+        <Setter Property="HorizontalAlignment" Value="Center"/>
+    </Style>
+    <local:TimeItemConverter x:Key="DTConv_Hour" Type="Hour"/>
+    <local:TimeItemConverter x:Key="DTConv_Minute" Type="Minute"/>
+    <ItemsPanelTemplate x:Key="DTPicker_PanelTemplate_Hour">
+        <Grid>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="Auto"/>
+            </Grid.ColumnDefinitions>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
+        </Grid>
+    </ItemsPanelTemplate>
+    <ItemsPanelTemplate x:Key="DTPicker_PanelTemplate_Minute">
+        <Grid>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="Auto"/>
+            </Grid.ColumnDefinitions>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
+        </Grid>
+    </ItemsPanelTemplate>
+    <Style x:Key="DTPicker_ComboItemStyle" TargetType="ComboBoxItem">
+        <Setter Property="Padding" Value="2"/>
+        <Setter Property="Grid.Column" Value="{Binding Column}"/>
+        <Setter Property="Grid.Row" Value="{Binding Row}"/>
+        <Setter Property="FontSize" Value="12"/>
+    </Style>
+    <DataTemplate x:Key="DTPicker_TextBlockTemplate_2" DataType="local:TimeItem">
+        <TextBlock Style="{StaticResource DTPicker_TextBlock}" Text="{Binding Value, StringFormat={}{0:D2}}" Padding="2,0"/>
+    </DataTemplate>
+    <wpf:DateTimeToStringConverter x:Key="DTPicker_C_Date" Format="yyyy/MM/dd"/>
+    <Style x:Key="DTPicker_DateButton" TargetType="Button">
+        <Setter Property="Margin" Value="0"/>
+        <Setter Property="Padding" Value="2,0"/>
+        <Setter Property="Background" Value="{StaticResource Brush_Background}"/>
+        <Setter Property="BorderBrush" Value="Transparent"/>
+        <Setter Property="BorderThickness" Value="1"/>
+        <Setter Property="VerticalContentAlignment" Value="Center"/>
+        <Setter Property="HorizontalContentAlignment" Value="Center"/>
+        <Setter Property="Focusable" Value="False"/>
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="Button">
+                    <Border x:Name="templateRoot" Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}">
+                        <ContentPresenter x:Name="content" Margin="{TemplateBinding Padding}" HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}" VerticalAlignment="{TemplateBinding VerticalContentAlignment}"/>
+                    </Border>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter TargetName="templateRoot" Property="Background" Value="{StaticResource ComboBox.MouseOver.Background}"/>
+                            <Setter TargetName="templateRoot" Property="BorderBrush" Value="{StaticResource ComboBox.MouseOver.Border}"/>
+                        </Trigger>
+                        <Trigger Property="IsPressed" Value="true">
+                            <Setter TargetName="templateRoot" Property="Background" Value="{StaticResource ComboBox.Pressed.Background}"/>
+                            <Setter TargetName="templateRoot" Property="BorderBrush" Value="{StaticResource ComboBox.Pressed.Border}"/>
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+    <Style x:Key="DTPicker_DatePicker" TargetType="DatePicker">
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="DatePicker">
+                    <Grid>
+                        <Button x:Name="PART_Button" Foreground="{TemplateBinding Foreground}" Style="{StaticResource DTPicker_DateButton}">
+                            <TextBlock Text="{Binding SelectedDate, RelativeSource={RelativeSource Mode=TemplatedParent}, Converter={StaticResource DTPicker_C_Date}}" />
+                        </Button>
+                        <Popup x:Name="PART_Popup" Style="{StaticResource DDMB_Popup}" PlacementTarget="{Binding ElementName=PART_Button}" StaysOpen="False"/>
+                    </Grid>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+    <Style x:Key="DTPicker_Button_Now" TargetType="local:Button">
+        <Setter Property="Margin" Value="0"/>
+        <Setter Property="Padding" Value="3"/>
+        <Setter Property="MinWidth" Value="0"/>
+        <Setter Property="MinHeight" Value="0"/>
+        <Setter Property="BorderBrush" Value="Transparent"/>
+        <Setter Property="Icon" Value="{x:Static local:Icons.Clock}"/>
+        <Setter Property="VerticalAlignment" Value="Center"/>
+        <Setter Property="HorizontalAlignment" Value="Center"/>
+        <Setter Property="Focusable" Value="False"/>
+    </Style>
+    <Style TargetType="local:DateTimePicker">
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="local:DateTimePicker">
+                    <Border Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}">
+                        <Grid Margin="{TemplateBinding Padding}">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="Auto"/>
+                            </Grid.ColumnDefinitions>
+                            <DatePicker x:Name="PART_Date" Style="{StaticResource DTPicker_DatePicker}" SelectedDate="{Binding SelectedDate, Mode=TwoWay, RelativeSource={RelativeSource Mode=TemplatedParent}}" DisplayDateStart="{TemplateBinding DisplayDateStart}" DisplayDateEnd="{TemplateBinding DisplayDateEnd}"/>
+                            <ComboBox x:Name="PART_Hour" Grid.Column="1" Style="{StaticResource DTPicker_ComboBox}" ItemsPanel="{StaticResource DTPicker_PanelTemplate_Hour}" ItemContainerStyle="{StaticResource DTPicker_ComboItemStyle}" ItemTemplate="{StaticResource DTPicker_TextBlockTemplate_2}" SelectedItem="{Binding SelectedHour, Mode=TwoWay, RelativeSource={RelativeSource Mode=TemplatedParent}, Converter={StaticResource DTConv_Hour}}"/>
+                            <TextBlock Grid.Column="2" Style="{StaticResource DTPicker_TextBlock}" Text=":" Margin="-2,0"/>
+                            <ComboBox x:Name="PART_Minute" Grid.Column="3" Style="{StaticResource DTPicker_ComboBox}" ItemsPanel="{StaticResource DTPicker_PanelTemplate_Minute}" ItemContainerStyle="{StaticResource DTPicker_ComboItemStyle}" ItemTemplate="{StaticResource DTPicker_TextBlockTemplate_2}" SelectedItem="{Binding SelectedMinute, Mode=TwoWay, RelativeSource={RelativeSource Mode=TemplatedParent}, Converter={StaticResource DTConv_Minute}}"/>
+                            <local:Button x:Name="PART_Now" Grid.Column="4" Style="{StaticResource DTPicker_Button_Now}"/>
+                        </Grid>
+                    </Border>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <Style TargetType="local:LabeledSlider">
+        <Setter Property="VerticalContentAlignment" Value="Center"/>
+        <Setter Property="IsSnapToTickEnabled" Value="True"/>
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="local:LabeledSlider">
+                    <Border Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="Auto"/>
+                            </Grid.ColumnDefinitions>
+                            <Label Grid.Column="0" x:Name="header" Margin="0,0,2,0" Padding="0" Content="{TemplateBinding Header}" VerticalContentAlignment="{TemplateBinding VerticalContentAlignment}"/>
+                            <Slider Grid.Column="1" x:Name="PART_Slider" Focusable="False" Width="{TemplateBinding SliderWidth}" VerticalAlignment="{TemplateBinding VerticalContentAlignment}"/>
+                            <local:DoubleTextBox 
+                                Grid.Column="2" x:Name="PART_TextBox" Margin="2,0,0,0" Padding="2" Width="{TemplateBinding TextWidth}" 
+                                VerticalAlignment="{TemplateBinding VerticalContentAlignment}" VerticalContentAlignment="Center" HorizontalContentAlignment="Right"
+                                StringFormat="{TemplateBinding StringFormat}"
+                                Value="{Binding Value, Mode=TwoWay, RelativeSource={RelativeSource Mode=TemplatedParent}}" Minimum="{TemplateBinding Minimum}" Maximum="{TemplateBinding Maximum}"/>
+                            <TextBlock Grid.Column="2" x:Name="PART_ValueText" Margin="2,0,0,0" Width="{TemplateBinding TextWidth}" VerticalAlignment="{TemplateBinding VerticalContentAlignment}"/>
+                        </Grid>
+                    </Border>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsTextEditable" Value="True">
+                            <Setter TargetName="PART_ValueText" Property="Visibility" Value="Collapsed"/>
+                        </Trigger>
+                        <Trigger Property="IsTextEditable" Value="False">
+                            <Setter TargetName="PART_TextBox" Property="Visibility" Value="Collapsed"/>
+                        </Trigger>
+                        <Trigger Property="Header" Value="{x:Null}">
+                            <Setter TargetName="header" Property="Visibility" Value="Collapsed"/>
+                        </Trigger>
+                        <Trigger Property="IsEnabled" Value="False">
+                            <Setter Property="Opacity" Value="0.56"/>
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <SolidColorBrush x:Key="SliderThumb.Static.Background" po:Freeze="True" Color="#FFF0F0F0"/>
+    <SolidColorBrush x:Key="SliderThumb.Static.Border" po:Freeze="True" Color="#FFACACAC"/>
+    <SolidColorBrush x:Key="SliderThumb.Static.Foreground" po:Freeze="True" Color="#FFE5E5E5"/>
+    <SolidColorBrush x:Key="SliderThumb.MouseOver.Background" po:Freeze="True" Color="#FFDCECFC"/>
+    <SolidColorBrush x:Key="SliderThumb.MouseOver.Border" po:Freeze="True" Color="#FF7Eb4EA"/>
+    <SolidColorBrush x:Key="SliderThumb.Pressed.Background" po:Freeze="True" Color="#FFDAECFC"/>
+    <SolidColorBrush x:Key="SliderThumb.Pressed.Border" po:Freeze="True" Color="#FF569DE5"/>
+    <SolidColorBrush x:Key="SliderThumb.Disabled.Background" po:Freeze="True" Color="#FFF0F0F0"/>
+    <SolidColorBrush x:Key="SliderThumb.Disabled.Border" po:Freeze="True" Color="#FFD9D9D9"/>
+    <SolidColorBrush x:Key="SliderThumb.Track.Background" po:Freeze="True" Color="#FFE7EAEA"/>
+    <SolidColorBrush x:Key="SliderThumb.Track.Border" po:Freeze="True" Color="#FFD6D6D6"/>
+
+    <Style x:Key="RepeatButtonTransparent" TargetType="{x:Type RepeatButton}">
+        <Setter Property="OverridesDefaultStyle" Value="true"/>
+        <Setter Property="Background" Value="Transparent"/>
+        <Setter Property="Focusable" Value="false"/>
+        <Setter Property="IsTabStop" Value="false"/>
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type RepeatButton}">
+                    <Rectangle Fill="{TemplateBinding Background}" Height="{TemplateBinding Height}" Width="{TemplateBinding Width}"/>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+    <ControlTemplate x:Key="SliderThumbHorizontalDefault" TargetType="Thumb">
+        <Grid UseLayoutRounding="True" HorizontalAlignment="Center" VerticalAlignment="Center">
+            <Path x:Name="grip" Data="M 0,0 C0,0 11,0 11,0 11,0 11,18 11,18 11,18 0,18 0,18 0,18 0,0 0,0 z" Fill="{StaticResource SliderThumb.Static.Background}" Stroke="{StaticResource SliderThumb.Static.Border}" SnapsToDevicePixels="True" Stretch="Fill" StrokeThickness="1" UseLayoutRounding="True" VerticalAlignment="Center"/>
+        </Grid>
+        <ControlTemplate.Triggers>
+            <Trigger Property="IsMouseOver" Value="true">
+                <Setter Property="Fill" TargetName="grip" Value="{StaticResource SliderThumb.MouseOver.Background}"/>
+                <Setter Property="Stroke" TargetName="grip" Value="{StaticResource SliderThumb.MouseOver.Border}"/>
+            </Trigger>
+            <Trigger Property="IsDragging" Value="true">
+                <Setter Property="Fill" TargetName="grip" Value="{StaticResource SliderThumb.Pressed.Background}"/>
+                <Setter Property="Stroke" TargetName="grip" Value="{StaticResource SliderThumb.Pressed.Border}"/>
+            </Trigger>
+            <Trigger Property="IsEnabled" Value="false">
+                <Setter Property="Fill" TargetName="grip" Value="{StaticResource SliderThumb.Disabled.Background}"/>
+                <Setter Property="Stroke" TargetName="grip" Value="{StaticResource SliderThumb.Disabled.Border}"/>
+            </Trigger>
+        </ControlTemplate.Triggers>
+    </ControlTemplate>
+
+    <Style TargetType="TextBox" x:Key="TextBox_RangeSlider">
+        <Setter Property="Margin" Value="0"/>
+        <Setter Property="VerticalAlignment" Value="Center"/>
+        <Setter Property="VerticalContentAlignment" Value="Center"/>
+        <Setter Property="HorizontalContentAlignment" Value="Right"/>
+        <Setter Property="InputMethod.IsInputMethodEnabled" Value="False"/>
+    </Style>
+    <Style TargetType="Label" x:Key="Label_RangeSlider">
+        <Setter Property="Margin" Value="0"/>
+        <Setter Property="Padding" Value="0"/>
+        <Setter Property="VerticalAlignment" Value="Center"/>
+        <Setter Property="VerticalContentAlignment" Value="Center"/>
+        <Setter Property="HorizontalContentAlignment" Value="Right"/>
+    </Style>
+    <Style TargetType="Thumb" x:Key="Thumb_RangeSlider">
+        <Setter Property="Focusable" Value="False"/>
+        <Setter Property="Width" Value="11"/>
+        <Setter Property="Height" Value="18"/>
+        <Setter Property="OverridesDefaultStyle" Value="True"/>
+        <Setter Property="Template" Value="{StaticResource SliderThumbHorizontalDefault}"/>
+    </Style>
+    <Style TargetType="local:RangeSlider">
+        <Setter Property="Focusable" Value="False"/>
+        <Setter Property="MinHeight" Value="18"/>
+        <Setter Property="TextWidth" Value="36"/>
+        <Setter Property="Background" Value="Transparent"/>
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="local:RangeSlider">
+                    <Border Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" SnapsToDevicePixels="True">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="Auto"/>
+                            </Grid.ColumnDefinitions>
+                            <Grid.RowDefinitions>
+                                <RowDefinition MinHeight="{TemplateBinding MinHeight}"/>
+                            </Grid.RowDefinitions>
+                            <local:DoubleTextBox 
+                                x:Name="PART_TextBox1" Grid.Column="0" Width="{TemplateBinding TextWidth}" Style="{StaticResource TextBox_RangeSlider}" 
+                                Value="{Binding Value1, Mode=TwoWay, RelativeSource={RelativeSource Mode=TemplatedParent}}" 
+                                Minimum="{TemplateBinding Minimum}" Maximum="{TemplateBinding Value2}" />
+                            <local:DoubleTextBox 
+                                x:Name="PART_TextBox2" Grid.Column="2" Width="{TemplateBinding TextWidth}" Style="{StaticResource TextBox_RangeSlider}" 
+                                Value="{Binding Value2, Mode=TwoWay, RelativeSource={RelativeSource Mode=TemplatedParent}}" 
+                                Minimum="{TemplateBinding Value1}" Maximum="{TemplateBinding Maximum}" />
+                            <Label x:Name="label1" Grid.Column="0" Style="{StaticResource Label_RangeSlider}" Content="{Binding Text, ElementName=PART_TextBox1}" Width="{TemplateBinding TextWidth}"/>
+                            <Label x:Name="label2" Grid.Column="2" Style="{StaticResource Label_RangeSlider}" Content="{Binding Text, ElementName=PART_TextBox2}" Width="{TemplateBinding TextWidth}" HorizontalContentAlignment="Left"/>
+                            <CheckBox x:Name="PART_ExCheckBox" Grid.Column="3" VerticalAlignment="Center" VerticalContentAlignment="Center" Content="{TemplateBinding ExclusiveText}" Margin="4,0,0,0" IsChecked="{Binding IsExclusive, Mode=TwoWay, RelativeSource={RelativeSource Mode=TemplatedParent}}"/>
+                            <Border x:Name="PART_TrackBackground" Grid.Column="1" Margin="9,0" Background="{StaticResource SliderThumb.Track.Background}" BorderBrush="{StaticResource SliderThumb.Track.Border}" BorderThickness="1" Height="4" VerticalAlignment="center" IsHitTestVisible="False">
+                                <Canvas Margin="-1,-1">
+                                    <Rectangle 
+                                        x:Name="PART_SelectionRange1" Fill="{DynamicResource {x:Static SystemColors.HighlightBrushKey}}" 
+                                        Height="4" Canvas.Left="{TemplateBinding Selection1Left}" Width="{TemplateBinding Selection1Width}"/>
+                                    <Rectangle 
+                                        x:Name="PART_SelectionRange2" Fill="{DynamicResource {x:Static SystemColors.HighlightBrushKey}}" 
+                                        Height="4" Canvas.Left="{TemplateBinding Selection2Left}" Width="{TemplateBinding Selection2Width}"/>
+                                </Canvas>
+                            </Border>
+                            <RepeatButton x:Name="PART_RepeatButton" Focusable="False" Grid.Column="1" Style="{StaticResource RepeatButtonTransparent}"/>
+                            <Canvas Margin="14,-18,0,0" Grid.Column="1" VerticalAlignment="center">
+                                <Thumb x:Name="PART_Thumb1" Style="{StaticResource Thumb_RangeSlider}" Canvas.Left="{TemplateBinding ThumbLeft}"/>
+                                <Thumb x:Name="PART_Thumb2" Style="{StaticResource Thumb_RangeSlider}" Canvas.Left="{TemplateBinding ThumbRight}"/>
+                            </Canvas>
+                        </Grid>
+                    </Border>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsTextEditable" Value="True">
+                            <Setter TargetName="label1" Property="Visibility" Value="Collapsed"/>
+                            <Setter TargetName="label2" Property="Visibility" Value="Collapsed"/>
+                        </Trigger>
+                        <Trigger Property="IsTextEditable" Value="False">
+                            <Setter TargetName="PART_TextBox1" Property="Visibility" Value="Collapsed"/>
+                            <Setter TargetName="PART_TextBox2" Property="Visibility" Value="Collapsed"/>
+                        </Trigger>
+                        <Trigger Property="WithText" Value="False">
+                            <Setter TargetName="PART_TextBox1" Property="Visibility" Value="Collapsed"/>
+                            <Setter TargetName="PART_TextBox2" Property="Visibility" Value="Collapsed"/>
+                            <Setter TargetName="label1" Property="Visibility" Value="Collapsed"/>
+                            <Setter TargetName="label2" Property="Visibility" Value="Collapsed"/>
+                        </Trigger>
+                        <Trigger Property="WithExclusiveButton" Value="False">
+                            <Setter TargetName="PART_ExCheckBox" Property="Visibility" Value="Collapsed"/>
+                        </Trigger>
+                        <Trigger Property="IsEnabled" Value="False">
+                            <Setter Property="Opacity" Value="0.56"/>
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <RotateTransform x:Key="TabItem_Rotation_Right" Angle="90"/>
+    <RotateTransform x:Key="TabItem_Rotation_Left" Angle="-90"/>
+    <ControlTemplate x:Key="TabItemTemplate_Cornerd" TargetType="TabItem">
+        <Grid x:Name="Grid" SnapsToDevicePixels="true">
+            <Border x:Name="Border" Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="1,1,1,0" CornerRadius="{TemplateBinding Border.CornerRadius}"/>
+            <ContentPresenter VerticalAlignment="Center" HorizontalAlignment="Center" ContentSource="Header" Margin="{TemplateBinding Padding}"/>
+        </Grid>
+        <ControlTemplate.Triggers>
+            <Trigger Property="IsEnabled" Value="False">
+                <Setter Property="Foreground" Value="{DynamicResource {x:Static SystemColors.GrayTextBrushKey}}"/>
+            </Trigger>
+            <Trigger Property="IsMouseOver" SourceName="Grid" Value="True">
+                <Setter TargetName="Border" Property="Background" Value="{StaticResource Brush_MouseOver_Gradient}"/>
+                <Setter TargetName="Border" Property="BorderBrush" Value="{StaticResource Brush_MouseOver_Content}"/>
+            </Trigger>
+            <Trigger Property="TabStripPlacement" Value="Right">
+                <Setter TargetName="Grid" Property="LayoutTransform" Value="{StaticResource TabItem_Rotation_Right}"/>
+            </Trigger>
+            <Trigger Property="TabStripPlacement" Value="Left">
+                <Setter TargetName="Grid" Property="LayoutTransform" Value="{StaticResource TabItem_Rotation_Left}"/>
+            </Trigger>
+            <Trigger Property="TabStripPlacement" Value="Bottom">
+                <Setter TargetName="Border" Property="BorderThickness" Value="1,0,1,1"/>
+                <Setter TargetName="Border" Property="CornerRadius" Value="0,0,4,4"/>
+            </Trigger>
+            <Trigger Property="IsSelected" Value="True">
+                <Setter Property="Panel.ZIndex" Value="1"/>
+                <Setter TargetName="Border" Property="Background" Value="{StaticResource Brush_Background}"/>
+                <Setter TargetName="Border" Property="BorderBrush" Value="{StaticResource Brush_Border}"/>
+                <Setter Property="Margin" Value="-2,-2,-2,0"/>
+                <Setter TargetName="Border" Property="Margin" Value="0,0,0,-1"/>
+            </Trigger>
+            <MultiTrigger>
+                <MultiTrigger.Conditions>
+                    <Condition Property="TabStripPlacement" Value="Bottom"/>
+                    <Condition Property="IsSelected" Value="True"/>
+                </MultiTrigger.Conditions>
+                <MultiTrigger.Setters>
+                    <Setter Property="Margin" Value="-2,0,-2,-2"/>
+                    <Setter TargetName="Border" Property="Margin" Value="0,-1,0,0"/>
+                </MultiTrigger.Setters>
+            </MultiTrigger>
+        </ControlTemplate.Triggers>
+    </ControlTemplate>
+    <Style x:Key="TabItem_Cornered" TargetType="TabItem">
+        <Setter Property="Padding" Value="6,2"/>
+        <Setter Property="Border.CornerRadius" Value="4,4,0,0"/>
+        <Setter Property="Template" Value="{StaticResource TabItemTemplate_Cornerd}"/>
+    </Style>
+
+    <Style TargetType="local:WithPanelTabControl">
+        <Setter Property="Background" Value="{StaticResource Brush_Background}"/>
+        <Setter Property="BorderBrush" Value="{StaticResource Brush_Border}"/>
+        <Setter Property="ItemContainerStyle" Value="{StaticResource TabItem_Cornered}"/>
+        <Setter Property="BorderThickness" Value="1"/>
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="local:WithPanelTabControl">
+                    <Grid KeyboardNavigation.TabNavigation="Local">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="*"/>
+                            <RowDefinition Height="Auto"/>
+                        </Grid.RowDefinitions>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+                        <ContentPresenter Grid.Row="0" Grid.Column="0" Content="{TemplateBinding LeftPanel}" KeyboardNavigation.TabNavigation="Local" KeyboardNavigation.DirectionalNavigation="Contained" KeyboardNavigation.TabIndex="1" />
+                        <ContentPresenter Grid.Row="0" Grid.Column="2" Content="{TemplateBinding RightPanel}" KeyboardNavigation.TabNavigation="Local" KeyboardNavigation.DirectionalNavigation="Contained" KeyboardNavigation.TabIndex="3" />
+                        <Border Grid.Row="1" Grid.ColumnSpan="3" Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" KeyboardNavigation.TabNavigation="Local" KeyboardNavigation.DirectionalNavigation="Contained" KeyboardNavigation.TabIndex="4" >
+                            <ContentPresenter ContentSource="SelectedContent" Margin="{TemplateBinding Padding}" />
+                        </Border>
+                        <TabPanel Grid.Row="0" Grid.Column="1" IsItemsHost="True" Margin="{TemplateBinding TabHeaderMargin}" Background="Transparent" VerticalAlignment="Bottom" KeyboardNavigation.TabIndex="2"/>
+                    </Grid>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <Style TargetType="local:TaskProgressBar">
+        <Setter Property="Background" Value="{StaticResource Brush_8000}"/>
+        <Setter Property="Foreground" Value="{StaticResource Brush_666}"/>
+        <Setter Property="Visibility" Value="Collapsed"/>
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="local:TaskProgressBar">
+                    <Grid Background="{TemplateBinding Background}">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="*"/>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="*"/>
+                        </Grid.RowDefinitions>
+                        <StackPanel Grid.Column="1" Grid.Row="1">
+                            <Border x:Name="caption" Background="{TemplateBinding TextBackground}" Padding="4,0" MinWidth="{TemplateBinding BarWidth}" HorizontalAlignment="Center">
+                                <TextBlock Text="{TemplateBinding Caption}" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                            </Border>
+                            <ProgressBar x:Name="ProgressBar" Width="{TemplateBinding BarWidth}" Height="{TemplateBinding BarHeight}" Minimum="{TemplateBinding Minimum}" Maximum="{TemplateBinding Maximum}" Value="{TemplateBinding Value}"/>
+                            <Border x:Name="message" Background="{TemplateBinding TextBackground}" Padding="4,0" MinWidth="{TemplateBinding BarWidth}" HorizontalAlignment="Center">
+                                <TextBlock Text="{TemplateBinding Message}" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                            </Border>
+                        </StackPanel>
+                        <local:Button Grid.Column="1" Grid.Row="2" x:Name="cancelButton" Margin="4" Padding="4,2" HorizontalAlignment="Center" Content="{TemplateBinding AbortText}" Command="input:Commands.Cancel"/>
+                    </Grid>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="Caption" Value="{x:Null}">
+                            <Setter TargetName="caption" Property="Visibility" Value="Collapsed"/>
+                        </Trigger>
+                        <Trigger Property="Message" Value="{x:Null}">
+                            <Setter TargetName="message" Property="Visibility" Value="Collapsed"/>
+                        </Trigger>
+                        <Trigger Property="IsAbortable" Value="False">
+                            <Setter TargetName="cancelButton" Property="Visibility" Value="Collapsed"/>
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <Style TargetType="local:ScrollViewerBase">
+        <Setter Property="SnapsToDevicePixels" Value="True"/>
+        <Setter Property="UseLayoutRounding" Value="True"/>
+        <Setter Property="Background" Value="Gray"/>
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="local:ScrollViewerBase">
+                    <Grid x:Name="Grid" Background="{TemplateBinding Background}">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="*"/>
+                            <RowDefinition Height="Auto"/>
+                        </Grid.RowDefinitions>
+                        <Rectangle x:Name="Corner" Grid.Row="1" Grid.Column="1" Fill="{DynamicResource {x:Static SystemColors.ControlBrushKey}}"/>
+                        <Grid x:Name="PART_MainArea" Margin="{TemplateBinding Padding}">
+                            <ScrollContentPresenter x:Name="PART_ScrollContentPresenter" Grid.Row="0" Grid.Column="0" CanVerticallyScroll="False" CanHorizontallyScroll="False" CanContentScroll="{TemplateBinding CanContentScroll}" Content="{TemplateBinding Content}"/>
+                        </Grid>
+                        <Grid x:Name="PART_VerticalScrollBarArea" Grid.Row="0" Grid.Column="1">
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="*" MaxHeight="{DynamicResource {x:Static SystemParameters.VerticalScrollBarButtonHeightKey}}"/>
+                                <RowDefinition Height="0.00001*"/>
+                                <RowDefinition Height="*" MaxHeight="{DynamicResource {x:Static SystemParameters.VerticalScrollBarButtonHeightKey}}"/>
+                            </Grid.RowDefinitions>
+                            <ScrollBar x:Name="PART_VerticalScrollBar" Grid.RowSpan="3" Cursor="Arrow" AutomationProperties.AutomationId="VerticalScrollBar" Minimum="0" Maximum="{TemplateBinding ScrollableHeight}" Value="{Binding VerticalOffset, Mode=OneWay, RelativeSource={RelativeSource Mode=TemplatedParent}}" ViewportSize="{TemplateBinding ViewportHeight}" Visibility="{TemplateBinding ComputedVerticalScrollBarVisibility}"/>
+                        </Grid>
+                        <Grid x:Name="PART_HorizontalScrollBarArea" Grid.Row="1" Grid.Column="0">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*" MaxWidth="{DynamicResource {x:Static SystemParameters.HorizontalScrollBarButtonWidthKey}}"/>
+                                <ColumnDefinition Width="0.00001*"/>
+                                <ColumnDefinition Width="*" MaxWidth="{DynamicResource {x:Static SystemParameters.HorizontalScrollBarButtonWidthKey}}"/>
+                            </Grid.ColumnDefinitions>
+                            <ScrollBar x:Name="PART_HorizontalScrollBar" Grid.ColumnSpan="3" Cursor="Arrow" AutomationProperties.AutomationId="HorizontalScrollBar" Orientation="Horizontal" Minimum="0" Maximum="{TemplateBinding ScrollableWidth}" Value="{Binding HorizontalOffset, Mode=OneWay, RelativeSource={RelativeSource Mode=TemplatedParent}}" ViewportSize="{TemplateBinding ViewportWidth}" Visibility="{TemplateBinding ComputedHorizontalScrollBarVisibility}"/>
+                        </Grid>
+                    </Grid>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+        <Style.Triggers>
+            <Trigger Property="IsEnabled" Value="false">
+                <Setter Property="Foreground" Value="{DynamicResource {x:Static SystemColors.GrayTextBrushKey}}"/>
+            </Trigger>
+        </Style.Triggers>
+    </Style>
+
+    <Style TargetType="local:ConsoleViewer">
+        <Setter Property="Background" Value="Black"/>
+        <Setter Property="Foreground" Value="White"/>
+        <Setter Property="TimeForeground" Value="{StaticResource Brush_ccc}"/>
+        <Setter Property="FontFamily" Value="Consolas"/>
+        <Setter Property="FontSize" Value="12"/>
+        <Setter Property="Padding" Value="4,2"/>
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="local:ConsoleViewer">
+                    <Grid>
+                        <Border Background="{TemplateBinding Background}" Opacity="{TemplateBinding BackgroundOpacity}"/>
+                        <ScrollViewer x:Name="PART_ScrollViewer" FontFamily="{TemplateBinding FontFamily}" FontSize="{TemplateBinding FontSize}" Background="Transparent" Foreground="{TemplateBinding Foreground}">
+                            <Grid x:Name="PART_Grid" Margin="{TemplateBinding Padding}">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+                            </Grid>
+                            <FrameworkElement.ContextMenu>
+                                <ContextMenu>
+                                    <MenuItem Header="{TemplateBinding CopyText}" Command="local:ConsoleCommands.Copy">
+                                        <MenuItem.Icon>
+                                            <local:IconPresenter Style="{StaticResource MenuItemIconStyle}" Source="{x:Static local:Icons.Copy}"/>
+                                        </MenuItem.Icon>
+                                    </MenuItem>
+                                    <MenuItem Header="{TemplateBinding FlushText}" Command="local:ConsoleCommands.Flush">
+                                        <MenuItem.Icon>
+                                            <local:IconPresenter Style="{StaticResource MenuItemIconStyle}" Source="{x:Static local:Icons.Delete}"/>
+                                        </MenuItem.Icon>
+                                    </MenuItem>
+                                </ContextMenu>
+                            </FrameworkElement.ContextMenu>
+                        </ScrollViewer>
+                    </Grid>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <HierarchicalDataTemplate x:Key="JsonCollectionTemplate" DataType="text:JsonCollectionNode" ItemsSource="{Binding Children}">
+        <StackPanel Orientation="Horizontal">
+            <TextBlock Text="{Binding Name}" Foreground="{StaticResource Brush_c00}"/>
+            <TextBlock Text=": " Foreground="{StaticResource Brush_800}"/>
+            <TextBlock Text="{Binding ValueString}" TextWrapping="Wrap"/>
+        </StackPanel>
+    </HierarchicalDataTemplate>
+    <DataTemplate x:Key="JsonValueTemplate" DataType="text:JsonValueNode">
+        <StackPanel Orientation="Horizontal">
+            <TextBlock Text="{Binding Name}" Foreground="{StaticResource Brush_0a0}"/>
+            <TextBlock Text=": " Foreground="{StaticResource Brush_070}"/>
+            <TextBlock Text="{Binding ValueString}" TextWrapping="Wrap"/>
+        </StackPanel>
+    </DataTemplate>
+    <local:JsonViewTemplateSelector x:Key="JsonTemplateSelector" CollectionTemplate="{StaticResource JsonCollectionTemplate}" ValueTemplate="{StaticResource JsonValueTemplate}"/>
+
+    <Style TargetType="local:TitleBar">
+        <Setter Property="Background" Value="{DynamicResource ResourceKey={x:Static SystemColors.WindowBrushKey}}"/>
+        <Setter Property="Height" Value="26"/>
+        <Setter Property="UseLayoutRounding" Value="True"/>
+        <Setter Property="Focusable" Value="False"/>
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="local:TitleBar">
+                    <Grid Background="{TemplateBinding Background}" RenderOptions.ClearTypeHint="Enabled" Focusable="False">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+                        <Image x:Name="PART_Icon" Width="16" Height="16" Margin="4,0,0,0" VerticalAlignment="Center" SnapsToDevicePixels="True" Source="{TemplateBinding Icon}" Stretch="Uniform"/>
+                        <ItemsControl x:Name="PART_LeftPanel" Grid.Column="1" Focusable="False" ItemsSource="{Binding LeftPanelItems, Mode=OneWay, RelativeSource={RelativeSource Mode=TemplatedParent}}">
+                            <ItemsControl.ItemsPanel>
+                                <ItemsPanelTemplate>
+                                    <StackPanel Orientation="Horizontal"/>
+                                </ItemsPanelTemplate>
+                            </ItemsControl.ItemsPanel>
+                        </ItemsControl>
+                        <TextBlock Grid.Column="2" Margin="4,0,0,0" Text="{TemplateBinding Title}" HorizontalAlignment="Left" VerticalAlignment="Center"/>
+                        <ItemsControl x:Name="PART_RightPanel" Grid.Column="3" Focusable="False" ItemsSource="{Binding RightPanelItems, Mode=OneWay, RelativeSource={RelativeSource Mode=TemplatedParent}}">
+                            <ItemsControl.ItemsPanel>
+                                <ItemsPanelTemplate>
+                                    <StackPanel Orientation="Horizontal"/>
+                                </ItemsPanelTemplate>
+                            </ItemsControl.ItemsPanel>
+                        </ItemsControl>
+                        <Grid Grid.Column="4">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="Auto"/>
+                            </Grid.ColumnDefinitions>
+                            <Button Grid.Column="0" x:Name="Button_Minimize" Focusable="False" Width="{TemplateBinding ButtonWidth}" Command="SystemCommands.MinimizeWindowCommand">
+                                <Button.Template>
+                                    <ControlTemplate>
+                                        <Border x:Name="ButtonBorder" Background="Transparent">
+                                            <TextBlock x:Name="ButtonText" Text="0" FontFamily="Marlett" FontSize="16" Foreground="{StaticResource Brush_WindowButton_Foreground}" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+                                        </Border>
+                                        <ControlTemplate.Triggers>
+                                            <Trigger Property="IsMouseOver" Value="True">
+                                                <Setter TargetName="ButtonBorder" Property="Background" Value="{StaticResource Brush_WindowButton_MouseOver_Background}"/>
+                                                <Setter TargetName="ButtonText" Property="Foreground" Value="{StaticResource Brush_WindowButton_MouseOver_Foreground}"/>
+                                            </Trigger>
+                                        </ControlTemplate.Triggers>
+                                    </ControlTemplate>
+                                </Button.Template>
+                            </Button>
+                            <ToggleButton Grid.Column="1" x:Name="Button_Maximize" Focusable="False" Width="{TemplateBinding ButtonWidth}" Command="SystemCommands.MaximizeWindowCommand">
+                                <ToggleButton.Template>
+                                    <ControlTemplate TargetType="ToggleButton">
+                                        <Border x:Name="ButtonBorder" Background="Transparent">
+                                            <TextBlock x:Name="ButtonText" Text="1" FontFamily="Marlett" FontSize="16" Foreground="{StaticResource Brush_WindowButton_Foreground}" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+                                        </Border>
+                                        <ControlTemplate.Triggers>
+                                            <Trigger Property="IsMouseOver" Value="True">
+                                                <Setter TargetName="ButtonBorder" Property="Background" Value="{StaticResource Brush_WindowButton_MouseOver_Background}"/>
+                                                <Setter TargetName="ButtonText" Property="Foreground" Value="{StaticResource Brush_WindowButton_MouseOver_Foreground}"/>
+                                            </Trigger>
+                                            <Trigger Property="IsEnabled" Value="False">
+                                                <Setter TargetName="ButtonText" Property="Opacity" Value="0.56"/>
+                                            </Trigger>
+                                            <Trigger Property="IsChecked" Value="True">
+                                                <Setter TargetName="ButtonText" Property="Text" Value="2"/>
+                                            </Trigger>
+                                        </ControlTemplate.Triggers>
+                                    </ControlTemplate>
+                                </ToggleButton.Template>
+                            </ToggleButton>
+                            <Button Grid.Column="2" x:Name="Button_Close" Focusable="False" Width="{TemplateBinding ButtonWidth}" Command="SystemCommands.CloseWindowCommand">
+                                <Button.Template>
+                                    <ControlTemplate>
+                                        <Border x:Name="ButtonBorder" Background="Transparent">
+                                            <TextBlock x:Name="ButtonText" Text="r" FontFamily="Marlett" FontSize="16" Foreground="{StaticResource Brush_WindowButton_Foreground}" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+                                        </Border>
+                                        <ControlTemplate.Triggers>
+                                            <Trigger Property="IsMouseOver" Value="True">
+                                                <Setter TargetName="ButtonBorder" Property="Background" Value="{StaticResource Brush_WindowButton_Close_MouseOver_Background}"/>
+                                                <Setter TargetName="ButtonText" Property="Foreground" Value="{StaticResource Brush_WindowButton_Close_MouseOver_Foreground}"/>
+                                            </Trigger>
+                                        </ControlTemplate.Triggers>
+                                    </ControlTemplate>
+                                </Button.Template>
+                            </Button>
+                        </Grid>
+                    </Grid>
+                    <ControlTemplate.Triggers>
+                        <DataTrigger Binding="{Binding Icon, RelativeSource={RelativeSource Mode=TemplatedParent}}" Value="{x:Null}">
+                            <Setter TargetName="PART_Icon" Property="Visibility" Value="Collapsed"/>
+                        </DataTrigger>
+                        <Trigger Property="IsMinimizeVisible" Value="False">
+                            <Setter TargetName="Button_Minimize" Property="Visibility" Value="Collapsed"/>
+                        </Trigger>
+                        <Trigger Property="IsMaximizeVisible" Value="False">
+                            <Setter TargetName="Button_Maximize" Property="Visibility" Value="Collapsed"/>
+                        </Trigger>
+                        <Trigger Property="IsCloseVisible" Value="False">
+                            <Setter TargetName="Button_Close" Property="Visibility" Value="Collapsed"/>
+                        </Trigger>
+                        <Trigger Property="ResizeMode" Value="NoResize">
+                            <Setter TargetName="Button_Minimize" Property="Visibility" Value="Collapsed"/>
+                            <Setter TargetName="Button_Maximize" Property="Visibility" Value="Collapsed"/>
+                        </Trigger>
+                        <Trigger Property="ResizeMode" Value="CanMinimize">
+                            <Setter TargetName="Button_Maximize" Property="IsEnabled" Value="False"/>
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <Style x:Key="TitleBar_Button" TargetType="local:Button">
+        <Setter Property="Focusable" Value="False"/>
+        <Setter Property="IconSize" Value="16"/>
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="local:Button">
+                    <Border x:Name="ButtonBorder" Background="Transparent">
+                        <StackPanel Orientation="Horizontal" Margin="4,0">
+                            <local:IconPresenter x:Name="icon" Width="{TemplateBinding IconSize}" Height="{TemplateBinding IconSize}" Source="{TemplateBinding Icon}" Stretch="{TemplateBinding IconStretch}" FontFamily="{TemplateBinding IconFontFamily}" Foreground="{TemplateBinding Foreground}" Opacity="0.7" VerticalAlignment="Center"/>
+                            <Rectangle x:Name="padding" Width="{TemplateBinding IconPadding}"/>
+                            <ContentPresenter x:Name="content" VerticalAlignment="Center"/>
+                        </StackPanel>
+                    </Border>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="Icon" Value="{x:Null}">
+                            <Setter TargetName="icon" Property="Visibility" Value="Collapsed"/>
+                            <Setter TargetName="padding" Property="Visibility" Value="Collapsed"/>
+                        </Trigger>
+                        <Trigger Property="Content" Value="{x:Null}">
+                            <Setter TargetName="content" Property="Visibility" Value="Collapsed"/>
+                            <Setter TargetName="padding" Property="Visibility" Value="Collapsed"/>
+                        </Trigger>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter TargetName="ButtonBorder" Property="Background" Value="{StaticResource Brush_Background_MouseOver}"/>
+                            <Setter TargetName="icon" Property="Opacity" Value="1"/>
+                        </Trigger>
+                        <Trigger Property="IsPressed" Value="True">
+                            <Setter TargetName="ButtonBorder" Property="Background" Value="{StaticResource Brush_Background_Pressed}"/>
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <Style x:Key="TitleBar_ToggleButton" TargetType="local:ToggleButton">
+        <Setter Property="Focusable" Value="False"/>
+        <Setter Property="IconSize" Value="16"/>
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="local:ToggleButton">
+                    <Border x:Name="ButtonBorder" Background="Transparent">
+                        <StackPanel Orientation="Horizontal" Margin="4,0">
+                            <local:IconPresenter x:Name="icon" Width="{TemplateBinding IconSize}" Height="{TemplateBinding IconSize}" Source="{TemplateBinding Icon}" Stretch="{TemplateBinding IconStretch}" FontFamily="{TemplateBinding IconFontFamily}" Foreground="{TemplateBinding Foreground}" Opacity="0.7" VerticalAlignment="Center"/>
+                            <Rectangle x:Name="padding" Width="{TemplateBinding IconPadding}"/>
+                            <ContentPresenter x:Name="content" VerticalAlignment="Center"/>
+                        </StackPanel>
+                    </Border>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="Icon" Value="{x:Null}">
+                            <Setter TargetName="icon" Property="Visibility" Value="Collapsed"/>
+                            <Setter TargetName="padding" Property="Visibility" Value="Collapsed"/>
+                        </Trigger>
+                        <Trigger Property="Content" Value="{x:Null}">
+                            <Setter TargetName="content" Property="Visibility" Value="Collapsed"/>
+                            <Setter TargetName="padding" Property="Visibility" Value="Collapsed"/>
+                        </Trigger>
+                        <Trigger Property="IsChecked" Value="True">
+                            <Setter TargetName="ButtonBorder" Property="Background" Value="{StaticResource Brush_Background_Checked}"/>
+                        </Trigger>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter TargetName="ButtonBorder" Property="Background" Value="{StaticResource Brush_Background_MouseOver}"/>
+                            <Setter TargetName="icon" Property="Opacity" Value="1"/>
+                        </Trigger>
+                        <Trigger Property="IsPressed" Value="True">
+                            <Setter TargetName="ButtonBorder" Property="Background" Value="{StaticResource Brush_Background_Pressed}"/>
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <SolidColorBrush x:Key="Brush_ListBoxItemBackground" po:Freeze="True" Color="#08000080"/>
+
+    <Style x:Key="Alt2ListBoxItemContainerStyle" TargetType="ListBoxItem">
+        <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
+        <Style.Triggers>
+            <Trigger Property="ItemsControl.AlternationIndex" Value="1">
+                <Setter Property="Background" Value="{StaticResource Brush_ListBoxItemBackground}"/>
+            </Trigger>
+            <Trigger Property="IsSelected" Value="True">
+                <Setter Property="Background" Value="{StaticResource Brush_Background_Checked}"/>
+            </Trigger>
+            <Trigger Property="IsMouseOver" Value="True">
+                <Setter Property="Background" Value="{StaticResource Brush_Background_MouseOver}"/>
+            </Trigger>
+        </Style.Triggers>
+    </Style>
+
+    <Style x:Key="Alt2ListBoxStyle" TargetType="ListBox">
+        <Setter Property="AlternationCount" Value="2"/>
+        <Setter Property="ItemContainerStyle" Value="{StaticResource Alt2ListBoxItemContainerStyle}"/>
+        <Setter Property="ScrollViewer.HorizontalScrollBarVisibility" Value="Disabled"/>
+        <Setter Property="VirtualizingStackPanel.IsVirtualizing" Value="True"/>
+        <Setter Property="VirtualizingStackPanel.VirtualizationMode" Value="Recycling"/>
+    </Style>
+</ResourceDictionary>

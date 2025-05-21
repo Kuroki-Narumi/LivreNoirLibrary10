@@ -1,0 +1,21 @@
+﻿<UserControl x:Class="LivreNoirLibrary.Windows.Controls.JsonView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:LivreNoirLibrary.Windows.Controls"
+             mc:Ignorable="d" FontFamily="Meiryo" SnapsToDevicePixels="True" UseLayoutRounding="True"
+             d:DesignHeight="100" d:DesignWidth="100">
+    <UserControl.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="pack://application:,,,/LivreNoirLibrary.Wpf;component/Themes/Generic.xaml"/>
+            </ResourceDictionary.MergedDictionaries>
+            <Style TargetType="TreeViewItem">
+                <EventSetter Event="Expanded" Handler="OnExpanded_Json"/>
+                <EventSetter Event="Collapsed" Handler="OnExpanded_Json"/>
+            </Style>
+        </ResourceDictionary>
+    </UserControl.Resources>
+    <TreeView x:Name="TreeView" ItemTemplateSelector="{StaticResource JsonTemplateSelector}" VirtualizingPanel.IsVirtualizing="True"/>
+</UserControl>
