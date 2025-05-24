@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <OutputType>WinExe</OutputType>
+    <OutputType>Exe</OutputType>
     <TargetFramework>net9.0-windows</TargetFramework>
     <Nullable>enable</Nullable>
     <UseWPF>true</UseWPF>
@@ -15,6 +15,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\LivreNoirLibrary.Core\LivreNoirLibrary.Core.csproj" />
+    <ProjectReference Include="..\LivreNoirLibrary.Media\LivreNoirLibrary.Media.csproj" />
     <ProjectReference Include="..\LivreNoirLibrary.SourceGenerator\LivreNoirLibrary.SourceGenerator.csproj">
         <OutputItemType>Analyzer</OutputItemType>
         <ReferenceOutputAssembly>false</ReferenceOutputAssembly>

@@ -11,7 +11,7 @@ namespace LivreNoirLibrary.Media
         [ObservableProperty]
         private string? _filename;
         private WaveOutEvent? _waveOut;
-        private Wave.AudioFileReader? _stream;
+        private AudioFileReader? _stream;
 
         private void OnFilenameChanged(string? value)
         {

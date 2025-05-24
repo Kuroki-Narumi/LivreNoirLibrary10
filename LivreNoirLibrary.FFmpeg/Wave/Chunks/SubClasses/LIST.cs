@@ -22,12 +22,12 @@ namespace LivreNoirLibrary.Media.Wave.Chunks
         {
             var stream = reader.BaseStream;
             var limit = stream.Position + length;
-            var type = ChunkIds.Read(reader);
+            var type = FourLetterHeader.Read(reader);
             LIST data = new(type);
             var list = data.SubChunks;
             while (stream.Position < limit)
             {
-                var chid = ChunkIds.Read(reader);
+                var chid = FourLetterHeader.Read(reader);
                 switch (chid)
                 {
                     case ChunkIds.Label:
@@ -50,7 +50,7 @@ namespace LivreNoirLibrary.Media.Wave.Chunks
 
         public override void DumpContents(BinaryWriter writer)
         {
-            ChunkIds.Write(writer, Type);
+            FourLetterHeader.Write(writer, Type);
             foreach (var chunk in CollectionsMarshal.AsSpan(SubChunks))
             {
                 writer.WriteRiffChunk(chunk);

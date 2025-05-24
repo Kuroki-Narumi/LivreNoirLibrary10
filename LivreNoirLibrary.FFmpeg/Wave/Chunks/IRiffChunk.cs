@@ -41,7 +41,7 @@ namespace LivreNoirLibrary.Media.Wave
         public static T ReadRiffChunk<T>(this BinaryReader reader, string chid)
             where T : IRiffChunk<T>
         {
-            ChunkIds.CheckAndThrow(reader, chid);
+            FourLetterHeader.CheckAndThrow(reader, chid);
             return ReadRiffChunk<T>(reader);
         }
 
@@ -60,7 +60,7 @@ namespace LivreNoirLibrary.Media.Wave
         public static void WriteRiffChunk<T>(this BinaryWriter writer, T obj)
             where T : IRiffChunk
         {
-            ChunkIds.Write(writer, obj.Chid);
+            FourLetterHeader.Write(writer, obj.Chid);
             var bytes = obj.ByteSize;
             if (bytes is 0)
             {

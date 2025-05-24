@@ -103,15 +103,15 @@ namespace LivreNoirLibrary.Media.Wave
 
         private void ReadInfo(Stream stream, BinaryReader reader)
         {
-            ChunkIds.CheckAndThrow(reader, ChunkIds.RiffHeader);
+            FourLetterHeader.CheckAndThrow(reader, ChunkIds.RiffHeader);
             var length = (long)reader.ReadUInt32();
             var endPos = stream.Position + length;
-            ChunkIds.CheckAndThrow(reader, ChunkIds.DataHeader);
+            FourLetterHeader.CheckAndThrow(reader, ChunkIds.DataHeader);
             var list = _chunks;
             list.Clear();
             while (stream.Position < endPos)
             {
-                var chid = ChunkIds.Read(reader);
+                var chid = FourLetterHeader.Read(reader);
                 if (chid is ChunkIds.Data)
                 {
                     (_data_position, _data_length) = reader.ReadRiffChunk<DataChunk>();
@@ -253,19 +253,19 @@ namespace LivreNoirLibrary.Media.Wave
             var pos = stream.Position;
             try
             {
-                if (!ChunkIds.Check(reader, ChunkIds.RiffHeader))
+                if (!FourLetterHeader.Check(reader, ChunkIds.RiffHeader))
                 {
                     return false;
                 }
                 var length = (long)reader.ReadUInt32();
                 var endPos = stream.Position + length;
-                if (!ChunkIds.Check(reader, ChunkIds.DataHeader))
+                if (!FourLetterHeader.Check(reader, ChunkIds.DataHeader))
                 {
                     return false;
                 }
                 while (stream.Position < endPos)
                 {
-                    var chid = ChunkIds.Read(reader);
+                    var chid = FourLetterHeader.Read(reader);
                     if (chid is ChunkIds.Format)
                     {
                         var format = reader.ReadRiffChunk<FormatChunk>();

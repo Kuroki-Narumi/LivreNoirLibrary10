@@ -11,6 +11,8 @@ namespace LivreNoirLibrary.Media
 {
     public delegate void ValueWriter<T>(BinaryWriter writer, T value);
     public delegate T ValueReader<T>(BinaryReader reader);
+    public delegate TValue ValueReader<TX, TValue>(BinaryReader reader, TX position);
+    public delegate TValue ValueReader<TY, TX, TValue>(BinaryReader reader, TY key, TX position);
 
     public abstract class TimelineBase<TX, TValue, TOperator> : ITimeline<TX, TValue>
         where TX : struct, IComparable<TX>

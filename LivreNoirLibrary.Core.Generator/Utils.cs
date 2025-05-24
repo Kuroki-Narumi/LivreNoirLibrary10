@@ -27,6 +27,7 @@ namespace LivreNoirLibrary.Core
         public static readonly string[] Signed = [SByte, Short, Int, IntPtr, Long, Float, Double];
         public static readonly string[] Integer = [Int, UInt, Long, ULong, Int128, UInt128];
 
+        public const string PH_Target = "#TARGET#";
         public const string PH_Return = "#RETURN#";
         public const string PH_Method = "#METHOD#";
         public const string PH_Type = "#TYPE#";
@@ -34,5 +35,7 @@ namespace LivreNoirLibrary.Core
         public const string PH_Source = "#S-TYPE#";
         public const string PH_DestinationConvert = "#D-CONVERT#";
         public const string PH_SourceConvert = "#S-CONVERT#";
+        public const string PH_DestinationLength = "#D-LENGTH#";
+        public const string PH_SourceLength = "#S-LENGTH#";
     }
 }

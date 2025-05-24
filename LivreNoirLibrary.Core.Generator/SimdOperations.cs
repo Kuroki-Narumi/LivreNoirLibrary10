@@ -24,6 +24,7 @@ internal class SimdOperations : IIncrementalGenerator
         GenerateCore(context, Code_2Scalar_Overload, Code_2Scalar_Ptr, ["Clamp"], types);
         GenerateCore(context, Code_Unary_Overload, Code_Unary_Ptr, ["Clear"], types);
         GenerateCore(context, Code_Unary_Overload, Code_Unary_Ptr, ["Abs", "Negate"], Signed);
+        GenerateCore_Equals(context, types);
         // 総計
         types = [Int, UInt, Long, ULong, Float, Double];
         GenerateCore_Readonly(context, ["Sum", "Average", "Square", "MeanSquare"], types, PH_Type);
@@ -54,7 +55,7 @@ internal class SimdOperations : IIncrementalGenerator
                                     .Replace(PH_Destination, name);
                 if (twoVector)
                 {
-                    foreach (var (name2, conv2) in SpanTypes_Source)
+                    foreach (var (name2, conv2) in SpanTypes_ReadOnly)
                     {
                         var srcFixed = destFixed.Replace(PH_SourceConvert, conv2)
                                                 .Replace(PH_Source, name2);
@@ -96,7 +97,7 @@ internal class SimdOperations : IIncrementalGenerator
                                                    .Replace(PH_Method, method);
 
             // 配列タイプごとのオーバーロード
-            foreach (var (name, conv) in SpanTypes_Source)
+            foreach (var (name, conv) in SpanTypes_ReadOnly)
             {
                 var destFixed = text.Replace(PH_SourceConvert, conv)
                                     .Replace(PH_Source, name);
@@ -119,6 +120,42 @@ internal class SimdOperations : IIncrementalGenerator
         }
     }
 
+    private static void GenerateCore_Equals(IncrementalGeneratorPostInitializationContext context, Span<string> types)
+    {
+        StringBuilder sb = new();
+        sb.AppendLine(Code_Header);
+
+        var text = Code_EqualsAll_Overload;
+
+        // 配列タイプごとのオーバーロード
+        foreach (var (name, length, conv) in SpanTypes_Equals)
+        {
+            var destFixed = text.Replace(PH_DestinationConvert, conv.Replace(PH_Target, "left"))
+                                .Replace(PH_DestinationLength, length)
+                                .Replace(PH_Destination, name);
+            foreach (var (name2, length2, conv2) in SpanTypes_Equals)
+            {
+                var srcFixed = destFixed.Replace(PH_SourceConvert, conv2.Replace(PH_Target, "right"))
+                                        .Replace(PH_SourceLength, length2)
+                                        .Replace(PH_Source, name2);
+                foreach (var type in types)
+                {
+                    sb.AppendLine(srcFixed.Replace(PH_Type, type));
+                }
+            }
+        }
+
+        // ポインタのオーバーロード
+        text = Code_EqualsAll_Ptr;
+        foreach (var type in types)
+        {
+            sb.AppendLine(text.Replace(PH_Type, type));
+        }
+
+        sb.AppendLine(Code_Footer);
+        context.AddSource($"EqualsAll.g.cs", sb.ToString());
+    }
+
     private static readonly (string, string)[] SpanTypes_Destination =
     [
         ($"List<{PH_Type}>", "CollectionsMarshal.AsSpan(destination)"),
@@ -127,7 +164,7 @@ internal class SimdOperations : IIncrementalGenerator
         ($"Span<{PH_Type}>", "destination"),
     ];
 
-    private static readonly (string, string)[] SpanTypes_Source =
+    private static readonly (string, string)[] SpanTypes_ReadOnly =
     [
         ($"List<{PH_Type}>", "CollectionsMarshal.AsSpan(source)"),
         ($"{PH_Type}[]", "source"),
@@ -135,6 +172,16 @@ internal class SimdOperations : IIncrementalGenerator
         ($"Span<{PH_Type}>", "source"),
         ($"ReadOnlyMemory<{PH_Type}>", "source.Span"),
         ($"ReadOnlySpan<{PH_Type}>", "source"),
+    ];
+
+    private static readonly (string, string, string)[] SpanTypes_Equals =
+    [
+        ($"List<{PH_Type}>", "Count", $"CollectionsMarshal.AsSpan({PH_Target})"),
+        ($"{PH_Type}[]", "Length", $"{PH_Target}"),
+        ($"Memory<{PH_Type}>", "Length", $"{PH_Target}.Span"),
+        ($"Span<{PH_Type}>", "Length", $"{PH_Target}"),
+        ($"ReadOnlyMemory<{PH_Type}>", "Length", $"{PH_Target}.Span"),
+        ($"ReadOnlySpan<{PH_Type}>", "Length", $"{PH_Target}"),
     ];
 
     const string Code_Header = """
@@ -293,5 +340,52 @@ namespace LivreNoirLibrary.Collections
     const string Code_Unary_Readonly_Ptr = $$"""
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static {{PH_Return}} {{PH_Method}}({{PH_Type}}* source, int length) => {{PH_Method}}Core(source, length);
+""";
+
+    const string Code_EqualsAll_Overload = $$"""
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static bool EqualsAll(this {{PH_Destination}} left, {{PH_Source}} right)
+        {
+            if (left.{{PH_DestinationLength}} != right.{{PH_SourceLength}})
+            {
+                return false;
+            }
+            var l = {{PH_DestinationConvert}};
+            var r = {{PH_SourceConvert}};
+            fixed ({{PH_Type}}* leftPtr = l)
+            fixed ({{PH_Type}}* rightPtr = r)
+            {
+                return EqualsCore(leftPtr, rightPtr, l.Length);
+            }
+        }
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static bool Intersects(this {{PH_Destination}} left, {{PH_Source}} right)
+        {
+            var l = {{PH_DestinationConvert}};
+            var r = {{PH_SourceConvert}};
+            var length = Math.Min(l.Length, r.Length);
+            fixed ({{PH_Type}}* leftPtr = l)
+            fixed ({{PH_Type}}* rightPtr = r)
+            {
+                return EqualsCore(leftPtr, rightPtr, length);
+            }
+        }
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static bool EqualsAll(this {{PH_Destination}} left, {{PH_Source}} right, int leftOffset, int rightOffset, int length)
+        {
+            var l = {{PH_DestinationConvert}};
+            var r = {{PH_SourceConvert}};
+            AdjustArgs(l.Length, r.Length, ref leftOffset, ref rightOffset, ref length);
+            fixed ({{PH_Type}}* leftPtr = l)
+            fixed ({{PH_Type}}* rightPtr = r)
+            {
+                return EqualsCore(leftPtr, rightPtr, length);
+            }
+        }
+""";
+
+    const string Code_EqualsAll_Ptr = $$"""
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static bool EqualsAll({{PH_Type}}* left, {{PH_Type}}* right, int length) => EqualsCore(left, right, length);
 """;
 }

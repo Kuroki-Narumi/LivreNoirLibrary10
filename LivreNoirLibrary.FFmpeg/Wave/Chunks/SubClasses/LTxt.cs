@@ -51,7 +51,7 @@ namespace LivreNoirLibrary.Media.Wave.Chunks
         {
             Id = reader.ReadInt32();
             SampleLength = reader.ReadUInt32();
-            Purpose = ChunkIds.Read(reader);
+            Purpose = FourLetterHeader.Read(reader);
             Country = reader.ReadInt16();
             Language = reader.ReadInt16();
             Dialect = reader.ReadInt16();
@@ -66,7 +66,7 @@ namespace LivreNoirLibrary.Media.Wave.Chunks
         {
             writer.Write(Id);
             writer.Write(SampleLength);
-            ChunkIds.Write(writer, Purpose);
+            FourLetterHeader.Write(writer, Purpose);
             writer.Write(Country);
             writer.Write(Language);
             writer.Write(Dialect);

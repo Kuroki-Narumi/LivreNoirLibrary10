@@ -1,17 +1,9 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Threading;
-using System.Runtime.CompilerServices;
-using System.Text;
-using LivreNoirLibrary.Text;
 
 namespace LivreNoirLibrary.Media.Wave
 {
     public static class ChunkIds
     {
-        public const int Length = 4;
-
         public const string RiffHeader = "RIFF";
         public const string DataHeader = "WAVE";
 
@@ -59,43 +51,5 @@ namespace LivreNoirLibrary.Media.Wave
         public const string ISource = "ISRC";
         public const string ISurface = "ISRF";
         public const string ITech = "ITCH";
-
-        private static readonly Lock _lock = new();
-        private static readonly byte[] _chid_buffer = new byte[Length];
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static string Read(BinaryReader reader)
-        {
-            lock (_lock)
-            {
-                var count = reader.Read(_chid_buffer, 0, Length);
-                if (count is not Length)
-                {
-                    throw new EndOfStreamException("Cannot read 4 bytes.");
-                }
-                return Encoding.ASCII.GetString(_chid_buffer);
-            }
-        }
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static bool Check(BinaryReader reader, string chid)
-        {
-            lock (_lock)
-            {
-                var count = reader.Read(_chid_buffer, 0, Length);
-                return count is Length && _chid_buffer.AsSpan().SequenceEqual(StringPool.AsAsciiSpan(chid));
-            }
-        }
-
-        public static void CheckAndThrow(BinaryReader reader, string chid)
-        {
-            if (!Check(reader, chid))
-            {
-                throw new InvalidDataException($"Header pattern mismatched (\"{Encoding.ASCII.GetString(_chid_buffer)}\" expected \"{chid}\")");
-            }
-        }
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static void Write(BinaryWriter writer, string chid) => writer.Write(StringPool.AsAsciiArray(chid));
     }
 }

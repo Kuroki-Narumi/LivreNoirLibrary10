@@ -1,31 +1,31 @@
-﻿using LivreNoirLibrary.ObjectModel;
-using System;
+﻿using System;
 using System.Buffers;
-using System.Runtime.ConstrainedExecution;
+using System.Collections;
+using System.Collections.Generic;
+using System.Numerics;
+using System.Runtime.CompilerServices;
 using System.Threading;
+using LivreNoirLibrary.ObjectModel;
 
 namespace LivreNoirLibrary.Collections
 {
-    public class SharedBuffer<T> : DisposableBase
+    public class SharedBuffer<T> : DisposableBase, IList<T>
     {
-        protected override void DisposeUnmanaged()
-        {
-            ArrayPool<T>.Shared.Return(_array);
-            base.DisposeUnmanaged();
-        }
+        public const int DefaultCapacity = 32;
+        protected static readonly bool IsRefType = RuntimeHelpers.IsReferenceOrContainsReferences<T>();
 
-        private T[] _array;
-        private int _size;
+        protected T[] _array;
+        protected int _size;
         protected readonly ReaderWriterLockSlim _lock = new(LockRecursionPolicy.SupportsRecursion);
 
         public int Capacity => _array.Length;
-        public int Length => _size;
+        public int Count => _size;
 
         public T this[int index]
         {
             get
             {
-                if ((uint)index >= (uint)Capacity)
+                if ((uint)index >= (uint)_size)
                 {
                     throw new IndexOutOfRangeException();
                 }
@@ -41,7 +41,7 @@ namespace LivreNoirLibrary.Collections
             }
             set
             {
-                if ((uint)index >= (uint)Capacity)
+                if ((uint)index >= (uint)_size)
                 {
                     throw new IndexOutOfRangeException();
                 }
@@ -59,68 +59,81 @@ namespace LivreNoirLibrary.Collections
 
         public T this[Index index]
         {
-            get => this[index.GetOffset(Capacity)];
-            set => this[index.GetOffset(Capacity)] = value;
+            get => this[index.GetOffset(_size)];
+            set => this[index.GetOffset(_size)] = value;
         }
 
-        public SharedBuffer(int size)
+        public SharedBuffer(int capacity = DefaultCapacity)
         {
-            _array = ArrayPool<T>.Shared.Rent(Math.Max(size, 1));
-            _size = size;
-            Array.Clear(_array); // 借りてきた配列にゴミが入っている可能性を考慮
-        }
-
-        public void Clear()
-        {
-            _lock.EnterWriteLock();
-            try
+            _array = capacity is > 0 ? ArrayPool<T>.Shared.Rent(capacity) : [];
+            // 借りてきた配列に入っているゴミを削除
+            if (IsRefType)
             {
                 Array.Clear(_array);
             }
-            finally
-            {
-                _lock.ExitWriteLock();
-            }
         }
 
-        public void SetSize(int size, bool clear = false)
+        protected override void DisposeUnmanaged()
+        {
+            ArrayPool<T>.Shared.Return(_array, IsRefType);
+            base.DisposeUnmanaged();
+        }
+
+        protected virtual void ProcessCopy(ReadOnlySpan<T> source, Span<T> destination)
+        {
+            source.CopyTo(destination);
+        }
+
+        public void Clear() => SetSize(0);
+
+        public void SetSize(int size)
         {
             _lock.EnterWriteLock();
             try
             {
-                if (size <= _array.Length)
+                var oldLength = _array.Length;
+                if (size > oldLength)
                 {
-                    if (clear)
+                    var newArray = ArrayPool<T>.Shared.Rent(size);
+                    if (IsRefType)
                     {
-                        Array.Clear(_array, size, _size - size);
+                        Array.Clear(newArray, oldLength, newArray.Length - oldLength);
                     }
-                    _size = size;
-                    return;
+                    ProcessCopy(_array, newArray);
+                    ArrayPool<T>.Shared.Return(_array, IsRefType);
+                    _array = newArray;
                 }
-                var newArray = ArrayPool<T>.Shared.Rent(size);
-                if (clear)
+                else if (size < _size && IsRefType)
                 {
-                    Array.Clear(newArray);
+                    Array.Clear(_array, size, _size - size);
                 }
-                else
-                {
-                    Array.Copy(_array, newArray, _array.Length);
-                }
-                ArrayPool<T>.Shared.Return(_array);
-                _array = newArray;
             }
             finally
             {
+                _size = size;
                 _lock.ExitWriteLock();
             }
         }
 
-        public void EnsureSize(int size, bool clear = false)
+        public void EnsureSize(int size)
         {
             if (_size < size)
             {
-                SetSize(size, clear);
+                SetSize(size);
             }
+        }
+
+        public void SetData(ReadOnlySpan<T> source)
+        {
+            SetSize(source.Length);
+            ProcessCopy(source, _array);
+        }
+
+        public void Append(ReadOnlySpan<T> source)
+        {
+            var size = _size;
+            SetSize(_size + source.Length);
+            ProcessCopy(source, _array.AsSpan(size));
         }
 
         public Span<T> AsSpan() => _array.AsSpan(0, _size);
@@ -128,5 +141,109 @@ namespace LivreNoirLibrary.Collections
         public Span<T> AsSpan(int offset, int length) => _array.AsSpan(offset, length);
         public static implicit operator Span<T>(SharedBuffer<T> buffer) => buffer.AsSpan();
         public static implicit operator ReadOnlySpan<T>(SharedBuffer<T> buffer) => buffer.AsSpan();
+
+        public Enumerator GetEnumerator() => new(this);
+
+        #region Interface Methods
+        public int IndexOf(T item) => Array.IndexOf(_array, item, 0, _size);
+        public bool Contains(T item) => IndexOf(item) is >= 0;
+
+        public void Add(T item)
+        {
+            var size = _size;
+            SetSize(_size + 1);
+            _array[size] = item;
+        }
+
+        public void Insert(int index, T item)
+        {
+            if ((uint)index < (uint)_size)
+            {
+                SetSize(_size + 1);
+                Array.Copy(_array, index, _array, index + 1, _size - index - 1);
+                _array[index] = item;
+            }
+            else if (index == _size)
+            {
+                Add(item);
+            }
+            else
+            {
+                throw new IndexOutOfRangeException();
+            }
+        }
+
+        public bool Remove(T item)
+        {
+            var index = IndexOf(item);
+            if (index is >= 0)
+            {
+                RemoveAt(index);
+                return true;
+            }
+            return false;
+        }
+
+        public void RemoveAt(int index)
+        {
+            if ((uint)index < (uint)_size)
+            {
+                SetSize(_size - 1);
+                if (index < _size)
+                {
+                    Array.Copy(_array, index + 1, _array, index, _size - index);
+                }
+                if (RuntimeHelpers.IsReferenceOrContainsReferences<T>())
+                {
+                    _array[_size] = default!;
+                }
+            }
+            else
+            {
+                throw new IndexOutOfRangeException();
+            }
+        }
+
+        bool ICollection<T>.IsReadOnly => false;
+
+        IEnumerator<T> IEnumerable<T>.GetEnumerator() => GetEnumerator();
+        IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
+
+        public void CopyTo(T[] array, int arrayIndex) => ProcessCopy(AsSpan(), array.AsSpan(arrayIndex));
+
+        #endregion
+
+        public struct Enumerator : IEnumerator<T>
+        {
+            private readonly SharedBuffer<T> _source;
+            private readonly int _size;
+            private int _index;
+
+            internal Enumerator(SharedBuffer<T> source)
+            {
+                _source = source;
+                _size = source._size;
+                _index = -1;
+            }
+
+            public readonly T Current => _source._array[_index];
+            readonly object? IEnumerator.Current => Current;
+
+            public bool MoveNext()
+            {
+                if (++_index < _size)
+                {
+                    return true;
+                }
+                return false;
+            }
+
+            public void Reset()
+            {
+                _index = -1;
+            }
+
+            public readonly void Dispose() { }
+        }
     }
 }

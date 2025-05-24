@@ -21,22 +21,26 @@ namespace LivreNoirLibrary.Windows.Controls
 
         protected readonly Canvas _main_canvas;
         protected readonly Canvas _fixed_canvas = CreateSubCanvas();
-        protected readonly Canvas _vertical_scrollbar = CreateSubCanvas(false);
-        protected readonly Canvas _horizontal_scrollbar = CreateSubCanvas(false);
+        protected readonly Canvas _vertical_scrollbar = CreateSubCanvas();
+        protected readonly Canvas _horizontal_scrollbar = CreateSubCanvas();
+        protected readonly ScrollIcon _scroll_icon = new();
         private Panel? _fixed_area;
         private Panel? _vertical_area;
         private Panel? _horizontal_area;
-        private readonly ScrollIcon _scroll_icon = new();
 
-        private static Canvas CreateSubCanvas(bool isHitTestVisible = true) => new()
+        private static Canvas CreateSubCanvas() => new()
         {
             ClipToBounds = true,
             HorizontalAlignment = HorizontalAlignment.Left,
             VerticalAlignment = VerticalAlignment.Top,
-            IsHitTestVisible = isHitTestVisible
+            IsHitTestVisible = false
         };
 
         public Canvas MainCanvas => _main_canvas;
+        public Canvas FixedCanvas => _fixed_canvas;
+        public Canvas VerticalScrollbar => _vertical_scrollbar;
+        public Canvas HorizontalScrollbar => _horizontal_scrollbar;
+        public ScrollIcon ScrollIcon => _scroll_icon;
 
         public ScrollViewerBase()
         {
@@ -44,28 +48,8 @@ namespace LivreNoirLibrary.Windows.Controls
             main.SetBinding(SnapsToDevicePixelsProperty, new Binding(nameof(SnapsToDevicePixels)) { Mode = BindingMode.OneWay, Source = this });
             main.SetBinding(UseLayoutRoundingProperty, new Binding(nameof(UseLayoutRounding)) { Mode = BindingMode.OneWay, Source = this });
             Content = _main_canvas = main;
-
             _scale_x = (double)GetValue(ScaleXProperty);
             _scale_y = (double)GetValue(ScaleYProperty);
-            _fixed_canvas.Children.Add(_scroll_icon);
-        }
-
-        public override void OnApplyTemplate()
-        {
-            _fixed_area?.Children.Remove(_fixed_canvas);
-            _horizontal_area?.Children.Remove(_horizontal_scrollbar);
-            _vertical_area?.Children.Remove(_vertical_scrollbar);
-
-            base.OnApplyTemplate();
-
-            _fixed_area = GetTemplateChild(PART_MainArea) as Panel;
-            _horizontal_area = GetTemplateChild(PART_VerticalScrollBarArea) as Panel;
-            _vertical_area = GetTemplateChild(PART_HorizontalScrollBarArea) as Panel;
-
-            _fixed_area?.Children.Add(_fixed_canvas);
-            _horizontal_area?.Children.Add(_horizontal_scrollbar);
-            _vertical_area?.Children.Add(_vertical_scrollbar);
-
             Initialize();
         }
 
@@ -88,14 +72,33 @@ namespace LivreNoirLibrary.Windows.Controls
         }
 
         protected virtual void PreInitialize() { }
-        protected virtual void InitializeContents() { }
+
+        protected void InitializeContents()
+        {
+            var children = _main_canvas.Children;
+            foreach (var element in EnumMainCanvasContents())
+            {
+                children.Add(element);
+            }
+            children = _fixed_canvas.Children;
+            foreach (var element in EnumFixedCanvasContents())
+            {
+                children.Add(element);
+            }
+        }
+
         protected virtual void InitializeCommands() { }
         protected virtual void InitializeBindings() { }
         protected virtual void PostInitialize() { }
 
-        protected void AddChild(UIElement element)
+        protected virtual IEnumerable<UIElement> EnumMainCanvasContents()
         {
-            _main_canvas.Children.Add(element);
+            yield break;
+        }
+
+        protected virtual IEnumerable<UIElement> EnumFixedCanvasContents()
+        {
+            yield return _scroll_icon;
         }
 
         protected bool CheckInitialized(Action action)
@@ -106,6 +109,25 @@ namespace LivreNoirLibrary.Windows.Controls
                 return true;
             }
             return false;
+        }
+
+        public override void OnApplyTemplate()
+        {
+            _fixed_area?.Children.Remove(_fixed_canvas);
+            _horizontal_area?.Children.Remove(_horizontal_scrollbar);
+            _vertical_area?.Children.Remove(_vertical_scrollbar);
+
+            base.OnApplyTemplate();
+
+            _fixed_area = GetTemplateChild(PART_MainArea) as Panel;
+            _horizontal_area = GetTemplateChild(PART_VerticalScrollBarArea) as Panel;
+            _vertical_area = GetTemplateChild(PART_HorizontalScrollBarArea) as Panel;
+
+            _fixed_area?.Children.Add(_fixed_canvas);
+            _horizontal_area?.Children.Add(_horizontal_scrollbar);
+            _vertical_area?.Children.Add(_vertical_scrollbar);
+
+            Refresh();
         }
 
         public void Refresh()

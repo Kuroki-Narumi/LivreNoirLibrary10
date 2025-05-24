@@ -13,6 +13,7 @@ namespace LivreNoirLibrary.Media
         public readonly ushort Denominator = denominator;
 
         public TimeSignature(int numerator, int denominator) : this((ushort)numerator, (ushort)denominator) { }
+        public TimeSignature(Rational value) : this((ushort)value.Numerator, (ushort)value.Denominator) { }
 
         public void Dump(BinaryWriter writer)
         {
@@ -37,6 +38,6 @@ namespace LivreNoirLibrary.Media
         public static implicit operator TimeSignature((int, int) obj) => new(obj.Item1, obj.Item2);
         public static implicit operator TimeSignature((ushort, ushort) obj) => new(obj.Item1, obj.Item2);
         public static implicit operator Rational(TimeSignature obj) => obj.ToRational();
-        public static explicit operator TimeSignature(Rational obj) => new((ushort)obj.Numerator, (ushort)obj.Denominator);
+        public static explicit operator TimeSignature(Rational obj) => new(obj);
     }
 }

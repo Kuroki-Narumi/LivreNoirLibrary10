@@ -423,5 +423,22 @@ namespace LivreNoirLibrary.Media
                 Add(pos, values);
             }
         }
+
+        public void ProcessLoad(BinaryReader reader, ValueReader<TX, TValue> valueReader, string? chid = null)
+        {
+            reader.CheckChid(chid);
+            var count = reader.ReadInt32();
+            for (int i = 0; i < count; i++)
+            {
+                var pos = _operator.Read(reader);
+                var innerCount = reader.ReadInt32();
+                List<TValue> values = new(innerCount);
+                for (var j = 0; j < innerCount; j++)
+                {
+                    values.Add(valueReader(reader, pos));
+                }
+                Add(pos, values);
+            }
+        }
     }
 }

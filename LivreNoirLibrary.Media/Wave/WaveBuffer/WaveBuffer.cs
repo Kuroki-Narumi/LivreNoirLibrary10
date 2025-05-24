@@ -26,6 +26,7 @@ namespace LivreNoirLibrary.Media.Wave
         public int TotalSample => _data_length;
 
         public int SampleLength => _data_length / _channels;
+        int IMarker.Length => SampleLength;
         public double TotalSeconds => (double)SampleLength / _sample_rate;
         public TimeSpan TotalTime => TimeSpan.FromSeconds(TotalSeconds);
 

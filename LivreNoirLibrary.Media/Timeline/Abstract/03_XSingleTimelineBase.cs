@@ -88,5 +88,17 @@ namespace LivreNoirLibrary.Media
                 Set(pos, value);
             }
         }
+
+        public void ProcessLoad(BinaryReader reader, ValueReader<TX, TValue> valueReader, string? chid = null)
+        {
+            reader.CheckChid(chid);
+            var count = reader.ReadInt32();
+            for (int i = 0; i < count; i++)
+            {
+                var pos = _operator.Read(reader);
+                var value = valueReader(reader, pos);
+                Set(pos, value);
+            }
+        }
     }
 }

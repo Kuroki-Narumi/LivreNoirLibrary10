@@ -67,13 +67,13 @@ namespace LivreNoirLibrary.Windows.Controls
         public static void CanExecute_MoveUp(this Selector selector, object sender, CanExecuteRoutedEventArgs e)
         {
             var index = selector.SelectedIndex;
-            e.CanExecute = (uint)(index - 1) < (uint)selector.Items.Count;
+            e.CanExecute = Collections.CollectionExtensions.CanMoveUp(selector.Items, index);
         }
 
         public static void CanExecute_MoveDown(this Selector selector, object sender, CanExecuteRoutedEventArgs e)
         {
             var index = selector.SelectedIndex;
-            e.CanExecute = (uint)index < (uint)(selector.Items.Count - 1);
+            e.CanExecute = Collections.CollectionExtensions.CanMoveDown(selector.Items, index);
         }
 
         public static void ProcessSelect(this Selector selector, int index)
@@ -124,7 +124,7 @@ namespace LivreNoirLibrary.Windows.Controls
         {
             var index = selector.SelectedIndex;
             var list = (selector.ItemsSource as IList) ?? selector.Items;
-            list.MoveUp(index);
+            Collections.CollectionExtensions.MoveUp(list, index);
             ProcessSelect(selector, index - 1);
             e.Handled = true;
         }
@@ -133,7 +133,7 @@ namespace LivreNoirLibrary.Windows.Controls
         {
             var index = selector.SelectedIndex;
             var list = (selector.ItemsSource as IList) ?? selector.Items;
-            list.MoveDown(index);
+            Collections.CollectionExtensions.MoveDown(list, index);
             ProcessSelect(selector, index + 1);
             e.Handled = true;
         }

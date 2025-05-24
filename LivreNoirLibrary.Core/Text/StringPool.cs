@@ -26,20 +26,5 @@ namespace LivreNoirLibrary.Text
                 return str;
             }
         }
-
-        private static readonly Dictionary<string, byte[]> _ascii = [];
-
-        private static byte[] AsAsciiSpanInternal(string s)
-        {
-            if (!_ascii.TryGetValue(s, out var ary))
-            {
-                ary = Encoding.ASCII.GetBytes(s);
-                _ascii.Add(s, ary);
-            }
-            return ary;
-        }
-
-        public static byte[] AsAsciiArray(this string s) => AsAsciiSpanInternal(s);
-        public static ReadOnlySpan<byte> AsAsciiSpan(this string s) => new(AsAsciiSpanInternal(s));
     }
 }

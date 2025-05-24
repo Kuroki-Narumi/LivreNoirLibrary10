@@ -13,7 +13,7 @@ namespace LivreNoirLibrary.Media.Wave
         public static bool TryGetNextMarker<T>(this T obj, long position, out Marker marker) where T : IMarker => obj.Markers.TryGet(position, SearchMode.Next, out marker);
         public static bool TryGetPreviousMarker<T>(this T obj, long position, out Marker marker) where T : IMarker => obj.Markers.TryGet(position, SearchMode.Previous, out marker);
 
-        public static long GetMarkerLength<T>(this T obj, in Marker marker) where T : IMarker => obj.Markers.GetLength(marker, obj.SampleLength);
+        public static long GetMarkerLength<T>(this T obj, in Marker marker) where T : IMarker => obj.Markers.GetLength(marker, obj.Length);
 
         public static bool MoveMarkerToMinimum<T>(this T obj, long maxDif = 44)
              where T : IMarker, IWaveBuffer
@@ -81,7 +81,7 @@ namespace LivreNoirLibrary.Media.Wave
             var count = poss.Count;
             var index = poss.FindNearestIndex(position);
             var leftLimit = index is > 0 ? poss[index - 1] + 1 : 0;
-            var rightLimit = (singleMove && index < count - 1 ? poss[index + 1] : obj.SampleLength) - 1;
+            var rightLimit = (singleMove && index < count - 1 ? poss[index + 1] : obj.Length) - 1;
 
             var left = poss[index];
             if (singleMove)
@@ -110,6 +110,6 @@ namespace LivreNoirLibrary.Media.Wave
 
         public  static long GetSliceCount<T>(this T obj) where T : IMarker => obj.Markers.GetValidCount();
 
-        public static IEnumerable<MarkerInfo> EachSlice<T>(this T obj, bool skipIgnoreName = true) where T : IMarker => obj.Markers.EachMarkerWithLength(obj.SampleLength, skipIgnoreName);
+        public static IEnumerable<MarkerInfo> EachSlice<T>(this T obj, bool skipIgnoreName = true) where T : IMarker => obj.Markers.EachMarkerWithLength(obj.Length, skipIgnoreName);
     }
 }

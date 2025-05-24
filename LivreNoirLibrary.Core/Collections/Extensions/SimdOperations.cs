@@ -1,5 +1,4 @@
 using System;
-using System.Collections.Generic;
 using System.Numerics;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
@@ -54,6 +53,31 @@ namespace LivreNoirLibrary.Collections
                 length += srcLength;
             }
             length = Math.Min(length, Math.Min(dstLength - dstOffset, srcLength - srcOffset));
+        }
+
+        private static bool EqualsCore<T>(T* left, T* right, int length)
+            where T : unmanaged, IComparisonOperators<T, T, bool>
+        {
+            var count = Vector<T>.Count;
+            var leftVec = (Vector<T>*)left;
+            var rightVec = (Vector<T>*)right;
+            for (; length >= count; length -= count, leftVec++, rightVec++)
+            {
+                if (!Vector.EqualsAll(*leftVec, *rightVec))
+                {
+                    return false;
+                }
+            }
+            left = (T*)leftVec;
+            right = (T*)rightVec;
+            for (; length is > 0; length--, left++, right++)
+            {
+                if (*left != *right)
+                {
+                    return false;
+                }
+            }
+            return true;
         }
 
         internal static void Clear<T>(T* destination, int length) where T : unmanaged => ClearCore(destination, length);

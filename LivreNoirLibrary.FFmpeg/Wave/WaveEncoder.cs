@@ -70,16 +70,16 @@ namespace LivreNoirLibrary.Media.Wave
                 return;
             }
             var stream = writer.BaseStream;
-            ChunkIds.Write(writer, ChunkIds.RiffHeader);
+            FourLetterHeader.Write(writer, ChunkIds.RiffHeader);
             writer.Write(0u);
             _header_position = stream.Position;
-            ChunkIds.Write(writer, ChunkIds.DataHeader);
+            FourLetterHeader.Write(writer, ChunkIds.DataHeader);
             _format.Dump(writer);
             if (this.TryGetChunk<Chunks.Fact>(out var fact))
             {
                 _fact_position = fact.Dump(writer);
             }
-            ChunkIds.Write(writer, ChunkIds.Data);
+            FourLetterHeader.Write(writer, ChunkIds.Data);
             writer.Write(0u);
             _data_position = stream.Position;
             _header_wrote = true;

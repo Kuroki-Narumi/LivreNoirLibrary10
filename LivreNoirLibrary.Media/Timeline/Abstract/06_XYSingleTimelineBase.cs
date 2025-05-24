@@ -204,5 +204,22 @@ namespace LivreNoirLibrary.Media
                 }
             }
         }
+
+        public void ProcessLoad(BinaryReader reader, ValueReader<TY> keyReader, ValueReader<TY, TX, TValue> valueReader, string? chid = null)
+        {
+            reader.CheckChid(chid);
+            var count = reader.ReadInt32();
+            for (int i = 0; i < count; i++)
+            {
+                var key = keyReader(reader);
+                var innerCount = reader.ReadInt32();
+                for (var j = 0; j < innerCount; j++)
+                {
+                    var pos = _operator.Read(reader);
+                    var value = valueReader(reader, key, pos);
+                    Set(key, pos, value);
+                }
+            }
+        }
     }
 }

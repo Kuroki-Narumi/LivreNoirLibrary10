@@ -13,7 +13,6 @@ namespace LivreNoirLibrary.Windows.Controls
         public ScrollIcon()
         {
             IsHitTestVisible = false;
-            Panel.SetZIndex(this, int.MaxValue);
         }
 
         private void OnIconTypeChanged(ScrollIconType value)
