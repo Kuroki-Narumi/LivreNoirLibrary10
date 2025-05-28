@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Windows;
 using System.Windows.Data;
 using System.Windows.Controls;
@@ -60,14 +59,14 @@ namespace LivreNoirLibrary.Windows.Controls
         public override void OnApplyTemplate()
         {
             base.OnApplyTemplate();
+            if (_slider is not null)
+            {
+                BindingOperations.ClearAllBindings(_slider);
+            }
             if (GetTemplateChild(PART_Slider) is Slider slider)
             {
                 void Bind(DependencyProperty dp)
                 {
-                    if (_slider is not null)
-                    {
-                        BindingOperations.ClearBinding(_slider, dp);
-                    }
                     slider.SetBinding(dp, new Binding(dp.Name) { Source = this, Mode = BindingMode.TwoWay });
                 }
                 foreach (var dp in BindingTargets)

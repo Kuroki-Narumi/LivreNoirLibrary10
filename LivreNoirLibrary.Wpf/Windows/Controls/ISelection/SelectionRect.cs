@@ -8,8 +8,10 @@ using static LivreNoirLibrary.Media.MediaUtils;
 
 namespace LivreNoirLibrary.Windows.Controls
 {
-    public class SelectionRect(SelectionType type)
+    public class SelectionRect : ISelectionRect
     {
+        private SelectionMode _mode;
+
         public Rectangle Rectangle { get; init; } = new()
         {
             Fill = GetBrush(SelectionColors.Fill),
@@ -19,34 +21,24 @@ namespace LivreNoirLibrary.Windows.Controls
             Height = 0,
         };
 
-        public SelectionType Type { get; init; } = type;
-        public SelectionMode Mode { get; set; }
+        public SelectionMode Mode
+        {
+            get => _mode;
+            set
+            {
+                _mode = value;
+                Fill = value switch
+                {
+                    SelectionMode.New => GetBrush(SelectionColors.Fill),
+                    SelectionMode.Union => GetBrush(SelectionColors.Union),
+                    SelectionMode.Except => GetBrush(SelectionColors.Except),
+                    SelectionMode.Intersect => GetBrush(SelectionColors.Intersect),
+                    _ => null
+                };
+            }
+        }
 
         public Brush? Fill { get => Rectangle.Fill; set => Rectangle.Fill = value; }
-
-        public void SetNew()
-        {
-            Mode = SelectionMode.New;
-            Fill = GetBrush(SelectionColors.Fill);
-        }
-
-        public void SetUnion()
-        {
-            Mode = SelectionMode.Union;
-            Fill = GetBrush(SelectionColors.Union);
-        }
-
-        public void SetExcept()
-        {
-            Mode = SelectionMode.Except;
-            Fill = GetBrush(SelectionColors.Except);
-        }
-
-        public void SetIntersect()
-        {
-            Mode = SelectionMode.Intersect;
-            Fill = GetBrush(SelectionColors.Intersect);
-        }
 
         public void SetHorizontalBinding(Binding binding)
         {
@@ -56,19 +48,6 @@ namespace LivreNoirLibrary.Windows.Controls
         public void SetVerticalBinding(Binding binding)
         {
             Rectangle.SetBinding(FrameworkElement.HeightProperty, binding);
-        }
-
-        public void Clear()
-        {
-            if (Type.IsHorizontal())
-            {
-                Rectangle.Width = 0;
-            }
-            if (Type.IsVertical())
-            {
-                Rectangle.Height = 0;
-            }
-            Rectangle.Visibility = Visibility.Collapsed;
         }
 
         public void Show()
@@ -88,6 +67,11 @@ namespace LivreNoirLibrary.Windows.Controls
             Canvas.SetTop(Rectangle, y);
             Rectangle.Height = Math.Max(height, 0);
             Show();
+        }
+
+        public void Hide()
+        {
+            Rectangle.Visibility = Visibility.Collapsed;
         }
     }
 }

@@ -7,6 +7,9 @@ namespace LivreNoirLibrary.Media
 {
     public static partial class MediaUtils
     {
+        public const double DefaultDashLength = 4;
+        public const double DefaultCheckerSize = 8;
+
         private static readonly Dictionary<Color, SolidColorBrush> _brush_cache = [];
         private static readonly Dictionary<(Brush, double), Pen> _pen_cache = [];
 
@@ -27,13 +30,12 @@ namespace LivreNoirLibrary.Media
             }
             return brush;
         }
-
         public static SolidColorBrush GetBrush(byte a, byte r, byte g, byte b) => GetBrush(Color.FromArgb(a, r, g, b));
         public static SolidColorBrush GetBrush(string colorCode) => GetBrush(colorCode.ToColor());
 
         public static Pen? GetPen(Brush? brush, double th)
         {
-            if (brush is not null && th > 0)
+            if (brush is not null && th is > 0)
             {
                 var key = (brush, th);
                 if (!_pen_cache.TryGetValue(key, out var pen))
@@ -46,79 +48,92 @@ namespace LivreNoirLibrary.Media
             }
             return null;
         }
-
         public static Pen? GetPen(Color color, double th) => GetPen(GetBrush(color), th);
+        public static Pen? GetPen(string colorCode, double th) => GetPen(GetBrush(colorCode), th);
 
-        public static DrawingBrush CreateHorizontalDashBrush(Color? color1, Color? color2, double len1 = 4, double len2 = 4)
+        public static DrawingBrush CreateHorizontalDashBrush(Color color1, Color color2, double len1 = DefaultDashLength, double len2 = DefaultDashLength)
         {
             DrawingGroup group = new();
             RenderOptions.SetEdgeMode(group, EdgeMode.Aliased);
 
-            RectangleGeometry rect = new(new(0, 0, len1, 1));
-            rect.Freeze();
-            GeometryDrawing gd = new()
+            group.Children.Add(Freeze(new GeometryDrawing()
             {
-                Brush = color1 is Color c1 ? GetBrush(c1) : Brushes.Transparent,
-                Geometry = rect,
-            };
-            gd.Freeze();
-            group.Children.Add(gd);
-
-            rect = new(new(len1, 0, len2, 1));
-            rect.Freeze();
-            gd = new()
+                Brush = GetBrush(color1),
+                Geometry = CreateRectGeometry(new(0, 0, len1, 1)),
+            }));
+            group.Children.Add(Freeze(new GeometryDrawing()
             {
-                Brush = color2 is Color c2 ? GetBrush(c2) : Brushes.Transparent,
-                Geometry = rect,
-            };
-            gd.Freeze();
-            group.Children.Add(gd);
-
+                Brush = GetBrush(color2),
+                Geometry = CreateRectGeometry(new(len1, 0, len2, 1)),
+            }));
             group.Freeze();
-            DrawingBrush brush = new(group)
+
+            return Freeze(new DrawingBrush(group)
             {
-                Viewport = new Rect(0, 0, len1 + len2, 1),
+                Viewport = new(0, 0, len1 + len2, 1),
                 TileMode = TileMode.Tile,
                 ViewportUnits = BrushMappingMode.Absolute,
-            };
-            brush.Freeze();
-            return brush;
+            });
         }
+        public static DrawingBrush CreateHorizontalDashBrush(string color1Code, string color2Code, double len1 = DefaultDashLength, double len2 = DefaultDashLength)
+            => CreateHorizontalDashBrush(color1Code.ToColor(), color2Code.ToColor(), len1, len2);
 
-        public static DrawingBrush CreateVerticalDashBrush(Color? color1, Color? color2, double len1 = 4, double len2 = 4)
+        public static DrawingBrush CreateVerticalDashBrush(Color color1, Color color2, double len1 = DefaultDashLength, double len2 = DefaultDashLength)
         {
             DrawingGroup group = new();
             RenderOptions.SetEdgeMode(group, EdgeMode.Aliased);
 
-            RectangleGeometry rect = new(new(0, 0, 1, len1));
-            rect.Freeze();
-            GeometryDrawing gd = new()
+            group.Children.Add(Freeze(new GeometryDrawing()
             {
-                Brush = color1 is Color c1 ? GetBrush(c1) : Brushes.Transparent,
-                Geometry = rect,
-            };
-            gd.Freeze();
-            group.Children.Add(gd);
-
-            rect = new(new(0, len1, 1, len2));
-            rect.Freeze();
-            gd = new()
+                Brush = GetBrush(color1),
+                Geometry = CreateRectGeometry(new(0, 0, 1, len1)),
+            }));
+            group.Children.Add(Freeze(new GeometryDrawing()
             {
-                Brush = color2 is Color c2 ? GetBrush(c2) : Brushes.Transparent,
-                Geometry = rect,
-            };
-            gd.Freeze();
-            group.Children.Add(gd);
-
+                Brush = GetBrush(color2),
+                Geometry = CreateRectGeometry(new(0, len1, 1, len2)),
+            }));
             group.Freeze();
-            DrawingBrush brush = new(group)
+
+            return Freeze(new DrawingBrush(group)
             {
-                Viewport = new Rect(0, 0, 1, len1 + len2),
+                Viewport = new(0, 0, 1, len1 + len2),
                 TileMode = TileMode.Tile,
                 ViewportUnits = BrushMappingMode.Absolute,
-            };
-            brush.Freeze();
-            return brush;
+            });
         }
+        public static DrawingBrush CreateVerticalDashBrush(string color1Code, string color2Code, double len1 = DefaultDashLength, double len2 = DefaultDashLength)
+            => CreateVerticalDashBrush(color1Code.ToColor(), color2Code.ToColor(), len1, len2);
+
+        public static DrawingBrush TransparentCheckerBrush { get; } = CreateTransparentCheckerBrush("#eee", "#ccc");
+
+        public static DrawingBrush CreateTransparentCheckerBrush(Color color1, Color color2, double size = DefaultCheckerSize)
+        {
+            DrawingGroup dg = new();
+            RenderOptions.SetEdgeMode(dg, EdgeMode.Aliased);
+
+            Rect viewport = new(0, 0, size * 2, size * 2);
+            dg.Children.Add(Freeze(new GeometryDrawing() 
+            {
+                Brush = GetBrush(color1),
+                Geometry = CreateRectGeometry(viewport),
+            }));
+            var rectExpr = $"h{size} v{size} h-{size} Z";
+            dg.Children.Add(Freeze(new GeometryDrawing()
+            {
+                Brush = GetBrush(color2),
+                Geometry = CreateGeometry($"M0,0 {rectExpr} M{size},{size} {rectExpr}"),
+            }));
+            dg.Freeze();
+
+            return Freeze(new DrawingBrush(dg)
+            {
+                Viewport = viewport,
+                TileMode = TileMode.Tile,
+                ViewportUnits = BrushMappingMode.Absolute,
+            });
+        }
+        public static DrawingBrush CreateTransparentCheckerBrush(string color1Code, string color2Code, double size = DefaultCheckerSize)
+            => CreateTransparentCheckerBrush(color1Code.ToColor(), color2Code.ToColor(), size);
     }
 }

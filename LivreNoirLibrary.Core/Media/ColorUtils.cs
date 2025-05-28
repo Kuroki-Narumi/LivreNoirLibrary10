@@ -5,6 +5,9 @@ namespace LivreNoirLibrary.Media
 {
     public static class ColorUtils
     {
+        public const float InvertFactor = 1f / 255f;
+        public const float InvertFactor4bits = 1f / 15f;
+
         public static float NormalizeHue(float h)
         {
             h %= 360;
@@ -89,6 +92,8 @@ namespace LivreNoirLibrary.Media
         public static float Blend(float value1, float value2, float ratio = 0.5f) => value1 * (1 - ratio) + value2 * ratio;
         public static byte Blend(byte value1, byte value2, float ratio = 0.5f) => (byte)Math.Clamp(MathF.Round(value1 * (1 - ratio) + value2 * ratio), 0, 255);
 
+        public static string GetColroCode(byte r, byte g, byte b) => $"#{r:X2}{g:X2}{b:X2}";
+        public static string GetColroCode(byte a, byte r, byte g, byte b) => $"#{a:X2}{r:X2}{g:X2}{b:X2}";
         public static string GetColorCode(float r, float g, float b) => $"#{GetByte(r):X2}{GetByte(g):X2}{GetByte(b):X2}";
         public static string GetColorCode(float a, float r, float g, float b) => $"#{GetByte(a):X2}{GetByte(r):X2}{GetByte(g):X2}{GetByte(b):X2}";
 
@@ -99,41 +104,94 @@ namespace LivreNoirLibrary.Media
             {
                 return false;
             }
-            text = text.Replace("#", "");
-            return text.Length is 3 or 4 or 6 or 8 && uint.TryParse(text, System.Globalization.NumberStyles.HexNumber, null, out _);
+            var span = text.AsSpan();
+            if (span[0] is '#')
+            {
+                span = span[1..];
+            }
+            return span.Length is 3 or 4 or 6 or 8 && uint.TryParse(span, System.Globalization.NumberStyles.HexNumber, null, out _);
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static bool TryParseColorCodeToByte(string colorCode, out byte a, out byte r, out byte g, out byte b)
+        {
+            var span = colorCode.AsSpan();
+            if (span[0] is '#')
+            {
+                span = span[1..];
+            }
+            if (uint.TryParse(span, System.Globalization.NumberStyles.HexNumber, null, out var value))
+            {
+                unchecked
+                {
+                    switch (span.Length)
+                    {
+                        case 3: // rgb
+                            a = 255;
+                            r = (byte)(((value >> 8) & 0xF) * 0x11);
+                            g = (byte)(((value >> 4) & 0xF) * 0x11);
+                            b = (byte)((value & 0xF) * 0x11);
+                            return true;
+                        case 4: // argb
+                            a = (byte)(((value >> 12) & 0xF) * 0x11);
+                            r = (byte)(((value >> 8) & 0xF) * 0x11);
+                            g = (byte)(((value >> 4) & 0xF) * 0x11);
+                            b = (byte)((value & 0xF) * 0x11);
+                            return true;
+                        case 6: // rrggbb
+                            a = 255;
+                            r = (byte)(value >> 16);
+                            g = (byte)(value >> 8);
+                            b = (byte)value;
+                            return true;
+                        case 8: // aarrggbb
+                            a = (byte)(value >> 24);
+                            r = (byte)(value >> 16);
+                            g = (byte)(value >> 8);
+                            b = (byte)value;
+                            return true;
+                    }
+                }
+            }
+            a = r = g = b = 0;
+            return false;
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static bool TryParseColorCode(string colorCode, out float a, out float r, out float g, out float b)
         {
-            colorCode = colorCode.Replace("#", "");
-            if (uint.TryParse(colorCode, System.Globalization.NumberStyles.HexNumber, null, out var value))
+            var span = colorCode.AsSpan();
+            if (span[0] is '#')
             {
-                switch (colorCode.Length)
+                span = span[1..];
+            }
+            if (uint.TryParse(span, System.Globalization.NumberStyles.HexNumber, null, out var value))
+            {
+                switch (span.Length)
                 {
                     case 3: // rgb
                         a = 1;
-                        r = (float)((value >> 8) & 0xF) / 0xF;
-                        g = (float)((value >> 4) & 0xF) / 0xF;
-                        b = (float)(value & 0xF) / 0xF;
+                        r = ((value >> 8) & 0xF) * InvertFactor4bits;
+                        g = ((value >> 4) & 0xF) * InvertFactor4bits;
+                        b = (value & 0xF) * InvertFactor4bits;
                         return true;
                     case 4: // argb
-                        a = (float)((value >> 12) & 0xF) / 0xF;
-                        r = (float)((value >> 8) & 0xF) / 0xF;
-                        g = (float)((value >> 4) & 0xF) / 0xF;
-                        b = (float)(value & 0xF) / 0xF;
+                        a = ((value >> 12) & 0xF) * InvertFactor4bits;
+                        r = ((value >> 8) & 0xF) * InvertFactor4bits;
+                        g = ((value >> 4) & 0xF) * InvertFactor4bits;
+                        b = (value & 0xF) * InvertFactor4bits;
                         return true;
                     case 6: // rrggbb
                         a = 1;
-                        r = (float)((value >> 16) & 0xFF) / 0xFF;
-                        g = (float)((value >> 8) & 0xFF) / 0xFF;
-                        b = (float)(value & 0xFF) / 0xFF;
+                        r = ((value >> 16) & 0xFF) * InvertFactor;
+                        g = ((value >> 8) & 0xFF) * InvertFactor;
+                        b = (value & 0xFF) * InvertFactor;
                         return true;
                     case 8: // aarrggbb
-                        a = (float)((value >> 24) & 0xFF) / 0xFF;
-                        r = (float)((value >> 16) & 0xFF) / 0xFF;
-                        g = (float)((value >> 8) & 0xFF) / 0xFF;
-                        b = (float)(value & 0xFF) / 0xFF;
+                        a = ((value >> 24) & 0xFF) * InvertFactor;
+                        r = ((value >> 16) & 0xFF) * InvertFactor;
+                        g = ((value >> 8) & 0xFF) * InvertFactor;
+                        b = (value & 0xFF) * InvertFactor;
                         return true;
                 }
             }
@@ -143,7 +201,7 @@ namespace LivreNoirLibrary.Media
 
         public static byte GetByte(float value) => (byte)MathF.Round(255 * value);
         public static int GetInt(float value) => (int)MathF.Round(255 * value);
-        public static float GetFloat(byte value) => value / 255f;
-        public static float GetFloat(int value) => value / 255f;
+        public static float GetFloat(byte value) => value * InvertFactor;
+        public static float GetFloat(int value) => value * InvertFactor;
     }
 }

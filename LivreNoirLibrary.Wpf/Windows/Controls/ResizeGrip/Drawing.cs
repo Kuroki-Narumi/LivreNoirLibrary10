@@ -6,6 +6,7 @@ using System.Windows.Media.Animation;
 using System.Windows.Input;
 using System.Windows.Data;
 using LivreNoirLibrary.Media;
+using LivreNoirLibrary.Windows.Converters;
 
 namespace LivreNoirLibrary.Windows.Controls
 {
@@ -50,7 +51,7 @@ namespace LivreNoirLibrary.Windows.Controls
         {
             DrawingGroup dg = new();
             // background
-            GeometryDrawing gd = new() { Geometry = MediaUtils.Freeze(new RectangleGeometry(new(0, 0, 5, 1))) };
+            GeometryDrawing gd = new() { Geometry = MediaUtils.CreateRectGeometry(new(0, 0, 5, 1)) };
             BindingOperations.SetBinding(gd, GeometryDrawing.BrushProperty, background);
             dg.Children.Add(gd);
             // foreground
@@ -71,7 +72,7 @@ namespace LivreNoirLibrary.Windows.Controls
         {
             DrawingGroup dg = new();
             // background
-            GeometryDrawing gd = new() { Geometry = MediaUtils.Freeze(new RectangleGeometry(new(0, 0, 1, 5))) };
+            GeometryDrawing gd = new() { Geometry = MediaUtils.CreateRectGeometry(new(0, 0, 1, 5)) };
             BindingOperations.SetBinding(gd, GeometryDrawing.BrushProperty, background);
             dg.Children.Add(gd);
             // foreground
@@ -92,7 +93,7 @@ namespace LivreNoirLibrary.Windows.Controls
         {
             DrawingGroup dg = new();
             // background
-            GeometryDrawing gd = new() { Geometry = MediaUtils.Freeze(new RectangleGeometry(new(0, 0, 20, 20))) };
+            GeometryDrawing gd = new() { Geometry = MediaUtils.CreateRectGeometry(new(0, 0, 20, 20)) };
             BindingOperations.SetBinding(gd, GeometryDrawing.BrushProperty, background);
             dg.Children.Add(gd);
             // foreground

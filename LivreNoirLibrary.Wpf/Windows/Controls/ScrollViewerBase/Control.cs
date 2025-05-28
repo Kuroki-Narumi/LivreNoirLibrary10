@@ -70,7 +70,7 @@ namespace LivreNoirLibrary.Windows.Controls
 
                 void mouseUp(object sender, MouseButtonEventArgs e)
                 {
-                    if (moving)
+                    if (moving && e.ChangedButton is MouseButton.Middle)
                     {
                         moveEnd(sender, e);
                     }
@@ -118,5 +118,18 @@ namespace LivreNoirLibrary.Windows.Controls
 
         protected virtual bool ProcessWheel(int delta, bool ctrl, bool shift) => false;
 
+        protected override void OnPreviewKeyDown(KeyEventArgs e)
+        {
+            if (!e.Handled && ProcessKey(e.Key, KeyInput.IsCtrlDown(), KeyInput.IsShiftDown()))
+            {
+                e.Handled = true;
+            }
+            else
+            {
+                base.OnPreviewKeyDown(e);
+            }
+        }
+
+        protected virtual bool ProcessKey(Key key, bool ctrl, bool shift) => false;
     }
 }

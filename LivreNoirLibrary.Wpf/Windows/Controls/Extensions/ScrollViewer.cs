@@ -6,6 +6,14 @@ namespace LivreNoirLibrary.Windows.Controls
 {
     public static partial class ControlExtension
     {
+        public static void HandleHorizontalWheel(this ScrollViewer viewer, MouseWheelEventArgs e)
+        {
+            var offset = viewer.HorizontalOffset;
+            var newOffset = Math.Clamp(offset + e.Delta, 0, viewer.ScrollableWidth);
+            viewer.ScrollToHorizontalOffset(newOffset);
+            e.Handled = newOffset != offset;
+        }
+
         public static void AutoScroll(this ScrollViewer viewer)
         {
             var pos = Mouse.GetPosition(viewer);
@@ -24,38 +32,48 @@ namespace LivreNoirLibrary.Windows.Controls
 
         public static void AutoScroll_Horizontal(this ScrollViewer viewer, double x)
         {
-            var dif = 0d;
-            if (x < 0)
+            double dif;
+            if (x is < 0)
             {
-                dif = (x - 15) / 16;
+                dif = x - 15;
             }
-            else if (x > viewer.ViewportWidth)
+            else
             {
-                dif = (x - viewer.ViewportWidth + 15) / 16;
+                x -= viewer.ViewportWidth;
+                if (x is > 0)
+                {
+                    dif = x + 15;
+                }
+                else
+                {
+                    return;
+                }
             }
-            if (dif is not 0)
-            {
-                viewer.ScrollToHorizontalOffset(viewer.HorizontalOffset + Math.Truncate(dif));
-            }
+            viewer.ScrollToHorizontalOffset(viewer.HorizontalOffset + Math.Truncate(dif / 16));
         }
 
         public static void AutoScroll_Vertical(this ScrollViewer viewer) => AutoScroll_Vertical(viewer, Mouse.GetPosition(viewer).Y);
 
         public static void AutoScroll_Vertical(this ScrollViewer viewer, double y)
         {
-            var dif = 0d;
+            double dif;
             if (y < 0)
             {
-                dif = (y - 15) / 16;
+                dif = y - 15;
             }
-            else if (y > viewer.ViewportHeight)
+            else
             {
-                dif = (y - viewer.ViewportHeight + 15) / 16;
+                y -= viewer.ViewportHeight;
+                if (y is > 0)
+                {
+                    dif = y + 15;
+                }
+                else
+                {
+                    return;
+                }
             }
-            if (dif is not 0)
-            {
-                viewer.ScrollToVerticalOffset(viewer.VerticalOffset + Math.Truncate(dif));
-            }
+            viewer.ScrollToVerticalOffset(viewer.VerticalOffset + Math.Truncate(dif / 16));
         }
 
         public const double ScrollThreshold = 8;

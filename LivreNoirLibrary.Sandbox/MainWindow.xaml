@@ -4,9 +4,17 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:LivreNoirLibrary.Sandbox"
+        xmlns:ctrl="clr-namespace:LivreNoirLibrary.Windows.Controls;assembly=LivreNoirLibrary.Wpf"
+        xmlns:media="clr-namespace:LivreNoirLibrary.Media;assembly=LivreNoirLibrary.Wpf"
         mc:Ignorable="d"
         Title="MainWindow" Height="450" Width="800">
     <Grid>
-
+        <TabControl ItemContainerStyle="{StaticResource TabItem_Cornered}">
+            <TabItem Header="ImageRectSelector">
+                <Grid AllowDrop="True" DragOver="OnDragOver_Image" Drop="OnDrop_Image">
+                    <ctrl:ImageRectSelector x:Name="ImageRectSelector" Grid.Row="1"/>
+                </Grid>
+            </TabItem>
+        </TabControl>
     </Grid>
 </Window>

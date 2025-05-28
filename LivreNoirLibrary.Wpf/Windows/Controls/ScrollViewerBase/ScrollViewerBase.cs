@@ -5,6 +5,7 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
 using System.Windows.Input;
+using System.Windows.Interop;
 
 namespace LivreNoirLibrary.Windows.Controls
 {
@@ -19,21 +20,21 @@ namespace LivreNoirLibrary.Windows.Controls
             PropertyUtils.OverrideDefaultStyleKey<ScrollViewerBase>();
         }
 
-        protected readonly Canvas _main_canvas;
-        protected readonly Canvas _fixed_canvas = CreateSubCanvas();
-        protected readonly Canvas _vertical_scrollbar = CreateSubCanvas();
-        protected readonly Canvas _horizontal_scrollbar = CreateSubCanvas();
+        protected readonly Canvas _main_canvas = CreateSubCanvas(true);
+        protected readonly Canvas _fixed_canvas = CreateSubCanvas(false);
+        protected readonly Canvas _vertical_scrollbar = CreateSubCanvas(false);
+        protected readonly Canvas _horizontal_scrollbar = CreateSubCanvas(false);
         protected readonly ScrollIcon _scroll_icon = new();
         private Panel? _fixed_area;
         private Panel? _vertical_area;
         private Panel? _horizontal_area;
 
-        private static Canvas CreateSubCanvas() => new()
+        private static Canvas CreateSubCanvas(bool isHisTestVisible) => new()
         {
             ClipToBounds = true,
             HorizontalAlignment = HorizontalAlignment.Left,
             VerticalAlignment = VerticalAlignment.Top,
-            IsHitTestVisible = false
+            IsHitTestVisible = isHisTestVisible,
         };
 
         public Canvas MainCanvas => _main_canvas;
@@ -44,13 +45,12 @@ namespace LivreNoirLibrary.Windows.Controls
 
         public ScrollViewerBase()
         {
-            Canvas main = CreateSubCanvas();
-            main.SetBinding(SnapsToDevicePixelsProperty, new Binding(nameof(SnapsToDevicePixels)) { Mode = BindingMode.OneWay, Source = this });
-            main.SetBinding(UseLayoutRoundingProperty, new Binding(nameof(UseLayoutRounding)) { Mode = BindingMode.OneWay, Source = this });
-            Content = _main_canvas = main;
+            Content = _main_canvas;
             _scale_x = (double)GetValue(ScaleXProperty);
             _scale_y = (double)GetValue(ScaleYProperty);
-            Initialize();
+            Grid.SetRow(_vertical_scrollbar, 1);
+            Grid.SetColumn(_horizontal_scrollbar, 1);
+            this.SetDispatcher(Initialize, System.Windows.Threading.DispatcherPriority.Send);
         }
 
         private Action? _refresh_action;
@@ -59,7 +59,8 @@ namespace LivreNoirLibrary.Windows.Controls
         {
             _main_canvas.Children.Clear();
             PreInitialize();
-            InitializeContents();
+            InitializeScrollableContents();
+            InitializeFixedContents();
             InitializeCommands();
             InitializeBindings();
             PostInitialize();
@@ -72,34 +73,27 @@ namespace LivreNoirLibrary.Windows.Controls
         }
 
         protected virtual void PreInitialize() { }
-
-        protected void InitializeContents()
-        {
-            var children = _main_canvas.Children;
-            foreach (var element in EnumMainCanvasContents())
-            {
-                children.Add(element);
-            }
-            children = _fixed_canvas.Children;
-            foreach (var element in EnumFixedCanvasContents())
-            {
-                children.Add(element);
-            }
-        }
-
+        protected virtual void InitializeScrollableContents() { }
+        protected virtual void InitializeFixedContents() => AddFixedContent(_scroll_icon);
         protected virtual void InitializeCommands() { }
-        protected virtual void InitializeBindings() { }
+        protected virtual void InitializeBindings()
+        {
+            FrameworkElement element = _main_canvas;
+            element.SetBinding(SnapsToDevicePixelsProperty, new Binding(nameof(SnapsToDevicePixels)) { Mode = BindingMode.OneWay, Source = this });
+            element.SetBinding(UseLayoutRoundingProperty, new Binding(nameof(UseLayoutRounding)) { Mode = BindingMode.OneWay, Source = this });
+            element.SetBinding(WidthProperty, Binding_ContentWidth);
+            element.SetBinding(HeightProperty, Binding_ContentHeight);
+            element.SetBinding(VerticalAlignmentProperty, new Binding(nameof(VerticalContentAlignment)) { Source = this });
+            element.SetBinding(HorizontalAlignmentProperty, new Binding(nameof(HorizontalContentAlignment)) { Source = this });
+
+            element = _fixed_canvas;
+            element.SetBinding(WidthProperty, Binding_ViewportWidth);
+            element.SetBinding(HeightProperty, Binding_ViewportHeight);
+        }
         protected virtual void PostInitialize() { }
 
-        protected virtual IEnumerable<UIElement> EnumMainCanvasContents()
-        {
-            yield break;
-        }
-
-        protected virtual IEnumerable<UIElement> EnumFixedCanvasContents()
-        {
-            yield return _scroll_icon;
-        }
+        protected void AddScrollableContent(UIElement content) => _main_canvas.Children.Add(content);
+        protected void AddFixedContent(UIElement content) => _fixed_canvas.Children.Add(content);
 
         protected bool CheckInitialized(Action action)
         {
@@ -146,16 +140,10 @@ namespace LivreNoirLibrary.Windows.Controls
         protected virtual void PostRefresh() { }
 
         protected void AdjustHorizontalScroll(double oldScale, double newScale) => AdjustHorizontalScroll(Mouse.GetPosition(this).X, oldScale, newScale);
-        protected void AdjustHorizontalScroll(double pivot, double oldScale, double newScale)
-        {
-            ScrollToHorizontalOffset((HorizontalOffset + pivot) * newScale / oldScale - pivot);
-        }
+        protected void AdjustHorizontalScroll(double pivot, double oldScale, double newScale) => ScrollToHorizontalOffset((HorizontalOffset + pivot) * newScale / oldScale - pivot);
 
         protected void AdjustVerticalScroll(double oldScale, double newScale) => AdjustVerticalScroll(Mouse.GetPosition(this).Y, oldScale, newScale);
-        protected void AdjustVerticalScroll(double pivot, double oldScale, double newScale)
-        {
-            ScrollToVerticalOffset((VerticalOffset + pivot) * newScale / oldScale - pivot);
-        }
+        protected void AdjustVerticalScroll(double pivot, double oldScale, double newScale) => ScrollToVerticalOffset((VerticalOffset + pivot) * newScale / oldScale - pivot);
 
         public static double GetScrollUnit(double scale, double viewport)
         {

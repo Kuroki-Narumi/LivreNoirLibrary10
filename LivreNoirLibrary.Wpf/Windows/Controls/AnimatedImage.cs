@@ -126,10 +126,13 @@ namespace LivreNoirLibrary.Windows.Controls
                     timings.Add(i);
                 }
             }
-            var ts = TimeSpan.FromMilliseconds(time * 10);
-            _gif_animation = new Int32Animation(0, time - 1, new Duration(ts), FillBehavior.Stop)
+            _gif_animation = new Int32Animation()
             {
-                RepeatBehavior = RepeatBehavior.Forever
+                From = 0,
+                To = time,
+                Duration = TimeSpan.FromMilliseconds(time * 10),
+                FillBehavior = FillBehavior.Stop,
+                RepeatBehavior = RepeatBehavior.Forever,
             };
         }
     }

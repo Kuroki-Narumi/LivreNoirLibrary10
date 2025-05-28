@@ -122,15 +122,15 @@ namespace LivreNoirLibrary.Media
             var h = Math.Ceiling(bounds.Height / unit) * unit;
             RenderTargetBitmap buffer = new((int)w, (int)h, 96, 96, PixelFormat);
             buffer.Render(dv);
-            if (options.Rect.Width is <= 0 || options.Rect.Height is <= 0)
+            var r = options.Rect;
+            if (r.Width is <= 0 || r.Height is <= 0)
             {
-                var r = options.Rect;
-                CroppedBitmap cr = new(buffer, new((int)(r.X - bounds.X), (int)(r.Y - bounds.Y), (int)Math.Ceiling(r.Width), (int)Math.Ceiling(r.Height)));
-                return cr;
+                return buffer;
             }
             else
             {
-                return buffer;
+                CroppedBitmap cr = new(buffer, new((int)(r.X - bounds.X), (int)(r.Y - bounds.Y), (int)Math.Ceiling(r.Width), (int)Math.Ceiling(r.Height)));
+                return cr;
             }
         }
 
@@ -144,13 +144,13 @@ namespace LivreNoirLibrary.Media
             bitmap.Clear();
             bitmap.Render(dv);
             Int32Rect rect;
-            if (options.Rect.IsEmpty)
+            var r = options.Rect;
+            if (r.Width is <= 0 || r.Height is <= 0)
             {
                 rect = new(0, 0, bitmap.PixelWidth, bitmap.PixelHeight);
             }
             else
             {
-                var r = options.Rect;
                 rect = new((int)(r.X - bounds.X), (int)(r.Y - bounds.Y), (int)Math.Ceiling(r.Width), (int)Math.Ceiling(r.Height));
             }
             var bytesPerPixel = bitmap.Format.BitsPerPixel / 8;

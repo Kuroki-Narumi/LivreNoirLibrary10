@@ -9,7 +9,7 @@ namespace LivreNoirLibrary.ObjectModel
 
     public partial class SelectableObject : ObservableObjectBase, ISelectableObject
     {
-        public event BooleanPropertyChangedEventHandler? IsSelectedChanged;
+        public event ValueChangedEventHandler<bool>? IsSelectedChanged;
 
         [ObservableProperty]
         protected bool _isSelected;

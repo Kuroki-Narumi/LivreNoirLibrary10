@@ -21,15 +21,15 @@ namespace LivreNoirLibrary.Windows.Controls
 
     public partial class EditableTextBlock
     {
-        public static readonly RoutedEvent TextChangedEvent = EventRegister.Register<EditableTextBlock, EditableTextChangedEventHandler>();
+        public static readonly RoutedEvent TextChangedEvent = EventRegister.Register<EditableTextBlock, EditableTextChangedEventHandler>(RoutingStrategy.Direct);
 
-        public event EditableTextChangedEventHandler? TextChanged
+        public event EditableTextChangedEventHandler TextChanged
         {
             add => AddHandler(TextChangedEvent, value);
             remove => RemoveHandler(TextChangedEvent, value);
         }
 
-        private void RaiseTextChanged(string? oldText, string? newText)
+        protected void RaiseTextChanged(string? oldText, string? newText)
         {
             RaiseEvent(new EditableTextChangedEventArgs(TextChangedEvent, this, oldText, newText));
         }

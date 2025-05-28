@@ -1,6 +1,8 @@
-﻿using System.Configuration;
+﻿using System;
+using System.Configuration;
 using System.Data;
 using System.Windows;
+using LivreNoirLibrary.Windows.Input;
 
 namespace LivreNoirLibrary.Sandbox
 {
@@ -10,5 +12,4 @@ namespace LivreNoirLibrary.Sandbox
     public partial class App : Application
     {
     }
-
 }

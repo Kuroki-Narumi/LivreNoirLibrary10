@@ -1,0 +1,24 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net9.0-windows</TargetFramework>
+    <ImplicitUsings>disable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <AllowUnsafeBlocks>True</AllowUnsafeBlocks>
+    <UseWPF>true</UseWPF>
+    <Authors>Kuroki-Narumi</Authors>
+    <Company>LivreNoir</Company>
+    <RepositoryUrl>https://github.com/Kuroki-Narumi/LivreNoirLibrary10</RepositoryUrl>
+    <RootNamespace>LivreNoirLibrary.Media</RootNamespace>
+    <BaseOutputPath>..\bin</BaseOutputPath>
+  </PropertyGroup>
+
+	<ItemGroup>
+		<ProjectReference Include="..\LivreNoirLibrary.Media\LivreNoirLibrary.Media.csproj" />
+		<ProjectReference Include="..\LivreNoirLibrary.SourceGenerator\LivreNoirLibrary.SourceGenerator.csproj">
+			<OutputItemType>Analyzer</OutputItemType>
+			<ReferenceOutputAssembly>false</ReferenceOutputAssembly>
+		</ProjectReference>
+		<ProjectReference Include="..\LivreNoirLibrary.Wpf\LivreNoirLibrary.Wpf.csproj" />
+	</ItemGroup>
+</Project>

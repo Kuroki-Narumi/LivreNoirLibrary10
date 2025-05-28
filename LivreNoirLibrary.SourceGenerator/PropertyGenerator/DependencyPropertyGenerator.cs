@@ -30,6 +30,8 @@ public class DependencyPropertyGenerator : PropertyGeneratorBase<DependencyPrope
         SubPropertiesDoNotAffectRender = 2048,
     }
 
+    public static bool IsFlagSet(FrameworkPropertyMetadataOptions options, FrameworkPropertyMetadataOptions flag) => (options & flag) == flag;
+
     public record FieldInfo : FieldInfoBase
     {
         public FrameworkPropertyMetadataOptions MetadataOptions { get; set; }
@@ -95,7 +97,9 @@ public class DependencyPropertyGenerator : PropertyGeneratorBase<DependencyPrope
             var ((fieldType, fieldName, isValueType, isNullable), defaultValue, (propertyType, propertyName), setterScope, coerceHandler, changedHandler, _) = info;
             var conv = isValueType ? $"({fieldType}){{0}}" : $"{{0}} as {propertyType}";
             var defaultText = string.IsNullOrEmpty(defaultValue) ? $"default({propertyType})" : string.Format(conv, defaultValue);
-            if (info.IsSetterPublic)
+            var options = info.MetadataOptions;
+            var isPublic = info.IsSetterPublic;
+            if (isPublic)
             {
                 dp.AppendLine($$"""
                                 public static readonly DependencyProperty {{propertyName}}Property = DependencyProperty.Register(
@@ -113,7 +117,7 @@ public class DependencyPropertyGenerator : PropertyGeneratorBase<DependencyPrope
                                     typeof({{className}}),
                                     new FrameworkPropertyMetadata(
                                         {{defaultText}},
-                                        (FrameworkPropertyMetadataOptions){{(int)info.MetadataOptions}},
+                                        (FrameworkPropertyMetadataOptions){{(int)options}},
                                         On{{propertyName}}Changed{{(coerceHandler is not CoerceType.None ? $", Coerce{propertyName}" : "")}}
                                         )
                         """);
@@ -181,6 +185,24 @@ public class DependencyPropertyGenerator : PropertyGeneratorBase<DependencyPrope
                                         obj.On{{propertyName}}Changed({{string.Format(conv, "e.OldValue")}}, value);
                         """);
             }
+            if (IsFlagSet(options, FrameworkPropertyMetadataOptions.AffectsMeasure))
+            {
+                changed.AppendLine($$"""
+                                        obj.InvalidateMeasure();
+                        """);
+            }
+            else if (IsFlagSet(options, FrameworkPropertyMetadataOptions.AffectsArrange))
+            {
+                changed.AppendLine($$"""
+                                        obj.InvalidateArrange();
+                        """);
+            }
+            else if (IsFlagSet(options, FrameworkPropertyMetadataOptions.AffectsRender))
+            {
+                changed.AppendLine($$"""
+                                        obj.InvalidateVisual();
+                        """);
+            }
             changed.AppendLine($$"""
                                     }
                                 }
@@ -196,7 +218,7 @@ public class DependencyPropertyGenerator : PropertyGeneratorBase<DependencyPrope
                                 public {{fieldType}} {{propertyName}}
                                 {
                                     get => {{fieldName}};
-                                    {{setterScope}}set => SetValue({{propertyName}}Property, value);
+                                    {{setterScope}}set => SetValue({{propertyName}}Property{{(isPublic ? "" : "Key")}}, value);
                                 }
                         """);
         }

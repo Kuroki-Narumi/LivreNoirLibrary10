@@ -1,33 +1,26 @@
-﻿using LivreNoirLibrary.Windows.Input;
-using System;
-using System.Windows;
-using System.Windows.Input;
+﻿using System;
 
 namespace LivreNoirLibrary.Windows
 {
     public delegate void EditEventHandler(object sender);
 
-    public interface IHistoryOwner<TSelf, TData>
-        where TSelf : IHistoryOwner<TSelf, TData>
+    public interface IHistoryOwner
     {
-        public History<TSelf, TData> History { get; }
+        public IHistory History { get; }
+    }
 
-        public TData GetHistoryData();
-        public void ApplyHistoryData(TData historyData);
+    public interface IHistoryOwner<T> : IHistoryOwner
+    {
+        public T GetHistoryData();
+        public bool NeedsUpdateHistory(T historyData);
+        public void ApplyHistory(T historyData);
     }
 
     public static class IHistoryOwnerExtensions
     {
-        public static void OnBeforeEdit<TSelf, TData>(this TSelf obj, object sender)
-            where TSelf : IHistoryOwner<TSelf, TData>
+        public static void OnEdit(this IHistoryOwner obj, object sender)
         {
-            obj.History.BeforeEdit();
-        }
-
-        public static void OnAfterEdit<TSelf, TData>(this TSelf obj, object sender)
-            where TSelf : IHistoryOwner<TSelf, TData>
-        {
-            obj.History.AfterEdit();
+            obj.History.PushUndo();
         }
     }
 }

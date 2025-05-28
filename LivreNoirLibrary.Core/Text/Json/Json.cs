@@ -5,6 +5,8 @@ using System.Text.Json.Serialization;
 using System.IO;
 using System.Diagnostics.CodeAnalysis;
 using LivreNoirLibrary.IO;
+using LivreNoirLibrary.Collections;
+using System.Threading;
 
 namespace LivreNoirLibrary.Text
 {
@@ -25,14 +27,14 @@ namespace LivreNoirLibrary.Text
         public static T Parse<T>(string json)
             where T : class
         {
-            var obj = JsonSerializer.Deserialize<T>(json, GetOptions(true));
+            var obj = JsonSerializer.Deserialize<T>(json, GetOptions(false));
             return GetValueOrThrow(obj);
         }
 
         public static T Parse<T>(ReadOnlySpan<byte> utf8json)
             where T : class
         {
-            var obj = JsonSerializer.Deserialize<T>(utf8json, GetOptions(true));
+            var obj = JsonSerializer.Deserialize<T>(utf8json, GetOptions(false));
             return GetValueOrThrow(obj);
         }
 
@@ -46,7 +48,7 @@ namespace LivreNoirLibrary.Text
         public static T Load<T>(Stream utf8json)
             where T : class
         {
-            var obj = JsonSerializer.Deserialize<T>(utf8json, GetOptions(true));
+            var obj = JsonSerializer.Deserialize<T>(utf8json, GetOptions(false));
             return GetValueOrThrow(obj);
         }
 
@@ -134,13 +136,23 @@ namespace LivreNoirLibrary.Text
             return JsonSerializer.Serialize(obj, GetOptions(pretty));
         }
 
-        public static JsonSerializerOptions GetOptions(bool pretty) => new()
+        public static JsonSerializerOptions GetReaderOptions() => new()
         {
-            WriteIndented = pretty,
-            DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull,
             ReadCommentHandling = JsonCommentHandling.Skip,
             Encoder = System.Text.Encodings.Web.JavaScriptEncoder.UnsafeRelaxedJsonEscaping,
         };
+
+        public static JsonSerializerOptions GetOptions(bool pretty)
+        {
+            JsonSerializerOptions options = new()
+            {
+                WriteIndented = pretty,
+                DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull,
+                Encoder = System.Text.Encodings.Web.JavaScriptEncoder.UnsafeRelaxedJsonEscaping,
+            };
+            options.Converters.Add(new IJsonWriterJsonConverter());
+            return options;
+        }
 
         public static JsonWriterOptions GetWriterOption(bool pretty)
         {
@@ -167,12 +179,23 @@ namespace LivreNoirLibrary.Text
             return Load<T>(ms);
         }
 
+        private static readonly Lock _equals_lock = new();
+        private static readonly MemoryStream _equals_left_ms = new(32768);
+        private static readonly MemoryStream _equals_right_ms = new(32768);
+
         public static bool Equals<T>(T left, T right)
         {
             var op = GetOptions(false);
-            var l = JsonSerializer.SerializeToUtf8Bytes(left, op);
-            var r = JsonSerializer.SerializeToUtf8Bytes(right, op);
-            return new ReadOnlySpan<byte>(l).SequenceEqual(r);
+            lock (_equals_lock)
+            {
+                var l = _equals_left_ms;
+                var r = _equals_right_ms;
+                l.SetLength(0);
+                r.SetLength(0);
+                JsonSerializer.Serialize(l, left, op);
+                JsonSerializer.Serialize(r, right, op);
+                return l.GetBuffer().AsSpan(0, (int)l.Length).EqualsAll(r.GetBuffer().AsSpan(0, (int)r.Length));
+            }
         }
     }
 }

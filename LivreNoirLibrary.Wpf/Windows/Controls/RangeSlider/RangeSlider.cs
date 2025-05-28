@@ -3,10 +3,9 @@ using System.Collections.Generic;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
-using System.Windows.Shapes;
-using System.Windows.Data;
 using System.Windows.Input;
 using System.Windows.Media;
+using LivreNoirLibrary.Windows.Input;
 
 namespace LivreNoirLibrary.Windows.Controls
 {
@@ -14,6 +13,8 @@ namespace LivreNoirLibrary.Windows.Controls
     {
         public const string PART_TrackBackground = nameof(PART_TrackBackground);
         public const string PART_RepeatButton = nameof(PART_RepeatButton);
+        public const string PART_TextBox1 = nameof(PART_TextBox1);
+        public const string PART_TextBox2 = nameof(PART_TextBox2);
         public const string PART_Thumb1 = nameof(PART_Thumb1);
         public const string PART_Thumb2 = nameof(PART_Thumb2);
 
@@ -23,8 +24,11 @@ namespace LivreNoirLibrary.Windows.Controls
         }
 
         private bool _initialized;
+        private bool _need_refresh;
         private Border _background = new();
         private RepeatButton? _repeatButton;
+        private EditableTextBlock? _text1;
+        private EditableTextBlock? _text2;
         private Thumb _thumb1 = new();
         private Thumb _thumb2 = new();
 
@@ -33,7 +37,17 @@ namespace LivreNoirLibrary.Windows.Controls
             _initialized = false;
             if (_repeatButton is not null)
             {
+                _repeatButton.PreviewMouseLeftButtonDown -= OnMouseLeftButtonDown_RepeatButton;
+                _repeatButton.PreviewMouseLeftButtonUp -= OnMouseLeftButtonUp_RepeatButton;
                 _repeatButton.Click -= OnClick_RepeatButton;
+            }
+            if (_text1 is not null)
+            {
+                _text1.TextChanged -= OnTextChanged;
+            }
+            if (_text2 is not null)
+            {
+                _text2.TextChanged -= OnTextChanged;
             }
             base.OnApplyTemplate();
             if (GetTemplateChild(PART_TrackBackground) is Border b)
@@ -42,7 +56,17 @@ namespace LivreNoirLibrary.Windows.Controls
             }
             if ((_repeatButton = GetTemplateChild(PART_RepeatButton) as RepeatButton) is not null)
             {
+                _repeatButton.PreviewMouseLeftButtonDown += OnMouseLeftButtonDown_RepeatButton;
+                _repeatButton.PreviewMouseLeftButtonUp += OnMouseLeftButtonUp_RepeatButton;
                 _repeatButton.Click += OnClick_RepeatButton;
+            }
+            if ((_text1 = GetTemplateChild(PART_TextBox1) as EditableTextBlock) is not null)
+            {
+                _text1.TextChanged += OnTextChanged;
+            }
+            if ((_text2 = GetTemplateChild(PART_TextBox2) as EditableTextBlock) is not null)
+            {
+                _text2.TextChanged += OnTextChanged;
             }
             if (GetTemplateChild(PART_Thumb1) is Thumb t1)
             {
@@ -66,8 +90,6 @@ namespace LivreNoirLibrary.Windows.Controls
             ReserveRefresh();
         }
 
-        private bool _need_refresh;
-
         public void ReserveRefresh()
         {
             _need_refresh = true;
@@ -87,33 +109,33 @@ namespace LivreNoirLibrary.Windows.Controls
         {
             _need_refresh = false;
             var range = _maximum - _minimum;
-            var tw = _thumb1.Width;
-            var w = _background.ActualWidth - tw;
+            var tw = _thumbWidth;
+            var w = Math.Max(_background.ActualWidth, 0);
             if (range is > 0)
             {
                 range = w / range;
                 var x1 = Math.Round(Math.Clamp((_value1 - _minimum) * range, 0, w));
                 var x2 = Math.Round(Math.Clamp((_value2 - _minimum) * range, 0, w));
-                ThumbLeft = x1 - tw;
-                ThumbRight = x2;
+                Thumb1Margin = new(x1, 0, 0, 0);
+                Thumb2Margin = new(x2 + tw, 0, 0, 0);
                 if (IsExclusive)
                 {
-                    Selection1Left = 0;
-                    Selection1Width = Math.Max(x1, 0);
-                    Selection2Left = x2 + tw;
-                    Selection2Width = Math.Max(w - x2, 0);
+                    Selection1Margin = default;
+                    Selection1Width = x1;
+                    Selection2Margin = new(x2, 0, 0, 0);
+                    Selection2Width = w - x2;
                 }
                 else
                 {
-                    Selection1Left = x1;
-                    Selection1Width = Math.Max(x2 - x1 + tw, 0);
+                    Selection1Margin = new(x1, 0, 0, 0);
+                    Selection1Width = x2 - x1;
                     Selection2Width = 0;
                 }
             }
             else
             {
-                ThumbLeft = -tw;
-                ThumbRight = w;
+                Thumb1Margin = default;
+                Thumb2Margin = new(w + tw, 0, 0, 0);
                 Selection1Width = 0;
                 Selection1Width = 0;
             }
@@ -126,6 +148,7 @@ namespace LivreNoirLibrary.Windows.Controls
             Value1 = value1;
             Value2 = value2;
             IsExclusive = exclusive;
+            RaiseValueChanged();
         }
 
         public (double Value1, double Value2, bool IsExclusive) GetRange() => (_value1, _value2, _isExclusive);
@@ -146,7 +169,11 @@ namespace LivreNoirLibrary.Windows.Controls
         {
             var pos = Mouse.GetPosition(_background);
             var initialX = pos.X;
-            var w = (_maximum - _minimum) / (_background.ActualWidth - _thumb1.Width);
+            var w = (_maximum - _minimum) / _background.ActualWidth;
+
+            thumb.CaptureMouse();
+            thumb.MouseMove += MouseMove;
+            thumb.MouseLeftButtonUp += MouseUp;
 
             void MouseMove(object sender, MouseEventArgs e)
             {
@@ -172,16 +199,13 @@ namespace LivreNoirLibrary.Windows.Controls
                 thumb.MouseMove -= MouseMove;
                 thumb.MouseLeftButtonUp -= MouseUp;
                 thumb.ReleaseMouseCapture();
+                RaiseValueChanged();
             }
-
-            thumb.CaptureMouse();
-            thumb.MouseMove += MouseMove;
-            thumb.MouseLeftButtonUp += MouseUp;
         }
 
         protected (double current, DependencyProperty property, bool increase) GetTarget()
         {
-            var x1 = Mouse.GetPosition(_thumb1).X - _thumb1.Width;
+            var x1 = Mouse.GetPosition(_thumb1).X - _thumbWidth;
             var x2 = Mouse.GetPosition(_thumb2).X;
             if (x1 < 0)
             {
@@ -199,14 +223,28 @@ namespace LivreNoirLibrary.Windows.Controls
 
         protected override void OnPreviewMouseWheel(MouseWheelEventArgs e)
         {
-            var (current, property, _) = GetTarget();
-            ChangeByWheel(current, property, e);
+            if (Mouse.Captured is null)
+            {
+                var (current, property, _) = GetTarget();
+                MoveValue(current, property, e.Delta is > 0);
+                e.Handled = true;
+            }
         }
 
-        protected virtual void ChangeByWheel(double current, DependencyProperty target, MouseWheelEventArgs e)
+        private bool _changing_by_click;
+
+        private void OnMouseLeftButtonDown_RepeatButton(object sender, MouseButtonEventArgs e)
         {
-            MoveValue(current, target, e.Delta > 0);
-            e.Handled = true;
+            _changing_by_click = true;
+        }
+
+        private void OnMouseLeftButtonUp_RepeatButton(object sender, MouseButtonEventArgs e)
+        {
+            if (_changing_by_click)
+            {
+                _changing_by_click = false;
+                RaiseValueChanged();
+            }
         }
 
         private void OnClick_RepeatButton(object sender, RoutedEventArgs e)
@@ -218,19 +256,36 @@ namespace LivreNoirLibrary.Windows.Controls
 
         protected void MoveValue(double current, DependencyProperty target, bool increase)
         {
-            if (current % _tick_frequency != 0)
+            var amount = _tick_frequency;
+            if (current % amount is not 0)
             {
-                current = _tick_frequency * (increase ? (int)Math.Ceiling(current / _tick_frequency) : (int)Math.Floor(current / _tick_frequency));
-            }
-            else if (increase)
-            {
-                current += _tick_frequency;
+                current = amount * (increase ? Math.Ceiling(current / amount) : Math.Floor(current / amount));
             }
             else
             {
-                current -= _tick_frequency;
+                if (KeyInput.IsShiftDown())
+                {
+                    amount *= 10;
+                }
+                if (increase)
+                {
+                    current += amount;
+                }
+                else
+                {
+                    current -= amount;
+                }
             }
             SetValue(target, current);
+            if (!_changing_by_click)
+            {
+                RaiseValueChanged();
+            }
+        }
+
+        private void OnTextChanged(object sender, EditableTextChangedEventArgs e)
+        {
+            RaiseValueChanged();
         }
     }
 }

@@ -75,9 +75,9 @@ namespace LivreNoirLibrary.Windows.Controls
         public static DG HorizontalAlign_Right { get; } = Get(Dr.HorizontalAlign_Right);
         public static DG HorizontalAlign_Stretch { get; } = Get(Dr.HorizontalAlign_Stretch);
 
-        public static DG Scroll_All { get; } = Get(Dr.Circle_Outer, Dr.Circle_Inner_Mono, Dr.Scroll_All);
-        public static DG Scroll_Vertical { get; } = Get(Dr.Circle_Outer, Dr.Circle_Inner_Mono, Dr.Scroll_Vertical);
-        public static DG Scroll_Horizontal { get; } = Get(Dr.Circle_Outer, Dr.Circle_Inner_Mono, Dr.Scroll_Horizontal);
+        public static DG Scroll_All { get; } = Get(Dr.Circle_Outer, Dr.Scroll_Circle, Dr.Scroll_All);
+        public static DG Scroll_Vertical { get; } = Get(Dr.Circle_Outer, Dr.Scroll_Circle, Dr.Scroll_Vertical);
+        public static DG Scroll_Horizontal { get; } = Get(Dr.Circle_Outer, Dr.Scroll_Circle, Dr.Scroll_Horizontal);
 
         public static DG Help { get; } = Get(Dr.Circle_Outer, Dr.Circle_Inner, Dr.Question);
         public static DG Question { get; } = Get(Dr.Question_Mono);

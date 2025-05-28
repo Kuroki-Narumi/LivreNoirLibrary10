@@ -3,48 +3,45 @@ using System.Collections.Generic;
 
 namespace LivreNoirLibrary.Windows
 {
-    public class History<TOwner, TData>(TOwner owner) : IHistory
-        where TOwner : IHistoryOwner<TOwner, TData>
+    public class History<T> : IHistory
     {
-        private readonly TOwner _owner = owner;
-        private readonly Stack<TData> _undo = new();
-        private readonly Stack<TData> _redo = new();
-        private TData? _temporal_data;
+        private readonly IHistoryOwner<T> _owner;
+        private readonly Stack<T> _undo = new();
+        private readonly Stack<T> _redo = new();
+        private T _last_data;
 
         public int UndoCount => _undo.Count;
         public int RedoCount => _redo.Count;
 
-        public void Clear()
+        public History(IHistoryOwner<T> owner)
+        {
+            _owner = owner;
+            _last_data = _owner.GetHistoryData();
+        }
+
+        public void Initialize()
         {
             _undo.Clear();
             _redo.Clear();
+            _last_data = _owner.GetHistoryData();
         }
 
-        public void BeforeEdit()
+        public void PushUndo()
         {
-            _temporal_data = _owner.GetHistoryData();
-        }
-
-        public void AfterEdit()
-        {
-            if (_temporal_data is not null)
+            if (_owner.NeedsUpdateHistory(_last_data))
             {
-                PushUndo(_temporal_data);
+                _redo.Clear();
+                _undo.Push(_last_data);
+                _last_data = _owner.GetHistoryData();
             }
         }
 
-        public void PushUndo(TData data)
-        {
-            _redo.Clear();
-            _undo.Push(data);
-            _temporal_data = default;
-        }
-
-        private void ProcessDo(Stack<TData> from, Stack<TData> to)
+        private void ProcessDo(Stack<T> from, Stack<T> to)
         {
             to.Push(_owner.GetHistoryData());
             var data = from.Pop();
-            _owner.ApplyHistoryData(data);
+            _owner.ApplyHistory(data);
+            _last_data = data;
         }
 
         public void Undo() => ProcessDo(_undo, _redo);

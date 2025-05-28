@@ -48,7 +48,7 @@ namespace LivreNoirLibrary.Windows
             height = rect.Height;
         }
 
-        public static void Deconstruct(this Int32Rect rect, out double x, out double y, out double width, out double height)
+        public static void Deconstruct(this Int32Rect rect, out int x, out int y, out int width, out int height)
         {
             x = rect.X;
             y = rect.Y;
@@ -56,7 +56,7 @@ namespace LivreNoirLibrary.Windows
             height = rect.Height;
         }
 
-        public static void Deconstruct(this System.Drawing.Rectangle rect, out double x, out double y, out double width, out double height)
+        public static void Deconstruct(this System.Drawing.Rectangle rect, out int x, out int y, out int width, out int height)
         {
             x = rect.X;
             y = rect.Y;
@@ -70,7 +70,7 @@ namespace LivreNoirLibrary.Windows
             y = point.Y;
         }
 
-        public static void Deconstruct(this System.Drawing.Point point, out double x, out double y)
+        public static void Deconstruct(this System.Drawing.Point point, out int x, out int y)
         {
             x = point.X;
             y = point.Y;

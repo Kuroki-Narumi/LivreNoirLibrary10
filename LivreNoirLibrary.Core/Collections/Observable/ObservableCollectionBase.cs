@@ -4,18 +4,14 @@ using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.ComponentModel;
 using System.Diagnostics.CodeAnalysis;
-using System.Linq;
-using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
+using LivreNoirLibrary.ObjectModel;
 
 namespace LivreNoirLibrary.Collections
 {
-    public abstract class ObservableCollectionBase<T> : ICollection<T>, ICollection, INotifyCollectionChanged, INotifyPropertyChanged
+    public abstract class ObservableCollectionBase<T> : ObservableObjectBase, ICollection<T>, ICollection, INotifyCollectionChanged, INotifyPropertyChanged
     {
         public event NotifyCollectionChangedEventHandler? CollectionChanged;
-        public event PropertyChangedEventHandler? PropertyChanged;
-
-        public bool AllowsNotifyMultiple { get; set; } = false;
 
         protected int _version = 0;
         protected readonly List<T> _list;
@@ -89,24 +85,52 @@ namespace LivreNoirLibrary.Collections
         /// <inheritdoc cref="ICollection{T}.Remove"/>
         public bool RemoveWithoutNotify(T item) => TryRemove(IndexOf(item), out _);
 
-        public void Overwrite(IEnumerable<T> items)
-        {
-            ClearWithoutNotify();
-            AddRange(items);
-        }
+        /// <inheritdoc cref="List{T}.AddRange"/>
+        public void AddRange(ObservableCollectionBase<T> items) => AddRange(items._list);
 
         /// <inheritdoc cref="List{T}.AddRange"/>
         public void AddRange(IEnumerable<T> items)
         {
-            if (AddRangeCore(items, out var index, out var list))
+            if (AddRangeCore(items))
             {
-                OnCollectionAdded(list, index);
+                NotifyCollectionReset();
+            }
+        }
+
+        /// <inheritdoc cref="List{T}.AddRange"/>
+        public void AddRange(params ReadOnlySpan<T> items)
+        {
+            if (AddRangeCore(items))
+            {
+                NotifyCollectionReset();
             }
         }
 
         public void AddRange<TK>(IDictionary<TK, T> items) where TK : notnull => AddRange(items.Values);
 
+        public void Load(ObservableCollectionBase<T> items)
+        {
+            ClearWithoutNotify();
+            AddRange(items);
+        }
+
+        public void Load(IEnumerable<T> items)
+        {
+            ClearWithoutNotify();
+            AddRange(items);
+        }
+
         public int RemoveRange(IEnumerable<T> items)
+        {
+            var c = RemoveRangeCore(items);
+            if (c > 0)
+            {
+                NotifyCollectionReset();
+            }
+            return c;
+        }
+
+        public int RemoveRange(params ReadOnlySpan<T> items)
         {
             var c = RemoveRangeCore(items);
             if (c > 0)
@@ -169,15 +193,8 @@ namespace LivreNoirLibrary.Collections
         public List<T>.Enumerator GetEnumerator() => _list.GetEnumerator();
         public void CopyTo(T[] array, int arrayIndex) => _list.CopyTo(array, arrayIndex);
 
-        protected virtual void OnItemRemoved(T item) { }
-        protected virtual void OnItemAdded(T item) { }
-
         protected virtual void ClearItems()
         {
-            foreach (var item in CollectionsMarshal.AsSpan(_list))
-            {
-                OnItemRemoved(item);
-            }
             _list.Clear();
             OnUpdate();
         }
@@ -223,46 +240,39 @@ namespace LivreNoirLibrary.Collections
         protected virtual void AddItem(int index, T item)
         {
             _list.Insert(index, item);
-            OnItemAdded(item);
             OnUpdate();
         }
 
         protected virtual void ReplaceItem(int index, T item)
         {
-            OnItemRemoved(_list[index]);
             _list[index] = item;
-            OnItemAdded(item);
             OnUpdate();
         }
 
         protected virtual void RemoveItem(int index)
         {
-            OnItemRemoved(_list[index]);
             _list.RemoveAt(index);
             OnUpdate();
         }
 
-        protected virtual bool AddRangeCore(IEnumerable<T> items, out int index, [MaybeNullWhen(false)] out List<T> addedItems)
+        protected virtual bool AddRangeCore(IEnumerable<T> items)
         {
-            index = _list.Count;
+            var count = _list.Count;
             _list.AddRange(items);
-            if (!items.TryGetNonEnumeratedCount(out var c))
-            {
-                c = 1;
-            }
-            addedItems = new(c);
-            foreach (var item in items)
-            {
-                addedItems.Add(item);
-                OnItemAdded(item);
-            }
             OnUpdate();
-            return true;
+            return _list.Count != count;
+        }
+
+        protected virtual bool AddRangeCore(ReadOnlySpan<T> items)
+        {
+            _list.AddRange(items);
+            OnUpdate();
+            return items.Length is > 0;
         }
         
         protected virtual int RemoveRangeCore(IEnumerable<T> items)
         {
-            int count = 0;
+            var count = 0;
             void Remove(T item)
             {
                 if (RemoveWithoutNotify(item))
@@ -300,6 +310,19 @@ namespace LivreNoirLibrary.Collections
             }
             return count;
         }
+        
+        protected virtual int RemoveRangeCore(ReadOnlySpan<T> items)
+        {
+            var count = 0;
+            foreach (var item in items)
+            {
+                if (RemoveWithoutNotify(item))
+                {
+                    count++;
+                }
+            }
+            return count;
+        }
 
         protected void OnCountChanged()
         {
@@ -318,36 +341,10 @@ namespace LivreNoirLibrary.Collections
             SendCollectionChanged(new(NotifyCollectionChangedAction.Add, item, indexTo));
         }
 
-        protected void OnCollectionAdded(List<T> items, int startingIndex)
-        {
-            OnCountChanged();
-            if (AllowsNotifyMultiple)
-            {
-                SendCollectionChanged(new(NotifyCollectionChangedAction.Add, items, startingIndex));
-            }
-            else
-            {
-                OnCollectionReset();
-            }
-        }
-
         protected void OnCollectionRemoved(T item, int indexFrom)
         {
             OnCountChanged();
             SendCollectionChanged(new(NotifyCollectionChangedAction.Remove, item, indexFrom));
-        }
-
-        protected void OnCollectionRemoved(List<T> items, int startingIndex)
-        {
-            if (AllowsNotifyMultiple)
-            {
-                OnCountChanged();
-                SendCollectionChanged(new(NotifyCollectionChangedAction.Remove, items, startingIndex));
-            }
-            else
-            {
-                OnCollectionReset();
-            }
         }
 
         protected void OnCollectionReplaced(T newItem, T? oldItem, int index)
@@ -355,45 +352,14 @@ namespace LivreNoirLibrary.Collections
             SendCollectionChanged(new(NotifyCollectionChangedAction.Replace, newItem, oldItem, index));
         }
 
-        protected void OnCollectionReplaced(List<T> added, List<T> removed, int startingIndex)
-        {
-            if (AllowsNotifyMultiple)
-            {
-                OnCountChanged();
-                SendCollectionChanged(new(NotifyCollectionChangedAction.Replace, added, removed, startingIndex));
-            }
-            else
-            {
-                OnCollectionReset();
-            }
-        }
-
         protected void OnCollectionMoved(T item, int indexTo, int indexFrom)
         {
             SendCollectionChanged(new(NotifyCollectionChangedAction.Move, item, indexTo, indexFrom));
         }
 
-        protected void OnCollectionMoved(List<T> items, int indexTo, int indexFrom)
-        {
-            if (AllowsNotifyMultiple)
-            {
-                OnCountChanged();
-                SendCollectionChanged(new(NotifyCollectionChangedAction.Move, items, indexTo, indexFrom));
-            }
-            else
-            {
-                OnCollectionReset();
-            }
-        }
-
         protected void SendCollectionChanged(NotifyCollectionChangedEventArgs e)
         {
             CollectionChanged?.Invoke(this, e);
-        }
-
-        protected void SendPropertyChanged([CallerMemberName]string propName = "")
-        {
-            PropertyChanged?.Invoke(this, new(propName));
         }
 
         protected virtual void OnUpdate()

@@ -22,7 +22,6 @@ namespace LivreNoirLibrary.Windows.Controls.IconContent
 
         public static GD Circle_Outer { get; } = Get(Geometries.Circle_16, Brushes.Gray_3);
         public static GD Circle_Inner { get; } = Get(Geometries.Circle_14, Brushes.BlueGreen_c84);
-        public static GD Circle_Inner_Mono { get; } = Get(Geometries.Circle_14, Brushes.White);
 
         public static GD HeadLeft_Inner { get; } = Get(Geometries.HeadLeft, Brushes.White, Outline);
         public static GD HeadRight_Inner { get; } = Get(Geometries.HeadRight, Brushes.White, Outline);
@@ -95,6 +94,7 @@ namespace LivreNoirLibrary.Windows.Controls.IconContent
         public static GD HorizontalAlign_Right { get; } = Get(Geometries.HorizontalAlign_Right, Brushes.Gray_3);
         public static GD HorizontalAlign_Stretch { get; } = Get(Geometries.HorizontalAlign_Stretch, Brushes.Gray_3);
 
+        public static GD Scroll_Circle { get; } = Get(Geometries.Circle_14, Brushes.White);
         public static GD Scroll_All { get; } = Get(Geometries.Scroll_All, Brushes.Gray_3);
         public static GD Scroll_Vertical { get; } = Get(Geometries.Scroll_Vertical, Brushes.Gray_3);
         public static GD Scroll_Horizontal { get; } = Get(Geometries.Scroll_Horizontal, Brushes.Gray_3);

@@ -3,9 +3,9 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
-             xmlns:local="clr-namespace:LivreNoirLibrary.Windows.Controls"
-             xmlns:lwin="clr-namespace:LivreNoirLibrary.Windows"
              xmlns:PresentationOptions="http://schemas.microsoft.com/winfx/2006/xaml/presentation/options"
+             xmlns:local="clr-namespace:LivreNoirLibrary.Windows.Controls"
+             xmlns:lwin="clr-namespace:LivreNoirLibrary.Windows.Converters"
              mc:Ignorable="d PresentationOptions" d:DataContext="{d:DesignInstance Type=local:ColorSelector}"
              UseLayoutRounding="True" SnapsToDevicePixels="True" 
              FontSize="14" Background="White">
@@ -27,7 +27,7 @@
                 <Setter Property="Height" Value="256"/>
                 <Setter Property="Canvas.Left" Value="5"/>
             </Style>
-            <GradientStopCollection x:Key="Gradient_Rainbow">
+            <GradientStopCollection x:Key="Gradient_Rainbow" PresentationOptions:Freeze="True">
                 <GradientStop Color="#F00" Offset="0" PresentationOptions:Freeze="True"/>
                 <GradientStop Color="#FF0" Offset="0.167" PresentationOptions:Freeze="True"/>
                 <GradientStop Color="#0F0" Offset="0.333" PresentationOptions:Freeze="True"/>
@@ -36,11 +36,11 @@
                 <GradientStop Color="#F0F" Offset="0.833" PresentationOptions:Freeze="True"/>
                 <GradientStop Color="#F00" Offset="1" PresentationOptions:Freeze="True"/>
             </GradientStopCollection>
-            <GradientStopCollection x:Key="Gradient_White">
+            <GradientStopCollection x:Key="Gradient_White" PresentationOptions:Freeze="True">
                 <GradientStop Color="#0fff" Offset="0" PresentationOptions:Freeze="True"/>
                 <GradientStop Color="White" Offset="1" PresentationOptions:Freeze="True"/>
             </GradientStopCollection>
-            <GradientStopCollection x:Key="Gradient_Black">
+            <GradientStopCollection x:Key="Gradient_Black" PresentationOptions:Freeze="True">
                 <GradientStop Color="#0000" Offset="0" PresentationOptions:Freeze="True"/>
                 <GradientStop Color="Black" Offset="1" PresentationOptions:Freeze="True"/>
             </GradientStopCollection>

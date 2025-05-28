@@ -13,35 +13,39 @@ namespace LivreNoirLibrary.Text
 
     public static class IJsonWriterExtension
     {
-        public static void WriteJson<T>(this T j, Stream utf8json, bool pretty = true)
+        public static void WriteJson<T>(this T obj, Stream utf8json, bool pretty = true)
             where T : IJsonWriter
         {
             using Utf8JsonWriter writer = new(utf8json, Json.GetWriterOption(pretty));
-            j.WriteJson(writer, Json.GetOptions(pretty));
+            obj.WriteJson(writer, Json.GetOptions(pretty));
         }
 
-        public static void SaveJson(this IJsonWriter j, string path, bool pretty = true)
+        public static void SaveJson<T>(this T obj, string path, bool pretty = true)
+            where T : IJsonWriter
         {
             using var file = General.CreateSafe(path);
-            WriteJson(j, file, pretty);
+            WriteJson(obj, file, pretty);
         }
 
-        public static MemoryStream GetJsonAsStream(this IJsonWriter j, bool pretty = false)
+        public static MemoryStream GetJsonAsStream<T>(this T obj, bool pretty = false)
+            where T : IJsonWriter
         {
             MemoryStream ms = new();
-            WriteJson(j, ms, pretty);
+            WriteJson(obj, ms, pretty);
             ms.Position = 0;
             return ms;
         }
 
-        public static byte[] GetJsonAsBuffer(this IJsonWriter j, bool pretty = false)
+        public static byte[] GetJsonAsBuffer<T>(this T obj, bool pretty = false)
+            where T : IJsonWriter
         {
-            return GetJsonAsStream(j, pretty).GetBuffer();
+            return GetJsonAsStream(obj, pretty).GetBuffer();
         }
 
-        public static string GetJsonAsString(this IJsonWriter j, bool pretty = true)
+        public static string GetJsonAsString<T>(this T obj, bool pretty = true)
+            where T : IJsonWriter
         {
-            var buffer = GetJsonAsBuffer(j, pretty);
+            var buffer = GetJsonAsBuffer(obj, pretty);
             return Encoding.UTF8.GetString(buffer);
         }
     }

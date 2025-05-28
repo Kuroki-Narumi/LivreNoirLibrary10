@@ -1,0 +1,71 @@
+﻿<UserControl x:Class="LivreNoirLibrary.Windows.Controls.ImageRectSelector"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:LivreNoirLibrary.Windows.Controls"
+             mc:Ignorable="d" 
+             d:DesignHeight="450" d:DesignWidth="800" Background="White">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+        <Grid>
+            <Grid.Resources>
+                <Style TargetType="TextBlock">
+                    <Setter Property="VerticalAlignment" Value="Center"/>
+                    <Setter Property="HorizontalAlignment" Value="Right"/>
+                    <Setter Property="Margin" Value="4,4,0,4"/>
+                </Style>
+                <Style TargetType="local:Button">
+                    <Setter Property="Margin" Value="2"/>
+                </Style>
+                <Style TargetType="ComboBox">
+                    <Setter Property="VerticalContentAlignment" Value="Center"/>
+                    <Setter Property="Margin" Value="2"/>
+                    <Setter Property="IsEditable" Value="True"/>
+                </Style>
+                <Style TargetType="local:RangeSlider">
+                    <Setter Property="Margin" Value="4,2"/>
+                </Style>
+            </Grid.Resources>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="Auto"/>
+            </Grid.ColumnDefinitions>
+            <StackPanel x:Name="LeftStackPanel" Grid.Column="0" HorizontalAlignment="Left" Orientation="Horizontal"/>
+            <StackPanel Grid.Column="1" Orientation="Horizontal">
+                <TextBlock x:Name="Text_Scale"/>
+                <ComboBox 
+                    x:Name="ComboBox_Scale" MaxWidth="68" PreviewMouseWheel="OnPreviewMouseWheel_Scale"
+                    Text="{Binding ScaleExpression, ElementName=SelectorView}"
+                    ItemsSource="{x:Static local:ImageRectSelectorView.ScaleExpressionList}"/>
+                <local:Button x:Name="Text_AutoScale" Click="OnClick_Scale_Auto"/>
+                <local:Button Content="100%" Click="OnClick_Scale_100"/>
+            </StackPanel>
+            <Grid Grid.Column="2">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="*" MaxWidth="200"/>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="*" MaxWidth="200"/>
+                </Grid.ColumnDefinitions>
+                <TextBlock x:Name="Text_Horizontal" Grid.Column="0"/>
+                <local:RangeSlider 
+                    Grid.Column="1" ValueChanged="OnValueChanged_Slider"
+                    Minimum="0" Maximum="{Binding Selection.OriginalWidth, ElementName=SelectorView}"
+                    Value1="{Binding Selection.Left, ElementName=SelectorView}" Value2="{Binding Selection.Right, ElementName=SelectorView}"/>
+                <TextBlock x:Name="Text_Vertical" Grid.Column="2"/>
+                <local:RangeSlider 
+                    Grid.Column="3" ValueChanged="OnValueChanged_Slider"
+                    Minimum="0" Maximum="{Binding Selection.OriginalHeight, ElementName=SelectorView}"
+                    Value1="{Binding Selection.Top, ElementName=SelectorView}" Value2="{Binding Selection.Bottom, ElementName=SelectorView}"/>
+            </Grid>
+            <StackPanel x:Name="RightStackPanel" Grid.Column="3" Orientation="Horizontal"/>
+        </Grid>
+        <local:ImageRectSelectorView Grid.Row="1" x:Name="SelectorView" ValueChanged="OnValueChanged_View"/>
+    </Grid>
+</UserControl>

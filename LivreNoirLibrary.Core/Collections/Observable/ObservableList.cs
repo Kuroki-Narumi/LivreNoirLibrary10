@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
+using System.Runtime.InteropServices;
 
 namespace LivreNoirLibrary.Collections
 {
@@ -12,7 +14,7 @@ namespace LivreNoirLibrary.Collections
             set
             {
                 var current = _list[index];
-                _list[index] = value;
+                ReplaceItem(index, value);
                 OnCollectionReplaced(value, current, index);
             }
         }
@@ -20,14 +22,6 @@ namespace LivreNoirLibrary.Collections
         public ObservableList() : base() { }
         public ObservableList(int capacy) : base(capacy) { }
         public ObservableList(IEnumerable<T> collection) : base([.. collection]) { }
-
-        public void AddRange(ObservableList<T> source)
-        {
-            var index = _list.Count;
-            _list.AddRange(source._list);
-            OnUpdate();
-            OnCollectionAdded(source._list, index);
-        }
 
         public void Insert(int index, T item)
         {
@@ -70,10 +64,8 @@ namespace LivreNoirLibrary.Collections
                 }
                 if (count is > 0)
                 {
-                    List<T> current = _list[index..(index + count)];
                     _list.RemoveRange(index, count);
-                    OnUpdate();
-                    OnCollectionRemoved(current, index);
+                    NotifyCollectionReset();
                 }
             }
         }
@@ -91,6 +83,85 @@ namespace LivreNoirLibrary.Collections
                 {
                     _list.RemoveRange(index, count);
                     OnUpdate();
+                }
+            }
+        }
+
+        public bool TryDequeue([MaybeNullWhen(false)] out T item)
+        {
+            if (_list.Count is > 0)
+            {
+                item = _list[0];
+                RemoveAt(0);
+                return true;
+            }
+            item = default;
+            return false;
+        }
+
+        public void CopyTo(List<T> target, int index, int count)
+        {
+            var c = _list.Count;
+            if ((uint)index < (uint)c)
+            {
+                if (index + count >= c)
+                {
+                    count = c - index;
+                }
+                if (count is > 0)
+                {
+                    target.AddRange(CollectionsMarshal.AsSpan(_list).Slice(index, count));
+                }
+            }
+        }
+
+        public void CopyTo(ObservableCollectionBase<T> target, int index, int count)
+        {
+            var c = _list.Count;
+            if ((uint)index < (uint)c)
+            {
+                if (index + count >= c)
+                {
+                    count = c - index;
+                }
+                if (count is > 0)
+                {
+                    target.AddRange(CollectionsMarshal.AsSpan(_list).Slice(index, count));
+                    RemoveRange(index, count);
+                }
+            }
+        }
+
+        public void MoveTo(List<T> target, int index, int count)
+        {
+            var c = _list.Count;
+            if ((uint)index < (uint)c)
+            {
+                if (index + count >= c)
+                {
+                    count = c - index;
+                }
+                if (count is > 0)
+                {
+                    target.AddRange(CollectionsMarshal.AsSpan(_list).Slice(index, count));
+                    RemoveRange(index, count);
+                }
+            }
+        }
+
+        public void MoveTo(ObservableCollectionBase<T> target, int index, int count)
+        {
+            var c = _list.Count;
+            if ((uint)index < (uint)c)
+            {
+                if (index + count >= c)
+                {
+                    count = c - index;
+                }
+                if (count is > 0)
+                {
+                    target.AddRange(CollectionsMarshal.AsSpan(_list).Slice(index, count));
+                    RemoveRange(index, count);
                 }
             }
         }
@@ -120,7 +191,8 @@ namespace LivreNoirLibrary.Collections
                 {
                     (index1, index2) = (index2, index1);
                 }
-                OnCollectionMoved([item1, item2], index1, index2);
+                OnCollectionMoved(item1, index2, index1);
+                OnCollectionMoved(item2, index1, index2);
             }
         }
 
@@ -159,21 +231,17 @@ namespace LivreNoirLibrary.Collections
             NotifyCollectionReset();
         }
 
-        public void Shuffle() => Shuffle(0, _list.Count, Random.Shared);
-        public void Shuffle(Random random) => Shuffle(0, _list.Count, random);
+        public void Shuffle() => Shuffle(Random.Shared);
+        public void Shuffle(Random random)
+        {
+            random.Shuffle(CollectionsMarshal.AsSpan(_list));
+            NotifyCollectionReset();
+        }
+
         public void Shuffle(int index, int count) => Shuffle(index, count, Random.Shared);
         public void Shuffle(int index, int count, Random random)
         {
-            var c = _list.Count;
-            if (index + count > c)
-            {
-                count = c - index;
-            }
-            for (var n = count; n > 0; n--)
-            {
-                var k = random.Next(n) + index;
-                (_list[n - 1], _list[k]) = (_list[k], _list[n - 1]);
-            }
+            random.Shuffle(CollectionsMarshal.AsSpan(_list).Slice(index, count));
             NotifyCollectionReset();
         }
 

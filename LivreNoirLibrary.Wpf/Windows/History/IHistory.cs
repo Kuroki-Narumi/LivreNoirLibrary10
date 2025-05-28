@@ -7,7 +7,8 @@ namespace LivreNoirLibrary.Windows
     {
         public int UndoCount { get; }
         public int RedoCount { get; }
-        public void Clear();
+        public void Initialize();
+        public void PushUndo();
         public void Undo();
         public void Redo();
     }

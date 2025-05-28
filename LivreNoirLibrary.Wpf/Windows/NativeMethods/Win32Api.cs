@@ -10,6 +10,9 @@ namespace LivreNoirLibrary.Windows.NativeMethods
         [LibraryImport("user32")]
         internal static partial int UnregisterHotKey(nint hWnd, int id);
 
+        [LibraryImport("user32")]
+        internal static partial int GetKeyboardState(nint buffer);
+
         [LibraryImport("kernel32")]
         internal static partial void RtlMoveMemory(nint dest, nint source, int length);
 

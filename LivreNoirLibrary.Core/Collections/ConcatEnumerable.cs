@@ -11,7 +11,7 @@ namespace LivreNoirLibrary.Collections
 
         public ConcatEnumerable(IEnumerable<T> enumer) => _enumerables = [enumer];
         public ConcatEnumerable(IEnumerable<IEnumerable<T>> enumers) => _enumerables = [.. enumers];
-        public ConcatEnumerable(params ReadOnlySpan<IEnumerable<T>> enumers) => _enumerables = [.. enumers];
+        public ConcatEnumerable(params List<IEnumerable<T>> enumers) => _enumerables = enumers;
 
         public void Clear()
         {

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Numerics;
 using System.Windows.Input;
+using LivreNoirLibrary.Debug;
 using LivreNoirLibrary.Windows.Input;
 
 namespace LivreNoirLibrary.Windows.Controls
@@ -81,7 +82,9 @@ namespace LivreNoirLibrary.Windows.Controls
         {
             if (!IsEditing)
             {
+                var oldText = Text;
                 Value = e.Delta is > 0 ? GetNext(_value) : GetPrevious(_value);
+                RaiseTextChanged(oldText, ToString(_value));
                 e.Handled = true;
             }
             base.OnPreviewMouseWheel(e);
@@ -142,7 +145,9 @@ namespace LivreNoirLibrary.Windows.Controls
             }
             else if (_value != _editing_value)
             {
+                var oldText = Text;
                 Value = _editing_value;
+                RaiseTextChanged(oldText, ToString(_value));
                 return;
             }
             base.ApplyText(text);

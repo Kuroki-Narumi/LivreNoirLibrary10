@@ -6,70 +6,21 @@
     xmlns:theme="clr-namespace:Microsoft.Windows.Themes;assembly=PresentationFramework.Aero2"
     mc:Ignorable="po"
     xmlns:local="clr-namespace:LivreNoirLibrary.Windows.Controls"
-    xmlns:wpf="clr-namespace:LivreNoirLibrary.Windows" 
+    xmlns:wpf="clr-namespace:LivreNoirLibrary.Windows"
+    xmlns:conv="clr-namespace:LivreNoirLibrary.Windows.Converters"
     xmlns:input="clr-namespace:LivreNoirLibrary.Windows.Input"
+    xmlns:media="clr-namespace:LivreNoirLibrary.Media"
     xmlns:text="clr-namespace:LivreNoirLibrary.Text;assembly=LivreNoirLibrary.Core"
     >
-    <SolidColorBrush x:Key="Brush_5000" po:Freeze="True" Color="#5000"/>
-    <SolidColorBrush x:Key="Brush_8000" po:Freeze="True" Color="#8000"/>
-    <SolidColorBrush x:Key="Brush_222" po:Freeze="True" Color="#222"/>
-    <SolidColorBrush x:Key="Brush_444" po:Freeze="True" Color="#444"/>
-    <SolidColorBrush x:Key="Brush_666" po:Freeze="True" Color="#666"/>
-    <SolidColorBrush x:Key="Brush_888" po:Freeze="True" Color="#888"/>
-    <SolidColorBrush x:Key="Brush_aaa" po:Freeze="True" Color="#aaa"/>
-    <SolidColorBrush x:Key="Brush_ccc" po:Freeze="True" Color="#ccc"/>
-    <SolidColorBrush x:Key="Brush_eee" po:Freeze="True" Color="#eee"/>
-    <SolidColorBrush x:Key="Brush_420" po:Freeze="True" Color="#420"/>
-    <SolidColorBrush x:Key="Brush_800" po:Freeze="True" Color="#800"/>
-    <SolidColorBrush x:Key="Brush_822" po:Freeze="True" Color="#822"/>
-    <SolidColorBrush x:Key="Brush_a55" po:Freeze="True" Color="#a55"/>
-    <SolidColorBrush x:Key="Brush_c00" po:Freeze="True" Color="#c00"/>
-    <SolidColorBrush x:Key="Brush_e44" po:Freeze="True" Color="#e44"/>
-    <SolidColorBrush x:Key="Brush_f66" po:Freeze="True" Color="#f66"/>
-    <SolidColorBrush x:Key="Brush_f88" po:Freeze="True" Color="#f88"/>
-    <SolidColorBrush x:Key="Brush_ea6" po:Freeze="True" Color="#ea6"/>
-    <SolidColorBrush x:Key="Brush_edb6b6" po:Freeze="True" Color="#edb6b6"/>
-    <SolidColorBrush x:Key="Brush_fc8" po:Freeze="True" Color="#fc8"/>
-    <SolidColorBrush x:Key="Brush_8ff0" po:Freeze="True" Color="#8ff0"/>
-    <SolidColorBrush x:Key="Brush_040" po:Freeze="True" Color="#040"/>
-    <SolidColorBrush x:Key="Brush_044" po:Freeze="True" Color="#044"/>
-    <SolidColorBrush x:Key="Brush_070" po:Freeze="True" Color="#070"/>
-    <SolidColorBrush x:Key="Brush_272" po:Freeze="True" Color="#272"/>
-    <SolidColorBrush x:Key="Brush_0a0" po:Freeze="True" Color="#0a0"/>
-    <SolidColorBrush x:Key="Brush_4e0" po:Freeze="True" Color="#4e0"/>
-    <SolidColorBrush x:Key="Brush_4fc" po:Freeze="True" Color="#4fc"/>
-    <SolidColorBrush x:Key="Brush_8fc" po:Freeze="True" Color="#8fc"/>
-    <SolidColorBrush x:Key="Brush_cfc" po:Freeze="True" Color="#cfc"/>
-    <SolidColorBrush x:Key="Brush_0fe" po:Freeze="True" Color="#0fe"/>
-    <SolidColorBrush x:Key="Brush_89b" po:Freeze="True" Color="#89b"/>
-    <SolidColorBrush x:Key="Brush_448" po:Freeze="True" Color="#448"/>
-    <SolidColorBrush x:Key="Brush_44a" po:Freeze="True" Color="#44a"/>
-    <SolidColorBrush x:Key="Brush_44e" po:Freeze="True" Color="#44e"/>
-    <SolidColorBrush x:Key="Brush_48c" po:Freeze="True" Color="#48c"/>
-    <SolidColorBrush x:Key="Brush_8cf" po:Freeze="True" Color="#8cf"/>
-    <SolidColorBrush x:Key="Brush_ccf" po:Freeze="True" Color="#ccf"/>
-    <SolidColorBrush x:Key="Brush_def" po:Freeze="True" Color="#def"/>
-    <SolidColorBrush x:Key="Brush_407" po:Freeze="True" Color="#407"/>
-    <SolidColorBrush x:Key="Brush_86e" po:Freeze="True" Color="#86e"/>
-    <SolidColorBrush x:Key="Brush_704" po:Freeze="True" Color="#704"/>
-    <SolidColorBrush x:Key="Brush_e68" po:Freeze="True" Color="#e68"/>
-
-    <Pen x:Key="Pen_8000_10" po:Freeze="True" Brush="{StaticResource Brush_8000}" Thickness="1"/>
-    <Pen x:Key="Pen_444_10" po:Freeze="True" Brush="{StaticResource Brush_444}" Thickness="1"/>
-    <Pen x:Key="Pen_444_15" po:Freeze="True" Brush="{StaticResource Brush_444}" Thickness="1.5"/>
-    <Pen x:Key="Pen_420_10" po:Freeze="True" Brush="{StaticResource Brush_420}" Thickness="1"/>
-    <Pen x:Key="Pen_420_15" po:Freeze="True" Brush="{StaticResource Brush_420}" Thickness="1.5"/>
-    <Pen x:Key="Pen_040_15" po:Freeze="True" Brush="{StaticResource Brush_040}" Thickness="1.5"/>
-    <Pen x:Key="Pen_407_15" po:Freeze="True" Brush="{StaticResource Brush_407}" Thickness="1.5"/>
-    <Pen x:Key="Pen_704_15" po:Freeze="True" Brush="{StaticResource Brush_704}" Thickness="1.5"/>
-
     <BooleanToVisibilityConverter x:Key="BVConv"/>
-    <wpf:BooleanConverter x:Key="BooleanConverter"/>
-    <wpf:BooleanInvertConverter x:Key="InvertConverter"/>
-    <wpf:ToVisibilityConverter x:Key="TVConv"/>
-    <wpf:ToVisibilityConverter x:Key="TVConvI" IsInverted="True"/>
-    <wpf:ComboItemConverter x:Key="ComboItemConverter"/>
-
+    <conv:BooleanConverter x:Key="BooleanConverter"/>
+    <conv:BooleanInvertConverter x:Key="InvertConverter"/>
+    <conv:ToVisibilityConverter x:Key="TVConv"/>
+    <conv:ToVisibilityConverter x:Key="TVConvI" IsInverted="True"/>
+    <conv:ComboItemConverter x:Key="ComboItemConverter"/>
+    <conv:StarGridLengthConverter x:Key="SGLConv"/>
+    <conv:DateTimeToStringConverter x:Key="DTPicker_C_Date" Format="yyyy/MM/dd"/>
+    
     <SolidColorBrush x:Key="Brush_Background" po:Freeze="True" Color="White"/>
     <SolidColorBrush x:Key="Brush_Border" po:Freeze="True" Color="#808080"/>
     <SolidColorBrush x:Key="Brush_Background_MouseOver" po:Freeze="True" Color="#bee6fd"/>
@@ -94,15 +45,6 @@
     <SolidColorBrush x:Key="Brush_Popup_Border" po:Freeze="True" Color="#767676"/>
     <SolidColorBrush x:Key="Brush_Popup_Background" po:Freeze="True" Color="#f1f2f7"/>
     <SolidColorBrush x:Key="Brush_Popup_Foreground" po:Freeze="True" Color="#575757"/>
-
-    <DrawingBrush po:Freeze="True" x:Key="Brush_TransparentChecker" Viewport="0,0,16,16" TileMode="Tile" ViewportUnits="Absolute">
-        <DrawingBrush.Drawing>
-            <DrawingGroup po:Freeze="True">
-                <GeometryDrawing po:Freeze="True" Brush="{StaticResource Brush_eee}" Geometry="M0,0 v2 h2 v-2"/>
-                <GeometryDrawing po:Freeze="True" RenderOptions.EdgeMode="Aliased" Brush="{StaticResource Brush_ccc}" Geometry="M0,0 v1 h1 v-1Z M1,1 v1 h1 v-1Z"/>
-            </DrawingGroup>
-        </DrawingBrush.Drawing>
-    </DrawingBrush>
 
     <SolidColorBrush po:Freeze="True" x:Key="ComboBox.Static.Glyph" Color="#FF606060"/>
     <LinearGradientBrush po:Freeze="True" x:Key="ComboBox.MouseOver.Background" EndPoint="0,1" StartPoint="0,0">
@@ -256,8 +198,6 @@
         <Setter Property="IsClearButtonVisible" Value="False"/>
     </Style>
 
-    <wpf:StarGridLengthConverter x:Key="SGL_Conv"/>
-
     <Style TargetType="local:ColorPicker">
         <Setter Property="Height" Value="24"/>
         <Setter Property="IndicatorWidth" Value="72"/>
@@ -277,7 +217,7 @@
                             <Border x:Name="PART_PopupContent" Padding="4" Background="White" BorderThickness="1" BorderBrush="{StaticResource Brush_Popup_Border}"/>
                         </Popup>
                         <Grid>
-                            <Rectangle Fill="{StaticResource Brush_TransparentChecker}" IsHitTestVisible="False"/>
+                            <Rectangle Fill="{x:Static media:MediaUtils.TransparentCheckerBrush}" IsHitTestVisible="False"/>
                             <Rectangle x:Name="rect" Stroke="{TemplateBinding BorderBrush}" StrokeThickness="{TemplateBinding BorderThickness}">
                                 <Rectangle.Fill>
                                     <SolidColorBrush x:Name="PART_Indicator" Color="{TemplateBinding SelectedColor}"/>
@@ -672,7 +612,7 @@
                             <Setter Property="BorderBrush" TargetName="templateRoot" Value="{StaticResource TextBox.Focus.Border}"/>
                         </Trigger>
                         <Trigger Property="IsTextValid" Value="False">
-                            <Setter TargetName="templateRoot" Property="BorderBrush" Value="{StaticResource Brush_e44}"/>
+                            <Setter TargetName="templateRoot" Property="BorderBrush" Value="{local:BrushProvider e44}"/>
                         </Trigger>
                     </ControlTemplate.Triggers>
                 </ControlTemplate>
@@ -740,7 +680,11 @@
                             <TextBlock x:Name="DefaultText" Style="{StaticResource DefaultTextBox_DefaultTextBlock}" Text="{TemplateBinding DefaultText}" Padding="{TemplateBinding Padding}" VerticalAlignment="{TemplateBinding VerticalContentAlignment}" HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}" TextTrimming="{TemplateBinding TextTrimming}"/>
                             <TextBlock Text="{TemplateBinding Text}" Margin="2,0" IsHitTestVisible="False" Padding="{TemplateBinding Padding}" VerticalAlignment="{TemplateBinding VerticalContentAlignment}" HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}" TextTrimming="{TemplateBinding TextTrimming}"/>
                             <Border Margin="2,0" Cursor="IBeam" Background="Transparent"/>
-                            <TextBox x:Name="PART_TextBox" Style="{StaticResource EditableTextBlock_TextBox}" HorizontalContentAlignment="{TemplateBinding HorizontalContentAlignment}" VerticalContentAlignment="{TemplateBinding VerticalContentAlignment}" Padding="{TemplateBinding Padding}" Background="{TemplateBinding Background}" AcceptsReturn="{TemplateBinding AcceptsReturn}"/>
+                            <TextBox 
+                                x:Name="PART_TextBox" Style="{StaticResource EditableTextBlock_TextBox}"
+                                HorizontalContentAlignment="{TemplateBinding HorizontalContentAlignment}" VerticalContentAlignment="{TemplateBinding VerticalContentAlignment}" 
+                                Padding="{TemplateBinding Padding}" Background="{TemplateBinding Background}" AcceptsReturn="{TemplateBinding AcceptsReturn}"
+                                IsUndoEnabled="False"/>
                             <Popup x:Name="PART_Popup" AllowsTransparency="True" IsOpen="{TemplateBinding IsEditing}">
                                 <Grid MinWidth="{Binding ActualWidth, ElementName=templateRoot}">
                                     <Grid.ColumnDefinitions>
@@ -786,7 +730,7 @@
                             <Setter Property="BorderBrush" TargetName="templateRoot" Value="{StaticResource TextBox.Focus.Border}"/>
                         </Trigger>
                         <Trigger Property="IsTextValid" Value="False">
-                            <Setter TargetName="templateRoot" Property="BorderBrush" Value="{StaticResource Brush_e44}"/>
+                            <Setter TargetName="templateRoot" Property="BorderBrush" Value="{local:BrushProvider e44}"/>
                         </Trigger>
                     </ControlTemplate.Triggers>
                 </ControlTemplate>
@@ -923,7 +867,6 @@
     <DataTemplate x:Key="DTPicker_TextBlockTemplate_2" DataType="local:TimeItem">
         <TextBlock Style="{StaticResource DTPicker_TextBlock}" Text="{Binding Value, StringFormat={}{0:D2}}" Padding="2,0"/>
     </DataTemplate>
-    <wpf:DateTimeToStringConverter x:Key="DTPicker_C_Date" Format="yyyy/MM/dd"/>
     <Style x:Key="DTPicker_DateButton" TargetType="Button">
         <Setter Property="Margin" Value="0"/>
         <Setter Property="Padding" Value="2,0"/>
@@ -1057,64 +1000,83 @@
     <SolidColorBrush x:Key="SliderThumb.Track.Background" po:Freeze="True" Color="#FFE7EAEA"/>
     <SolidColorBrush x:Key="SliderThumb.Track.Border" po:Freeze="True" Color="#FFD6D6D6"/>
 
-    <Style x:Key="RepeatButtonTransparent" TargetType="{x:Type RepeatButton}">
-        <Setter Property="OverridesDefaultStyle" Value="true"/>
-        <Setter Property="Background" Value="Transparent"/>
-        <Setter Property="Focusable" Value="false"/>
+    <Style x:Key="RangeSlider_TextBox" TargetType="local:EditableTextBlock">
+        <Setter Property="Margin" Value="0"/>
+        <Setter Property="Padding" Value="2,0"/>
+        <Setter Property="VerticalContentAlignment" Value="Center"/>
+        <Setter Property="HorizontalContentAlignment" Value="Right"/>
+        <Setter Property="InputMethod.IsInputMethodEnabled" Value="False"/>
+    </Style>
+    <Style x:Key="RangeSlider_Label" TargetType="Label">
+        <Setter Property="Margin" Value="0"/>
+        <Setter Property="Padding" Value="0"/>
+        <Setter Property="VerticalAlignment" Value="Center"/>
+        <Setter Property="HorizontalContentAlignment" Value="Right"/>
+    </Style>
+    <Style x:Key="RangeSlider_Thumb" TargetType="Thumb">
+        <Setter Property="OverridesDefaultStyle" Value="True"/>
+        <Setter Property="Focusable" Value="False"/>
         <Setter Property="IsTabStop" Value="false"/>
+        <Setter Property="Grid.Column" Value="1"/>
+        <Setter Property="Grid.ColumnSpan" Value="3"/>
+        <Setter Property="VerticalAlignment" Value="Center"/>
+        <Setter Property="HorizontalAlignment" Value="Left"/>
         <Setter Property="Template">
             <Setter.Value>
-                <ControlTemplate TargetType="{x:Type RepeatButton}">
+                <ControlTemplate TargetType="Thumb">
+                    <Border
+                        x:Name="grip" UseLayoutRounding="True" Width="{TemplateBinding Width}" Height="{TemplateBinding Height}"
+                        Background="{StaticResource SliderThumb.Static.Background}"
+                        BorderBrush="{StaticResource SliderThumb.Static.Border}"
+                        BorderThickness="1"/>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsMouseOver" Value="true">
+                            <Setter Property="Background" TargetName="grip" Value="{StaticResource SliderThumb.MouseOver.Background}"/>
+                            <Setter Property="BorderBrush" TargetName="grip" Value="{StaticResource SliderThumb.MouseOver.Border}"/>
+                        </Trigger>
+                        <Trigger Property="IsDragging" Value="true">
+                            <Setter Property="Background" TargetName="grip" Value="{StaticResource SliderThumb.Pressed.Background}"/>
+                            <Setter Property="BorderBrush" TargetName="grip" Value="{StaticResource SliderThumb.Pressed.Border}"/>
+                        </Trigger>
+                        <Trigger Property="IsEnabled" Value="false">
+                            <Setter Property="Background" TargetName="grip" Value="{StaticResource SliderThumb.Disabled.Background}"/>
+                            <Setter Property="BorderBrush" TargetName="grip" Value="{StaticResource SliderThumb.Disabled.Border}"/>
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+    <Style x:Key="RangeSlider_RepeatButton" TargetType="RepeatButton">
+        <Setter Property="OverridesDefaultStyle" Value="true"/>
+        <Setter Property="Focusable" Value="false"/>
+        <Setter Property="IsTabStop" Value="false"/>
+        <Setter Property="Background" Value="Transparent"/>
+        <Setter Property="Grid.Column" Value="1"/>
+        <Setter Property="Grid.ColumnSpan" Value="3"/>
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="RepeatButton">
                     <Rectangle Fill="{TemplateBinding Background}" Height="{TemplateBinding Height}" Width="{TemplateBinding Width}"/>
                 </ControlTemplate>
             </Setter.Value>
         </Setter>
     </Style>
-    <ControlTemplate x:Key="SliderThumbHorizontalDefault" TargetType="Thumb">
-        <Grid UseLayoutRounding="True" HorizontalAlignment="Center" VerticalAlignment="Center">
-            <Path x:Name="grip" Data="M 0,0 C0,0 11,0 11,0 11,0 11,18 11,18 11,18 0,18 0,18 0,18 0,0 0,0 z" Fill="{StaticResource SliderThumb.Static.Background}" Stroke="{StaticResource SliderThumb.Static.Border}" SnapsToDevicePixels="True" Stretch="Fill" StrokeThickness="1" UseLayoutRounding="True" VerticalAlignment="Center"/>
-        </Grid>
-        <ControlTemplate.Triggers>
-            <Trigger Property="IsMouseOver" Value="true">
-                <Setter Property="Fill" TargetName="grip" Value="{StaticResource SliderThumb.MouseOver.Background}"/>
-                <Setter Property="Stroke" TargetName="grip" Value="{StaticResource SliderThumb.MouseOver.Border}"/>
-            </Trigger>
-            <Trigger Property="IsDragging" Value="true">
-                <Setter Property="Fill" TargetName="grip" Value="{StaticResource SliderThumb.Pressed.Background}"/>
-                <Setter Property="Stroke" TargetName="grip" Value="{StaticResource SliderThumb.Pressed.Border}"/>
-            </Trigger>
-            <Trigger Property="IsEnabled" Value="false">
-                <Setter Property="Fill" TargetName="grip" Value="{StaticResource SliderThumb.Disabled.Background}"/>
-                <Setter Property="Stroke" TargetName="grip" Value="{StaticResource SliderThumb.Disabled.Border}"/>
-            </Trigger>
-        </ControlTemplate.Triggers>
-    </ControlTemplate>
-
-    <Style TargetType="TextBox" x:Key="TextBox_RangeSlider">
-        <Setter Property="Margin" Value="0"/>
+    <Style x:Key="RangeSlider_Indicator" TargetType="Rectangle">
+        <Setter Property="IsHitTestVisible" Value="False"/>
+        <Setter Property="Grid.Column" Value="2"/>
         <Setter Property="VerticalAlignment" Value="Center"/>
-        <Setter Property="VerticalContentAlignment" Value="Center"/>
-        <Setter Property="HorizontalContentAlignment" Value="Right"/>
-        <Setter Property="InputMethod.IsInputMethodEnabled" Value="False"/>
-    </Style>
-    <Style TargetType="Label" x:Key="Label_RangeSlider">
-        <Setter Property="Margin" Value="0"/>
-        <Setter Property="Padding" Value="0"/>
-        <Setter Property="VerticalAlignment" Value="Center"/>
-        <Setter Property="VerticalContentAlignment" Value="Center"/>
-        <Setter Property="HorizontalContentAlignment" Value="Right"/>
-    </Style>
-    <Style TargetType="Thumb" x:Key="Thumb_RangeSlider">
-        <Setter Property="Focusable" Value="False"/>
-        <Setter Property="Width" Value="11"/>
-        <Setter Property="Height" Value="18"/>
-        <Setter Property="OverridesDefaultStyle" Value="True"/>
-        <Setter Property="Template" Value="{StaticResource SliderThumbHorizontalDefault}"/>
+        <Setter Property="HorizontalAlignment" Value="Left"/>
+        <Setter Property="Height" Value="4"/>
+        <Setter Property="Fill" Value="{DynamicResource {x:Static SystemColors.HighlightBrushKey}}"/>
     </Style>
     <Style TargetType="local:RangeSlider">
         <Setter Property="Focusable" Value="False"/>
-        <Setter Property="MinHeight" Value="18"/>
+        <Setter Property="ThumbWidth" Value="11"/>
+        <Setter Property="ThumbHeight" Value="18"/>
         <Setter Property="TextWidth" Value="36"/>
+        <Setter Property="WithText" Value="True"/>
+        <Setter Property="IsTextEditable" Value="True"/>
         <Setter Property="Background" Value="Transparent"/>
         <Setter Property="Template">
             <Setter.Value>
@@ -1123,39 +1085,50 @@
                         <Grid>
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="Auto"/>
                                 <ColumnDefinition Width="*"/>
                                 <ColumnDefinition Width="Auto"/>
                                 <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="Auto"/>
                             </Grid.ColumnDefinitions>
-                            <Grid.RowDefinitions>
-                                <RowDefinition MinHeight="{TemplateBinding MinHeight}"/>
-                            </Grid.RowDefinitions>
-                            <local:DoubleTextBox 
-                                x:Name="PART_TextBox1" Grid.Column="0" Width="{TemplateBinding TextWidth}" Style="{StaticResource TextBox_RangeSlider}" 
+                            <local:DoubleTextBlock 
+                                x:Name="PART_TextBox1" Grid.Column="0" Style="{StaticResource RangeSlider_TextBox}"
+                                Margin="{TemplateBinding TextMargin}" Width="{TemplateBinding TextWidth}"
                                 Value="{Binding Value1, Mode=TwoWay, RelativeSource={RelativeSource Mode=TemplatedParent}}" 
-                                Minimum="{TemplateBinding Minimum}" Maximum="{TemplateBinding Value2}" />
-                            <local:DoubleTextBox 
-                                x:Name="PART_TextBox2" Grid.Column="2" Width="{TemplateBinding TextWidth}" Style="{StaticResource TextBox_RangeSlider}" 
+                                Minimum="{TemplateBinding Minimum}" Maximum="{TemplateBinding Value2}"/>
+                            <Label 
+                                x:Name="label1" Grid.Column="0" Style="{StaticResource RangeSlider_Label}" 
+                                Margin="{TemplateBinding TextMargin}" Content="{TemplateBinding Value1}" Width="{TemplateBinding TextWidth}"/>
+                            <local:DoubleTextBlock 
+                                x:Name="PART_TextBox2" Grid.Column="4" Style="{StaticResource RangeSlider_TextBox}"
+                                Margin="{TemplateBinding TextMargin}" Width="{TemplateBinding TextWidth}"
                                 Value="{Binding Value2, Mode=TwoWay, RelativeSource={RelativeSource Mode=TemplatedParent}}" 
-                                Minimum="{TemplateBinding Value1}" Maximum="{TemplateBinding Maximum}" />
-                            <Label x:Name="label1" Grid.Column="0" Style="{StaticResource Label_RangeSlider}" Content="{Binding Text, ElementName=PART_TextBox1}" Width="{TemplateBinding TextWidth}"/>
-                            <Label x:Name="label2" Grid.Column="2" Style="{StaticResource Label_RangeSlider}" Content="{Binding Text, ElementName=PART_TextBox2}" Width="{TemplateBinding TextWidth}" HorizontalContentAlignment="Left"/>
-                            <CheckBox x:Name="PART_ExCheckBox" Grid.Column="3" VerticalAlignment="Center" VerticalContentAlignment="Center" Content="{TemplateBinding ExclusiveText}" Margin="4,0,0,0" IsChecked="{Binding IsExclusive, Mode=TwoWay, RelativeSource={RelativeSource Mode=TemplatedParent}}"/>
-                            <Border x:Name="PART_TrackBackground" Grid.Column="1" Margin="9,0" Background="{StaticResource SliderThumb.Track.Background}" BorderBrush="{StaticResource SliderThumb.Track.Border}" BorderThickness="1" Height="4" VerticalAlignment="center" IsHitTestVisible="False">
-                                <Canvas Margin="-1,-1">
-                                    <Rectangle 
-                                        x:Name="PART_SelectionRange1" Fill="{DynamicResource {x:Static SystemColors.HighlightBrushKey}}" 
-                                        Height="4" Canvas.Left="{TemplateBinding Selection1Left}" Width="{TemplateBinding Selection1Width}"/>
-                                    <Rectangle 
-                                        x:Name="PART_SelectionRange2" Fill="{DynamicResource {x:Static SystemColors.HighlightBrushKey}}" 
-                                        Height="4" Canvas.Left="{TemplateBinding Selection2Left}" Width="{TemplateBinding Selection2Width}"/>
-                                </Canvas>
+                                Minimum="{TemplateBinding Value1}" Maximum="{TemplateBinding Maximum}"/>
+                            <Label
+                                x:Name="label2" Grid.Column="4" HorizontalContentAlignment="Left" Style="{StaticResource RangeSlider_Label}" 
+                                Margin="{TemplateBinding TextMargin}" Content="{TemplateBinding Value2}" Width="{TemplateBinding TextWidth}"/>
+                            <Border Grid.Column="1" IsHitTestVisible="False" Width="{TemplateBinding ThumbWidth}" Height="{TemplateBinding ThumbHeight}"/>
+                            <Border 
+                                x:Name="PART_TrackBackground" Grid.Column="2" VerticalAlignment="Center" IsHitTestVisible="False" Height="4"
+                                Background="{StaticResource SliderThumb.Track.Background}" BorderBrush="{StaticResource SliderThumb.Track.Border}" BorderThickness="1">
                             </Border>
-                            <RepeatButton x:Name="PART_RepeatButton" Focusable="False" Grid.Column="1" Style="{StaticResource RepeatButtonTransparent}"/>
-                            <Canvas Margin="14,-18,0,0" Grid.Column="1" VerticalAlignment="center">
-                                <Thumb x:Name="PART_Thumb1" Style="{StaticResource Thumb_RangeSlider}" Canvas.Left="{TemplateBinding ThumbLeft}"/>
-                                <Thumb x:Name="PART_Thumb2" Style="{StaticResource Thumb_RangeSlider}" Canvas.Left="{TemplateBinding ThumbRight}"/>
-                            </Canvas>
+                            <Rectangle
+                                Style="{StaticResource RangeSlider_Indicator}"
+                                Margin="{TemplateBinding Selection1Margin}" Width="{TemplateBinding Selection1Width}"/>
+                            <Rectangle
+                                Style="{StaticResource RangeSlider_Indicator}"
+                                Margin="{TemplateBinding Selection2Margin}" Width="{TemplateBinding Selection2Width}"/>
+                            <RepeatButton x:Name="PART_RepeatButton" Style="{StaticResource RangeSlider_RepeatButton}"/>
+                            <Thumb
+                                x:Name="PART_Thumb1" Style="{StaticResource RangeSlider_Thumb}" Margin="{TemplateBinding Thumb1Margin}"
+                                Width="{TemplateBinding ThumbWidth}" Height="{TemplateBinding ThumbHeight}"/>
+                            <Thumb 
+                                x:Name="PART_Thumb2" Style="{StaticResource RangeSlider_Thumb}" Margin="{TemplateBinding Thumb2Margin}"
+                                Width="{TemplateBinding ThumbWidth}" Height="{TemplateBinding ThumbHeight}"/>
+                            <Border Grid.Column="3" IsHitTestVisible="False" Width="{TemplateBinding ThumbWidth}" Height="{TemplateBinding ThumbHeight}"/>
+                            <CheckBox 
+                                x:Name="exCheckBox" Grid.Column="5" Margin="4,0,0,0" VerticalAlignment="Center" VerticalContentAlignment="Center" 
+                                Content="{TemplateBinding ExclusiveText}" IsChecked="{Binding IsExclusive, Mode=TwoWay, RelativeSource={RelativeSource Mode=TemplatedParent}}"/>
                         </Grid>
                     </Border>
                     <ControlTemplate.Triggers>
@@ -1174,7 +1147,7 @@
                             <Setter TargetName="label2" Property="Visibility" Value="Collapsed"/>
                         </Trigger>
                         <Trigger Property="WithExclusiveButton" Value="False">
-                            <Setter TargetName="PART_ExCheckBox" Property="Visibility" Value="Collapsed"/>
+                            <Setter TargetName="exCheckBox" Property="Visibility" Value="Collapsed"/>
                         </Trigger>
                         <Trigger Property="IsEnabled" Value="False">
                             <Setter Property="Opacity" Value="0.56"/>
@@ -1267,8 +1240,8 @@
     </Style>
 
     <Style TargetType="local:TaskProgressBar">
-        <Setter Property="Background" Value="{StaticResource Brush_8000}"/>
-        <Setter Property="Foreground" Value="{StaticResource Brush_666}"/>
+        <Setter Property="Background" Value="{local:BrushProvider 8000}"/>
+        <Setter Property="Foreground" Value="{local:BrushProvider 666}"/>
         <Setter Property="Visibility" Value="Collapsed"/>
         <Setter Property="Template">
             <Setter.Value>
@@ -1316,6 +1289,10 @@
         <Setter Property="SnapsToDevicePixels" Value="True"/>
         <Setter Property="UseLayoutRounding" Value="True"/>
         <Setter Property="Background" Value="Gray"/>
+        <Setter Property="HorizontalScrollBarVisibility" Value="Visible"/>
+        <Setter Property="VerticalScrollBarVisibility" Value="Visible"/>
+        <Setter Property="HorizontalContentAlignment" Value="Left"/>
+        <Setter Property="VerticalContentAlignment" Value="Top"/>
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="local:ScrollViewerBase">
@@ -1329,7 +1306,7 @@
                             <RowDefinition Height="Auto"/>
                         </Grid.RowDefinitions>
                         <Rectangle x:Name="Corner" Grid.Row="1" Grid.Column="1" Fill="{DynamicResource {x:Static SystemColors.ControlBrushKey}}"/>
-                        <Grid x:Name="PART_MainArea" Margin="{TemplateBinding Padding}">
+                        <Grid x:Name="PART_MainArea">
                             <ScrollContentPresenter 
                                 x:Name="PART_ScrollContentPresenter" Grid.Row="0" Grid.Column="0" CanVerticallyScroll="False" CanHorizontallyScroll="False" 
                                 CanContentScroll="{TemplateBinding CanContentScroll}" Content="{TemplateBinding Content}"/>
@@ -1370,7 +1347,7 @@
     <Style TargetType="local:ConsoleViewer">
         <Setter Property="Background" Value="Black"/>
         <Setter Property="Foreground" Value="White"/>
-        <Setter Property="TimeForeground" Value="{StaticResource Brush_ccc}"/>
+        <Setter Property="TimeForeground" Value="{local:BrushProvider ccc}"/>
         <Setter Property="FontFamily" Value="Consolas"/>
         <Setter Property="FontSize" Value="12"/>
         <Setter Property="Padding" Value="4,2"/>
@@ -1409,15 +1386,15 @@
 
     <HierarchicalDataTemplate x:Key="JsonCollectionTemplate" DataType="text:JsonCollectionNode" ItemsSource="{Binding Children}">
         <StackPanel Orientation="Horizontal">
-            <TextBlock Text="{Binding Name}" Foreground="{StaticResource Brush_c00}"/>
-            <TextBlock Text=": " Foreground="{StaticResource Brush_800}"/>
+            <TextBlock Text="{Binding Name}" Foreground="{local:BrushProvider c00}"/>
+            <TextBlock Text=": " Foreground="{local:BrushProvider 800}"/>
             <TextBlock Text="{Binding ValueString}" TextWrapping="Wrap"/>
         </StackPanel>
     </HierarchicalDataTemplate>
     <DataTemplate x:Key="JsonValueTemplate" DataType="text:JsonValueNode">
         <StackPanel Orientation="Horizontal">
-            <TextBlock Text="{Binding Name}" Foreground="{StaticResource Brush_0a0}"/>
-            <TextBlock Text=": " Foreground="{StaticResource Brush_070}"/>
+            <TextBlock Text="{Binding Name}" Foreground="{local:BrushProvider 0a0}"/>
+            <TextBlock Text=": " Foreground="{local:BrushProvider 070}"/>
             <TextBlock Text="{Binding ValueString}" TextWrapping="Wrap"/>
         </StackPanel>
     </DataTemplate>
@@ -1636,5 +1613,12 @@
         <Setter Property="ScrollViewer.HorizontalScrollBarVisibility" Value="Disabled"/>
         <Setter Property="VirtualizingStackPanel.IsVirtualizing" Value="True"/>
         <Setter Property="VirtualizingStackPanel.VirtualizationMode" Value="Recycling"/>
+    </Style>
+
+    <Style TargetType="local:ImageRectSelectorView">
+        <Setter Property="Background" Value="Gray"/>
+        <Setter Property="HorizontalContentAlignment" Value="Center"/>
+        <Setter Property="VerticalContentAlignment" Value="Center"/>
+        <Setter Property="Padding" Value="32"/>
     </Style>
 </ResourceDictionary>

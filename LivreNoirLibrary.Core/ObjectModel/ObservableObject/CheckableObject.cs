@@ -10,7 +10,7 @@ namespace LivreNoirLibrary.ObjectModel
 
     public partial class CheckableObject : ObservableObjectBase, ICheckableObject
     {
-        public event BooleanPropertyChangedEventHandler? IsCheckedChanged;
+        public event ValueChangedEventHandler<bool>? IsCheckedChanged;
 
         [ObservableProperty]
         private bool _isChecked = false;

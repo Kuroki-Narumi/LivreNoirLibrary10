@@ -50,6 +50,7 @@ namespace LivreNoirLibrary.Windows.Controls
         private void VerifyValue2(double target) => VerifyValue(target, ref _value2, Value2Property, Math.Max(_minimum, _value1), _maximum);
         private void VerifyMinimum(double target) => VerifyValue(target, ref _minimum, MinimumProperty, double.MinValue, _maximum);
         private void VerifyMaximum(double target) => VerifyValue(target, ref _maximum, MaximumProperty, _minimum, double.MaxValue);
+
         private bool VerifyValue(double value, ref double field, DependencyProperty property, double min, double max)
         {
             if (_initialized)
@@ -77,27 +78,33 @@ namespace LivreNoirLibrary.Windows.Controls
         private double _tick_frequency = DefaultTickFrequency;
 
         [DependencyProperty]
-        private bool _withExclusiveButton = false;
+        private bool _withExclusiveButton;
         [DependencyProperty]
         private object? _exclusiveText = DefaultExclusiveText;
         [DependencyProperty]
-        private bool _isExclusive = false;
+        private bool _isExclusive;
         [DependencyProperty]
-        private bool _withText = true;
+        private bool _withText;
         [DependencyProperty]
         private double _textWidth = double.NaN;
         [DependencyProperty]
-        private bool _isTextEditable = true;
+        private Thickness _textMargin;
+        [DependencyProperty]
+        private bool _isTextEditable;
+        [DependencyProperty]
+        private double _thumbWidth;
+        [DependencyProperty]
+        private double _thumbHeight;
         [DependencyProperty(SetterScope = ObjectModel.Scope.Private)]
-        private double _thumbLeft;
+        private Thickness _thumb1Margin;
         [DependencyProperty(SetterScope = ObjectModel.Scope.Private)]
-        private double _thumbRight;
+        private Thickness _thumb2Margin;
         [DependencyProperty(SetterScope = ObjectModel.Scope.Private)]
-        private double _selection1Left;
+        private Thickness _selection1Margin;
         [DependencyProperty(SetterScope = ObjectModel.Scope.Private)]
         private double _selection1Width;
         [DependencyProperty(SetterScope = ObjectModel.Scope.Private)]
-        private double _selection2Left;
+        private Thickness _selection2Margin;
         [DependencyProperty(SetterScope = ObjectModel.Scope.Private)]
         private double _selection2Width;
 
@@ -108,5 +115,7 @@ namespace LivreNoirLibrary.Windows.Controls
         public double TickFrequency { get => _tick_frequency; set => SetValue(TickFrequencyProperty, value); }
 
         private void OnIsExclusiveChanged(bool value) => ReserveRefresh();
+        private void OnThumbWidthChanged(double value) => ReserveRefresh();
+        private void OnThumbHeightChanged(double value) => ReserveRefresh();
     }
 }

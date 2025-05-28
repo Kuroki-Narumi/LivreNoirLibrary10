@@ -154,11 +154,11 @@ namespace LivreNoirLibrary.Windows.Controls
 
             void MouseUp(object sender, MouseButtonEventArgs e)
             {
-                ResizeFinished?.Invoke(this, new(initRect, NewRect()));
                 s.ReleaseMouseCapture();
                 s.MouseMove -= MouseMove;
                 s.MouseLeftButtonUp -= MouseUp;
                 e.Handled = true;
+                ResizeFinished?.Invoke(this, new(initRect, NewRect()));
             }
 
             s.CaptureMouse();

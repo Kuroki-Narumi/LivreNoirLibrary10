@@ -198,8 +198,8 @@ namespace LivreNoirLibrary.Windows.Controls
         private void OnMouseMove_Main(object sender, MouseEventArgs e)
         {
             var pos = e.GetPosition((sender as IInputElement)!);
-            var x = (float)(pos.X / 255);
-            var y = (float)(pos.Y / 255);
+            var x = (float)pos.X * ColorUtils.InvertFactor;
+            var y = (float)pos.Y * ColorUtils.InvertFactor;
             switch (_current_image)
             {
                 case ColorImageIndex.Rgb:
@@ -231,7 +231,7 @@ namespace LivreNoirLibrary.Windows.Controls
 
         private void OnMouseMove_Slider(object sender, MouseEventArgs e)
         {
-            var y = (float)(e.GetPosition((sender as IInputElement)!).Y / 255);
+            var y = (float)e.GetPosition((sender as IInputElement)!).Y * ColorUtils.InvertFactor;
             switch (_current_image)
             {
                 case ColorImageIndex.Rgb:

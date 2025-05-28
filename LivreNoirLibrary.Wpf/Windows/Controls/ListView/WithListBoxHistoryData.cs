@@ -3,7 +3,7 @@ using System.Windows.Controls;
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
 
-namespace LivreNoirLibrary.Windows.Contorls
+namespace LivreNoirLibrary.Windows.Controls
 {
     public class WithListBoxHistoryData<T>
     {
@@ -18,7 +18,7 @@ namespace LivreNoirLibrary.Windows.Contorls
             _data = data;
             foreach (var control in controls)
             {
-                if (control.SelectionMode is SelectionMode.Single)
+                if (control.SelectionMode is System.Windows.Controls.SelectionMode.Single)
                 {
                     _selected_indexes.Add((new(control), control.SelectedIndex));
                 }
@@ -34,16 +34,16 @@ namespace LivreNoirLibrary.Windows.Contorls
         {
             foreach (var (@ref, index) in CollectionsMarshal.AsSpan(_selected_indexes))
             {
-                if (@ref.TryGetTarget(out var control) && control.SelectionMode is SelectionMode.Single)
+                if (@ref.TryGetTarget(out var control) && control.SelectionMode is System.Windows.Controls.SelectionMode.Single)
                 {
                     control.SelectedIndex = index;
                 }
             }
             foreach (var (@ref, list) in CollectionsMarshal.AsSpan(_selected_items))
             {
-                if (@ref.TryGetTarget(out var control) && control.SelectionMode is not SelectionMode.Single)
+                if (@ref.TryGetTarget(out var control) && control.SelectionMode is not System.Windows.Controls.SelectionMode.Single)
                 {
-                    if (control is Controls.IListView lv)
+                    if (control is IListView lv)
                     {
                         lv.SetSelectedItems(list);
                     }

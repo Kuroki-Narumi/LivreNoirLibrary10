@@ -58,10 +58,7 @@ namespace LivreNoirLibrary.Windows
                 }
                 return data;
             }
-            else
-            {
-                throw new JsonException();
-            }
+            throw new JsonException();
         }
 
         public override void Write(Utf8JsonWriter writer, VocabData value, JsonSerializerOptions options) => WriteStatic(value, writer, options);

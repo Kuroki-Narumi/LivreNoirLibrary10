@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Documents;
 using System.Windows.Input;
 using LivreNoirLibrary.Windows.Input;
 
@@ -53,7 +54,7 @@ namespace LivreNoirLibrary.Windows.Controls
             {
                 var old = t._text;
                 t._text = e.NewValue as string;
-                t.OnTextChanged(old);
+                t.OnTextChanged(old, t._text);
             }
         }
 
@@ -117,12 +118,14 @@ namespace LivreNoirLibrary.Windows.Controls
                     OpenPopup();
                     e.Handled = true;
                 }
-                else if (KeyInput.IsTextKey(e.Key))
+                else if (Keyboard.Modifiers is 0 or ModifierKeys.Shift && IsTextKey(e.Key))
                 {
                     OpenPopup();
                 }
             }
         }
+
+        protected virtual bool IsTextKey(Key key) => KeyInput.IsTextKey(key);
 
         private void OpenPopup()
         {
@@ -202,13 +205,11 @@ namespace LivreNoirLibrary.Windows.Controls
             ClosePopup();
         }
 
-        protected virtual void ApplyText(string? text) => Text = text;
-
-        private void OnTextChanged(string? oldValue)
+        protected virtual void ApplyText(string? text)
         {
-            var newValue = _text;
-            OnTextChanged(oldValue, newValue);
-            RaiseTextChanged(oldValue, newValue);
+            var oldValue = _text;
+            Text = text;
+            RaiseTextChanged(oldValue, text);
         }
 
         protected virtual void OnTextChanged(string? oldValue, string? newValue) { }

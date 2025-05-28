@@ -8,7 +8,8 @@ namespace LivreNoirLibrary.Windows.Controls
 {
     public interface ISelection
     {
-        public SelectionRect SelectionRect { get; }
+        public SelectionType SelectionType { get; }
+        public ISelectionRect SelectionRect { get; }
         public bool IsSelectionEmpty { get; }
 
         public void OnSelectionStart(double x, double y) { }
@@ -21,9 +22,9 @@ namespace LivreNoirLibrary.Windows.Controls
 
     public static class ISelectionExtension
     {
-        public static bool IsHorizontalSelection(this ISelection s) => s.SelectionRect.Type.IsHorizontal();
-        public static bool IsVerticalSelection(this ISelection s) => s.SelectionRect.Type.IsVertical();
-        public static bool NeedsHideSelection(this ISelection s) => s.SelectionRect.Type.NeedsHide();
+        public static bool IsHorizontalSelection(this ISelection s) => s.SelectionType.IsHorizontal();
+        public static bool IsVerticalSelection(this ISelection s) => s.SelectionType.IsVertical();
+        public static bool NeedsHideSelection(this ISelection s) => s.SelectionType.NeedsHide();
 
         public static void StartSelection<T>(this T s, UIElement element)
             where T : ISelection
@@ -37,26 +38,26 @@ namespace LivreNoirLibrary.Windows.Controls
 
             if (s.IsSelectionEmpty)
             {
-                selection.SetNew();
+                selection.Mode = SelectionMode.New;
             }
             else if (KeyInput.IsAltDown())
             {
                 if (KeyInput.IsShiftDown())
                 {
-                    selection.SetIntersect();
+                    selection.Mode = SelectionMode.Intersect;
                 }
                 else
                 {
-                    selection.SetExcept();
+                    selection.Mode = SelectionMode.Except;
                 }
             }
             else if (KeyInput.IsShiftDown())
             {
-                selection.SetUnion();
+                selection.Mode = SelectionMode.Union;
             }
             else
             {
-                selection.SetNew();
+                selection.Mode = SelectionMode.New;
             }
 
             var selecting = false;
@@ -114,7 +115,7 @@ namespace LivreNoirLibrary.Windows.Controls
                 selection.Mode = SelectionMode.None;
                 if (hide)
                 {
-                    selection.Clear();
+                    selection.Hide();
                 }
             }
         }

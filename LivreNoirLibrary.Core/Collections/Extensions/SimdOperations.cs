@@ -13,18 +13,23 @@ namespace LivreNoirLibrary.Collections
             if (offset is < 0)
             {
                 offset += spanLength;
+                if (offset is < 0)
+                {
+                    spanLength = offset = 0;
+                }
             }
-            if (offset is < 0)
+            else if (offset > spanLength)
             {
-                spanLength = 0;
-                offset = 0;
+                offset = spanLength;
             }
-            offset = Math.Min(offset, spanLength);
             if (length is <= 0)
             {
-                length += spanLength;
+                length = Math.Max(length + spanLength, 0);
             }
-            length = Math.Min(length, spanLength - offset);
+            else
+            {
+                length = Math.Min(length, spanLength - offset);
+            }
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -33,26 +38,35 @@ namespace LivreNoirLibrary.Collections
             if (dstOffset is < 0)
             {
                 dstOffset += dstLength;
+                if (dstOffset is < 0)
+                {
+                    dstLength = dstOffset = 0;
+                }
             }
-            if (dstOffset is < 0)
+            else if (dstOffset > dstLength)
             {
-                dstLength = dstOffset = 0;
+                dstOffset = dstLength;
             }
             if (srcOffset is < 0)
             {
                 srcOffset += srcLength;
+                if (srcOffset is < 0)
+                {
+                    srcLength = srcOffset = 0;
+                }
             }
-            if (srcOffset is < 0)
+            else if (srcOffset > srcLength)
             {
-                srcLength = srcOffset = 0;
+                srcOffset = srcLength;
             }
-            dstOffset = Math.Min(dstOffset, dstLength);
-            srcOffset = Math.Min(srcOffset, srcLength);
             if (length is <= 0)
             {
-                length += srcLength;
+                length = Math.Max(length + srcLength, 0);
             }
-            length = Math.Min(length, Math.Min(dstLength - dstOffset, srcLength - srcOffset));
+            else
+            {
+                length = Math.Min(length, Math.Min(dstLength - dstOffset, srcLength - srcOffset));
+            }
         }
 
         private static bool EqualsCore<T>(T* left, T* right, int length)

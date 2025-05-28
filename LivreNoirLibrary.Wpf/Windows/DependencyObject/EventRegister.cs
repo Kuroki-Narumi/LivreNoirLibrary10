@@ -7,7 +7,7 @@ namespace LivreNoirLibrary.Windows
 {
     public static partial class EventRegister
     {
-        [GeneratedRegex(@"Event?$", RegexOptions.CultureInvariant)]
+        [GeneratedRegex(@"Event$", RegexOptions.CultureInvariant)]
         public static partial Regex EventRegex { get; }
 
         public static string GetEventName(string caller) => EventRegex.Replace(caller, "");
