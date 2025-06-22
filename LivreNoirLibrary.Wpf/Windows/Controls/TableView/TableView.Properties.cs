@@ -88,11 +88,11 @@ namespace LivreNoirLibrary.Windows.Controls
         public FontWeight FontWeight { get => TextBlock.GetFontWeight(this); set => TextBlock.SetFontWeight(this, value); }
         public Brush Foreground { get => TextBlock.GetForeground(this); set => TextBlock.SetForeground(this, value); }
 
-        private void OnCellStyleChanged(TableViewCellStyle value) => UpdateDataCells();
-        private void OnRatioFixedChanged(bool value) => UpdateDataCells();
-        private void OnRatioDigitsChanged(int value) => UpdateDataCells();
-        private void OnSourceChanged(IEnumerable? value) => ReserveRefresh();
-        private void OnVerticalSelectorChanged(TableDataSelector? value) => ReserveRefresh();
-        private void OnHorizontalSelectorChanged(TableDataSelector? value) => ReserveRefresh();
+        private void OnCellStyleChanged() => UpdateDataCells();
+        private void OnRatioFixedChanged() => UpdateDataCells();
+        private void OnRatioDigitsChanged() => UpdateDataCells();
+        private void OnSourceChanged() => ReserveRefresh();
+        private void OnVerticalSelectorChanged() => ReserveRefresh();
+        private void OnHorizontalSelectorChanged() => ReserveRefresh();
     }
 }

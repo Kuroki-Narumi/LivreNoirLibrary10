@@ -193,6 +193,10 @@ namespace LivreNoirLibrary.Windows.Controls.IconContent
         public static SG Bms_Sort_Foreground { get; } = CreateGeometry("M0,6 h8 v4 h-8 z M0,18 h8 v4 h-8 Z M0,26 h8 v4 h-8 Z M8,2 h8 v4 h-8 Z M8,14 h8 v4 h-8 Z M8,26 h8 v4 h-8 Z M16,8 h8 v4 h-8 Z M16,18 h8 v4 h-8 Z");
         public static SG Bms_Sort_Highlight { get; } = CreateGeometry("M6,6 h2 v4 h-2 z M6,18 h2 v4 h-2 Z M6,26 h2 v4 h-2 Z M14,2 h2 v4 h-2 Z M14,14 h2 v4 h-2 Z M14,26 h2 v4 h-2 Z M22,8 h2 v4 h-2 Z M22,18 h2 v4 h-2 Z");
 
+        public static SG Bms_MultiDef_Background { get; } = CreateGeometry("M4,0 h8 v32 h-8 Z M20,0 h8 v32 h-8 Z");
+        public static SG Bms_MultiDef_Note { get; } = CreateGeometry("M4,12 h8 v4 h-8 Z M20,16 h8 v4 h-8 Z M12,20 h8 v4 h-8 Z M4,24 h8 v4 h-8 Z");
+        public static SG Bms_MultiDef_Wave { get; } = CreateGeometry("M8,0 l3,12 h-6 Z M24,4 l3,12 h-6 Z M16,8 l3,12 h-6 Z M8,12 l3,12 h-6 Z");
+
         public static SG Bms_Sequential { get; } = CreateGeometry("M8,2 h8 v4 h-8 Z M8,10 h8 v4 h-8 Z M8,18 h8 v4 h-8 Z M8,26 h8 v4 h-8 Z");
 
         public static SG Midi_Black { get; } = CreateGeometry("M0,2 v28 a2,2,0,0,0,2,2 h28 a2,2,0,0,0,2,-2 v-28 a2,2,0,0,0,-2,-2 h-28 a2,2,0,0,0,-2,2 Z");

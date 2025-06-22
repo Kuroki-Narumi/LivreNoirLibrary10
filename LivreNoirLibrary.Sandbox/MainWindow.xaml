@@ -5,14 +5,33 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:LivreNoirLibrary.Sandbox"
         xmlns:ctrl="clr-namespace:LivreNoirLibrary.Windows.Controls;assembly=LivreNoirLibrary.Wpf"
+        xmlns:win="clr-namespace:LivreNoirLibrary.Windows;assembly=LivreNoirLibrary.Wpf"
         xmlns:media="clr-namespace:LivreNoirLibrary.Media;assembly=LivreNoirLibrary.Wpf"
-        mc:Ignorable="d"
+        mc:Ignorable="d" FontSize="14" UseLayoutRounding="True"
         Title="MainWindow" Height="450" Width="800">
     <Grid>
         <TabControl ItemContainerStyle="{StaticResource TabItem_Cornered}">
             <TabItem Header="ImageRectSelector">
                 <Grid AllowDrop="True" DragOver="OnDragOver_Image" Drop="OnDrop_Image">
                     <ctrl:ImageRectSelector x:Name="ImageRectSelector" Grid.Row="1"/>
+                </Grid>
+            </TabItem>
+            <TabItem Header="Color">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
+                    <StackPanel Orientation="Horizontal">
+                        <ctrl:ColorPicker x:Name="ColorPicker" Modified="OnModified_Color"/>
+                        <CheckBox Content="Alpha" IsChecked="{Binding IsAlphaEnabled, ElementName=ColorPicker, Mode=TwoWay}" VerticalAlignment="Center"/>
+                    </StackPanel>
+                    <Rectangle Grid.Row="1" Fill="{x:Static media:MediaUtils.TransparentCheckerBrush}"/>
+                    <Rectangle Grid.Row="1">
+                        <Rectangle.Fill>
+                            <SolidColorBrush Color="{Binding SelectedColor, ElementName=ColorPicker}"/>
+                        </Rectangle.Fill>
+                    </Rectangle>
                 </Grid>
             </TabItem>
         </TabControl>

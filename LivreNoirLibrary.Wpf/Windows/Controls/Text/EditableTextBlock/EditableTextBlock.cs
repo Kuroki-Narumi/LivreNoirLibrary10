@@ -209,7 +209,7 @@ namespace LivreNoirLibrary.Windows.Controls
         {
             var oldValue = _text;
             Text = text;
-            RaiseTextChanged(oldValue, text);
+            this.RaiseModifiedEvent(oldValue != _text);
         }
 
         protected virtual void OnTextChanged(string? oldValue, string? newValue) { }

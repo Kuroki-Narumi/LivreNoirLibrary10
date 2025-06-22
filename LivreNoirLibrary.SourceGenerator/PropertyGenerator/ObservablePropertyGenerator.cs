@@ -97,7 +97,7 @@ public class ObservablePropertyGenerator : PropertyGeneratorBase<ObservablePrope
                 sb.AppendLine($"                value = Coerce{propertyName}(value);");
             }
         }
-        if (related.Length is > 0 || onChangedHandler is > 0)
+        if (related.Length is > 0 || onChangedHandler is >= 0)
         {
             sb.AppendLine($$"""
                                     if (SetProperty(ref {{fieldName}}, {{valueText}}))
@@ -107,13 +107,17 @@ public class ObservablePropertyGenerator : PropertyGeneratorBase<ObservablePrope
             {
                 sb.AppendLine($"                    SendPropertyChanged(\"{name}\");");
             }
-            if (onChangedHandler is 1)
+            switch (onChangedHandler)
             {
-                sb.AppendLine($"                    On{propertyName}Changed({valueText});");
-            }
-            else if (onChangedHandler is 2)
-            {
-                sb.AppendLine($"                    On{propertyName}Changed(oldValue, {valueText});");
+                case 0:
+                    sb.AppendLine($"                    On{propertyName}Changed();");
+                    break;
+                case 1:
+                    sb.AppendLine($"                    On{propertyName}Changed({valueText});");
+                    break;
+                case 2:
+                    sb.AppendLine($"                    On{propertyName}Changed(oldValue, {valueText});");
+                    break;
             }
             sb.AppendLine("                }");
         }

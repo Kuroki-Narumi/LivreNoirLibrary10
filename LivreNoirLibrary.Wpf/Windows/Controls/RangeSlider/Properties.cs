@@ -114,8 +114,8 @@ namespace LivreNoirLibrary.Windows.Controls
         public double Maximum { get => _maximum; set => SetValue(MaximumProperty, value); }
         public double TickFrequency { get => _tick_frequency; set => SetValue(TickFrequencyProperty, value); }
 
-        private void OnIsExclusiveChanged(bool value) => ReserveRefresh();
-        private void OnThumbWidthChanged(double value) => ReserveRefresh();
-        private void OnThumbHeightChanged(double value) => ReserveRefresh();
+        private void OnIsExclusiveChanged() => ReserveRefresh();
+        private void OnThumbWidthChanged() => ReserveRefresh();
+        private void OnThumbHeightChanged() => ReserveRefresh();
     }
 }

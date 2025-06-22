@@ -173,17 +173,23 @@ public class DependencyPropertyGenerator : PropertyGeneratorBase<DependencyPrope
                                         var value = {{string.Format(conv, "e.NewValue")}};
                                         obj.{{fieldName}} = value;
                         """);
-            if (changedHandler is 1)
+            switch (changedHandler)
             {
-                changed.AppendLine($$"""
+                case 0:
+                    changed.AppendLine($$"""
+                                        obj.On{{propertyName}}Changed();
+                        """);
+                    break;
+                case 1:
+                    changed.AppendLine($$"""
                                         obj.On{{propertyName}}Changed(value);
                         """);
-            }
-            else if (changedHandler is 2)
-            {
-                changed.AppendLine($$"""
+                    break;
+                case 2:
+                    changed.AppendLine($$"""
                                         obj.On{{propertyName}}Changed({{string.Format(conv, "e.OldValue")}}, value);
                         """);
+                    break;
             }
             if (IsFlagSet(options, FrameworkPropertyMetadataOptions.AffectsMeasure))
             {

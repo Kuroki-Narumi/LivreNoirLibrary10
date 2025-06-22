@@ -37,7 +37,7 @@ namespace LivreNoirLibrary.Media.BM3
                 {
                     var (pos, tempo) = @enum.Current;
                     if (pos >= limit) { break; }
-                    var bpm = MediaUtils.MicroSeconds2BpmM(tempo);
+                    var bpm = TimeUtils.MicroSeconds2BpmM(tempo);
                     if (pos.IsZero())
                     {
                         data.Bpm = bpm;

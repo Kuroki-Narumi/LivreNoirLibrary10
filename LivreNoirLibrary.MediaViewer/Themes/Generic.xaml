@@ -1,0 +1,17 @@
+<ResourceDictionary
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="clr-namespace:LivreNoirLibrary.Windows.Controls"
+    xmlns:lbms="clr-namespace:LivreNoirLibrary.Windows.Controls.Bms"
+    xmlns:wpf="clr-namespace:LivreNoirLibrary.Windows;assembly=LivreNoirLibrary.Wpf"
+    xmlns:ctrl="clr-namespace:LivreNoirLibrary.Windows.Controls;assembly=LivreNoirLibrary.Wpf"
+    xmlns:conv="clr-namespace:LivreNoirLibrary.Windows.Converters;assembly=LivreNoirLibrary.Wpf"
+    xmlns:input="clr-namespace:LivreNoirLibrary.Windows.Input;assembly=LivreNoirLibrary.Wpf"
+    xmlns:media="clr-namespace:LivreNoirLibrary.Media;assembly=LivreNoirLibrary.Wpf"
+    xmlns:text="clr-namespace:LivreNoirLibrary.Text;assembly=LivreNoirLibrary.Core"
+    >
+    <ResourceDictionary.MergedDictionaries>
+        <ResourceDictionary Source="pack://application:,,,/LivreNoirLibrary.Wpf;component/Themes/Generic.xaml"/>
+    </ResourceDictionary.MergedDictionaries>
+
+</ResourceDictionary>

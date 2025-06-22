@@ -222,6 +222,10 @@ namespace LivreNoirLibrary.Windows.Controls.IconContent
         public static GD Bms_Sort_Foreground { get; } = Get(Geometries.Bms_Sort_Foreground, Brushes.Red_f4);
         public static GD Bms_Sort_Highlight { get; } = Get(Geometries.Bms_Sort_Highlight, Brushes.Red_f8);
 
+        public static GD Bms_MultiDef_Background2 { get; } = Get(Geometries.Bms_MultiDef_Background, Brushes.Red_80);
+        public static GD Bms_MultiDef_Note { get; } = Get(Geometries.Bms_MultiDef_Note, Brushes.Red_f4);
+        public static GD Bms_MultiDef_Wave { get; } = Get(Geometries.Bms_MultiDef_Wave, Brushes.Gray_C);
+
         public static GD Bms_Sequential_Background1 { get; } = Get(Geometries.Base, Brushes.Blue_84);
         public static GD Bms_Sequential_Background2 { get; } = Get(Geometries.Bms_Sort_Background, Brushes.Gray_6);
         public static GD Bms_Sequential_Foreground { get; } = Get(Geometries.Bms_Sequential, Brushes.White);

@@ -2,13 +2,16 @@
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Runtime.CompilerServices;
+using System.Text.Json.Serialization;
 
 namespace LivreNoirLibrary.ObjectModel
 {
     public class GenericPropertyBase<T> : ObservableObjectBase
         where T : IEquatable<T>
     {
+        [JsonIgnore]
         public virtual T? DefaultValue { get; } = default;
+        [JsonIgnore]
         public virtual Dictionary<string, T> DefaultValues { get; } = [];
 
         protected readonly Dictionary<string, T> _values = [];

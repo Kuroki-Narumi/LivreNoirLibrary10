@@ -3,8 +3,6 @@ using System.Windows;
 using System.Windows.Media;
 using System.Windows.Media.Animation;
 using LivreNoirLibrary.Media;
-using LivreNoirLibrary.Numerics;
-using LivreNoirLibrary.ObjectModel;
 
 namespace LivreNoirLibrary.Windows.Controls
 {
@@ -13,8 +11,6 @@ namespace LivreNoirLibrary.Windows.Controls
         public const int MaxPattern = 8;
         public const int AnimationInterval = 80;
         public const double CornerRadius = 5;
-
-        public event ValueChangedEventHandler<Int32Rect>? RectChanged;
 
         private static readonly Int32Animation _animation = new()
         {
@@ -39,6 +35,10 @@ namespace LivreNoirLibrary.Windows.Controls
         [DependencyProperty(BindsTwoWayByDefault = true, AffectsRender = true)]
         private int _bottom;
         [DependencyProperty(BindsTwoWayByDefault = true, AffectsRender = true)]
+        private int _rectWidth;
+        [DependencyProperty(BindsTwoWayByDefault = true, AffectsRender = true)]
+        private int _rectHeight;
+        [DependencyProperty(BindsTwoWayByDefault = true, AffectsRender = true)]
         private double _scale;
         [DependencyProperty(AffectsRender = true)]
         private int _pattern;
@@ -54,32 +54,107 @@ namespace LivreNoirLibrary.Windows.Controls
         private int CoerceRight(int value) => Math.Clamp(value, _needCoerce ? _left : 0, _originalWidth);
         private int CoerceTop(int value) => Math.Clamp(value, 0, _needCoerce ? _bottom : _originalHeight);
         private int CoerceBottom(int value) => Math.Clamp(value, _needCoerce ? _top : 0, _originalHeight);
+        private int CoerceRectWidth(int value) => Math.Clamp(value, 0, _originalWidth);
+        private int CoerceRectHeight(int value) => Math.Clamp(value, 0, _originalHeight);
 
         public Int32Rect GetRect() => new(_left, _top, _right - _left, _bottom - _top);
 
-        private void NotifyRectChanged()
+        private void ProcessChange(Action action, bool force = false)
         {
-            if (_needCoerce)
+            if (force || _needCoerce)
             {
-                RectChanged?.Invoke(this, GetRect());
+                _needCoerce = false;
+                action();
+                _needCoerce = true;
             }
         }
 
+        private void UpdateWidth() => RectWidth = _right - _left;
+        private void UpdateHeight() => RectHeight = _bottom - _top;
+
         public void SetRect(Int32Rect rect)
         {
-            _needCoerce = false;
-            Left = rect.X;
-            Top = rect.Y;
-            Right = _left + rect.Width;
-            Bottom = _top + rect.Height;
-            _needCoerce = true;
-            NotifyRectChanged();
+            ProcessChange(() =>
+            {
+                Left = rect.X;
+                Top = rect.Y;
+                Right = _left + rect.Width;
+                Bottom = _top + rect.Height;
+                UpdateWidth();
+                UpdateHeight();
+            }, true);
         }
 
-        private void OnLeftChanged(int value) => NotifyRectChanged();
-        private void OnTopChanged(int value) => NotifyRectChanged();
-        private void OnRightChanged(int value) => NotifyRectChanged();
-        private void OnBottomChanged(int value) => NotifyRectChanged();
+        private void OnLeftChanged() => ProcessChange(UpdateWidth);
+        private void OnTopChanged() => ProcessChange(UpdateHeight);
+        private void OnRightChanged() => ProcessChange(UpdateWidth);
+        private void OnBottomChanged() => ProcessChange(UpdateHeight);
+        private void OnRectWidthChanged(int value)
+        {
+            ProcessChange(() =>
+            {
+                var right = _left + value;
+                var over = right - _originalWidth;
+                if (over is > 0)
+                {
+                    Left -= over;
+                    right = _originalWidth;
+                }
+                Right = right;
+            });
+        }
+        private void OnRectHeightChanged(int value)
+        {
+            ProcessChange(() =>
+            {
+                var bottom = _top + value;
+                var over = bottom - _originalHeight;
+                if (over is > 0)
+                {
+                    Top -= over;
+                    bottom = _originalHeight;
+                }
+                Bottom = bottom;
+            });
+        }
+
+        public void OffsetHorizontal(int offset)
+        {
+            ProcessChange(() =>
+            {
+                Left = _left + offset;
+                Right = _right + offset;
+                UpdateWidth();
+            });
+        }
+
+        public void OffsetVertical(int offset)
+        {
+            ProcessChange(() =>
+            {
+                Top = _top + offset;
+                Bottom = _bottom + offset;
+                UpdateHeight();
+            });
+        }
+
+        public void SetMovingHorizontal(int left, int right)
+        {
+            ProcessChange(() =>
+            {
+                (Left, Right) = (left > right) ? (right, left) : (left, right);
+                UpdateWidth();
+            });
+        }
+
+        public void SetMovingVertical(int top, int bottom)
+        {
+            ProcessChange(() =>
+            {
+                (Top, Bottom) = (top > bottom) ? (bottom, top) : (top, bottom);
+                UpdateHeight();
+            });
+        }
 
         private static GeometryDrawing GetGD(Brush brush, int x, int y, int w, int h) => MediaUtils.Freeze(new GeometryDrawing()
         {
@@ -202,40 +277,6 @@ namespace LivreNoirLibrary.Windows.Controls
                 }
             }
             return index;
-        }
-
-        public void OffsetHorizontal(int offset)
-        {
-            _needCoerce = false;
-            Left = _left + offset;
-            Right = _right + offset;
-            _needCoerce = true;
-            NotifyRectChanged();
-        } 
-
-        public void OffsetVertical(int offset)
-        {
-            _needCoerce = false;
-            Top = _top + offset;
-            Bottom = _bottom + offset;
-            _needCoerce = true;
-            NotifyRectChanged();
-        }
-
-        public void SetMovingHorizontal(int left, int right)
-        {
-            _needCoerce = false;
-            (Left, Right) = (left > right) ? (right, left) : (left, right);
-            _needCoerce = true;
-            NotifyRectChanged();
-        }
-
-        public void SetMovingVertical(int top, int bottom)
-        {
-            _needCoerce = false;
-            (Top, Bottom) = (top > bottom) ? (bottom, top) : (top, bottom);
-            _needCoerce = true;
-            NotifyRectChanged();
         }
     }
 }

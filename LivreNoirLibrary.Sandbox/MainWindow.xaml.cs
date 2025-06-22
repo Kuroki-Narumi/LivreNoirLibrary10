@@ -53,9 +53,12 @@ namespace LivreNoirLibrary.Sandbox
             window.Show();
         }
 
-        private void RangeSlider_ValueChanged(object sender, Windows.Controls.RangeSliderValueChangedEventArgs e)
+        private void OnModified_Color(object sender, RoutedEventArgs e)
         {
-            Console.WriteLine($"Value Changed: Value1={e.Value1}, Value2={e.Value2}");
+            if (sender == ColorPicker)
+            {
+                Console.WriteLine(ColorPicker.SelectedColor);
+            }
         }
     }
 }

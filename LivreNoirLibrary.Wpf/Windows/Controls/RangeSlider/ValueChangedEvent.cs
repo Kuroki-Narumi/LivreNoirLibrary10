@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Windows;
-
+/*
 namespace LivreNoirLibrary.Windows.Controls
 {
     public delegate void RangeSliderValueChangedEventHandler(object sender, RangeSliderValueChangedEventArgs e);
@@ -20,7 +20,7 @@ namespace LivreNoirLibrary.Windows.Controls
 
     public partial class RangeSlider
     {
-        public static readonly RoutedEvent ValueChangedEvent = EventRegister.Register<RangeSlider, RangeSliderValueChangedEventHandler>(RoutingStrategy.Direct);
+        public static readonly RoutedEvent ValueChangedEvent = Events.Register<RangeSlider, RangeSliderValueChangedEventHandler>(RoutingStrategy.Direct);
 
         public event RangeSliderValueChangedEventHandler ValueChanged
         {
@@ -35,3 +35,4 @@ namespace LivreNoirLibrary.Windows.Controls
         }
     }
 }
+*/

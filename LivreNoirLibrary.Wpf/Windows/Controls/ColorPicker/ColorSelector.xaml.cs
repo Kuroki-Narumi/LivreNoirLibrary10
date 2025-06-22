@@ -5,7 +5,6 @@ using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
 using LivreNoirLibrary.Media;
-using LivreNoirLibrary.Debug;
 
 namespace LivreNoirLibrary.Windows.Controls
 {
@@ -15,10 +14,8 @@ namespace LivreNoirLibrary.Windows.Controls
     public partial class ColorSelector : UserControl
     {
         public static readonly DependencyProperty SelectedColorProperty = ColorPicker.SelectedColorProperty.AddOwner(typeof(ColorSelector), default(Color));
-        public static readonly DependencyProperty IsAlphaEnabledProperty = ColorPicker.IsAlphaEnabledProperty.AddOwner(typeof(ColorSelector));
 
         public Color SelectedColor { get => (Color)GetValue(SelectedColorProperty); set => SetValue(SelectedColorProperty, value); }
-        public bool IsAlphaEnabled { get => (bool)GetValue(IsAlphaEnabledProperty); set => SetValue(IsAlphaEnabledProperty, value); }
         public ColorInfo ColorInfo => _color_info;
 
         private readonly ColorInfo _color_info = new();
@@ -52,6 +49,12 @@ namespace LivreNoirLibrary.Windows.Controls
             UpdateImage(Radio_H);
             Update();
             _color_info.PropertyChanged += OnPropertyChanged_ColorInfo;
+        }
+
+        public void SetColor(Color color, bool alpha)
+        {
+            _color_info.IsAlphaEnabled = alpha;
+            _color_info.SetColor(color);
         }
 
         private void OnPropertyChanged_ColorInfo(object? sender, System.ComponentModel.PropertyChangedEventArgs e)
@@ -261,5 +264,10 @@ namespace LivreNoirLibrary.Windows.Controls
         }
 
         private bool OnVerify_TextBox(string text) => ColorUtils.IsValidColorCode(text);
+
+        private void OnModified_InnerPicker(object sender, RoutedEventArgs e)
+        {
+            e.Handled = true;
+        }
     }
 }

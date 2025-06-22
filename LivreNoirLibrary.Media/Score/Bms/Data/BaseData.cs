@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Runtime.CompilerServices;
 using LivreNoirLibrary.Numerics;
 
 namespace LivreNoirLibrary.Media.Bms

@@ -4,7 +4,7 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:LivreNoirLibrary.Windows.Controls"
-             mc:Ignorable="d" 
+             mc:Ignorable="d"
              d:DesignHeight="450" d:DesignWidth="800" Background="White">
     <Grid>
         <Grid.RowDefinitions>
@@ -29,6 +29,10 @@
                 <Style TargetType="local:RangeSlider">
                     <Setter Property="Margin" Value="4,2"/>
                 </Style>
+                <Style TargetType="local:IntTextBlock" BasedOn="{StaticResource RangeSlider_TextBox}">
+                    <Setter Property="Margin" Value="2"/>
+                    <Setter Property="MinWidth" Value="36"/>
+                </Style>
             </Grid.Resources>
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="Auto"/>
@@ -40,7 +44,7 @@
             <StackPanel Grid.Column="1" Orientation="Horizontal">
                 <TextBlock x:Name="Text_Scale"/>
                 <ComboBox 
-                    x:Name="ComboBox_Scale" MaxWidth="68" PreviewMouseWheel="OnPreviewMouseWheel_Scale"
+                    x:Name="ComboBox_Scale" MaxWidth="100" PreviewMouseWheel="OnPreviewMouseWheel_Scale"
                     Text="{Binding ScaleExpression, ElementName=SelectorView}"
                     ItemsSource="{x:Static local:ImageRectSelectorView.ScaleExpressionList}"/>
                 <local:Button x:Name="Text_AutoScale" Click="OnClick_Scale_Auto"/>
@@ -52,20 +56,32 @@
                     <ColumnDefinition Width="*" MaxWidth="200"/>
                     <ColumnDefinition Width="Auto"/>
                     <ColumnDefinition Width="*" MaxWidth="200"/>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="Auto"/>
                 </Grid.ColumnDefinitions>
                 <TextBlock x:Name="Text_Horizontal" Grid.Column="0"/>
                 <local:RangeSlider 
-                    Grid.Column="1" ValueChanged="OnValueChanged_Slider"
+                    Grid.Column="1"
                     Minimum="0" Maximum="{Binding Selection.OriginalWidth, ElementName=SelectorView}"
                     Value1="{Binding Selection.Left, ElementName=SelectorView}" Value2="{Binding Selection.Right, ElementName=SelectorView}"/>
                 <TextBlock x:Name="Text_Vertical" Grid.Column="2"/>
                 <local:RangeSlider 
-                    Grid.Column="3" ValueChanged="OnValueChanged_Slider"
+                    Grid.Column="3"
                     Minimum="0" Maximum="{Binding Selection.OriginalHeight, ElementName=SelectorView}"
                     Value1="{Binding Selection.Top, ElementName=SelectorView}" Value2="{Binding Selection.Bottom, ElementName=SelectorView}"/>
+                <TextBlock x:Name="Text_Width" Grid.Column="4"/>
+                <local:IntTextBlock
+                    Grid.Column="5"
+                    Minimum="0" Maximum="{Binding Selection.OriginalWidth, ElementName=SelectorView}" Value="{Binding Selection.RectWidth, ElementName=SelectorView}"/>
+                <TextBlock x:Name="Text_Height" Grid.Column="6"/>
+                <local:IntTextBlock
+                    Grid.Column="7"
+                    Minimum="0" Maximum="{Binding Selection.OriginalHeight, ElementName=SelectorView}" Value="{Binding Selection.RectHeight, ElementName=SelectorView}"/>
             </Grid>
             <StackPanel x:Name="RightStackPanel" Grid.Column="3" Orientation="Horizontal"/>
         </Grid>
-        <local:ImageRectSelectorView Grid.Row="1" x:Name="SelectorView" ValueChanged="OnValueChanged_View"/>
+        <local:ImageRectSelectorView Grid.Row="1" x:Name="SelectorView"/>
     </Grid>
 </UserControl>

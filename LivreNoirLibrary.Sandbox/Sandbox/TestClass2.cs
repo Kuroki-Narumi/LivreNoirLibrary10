@@ -16,5 +16,10 @@ namespace LivreNoirLibrary.Sandbox
         [TypeConverter(typeof(string))]
         [ObservableProperty]
         private string? _name;
+
+        [ObservableProperty]
+        private int _value;
+
+        private void OnValueChanged() { }
     }
 }

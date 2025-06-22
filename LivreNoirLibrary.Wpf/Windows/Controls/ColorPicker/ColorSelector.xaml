@@ -200,7 +200,7 @@
                         <Setter Property="IsSnapToTickEnabled" Value="True"/>
                         <EventSetter Event="PreviewMouseWheel" Handler="OnWheel_Slider"/>
                     </Style>
-                    <Style x:Key="TextBlockBase" TargetType="TextBox">
+                    <Style TargetType="local:IntTextBox">
                         <Setter Property="FontSize" Value="14"/>
                         <Setter Property="FontFamily" Value="Consolas"/>
                         <Setter Property="VerticalContentAlignment" Value="Center"/>
@@ -209,14 +209,15 @@
                         <Setter Property="Padding" Value="0,2"/>
                         <Setter Property="Width" Value="32"/>
                         <Setter Property="HorizontalContentAlignment" Value="Right"/>
-                    </Style>
-                    <Style TargetType="local:IntTextBox" BasedOn="{StaticResource TextBlockBase}">
                         <Setter Property="Minimum" Value="0"/>
                         <Setter Property="Maximum" Value="255"/>
                     </Style>
                 </Grid.Resources>
 
-                <local:DefaultTextBox Grid.Column="1" Style="{StaticResource TextBlockBase}" Text="{Binding ColorInfo.ColorCode, Mode=TwoWay}" Width="76"/>
+                <local:ColorPicker
+                    Grid.ColumnSpan="3" HorizontalAlignment="Center" IsPickerEnabled="False"
+                    SelectedColor="{Binding ColorInfo.Color}" IsAlphaEnabled="{Binding ColorInfo.IsAlphaEnabled}"
+                    Modified="OnModified_InnerPicker"/>
 
                 <RadioButton Grid.Row="2" x:Name="Radio_R" Content="R"/>
                 <RadioButton Grid.Row="3" x:Name="Radio_G" Content="G"/>
@@ -224,7 +225,7 @@
                 <RadioButton Grid.Row="6" x:Name="Radio_H" Content="H" IsChecked="True"/>
                 <RadioButton Grid.Row="7" x:Name="Radio_S" Content="S"/>
                 <RadioButton Grid.Row="8" x:Name="Radio_V" Content="V"/>
-                <Label Grid.Row="10" Content="A" Visibility="{Binding IsAlphaEnabled, Converter={StaticResource BVConv}}"/>
+                <Label Grid.Row="10" Content="A" Visibility="{Binding ColorInfo.IsAlphaEnabled, Converter={StaticResource BVConv}}"/>
 
                 <Slider Grid.Row="2" Value="{Binding ColorInfo.IntR, Mode=TwoWay}"/>
                 <Slider Grid.Row="3" Value="{Binding ColorInfo.IntG, Mode=TwoWay}"/>
@@ -232,7 +233,7 @@
                 <Slider Grid.Row="6" Value="{Binding ColorInfo.IntH, Mode=TwoWay}" Maximum="359"/>
                 <Slider Grid.Row="7" Value="{Binding ColorInfo.IntS, Mode=TwoWay}"/>
                 <Slider Grid.Row="8" Value="{Binding ColorInfo.IntV, Mode=TwoWay}"/>
-                <Slider Grid.Row="10" Value="{Binding ColorInfo.IntA, Mode=TwoWay}" Visibility="{Binding IsAlphaEnabled, Converter={StaticResource BVConv}}"/>
+                <Slider Grid.Row="10" Value="{Binding ColorInfo.IntA, Mode=TwoWay}" Visibility="{Binding ColorInfo.IsAlphaEnabled, Converter={StaticResource BVConv}}"/>
 
                 <local:IntTextBox Grid.Row="2" Value="{Binding ColorInfo.IntR, Mode=TwoWay}"/>
                 <local:IntTextBox Grid.Row="3" Value="{Binding ColorInfo.IntG, Mode=TwoWay}"/>
@@ -240,7 +241,7 @@
                 <local:IntTextBox Grid.Row="6" Value="{Binding ColorInfo.IntH, Mode=TwoWay}" Maximum="359"/>
                 <local:IntTextBox Grid.Row="7" Value="{Binding ColorInfo.IntS, Mode=TwoWay}"/>
                 <local:IntTextBox Grid.Row="8" Value="{Binding ColorInfo.IntV, Mode=TwoWay}"/>
-                <local:IntTextBox Grid.Row="10" Value="{Binding ColorInfo.IntA, Mode=TwoWay}" Visibility="{Binding IsAlphaEnabled, Converter={StaticResource BVConv}}"/>
+                <local:IntTextBox Grid.Row="10" Value="{Binding ColorInfo.IntA, Mode=TwoWay}" Visibility="{Binding ColorInfo.IsAlphaEnabled, Converter={StaticResource BVConv}}"/>
             </Grid>
         </Grid>
     </Grid>

@@ -104,16 +104,16 @@ namespace LivreNoirLibrary.Windows.Controls
         [DependencyProperty(BindsTwoWayByDefault = true, AffectsMeasure = true)]
         private Color _midColor = DefaultMidColor;
 
-        private void OnIsValueVisibleChanged(bool value) => ReserveRefresh();
-        private void OnMaxValueChanged(double value) => ReserveRefresh();
-        private void OnMinValueChanged(double value) => ReserveRefresh();
-        private void OnMidValueChanged(double value) => ReserveRefresh();
-        private void OnAngleChanged(double value) => ReserveRefresh();
-        private void OnSweepDirectionChanged(SweepDirection value) => ReserveRefresh();
-        private void OnIsFilledChanged(bool value) => ReserveRefresh();
-        private void OnIsGradientChanged(bool value) => ReserveRefresh();
-        private void OnMaxColorChanged(Color value) => ReserveRefresh();
-        private void OnMinColorChanged(Color value) => ReserveRefresh();
-        private void OnMidColorChanged(Color value) => ReserveRefresh();
+        private void OnIsValueVisibleChanged() => ReserveRefresh();
+        private void OnMaxValueChanged() => ReserveRefresh();
+        private void OnMinValueChanged() => ReserveRefresh();
+        private void OnMidValueChanged() => ReserveRefresh();
+        private void OnAngleChanged() => ReserveRefresh();
+        private void OnSweepDirectionChanged() => ReserveRefresh();
+        private void OnIsFilledChanged() => ReserveRefresh();
+        private void OnIsGradientChanged() => ReserveRefresh();
+        private void OnMaxColorChanged() => ReserveRefresh();
+        private void OnMinColorChanged() => ReserveRefresh();
+        private void OnMidColorChanged() => ReserveRefresh();
     }
 }

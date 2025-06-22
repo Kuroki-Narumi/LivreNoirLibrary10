@@ -11,14 +11,14 @@ namespace LivreNoirLibrary.Windows.Controls
         public const int DefaultBitmapWidth = 640;
         public const int DefaultBitmapHeight = 640;
 
-        protected double _required_width;
-        protected double _required_height;
+        protected double _requiredWidth;
+        protected double _requiredHeight;
 
-        protected int _bitmap_width = DefaultBitmapWidth;
-        protected int _bitmap_height = DefaultBitmapHeight;
+        protected int _bitmapWidth = DefaultBitmapWidth;
+        protected int _bitmapHeight = DefaultBitmapHeight;
         protected WriteableBitmap? _bitmap;
 
-        private bool _need_refresh;
+        private bool _needRefresh;
 
         public BitmapSource? BufferBitmap => _bitmap;
 
@@ -32,22 +32,22 @@ namespace LivreNoirLibrary.Windows.Controls
         protected virtual void UpdateRenderSize(double width, double height)
         {
             bool flag = false;
-            if (_required_width != width)
+            if (_requiredWidth != width)
             {
-                _required_width = width;
-                while (_required_width > _bitmap_width)
+                _requiredWidth = width;
+                while (_requiredWidth > _bitmapWidth)
                 {
-                    _bitmap_width *= 2;
+                    _bitmapWidth *= 2;
                     flag = true;
                 }
                 OnRequiredWidthChanged();
             }
-            if (_required_height != height)
+            if (_requiredHeight != height)
             {
-                _required_height = height;
-                while (_required_height > _bitmap_height)
+                _requiredHeight = height;
+                while (_requiredHeight > _bitmapHeight)
                 {
-                    _bitmap_height *= 2;
+                    _bitmapHeight *= 2;
                     flag = true;
                 }
                 OnRequiredHeightChanged();
@@ -64,7 +64,7 @@ namespace LivreNoirLibrary.Windows.Controls
 
         public virtual void ReserveRefresh()
         {
-            _need_refresh = true;
+            _needRefresh = true;
             InvalidateVisual();
         }
 
@@ -74,18 +74,18 @@ namespace LivreNoirLibrary.Windows.Controls
             {
                 CreateBitmap();
             }
-            if (_need_refresh)
+            if (_needRefresh)
             {
-                _need_refresh = false;
+                _needRefresh = false;
                 Refresh();
             }
             base.OnRender(dc);
-            dc.DrawImage(_bitmap, new(GetBitmapOffsetX(), GetBitmapOffsetY(), _bitmap_width, _bitmap_height));
+            dc.DrawImage(_bitmap, new(GetBitmapOffsetX(), GetBitmapOffsetY(), _bitmapWidth, _bitmapHeight));
         }
 
         protected void CreateBitmap()
         {
-            _bitmap = Bitmap.Create(_bitmap_width, _bitmap_height);
+            _bitmap = Bitmap.Create(_bitmapWidth, _bitmapHeight);
         }
 
         protected virtual void Refresh() { }

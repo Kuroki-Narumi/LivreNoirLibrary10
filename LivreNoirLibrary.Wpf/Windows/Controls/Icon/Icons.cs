@@ -148,6 +148,7 @@ namespace LivreNoirLibrary.Windows.Controls
         public static DG Bms_Sort { get; } = Get(Dr.Bms_Sort_Background1, Dr.Bms_Sort_Background2, Dr.Bms_Sort_Foreground, Dr.Bms_Sort_Highlight);
         public static DG Bms_Sequential { get; } = Get(Dr.Bms_Sequential_Background1, Dr.Bms_Sequential_Background2, Dr.Bms_Sequential_Foreground);
         public static DG Bms_DefList { get; } = Get(Dr.Letter_ZZ);
+        public static DG Bms_MultiDef { get; } = Get(Dr.Bms_Sort_Background1, Dr.Bms_MultiDef_Background2, Dr.Bms_MultiDef_Note, Dr.Bms_MultiDef_Wave);
 
         public static DG Midi { get; } = Get(Dr.Midi_Black, Dr.Midi_White1, Dr.Midi_White2, Dr.Midi_Note1, Dr.Midi_Note2, Dr.Midi_Note3);
 

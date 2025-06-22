@@ -18,12 +18,10 @@ namespace LivreNoirLibrary.Windows.Controls
             PropertyUtils.OverrideDefaultStyleKey<ColorPicker>();
         }
 
-        public static readonly RoutedEvent SelectedColorChangedEvent = EventRegister.Register<ColorPicker, ColorChangedEventHandler>();
-
-        public event ColorChangedEventHandler SelectedColorChanged { add => AddHandler(SelectedColorChangedEvent, value); remove => RemoveHandler(SelectedColorChangedEvent, value); }
+        public event RoutedEventHandler Modified { add => Events.AddModifiedHandler(this, value); remove => Events.RemoveModifiedHandler(this, value); }
 
         [DependencyProperty(BindsTwoWayByDefault = true)]
-        private Color _selectedColor;
+        private Color _selectedColor = Colors.Black;
         [DependencyProperty(BindsTwoWayByDefault = true)]
         private bool _isAlphaEnabled;
         [DependencyProperty]
@@ -40,15 +38,18 @@ namespace LivreNoirLibrary.Windows.Controls
         private Border? _selector_parent;
         private ColorSelector? _selector;
 
-        private void OnSelectedColorChanged(Color value)
-        {
-            UpdateColorIndicate();
-            RaiseEvent(new ColorChangedEventArgs(value, SelectedColorChangedEvent, this));
-        }
+        private void OnSelectedColorChanged() => UpdateColorIndicate();
 
         private void OnIsAlphaEnabledChanged(bool value)
         {
-            UpdateColorIndicate();
+            if (!value && _selectedColor.A is not 255)
+            {
+                SelectedColor = _selectedColor with { A = 255 };
+            }
+            else
+            {
+                UpdateColorIndicate();
+            }
         }
 
         public override void OnApplyTemplate()
@@ -56,8 +57,7 @@ namespace LivreNoirLibrary.Windows.Controls
             if (_textBox is not null)
             {
                 _textBox.GotFocus -= OnGotFocus_TextBox;
-                _textBox.Verify -= OnVerify_TextBox;
-                _textBox.TextChanged -= OnTextChanged_TextBox;
+                _textBox.RemoveModifiedHandler(OnTextChanged_TextBox);
             }
             base.OnApplyTemplate();
             _indicator = GetTemplateChild(PART_Indicator) as SolidColorBrush;
@@ -66,8 +66,7 @@ namespace LivreNoirLibrary.Windows.Controls
             if (_textBox is not null)
             {
                 _textBox.GotFocus += OnGotFocus_TextBox;
-                _textBox.Verify += OnVerify_TextBox;
-                _textBox.TextChanged += OnTextChanged_TextBox;
+                _textBox.AddModifiedHandler(OnTextChanged_TextBox);
             }
             UpdateColorIndicate();
         }
@@ -107,23 +106,27 @@ namespace LivreNoirLibrary.Windows.Controls
             IsDropDownOpen = false;
         }
 
-        private bool OnVerify_TextBox(string? text) => ColorUtils.IsValidColorCode(text);
-
-        private void OnTextChanged_TextBox(object sender, EditableTextChangedEventArgs e)
+        private void OnTextChanged_TextBox(object sender, RoutedEventArgs e)
         {
-            var color = e.NewText!.ToColor();
-            if (!_isAlphaEnabled)
+            if (e.OriginalSource is EditableTextBlock t)
             {
-                color.A = 255;
-            }
-            if (color != _selectedColor)
-            {
-                SelectedColor = color;
+                var color = t.Text!.ToColor();
+                if (!_isAlphaEnabled)
+                {
+                    color.A = 255;
+                }
+                if (color != _selectedColor)
+                {
+                    SelectedColor = color;
+                }
             }
         }
 
+        private Color _last_color;
+
         protected override void OnDropDownOpen()
         {
+            _last_color = _selectedColor;
             base.OnDropDownOpen();
             if (_selector is null && _selector_parent is not null)
             {
@@ -141,6 +144,7 @@ namespace LivreNoirLibrary.Windows.Controls
                 ColorSelectorPool.Return(_selector);
                 _selector = null;
             }
+            this.RaiseModifiedEvent(_last_color != _selectedColor);
         }
     }
 }

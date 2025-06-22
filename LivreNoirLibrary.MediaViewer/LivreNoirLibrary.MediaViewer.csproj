@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>net9.0-windows</TargetFramework>
@@ -9,7 +9,7 @@
     <Authors>Kuroki-Narumi</Authors>
     <Company>LivreNoir</Company>
     <RepositoryUrl>https://github.com/Kuroki-Narumi/LivreNoirLibrary10</RepositoryUrl>
-    <RootNamespace>LivreNoirLibrary.Media</RootNamespace>
+    <RootNamespace>LivreNoirLibrary.Windows.Controls</RootNamespace>
     <BaseOutputPath>..\bin</BaseOutputPath>
   </PropertyGroup>
 

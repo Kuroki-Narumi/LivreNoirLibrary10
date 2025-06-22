@@ -20,7 +20,7 @@ namespace LivreNoirLibrary.Windows.Controls
             EventManager.RegisterClassHandler(typeof(DropDownBase), Mouse.MouseUpEvent, new MouseButtonEventHandler(OnMouseButtonUp), true);
         }
 
-        public static readonly RoutedEvent ClickEvent = EventRegister.Register<DropDownBase, RoutedEventHandler>();
+        public static readonly RoutedEvent ClickEvent = Events.Register<DropDownBase, RoutedEventHandler>();
         public static readonly DependencyProperty PlacementProperty = Popup.PlacementProperty.AddOwner(typeof(DropDownBase));
 
         private static object CoerceToolTipIsEnabled(DependencyObject d, object value) => !(d is DropDownBase { IsDropDownOpen: true });

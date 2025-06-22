@@ -108,16 +108,22 @@ namespace LivreNoirLibrary.Collections
 
         public void AddRange<TK>(IDictionary<TK, T> items) where TK : notnull => AddRange(items.Values);
 
-        public void Load(ObservableCollectionBase<T> items)
+        public void Load(ObservableCollectionBase<T>? items)
         {
             ClearWithoutNotify();
-            AddRange(items);
+            if (items is not null)
+            {
+                AddRange(items);
+            }
         }
 
-        public void Load(IEnumerable<T> items)
+        public void Load(IEnumerable<T>? items)
         {
             ClearWithoutNotify();
-            AddRange(items);
+            if (items is not null)
+            {
+                AddRange(items);
+            }
         }
 
         public int RemoveRange(IEnumerable<T> items)

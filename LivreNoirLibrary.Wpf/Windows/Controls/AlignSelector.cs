@@ -48,20 +48,9 @@ namespace LivreNoirLibrary.Windows.Controls
         private readonly Dictionary<VerticalAlignment, RadioButton> _vertical_buttons = [];
         private readonly Dictionary<HorizontalAlignment, RadioButton> _horizontal_buttons = [];
 
-        private void OnSelectionModeChanged(AlignSelectorMode value)
-        {
-            UpdateStackPanelVisibility(value);
-        }
-
-        private void OnSelectedVerticalAlignmentChanged(VerticalAlignment value)
-        {
-            UpdateButtonChecked(value);
-        }
-
-        private void OnSelectedHorizontalAlignmentChanged(HorizontalAlignment value)
-        {
-            UpdateButtonChecked(value);
-        }
+        private void OnSelectionModeChanged(AlignSelectorMode value) => UpdateStackPanelVisibility(value);
+        private void OnSelectedVerticalAlignmentChanged(VerticalAlignment value) => UpdateButtonChecked(value);
+        private void OnSelectedHorizontalAlignmentChanged(HorizontalAlignment value) => UpdateButtonChecked(value);
 
         public override void OnApplyTemplate()
         {

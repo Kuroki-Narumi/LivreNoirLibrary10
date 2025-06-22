@@ -82,9 +82,9 @@ namespace LivreNoirLibrary.Windows.Controls
         {
             if (!IsEditing)
             {
-                var oldText = Text;
+                var lastValue = _value;
                 Value = e.Delta is > 0 ? GetNext(_value) : GetPrevious(_value);
-                RaiseTextChanged(oldText, ToString(_value));
+                this.RaiseModifiedEvent(lastValue != _value);
                 e.Handled = true;
             }
             base.OnPreviewMouseWheel(e);
@@ -145,9 +145,8 @@ namespace LivreNoirLibrary.Windows.Controls
             }
             else if (_value != _editing_value)
             {
-                var oldText = Text;
                 Value = _editing_value;
-                RaiseTextChanged(oldText, ToString(_value));
+                this.RaiseModifiedEvent();
                 return;
             }
             base.ApplyText(text);

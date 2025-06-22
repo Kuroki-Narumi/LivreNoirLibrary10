@@ -121,12 +121,12 @@ namespace LivreNoirLibrary.YuGiOh.ViewModel
             PackInfo = source._packInfo;
         }
 
-        private void OnTextChanged(string value)
+        private void OnTextChanged()
         {
             _related_created = false;
             SendPropertyChanged(nameof(RelatedList));
             TextConvert.RemoveTextCache(this);
         }
-        private void OnPendulumTextChanged(string value) => OnTextChanged(value);
+        private void OnPendulumTextChanged() => OnTextChanged();
     }
 }

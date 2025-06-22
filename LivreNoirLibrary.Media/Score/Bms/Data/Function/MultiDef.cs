@@ -16,7 +16,7 @@ namespace LivreNoirLibrary.Media.Bms
         public bool ApplyMultiDef(MultiDefOptions options, string directory, ProgressReporter? reporter, CancellationToken c)
         {
             var modified = false;
-            reporter?.Report("Checking Timeline ...", 0, 100);
+            reporter?.Report("Multi Def", "Checking Timeline ...", 0, 100);
             var indexes = options.Indexes;
             Predicate<Note> selector = indexes.Count is 0 ? n => n.IsPlayableSound() && n.Id is not 0 : n => n.IsPlayableSound() && indexes.Contains(n.Id);
 
@@ -37,7 +37,7 @@ namespace LivreNoirLibrary.Media.Bms
             var current = 0;
             var max = 98.0 / idList.Count;
             WaveBuffer buffer = new();
-            var minInterval = (options.MinimumInterval * TimeSpan.TicksPerSecond).RoundToLong();
+            var minInterval = options.MinimumInterval * TimeSpan.TicksPerMillisecond;
             var threshold = WaveBuffer.Level2Value(options.Threshold);
             var maxCount = options.MaxCount;
             var requiredTicks = (stackalloc long[maxCount]);
@@ -93,7 +93,7 @@ namespace LivreNoirLibrary.Media.Bms
                         maxIndex = minIndex;
                     }
                 }
-                reporter?.Report($"Processing ({current} of {max})", 1.0 + current * max, 100);
+                reporter?.Report($"Processing ({++current} of {idList.Count})", 1.0 + current * max, 100);
                 if (maxIndex is not 0)
                 {
                     modified = true;
@@ -116,6 +116,7 @@ namespace LivreNoirLibrary.Media.Bms
                         if (replaceIndex >= insertedIndex.Count)
                         {
                             insertedIndex.Add(defIndex);
+                            DefLists.Set(DefType.Wav, defIndex, defValue);
                             defIndex = DefLists.FindFreeIndex(DefType.Wav, defIndex);
                         }
                         note.Id = insertedIndex[replaceIndex];
@@ -130,9 +131,12 @@ namespace LivreNoirLibrary.Media.Bms
                     DefIndexMap map = new();
                     var maxDefIndex = MaxDefIndex;
                     var offset = 0;
-                    for (var i = 0; i < MaxDefIndex; i++)
+                    for (var i = 0; i < maxDefIndex; i++)
                     {
-                        map.Set(i, i + offset);
+                        if (map.Get(i) == i)
+                        {
+                            map.Set(i, i + offset);
+                        }
                         if (insert.TryGetValue(i, out var inserted))
                         {
                             foreach (var newIndex in CollectionsMarshal.AsSpan(inserted))

@@ -21,8 +21,6 @@ namespace LivreNoirLibrary.Windows.Controls
 
         public static IEnumerable<string> ScaleExpressionList => ScaleList.Select(v => v.ToString("0.##%"));
 
-        public event ValueChangedEventHandler<Int32Rect>? ValueChanged;
-
         [DependencyProperty(BindsTwoWayByDefault = true)]
         private BitmapSource? _source;
         [DependencyProperty(BindsTwoWayByDefault = true)]
@@ -108,9 +106,10 @@ namespace LivreNoirLibrary.Windows.Controls
 
         protected override void OnScaleXChanged(double oldValue, double newValue)
         {
+            var padding = Padding;
             var pos = _scale_by_wheel ? Mouse.GetPosition(this) : new(ViewportWidth / 2, ViewportHeight / 2);
-            AdjustHorizontalScroll(pos.X, oldValue, newValue);
-            AdjustVerticalScroll(pos.Y, oldValue, newValue);
+            ScrollToHorizontalOffset(AdjustOffset(HorizontalOffset - padding.Left, pos.X, oldValue, newValue) + padding.Left);
+            ScrollToVerticalOffset(AdjustOffset(VerticalOffset - padding.Top, pos.Y, oldValue, newValue) + padding.Top);
             UpdateScale();
         }
 
@@ -194,6 +193,8 @@ namespace LivreNoirLibrary.Windows.Controls
             }
         }
 
+        private Int32Rect _lastRect;
+
         protected override void OnMouseLeftButtonDown(MouseButtonEventArgs e)
         {
             e.Handled = true;
@@ -215,6 +216,7 @@ namespace LivreNoirLibrary.Windows.Controls
             var vertical = index is not (4 or 6);
             element.MouseMove += MouseMove;
             element.MouseLeftButtonUp += MouseUp;
+            _lastRect = selection.GetRect();
 
             void MouseMove(object sender, MouseEventArgs e)
             {
@@ -277,7 +279,7 @@ namespace LivreNoirLibrary.Windows.Controls
                 element.MouseMove -= MouseMove;
                 element.MouseLeftButtonUp -= MouseUp;
                 UpdateCursor();
-                ValueChanged?.Invoke(this, _selectedRect);
+                this.RaiseModifiedEvent(_lastRect != selection.GetRect());
             }
         }
 
@@ -287,7 +289,11 @@ namespace LivreNoirLibrary.Windows.Controls
         {
             if (key is >= Key.Left and <= Key.Down)
             {
-                _key_moving = true;
+                if (!_key_moving)
+                {
+                    _lastRect = _selection.GetRect();
+                    _key_moving = true;
+                }
                 var amount = shift ? 10 : 1;
                 if (key is Key.Left or Key.Right)
                 {
@@ -319,7 +325,7 @@ namespace LivreNoirLibrary.Windows.Controls
             if (_key_moving)
             {
                 _key_moving = false;
-                ValueChanged?.Invoke(this, _selectedRect);
+                this.RaiseModifiedEvent(_lastRect != _selection.GetRect());
             }
             else if (e.Key is Key.LeftCtrl or Key.RightCtrl)
             {

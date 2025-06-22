@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
+using System.Linq;
 using System.Runtime.InteropServices;
 using LivreNoirLibrary.Files;
 
@@ -42,18 +43,19 @@ namespace LivreNoirLibrary.Media.Bms
             return false;
         }
 
-        public void DefMoveDown(DefType type, List<int> indexes)
+        public bool DefMoveDown(DefType type, List<int> indexes)
         {
             if (indexes.Count is 0)
             {
-                return;
+                return false;
             }
-            if (indexes.Count is 1)
+            else if (indexes.Count is 1)
             {
                 var i = indexes[0];
                 if ((uint)i < (uint)MaxDefIndex)
                 {
                     DefSwap(type, i, i + 1);
+                    return true;
                 }
             }
             else
@@ -77,15 +79,20 @@ namespace LivreNoirLibrary.Media.Bms
                         map.Set(next, index);
                     }
                 }
-                DefMap(type, map);
+                if (map.IsEffective())
+                {
+                    DefMap(type, map);
+                    return true;
+                }
             }
+            return false;
         }
 
-        public void DefMoveUp(DefType type, List<int> indexes)
+        public bool DefMoveUp(DefType type, List<int> indexes)
         {
             if (indexes.Count is 0)
             {
-                return;
+                return false;
             }
             if (indexes.Count is 1)
             {
@@ -93,6 +100,7 @@ namespace LivreNoirLibrary.Media.Bms
                 if (i is > 1)
                 {
                     DefSwap(type, i, i - 1);
+                    return true;
                 }
             }
             else
@@ -116,8 +124,13 @@ namespace LivreNoirLibrary.Media.Bms
                         map.Set(next, index);
                     }
                 }
-                DefMap(type, map);
+                if (map.IsEffective())
+                {
+                    DefMap(type, map);
+                    return true;
+                }
             }
+            return false;
         }
 
         public void DefSwap(DefType type, int index1, int index2)

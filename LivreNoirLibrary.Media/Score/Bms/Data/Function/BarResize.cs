@@ -22,35 +22,36 @@ namespace LivreNoirLibrary.Media.Bms
             Timeline.Move(converter, range);
         }
 
-        public void InsertBar(int number, in Rational length)
+        public BarEditResult InsertBar(int number, in Rational length)
         {
             ProcessMove(p => new(p.Bar + 1, p.Beat), new(number), null);
             Bars.Insert(number, length);
             Root.ClearBarCache(number);
+            return BarEditResult.Applied;
         }
 
-        public Selection DeleteBar(int number)
+        public BarEditResult DeleteBar(int number)
         {
             BarPosition first = new(number);
             BarPosition last = new(number + 1);
-            var selection = SelectRange(first, last, true);
+            Timeline.RemoveRange(RangeUtils.Get(first, last));
             ProcessMove(p => new(p.Bar - 1, p.Beat), last, null);
             Bars.Delete(number);
             Root.ClearBarCache(number);
-            return selection;
+            return BarEditResult.NeedRefresh;
         }
 
-        public bool ResizeBar(BarResizeOptions options)
+        public BarEditResult ResizeBar(BarResizeOptions options)
         {
             var ratio = options.Ratio;
             if (ratio && options.Length == Rational.One)
             {
-                return false;
+                return BarEditResult.NoEffect;
             }
             var mode = options.Mode;
             if (options.StretchWithTempo && mode is BarResizeMode.Stretch)
             {
-                return StretchBar(options);
+                return StretchBar(options) ? BarEditResult.NeedRefresh : BarEditResult.NoEffect;
             }
             var flag = false;
             var len = options.Length;
@@ -61,7 +62,7 @@ namespace LivreNoirLibrary.Media.Bms
                     flag = true;
                 }
             }
-            return flag;
+            return flag ? BarEditResult.Applied : BarEditResult.NoEffect;
         }
 
         private bool ResizeBar(int number, Rational length, bool ratioMode, BarResizeMode mode)
@@ -148,14 +149,14 @@ namespace LivreNoirLibrary.Media.Bms
             AddSelection(selection);
         }
 
-        public bool AddBarlineAt(BarPosition pos)
+        public BarEditResult AddBarLineAt(BarPosition pos)
         {
             var number = pos.Bar;
             var beat = pos.Beat;
             var current = GetBarLength(number);
             if (beat.IsNegativeOrZero() || beat >= current)
             {
-                return false;
+                return BarEditResult.NoEffect;
             }
             BarPosition nextBar = new(number + 1);
             ProcessMove(p => new(p.Bar + 1, p.Beat), nextBar, null);
@@ -163,14 +164,14 @@ namespace LivreNoirLibrary.Media.Bms
             Bars.Set(number, current - beat);
             Bars.Insert(number, beat);
             Root.ClearBarCache(number);
-            return true;
+            return BarEditResult.Applied;
         }
 
-        public bool MergeBar(int number, int count)
+        public BarEditResult MergeBar(int number, int count)
         {
             if (count is <= 1)
             {
-                return false;
+                return BarEditResult.NoEffect;
             }
             BarPosition first = new(number);
             BarPosition last = new(number + count);
@@ -179,14 +180,14 @@ namespace LivreNoirLibrary.Media.Bms
             ProcessMove(p => new(p.Bar - count + 1, p.Beat), last, null);
             Bars.MergeLines(number, count);
             Root.ClearBarCache(number);
-            return true;
+            return BarEditResult.Applied;
         }
 
-        public bool SplitBar(BarSplitOptions options)
+        public BarEditResult SplitBar(BarSplitOptions options)
         {
             if (!options.IsEffective())
             {
-                return false;
+                return BarEditResult.NoEffect;
             }
             var timeline = Timeline;
             var numbers = options._numbers;
@@ -260,7 +261,7 @@ namespace LivreNoirLibrary.Media.Bms
             {
                 timeline.Add(GetPosition(beat), list);
             }
-            return true;
+            return BarEditResult.Applied;
         }
     }
 }

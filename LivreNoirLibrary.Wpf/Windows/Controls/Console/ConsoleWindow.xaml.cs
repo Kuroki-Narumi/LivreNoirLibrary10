@@ -43,10 +43,7 @@ namespace LivreNoirLibrary.Windows.Controls
             this.RegisterCommand(Commands.ConsoleSlipThrough, OnExecuted_SlipThrough);
         }
 
-        private void OnSlipThroughChanged(bool value)
-        {
-            this.SetSlipThrough(value);
-        }
+        private void OnSlipThroughChanged(bool value) => this.SetSlipThrough(value);
 
         private void OnLeftButtonDown_Inner(object sender, MouseButtonEventArgs e)
         {

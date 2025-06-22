@@ -11,7 +11,7 @@ namespace LivreNoirLibrary.Media.Midi
         MetaType IMetaObject.Type => MetaType.Tempo;
         public override ObjectType ObjectType => ObjectType.Tempo;
         public override string ObjectName => "Tempo";
-        public override string ContentString => MediaUtils.MicroSeconds2Bpm(_value).ToString("0.000");
+        public override string ContentString => TimeUtils.MicroSeconds2Bpm(_value).ToString("0.000");
 
         protected override int CoerceValue(int value) => Math.Clamp(value, Tempo.MinValue, Tempo.MaxValue);
 

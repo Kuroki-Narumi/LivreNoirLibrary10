@@ -13,7 +13,7 @@ namespace LivreNoirLibrary.Media
         private WaveOutEvent? _waveOut;
         private AudioFileReader? _stream;
 
-        private void OnFilenameChanged(string? value)
+        private void OnFilenameChanged()
         {
             Stop(true);
         }

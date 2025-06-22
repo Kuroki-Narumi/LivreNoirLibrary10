@@ -5,7 +5,7 @@ using System.Windows.Data;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
-using LivreNoirLibrary.Debug;
+using LivreNoirLibrary.ObjectModel;
 using LivreNoirLibrary.Media;
 
 namespace LivreNoirLibrary.Windows.Controls
@@ -33,6 +33,10 @@ namespace LivreNoirLibrary.Windows.Controls
         private string? _horizontalText = "横";
         [DependencyProperty]
         private string? _verticalText = "縦";
+        [DependencyProperty]
+        private string? _widthText = "幅";
+        [DependencyProperty]
+        private string? _heightText = "高さ";
 
         private readonly History<Int32Rect> _history;
         IHistory IHistoryOwner.History => _history;
@@ -40,6 +44,8 @@ namespace LivreNoirLibrary.Windows.Controls
 
         public BitmapSource? Source { get => SelectorView.Source; set => SetValue(SourceProperty, value); }
         public Int32Rect InitialRect { get => SelectorView.InitialRect; set => SetValue(InitialRectProperty, value); }
+        public UIElementCollection LeftPanel => LeftStackPanel.Children;
+        public UIElementCollection RightPanel => RightStackPanel.Children;
 
         public ImageRectSelector()
         {
@@ -52,6 +58,9 @@ namespace LivreNoirLibrary.Windows.Controls
             Text_AutoScale.SetBinding(Button.ContentProperty, new Binding(nameof(AutoScaleText)) { Source = this });
             Text_Horizontal.SetBinding(TextBlock.TextProperty, new Binding(nameof(HorizontalText)) { Source = this });
             Text_Vertical.SetBinding(TextBlock.TextProperty, new Binding(nameof(VerticalText)) { Source = this });
+            Text_Width.SetBinding(TextBlock.TextProperty, new Binding(nameof(WidthText)) { Source = this });
+            Text_Height.SetBinding(TextBlock.TextProperty, new Binding(nameof(HeightText)) { Source = this });
+            this.AddModifiedHandler(OnModified);
         }
 
         public void SetVisualSource(Visual visual) => Source = Bitmap.GetSourceFromVisual(visual);
@@ -63,19 +72,12 @@ namespace LivreNoirLibrary.Windows.Controls
 
         public void ClearHistory() => _history.Initialize();
 
-        private void OnValueChanged_Slider(object sender, RangeSliderValueChangedEventArgs e)
+        private void OnModified(object sender, RoutedEventArgs e)
         {
             if (_needUpdateHistory)
             {
-                _history.PushUndo();
-            }
-        }
-
-        private void OnValueChanged_View(object sender, Int32Rect newValue)
-        {
-            if (_needUpdateHistory)
-            {
-                _history.PushUndo();
+                this.OnEdit();
+                e.Handled = true;
             }
         }
 

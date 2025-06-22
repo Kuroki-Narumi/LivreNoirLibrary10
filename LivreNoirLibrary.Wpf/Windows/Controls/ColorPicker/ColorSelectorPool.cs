@@ -34,9 +34,8 @@ namespace LivreNoirLibrary.Windows.Controls
 
         private static void SetBinding(ColorPicker source, ColorSelector target)
         {
-            target.ColorInfo.SetColor(source.SelectedColor);
             target.SetBinding(ColorSelector.SelectedColorProperty, new Binding(nameof(ColorPicker.SelectedColor)) { Source = source, Mode = BindingMode.TwoWay });
-            target.SetBinding(ColorSelector.IsAlphaEnabledProperty, new Binding(nameof(ColorPicker.IsAlphaEnabled)) { Source = source });
+            target.SetColor(source.SelectedColor, source.IsAlphaEnabled);
         }
 
         public static void Return(ColorSelector selector)

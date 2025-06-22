@@ -13,6 +13,7 @@ namespace LivreNoirLibrary.Windows.Controls.IconContent
         public static SolidColorBrush Gray_6 { get; } = GetBrush("#666");
         public static SolidColorBrush Gray_8 { get; } = GetBrush("#888");
         public static SolidColorBrush Gray_A { get; } = GetBrush("#aaa");
+        public static SolidColorBrush Gray_C { get; } = GetBrush("#ccc");
         public static SolidColorBrush White => MBrushes.White;
 
         public static SolidColorBrush Red_f0 => MBrushes.Red;

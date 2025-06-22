@@ -23,6 +23,14 @@ namespace LivreNoirLibrary.Collections
         public ObservableList(int capacy) : base(capacy) { }
         public ObservableList(IEnumerable<T> collection) : base([.. collection]) { }
 
+        public void ReplaceWithoutNotify(int index, T item)
+        {
+            if ((uint)index < (uint)_list.Count)
+            {
+                ReplaceItem(index, item);
+            }
+        }
+
         public void Insert(int index, T item)
         {
             if ((uint)index <= (uint)_list.Count)

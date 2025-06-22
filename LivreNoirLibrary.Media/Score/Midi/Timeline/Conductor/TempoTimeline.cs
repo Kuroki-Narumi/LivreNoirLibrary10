@@ -65,17 +65,17 @@ namespace LivreNoirLibrary.Media.Midi
         }
 
         public int Get(Rational position) => Get(position, DefaultTempo);
-        public double GetBpm(Rational position) => MediaUtils.MicroSeconds2Bpm(Get(position));
-        public decimal GetBpmM(Rational position) => MediaUtils.MicroSeconds2BpmM(Get(position));
-        public void SetBpm(Rational position, double value) => Set(position, MediaUtils.Bpm2MicroSeconds(value));
-        public void SetBpm(Rational position, decimal value) => Set(position, MediaUtils.Bpm2MicroSeconds(value));
+        public double GetBpm(Rational position) => TimeUtils.MicroSeconds2Bpm(Get(position));
+        public decimal GetBpmM(Rational position) => TimeUtils.MicroSeconds2BpmM(Get(position));
+        public void SetBpm(Rational position, double value) => Set(position, TimeUtils.Bpm2MicroSeconds(value));
+        public void SetBpm(Rational position, decimal value) => Set(position, TimeUtils.Bpm2MicroSeconds(value));
 
         public IEnumerable<(Rational Position, double Value)> EachBpm()
         {
             var c = _pos_list.Count;
             for (int i = 0; i < c; i++)
             {
-                yield return (_pos_list[i], MediaUtils.MicroSeconds2Bpm(_value_list[i]));
+                yield return (_pos_list[i], TimeUtils.MicroSeconds2Bpm(_value_list[i]));
             }
         }
 
@@ -85,7 +85,7 @@ namespace LivreNoirLibrary.Media.Midi
             var e = s + l;
             for (int i = s; i < e; i++)
             {
-                yield return (_pos_list[i], MediaUtils.MicroSeconds2Bpm(_value_list[i]));
+                yield return (_pos_list[i], TimeUtils.MicroSeconds2Bpm(_value_list[i]));
             }
         }
 

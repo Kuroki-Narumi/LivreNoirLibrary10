@@ -6,7 +6,7 @@ using static LivreNoirLibrary.Media.ColorUtils;
 
 namespace LivreNoirLibrary.Media
 {
-    public class ColorInfo : ObservableObjectBase
+    public partial class ColorInfo : ObservableObjectBase
     {
         private float _a;
         private float _r;
@@ -15,6 +15,8 @@ namespace LivreNoirLibrary.Media
         private float _h;
         private float _s;
         private float _v;
+        [ObservableProperty]
+        private bool _isAlphaEnabled = true;
 
         public float A { get => _a; set => SetPropertyA(ref _a, Math.Clamp(value, 0, 1)); }
         public float R { get => _r; set => SetProperty(ref _r, Math.Clamp(value, 0, 1)); }
@@ -37,7 +39,7 @@ namespace LivreNoirLibrary.Media
 
         public Color GetColor()
         {
-            var a = GetByte(_a);
+            var a = _isAlphaEnabled ? GetByte(_a) : (byte)255;
             var r = GetByte(_r);
             var g = GetByte(_g);
             var b = GetByte(_b);
@@ -46,14 +48,14 @@ namespace LivreNoirLibrary.Media
 
         public void SetColor(Color color)
         {
-            _a = GetFloat(color.A);
+            _a = _isAlphaEnabled ? GetFloat(color.A) : 1f;
             _r = GetFloat(color.R);
             _g = GetFloat(color.G);
             _b = GetFloat(color.B);
             CalcHSV();
         }
 
-        public string GetColorCode(bool alpha = true) => alpha ? ColorUtils.GetColorCode(_a, _r, _g, _b) : ColorUtils.GetColorCode(_r, _g, _b);
+        public string GetColorCode() => _isAlphaEnabled ? ColorUtils.GetColorCode(_a, _r, _g, _b) : ColorUtils.GetColorCode(_r, _g, _b);
 
         public bool SetColorCode(string colorCode)
         {

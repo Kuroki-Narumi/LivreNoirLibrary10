@@ -43,11 +43,11 @@ namespace LivreNoirLibrary.Windows.Controls
             }
             if (_text1 is not null)
             {
-                _text1.TextChanged -= OnTextChanged;
+                //_text1.TextChanged -= OnTextChanged;
             }
             if (_text2 is not null)
             {
-                _text2.TextChanged -= OnTextChanged;
+                //_text2.TextChanged -= OnTextChanged;
             }
             base.OnApplyTemplate();
             if (GetTemplateChild(PART_TrackBackground) is Border b)
@@ -62,11 +62,11 @@ namespace LivreNoirLibrary.Windows.Controls
             }
             if ((_text1 = GetTemplateChild(PART_TextBox1) as EditableTextBlock) is not null)
             {
-                _text1.TextChanged += OnTextChanged;
+                //_text1.TextChanged += OnTextChanged;
             }
             if ((_text2 = GetTemplateChild(PART_TextBox2) as EditableTextBlock) is not null)
             {
-                _text2.TextChanged += OnTextChanged;
+                //_text2.TextChanged += OnTextChanged;
             }
             if (GetTemplateChild(PART_Thumb1) is Thumb t1)
             {
@@ -143,12 +143,13 @@ namespace LivreNoirLibrary.Windows.Controls
 
         public void SetRange(double value1, double value2, bool exclusive = false)
         {
+            var lastValues = (_value1, _value2);
             _value1 = value1;
             _value2 = value2;
             Value1 = value1;
             Value2 = value2;
             IsExclusive = exclusive;
-            RaiseValueChanged();
+            this.RaiseModifiedEvent((_value1, _value2) != lastValues);
         }
 
         public (double Value1, double Value2, bool IsExclusive) GetRange() => (_value1, _value2, _isExclusive);
@@ -199,7 +200,7 @@ namespace LivreNoirLibrary.Windows.Controls
                 thumb.MouseMove -= MouseMove;
                 thumb.MouseLeftButtonUp -= MouseUp;
                 thumb.ReleaseMouseCapture();
-                RaiseValueChanged();
+                this.RaiseModifiedEvent((double)GetValue(target) != initialValue);
             }
         }
 
@@ -231,10 +232,12 @@ namespace LivreNoirLibrary.Windows.Controls
             }
         }
 
+        private (double, double) _lastValues;
         private bool _changing_by_click;
 
         private void OnMouseLeftButtonDown_RepeatButton(object sender, MouseButtonEventArgs e)
         {
+            _lastValues = (_value1, _value2);
             _changing_by_click = true;
         }
 
@@ -243,7 +246,7 @@ namespace LivreNoirLibrary.Windows.Controls
             if (_changing_by_click)
             {
                 _changing_by_click = false;
-                RaiseValueChanged();
+                this.RaiseModifiedEvent((_value1, _value2) != _lastValues);
             }
         }
 
@@ -256,6 +259,7 @@ namespace LivreNoirLibrary.Windows.Controls
 
         protected void MoveValue(double current, DependencyProperty target, bool increase)
         {
+            var lastValue = current;
             var amount = _tick_frequency;
             if (current % amount is not 0)
             {
@@ -277,15 +281,7 @@ namespace LivreNoirLibrary.Windows.Controls
                 }
             }
             SetValue(target, current);
-            if (!_changing_by_click)
-            {
-                RaiseValueChanged();
-            }
-        }
-
-        private void OnTextChanged(object sender, EditableTextChangedEventArgs e)
-        {
-            RaiseValueChanged();
+            this.RaiseModifiedEvent(!_changing_by_click && (double)GetValue(target) != lastValue);
         }
     }
 }

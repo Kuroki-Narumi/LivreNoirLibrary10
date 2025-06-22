@@ -29,5 +29,6 @@ namespace LivreNoirLibrary.Sandbox
         public string UpperName => _name.ToUpper();
 
         private static int CoerceNumber(int value) => Math.Clamp(value, 0, 100);
+        private void OnNumberChanged() { }
     }
 }

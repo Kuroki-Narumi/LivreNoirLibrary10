@@ -9,5 +9,7 @@ namespace LivreNoirLibrary.Media.Bms
         Mine,
         Decimal,
         Rational,
+
+        Invalid = -1,
     }
 }

@@ -13,9 +13,11 @@ public enum CoerceType
 internal class MethodCacheItem
 {
     private readonly Dictionary<(string, string), bool> _validate_methods = [];
+    private bool _changed_noArgs;
     private readonly Dictionary<string, int> _changed_methods = [];
 
     public void AddCoerce(string propertyType, string fieldType, bool isStatic) => _validate_methods.Add((propertyType, fieldType), isStatic);
+    public void AddOnChanged() => _changed_noArgs = true;
     public void AddOnChanged(string fieldType, int argCount)
     {
         if (!_changed_methods.TryGetValue(fieldType, out var current) || current < argCount)
@@ -25,6 +27,7 @@ internal class MethodCacheItem
     }
 
     public bool ContainsCoerce(string propertyType, string fieldType, out bool isStatic) => _validate_methods.TryGetValue((propertyType, fieldType), out isStatic);
+    public bool ContainsOnChangedNoArgs => _changed_noArgs;
     public bool ContainsOnChanged(string fieldType, out int argCount) => _changed_methods.TryGetValue(fieldType, out argCount);
 }
 
@@ -56,12 +59,17 @@ internal class MethodCache : Dictionary<string, MethodCacheItem>
     public void AddOnChangedMethod(string propertyName, IMethodSymbol method)
     {
         var @params = method.Parameters;
-        if (method.ReturnsVoid && !method.IsStatic &&
-            (@params.Length is 1 || @params.Length is 2 && @params[0].Type.Equals(@params[1].Type, SymbolEqualityComparer.Default))
-            )
+        if (method.ReturnsVoid && !method.IsStatic)
         {
-            var fieldType = Utils.GetTypeFullname(@params[0].Type);
-            GetItem(propertyName).AddOnChanged(fieldType, @params.Length);
+            if (@params.Length is 1 || @params.Length is 2 && @params[0].Type.Equals(@params[1].Type, SymbolEqualityComparer.Default))
+            {
+                var fieldType = Utils.GetTypeFullname(@params[0].Type);
+                GetItem(propertyName).AddOnChanged(fieldType, @params.Length);
+            }
+            else if (@params.Length is 0)
+            {
+                GetItem(propertyName).AddOnChanged();
+            }
         }
     }
 
@@ -69,7 +77,22 @@ internal class MethodCache : Dictionary<string, MethodCacheItem>
         TryGetValue(methodName, out var cache) && cache.ContainsCoerce(propertyType, fieldType, out var isStatic) 
         ? (isStatic ? CoerceType.Static : CoerceType.Instance)
         : CoerceType.None;
-    public int CheckOnChange(string methodName, string fieldType) => TryGetValue(methodName, out var cache) && cache.ContainsOnChanged(fieldType, out var argCount) ? argCount : 0;
+
+    public int CheckOnChange(string methodName, string fieldType)
+    {
+        if (TryGetValue(methodName, out var cache))
+        {
+            if (cache.ContainsOnChanged(fieldType, out var argCount))
+            {
+                return argCount;
+            }
+            if (cache.ContainsOnChangedNoArgs)
+            {
+                return 0;
+            }
+        }
+        return -1;
+    }
 
     private static readonly Dictionary<INamedTypeSymbol, MethodCache> _method_cache = [];
 

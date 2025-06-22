@@ -1,10 +1,11 @@
-﻿using System;
+﻿using LivreNoirLibrary.Collections;
+using LivreNoirLibrary.Files;
+using LivreNoirLibrary.Text;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using LivreNoirLibrary.Collections;
-using LivreNoirLibrary.Files;
-using LivreNoirLibrary.Text;
+using System.Runtime.InteropServices;
 
 namespace LivreNoirLibrary.Media.Bms
 {
@@ -85,6 +86,7 @@ namespace LivreNoirLibrary.Media.Bms
             foreach (var data in EachData())
             {
                 var defLists = data.DefLists;
+                List<short> localRemoved = [];
                 if (removeDuplicated && defLists.TryGetValue(DefType.Wav, out var wavDef))
                 {
                     foreach (var (_, note) in data.Timeline)
@@ -100,8 +102,10 @@ namespace LivreNoirLibrary.Media.Bms
                                     {
                                         note.Id = baseId;
                                         wavMap.Set(id, baseId);
-                                        wavDef.Remove(id);
-                                        removed.Add(id);
+                                        if (removed.Add(id))
+                                        {
+                                            localRemoved.Add(id);
+                                        }
                                     }
                                 }
                                 else
@@ -110,6 +114,10 @@ namespace LivreNoirLibrary.Media.Bms
                                 }
                             }
                         }
+                    }
+                    foreach (var id in CollectionsMarshal.AsSpan(localRemoved))
+                    {
+                        wavDef.Remove(id);
                     }
                 }
                 if (removeUnused)

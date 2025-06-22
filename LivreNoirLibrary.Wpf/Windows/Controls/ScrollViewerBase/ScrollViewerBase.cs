@@ -140,10 +140,12 @@ namespace LivreNoirLibrary.Windows.Controls
         protected virtual void PostRefresh() { }
 
         protected void AdjustHorizontalScroll(double oldScale, double newScale) => AdjustHorizontalScroll(Mouse.GetPosition(this).X, oldScale, newScale);
-        protected void AdjustHorizontalScroll(double pivot, double oldScale, double newScale) => ScrollToHorizontalOffset((HorizontalOffset + pivot) * newScale / oldScale - pivot);
+        protected void AdjustHorizontalScroll(double pivot, double oldScale, double newScale) => ScrollToHorizontalOffset(AdjustOffset(HorizontalOffset, pivot, newScale, oldScale));
 
         protected void AdjustVerticalScroll(double oldScale, double newScale) => AdjustVerticalScroll(Mouse.GetPosition(this).Y, oldScale, newScale);
-        protected void AdjustVerticalScroll(double pivot, double oldScale, double newScale) => ScrollToVerticalOffset((VerticalOffset + pivot) * newScale / oldScale - pivot);
+        protected void AdjustVerticalScroll(double pivot, double oldScale, double newScale) => ScrollToVerticalOffset(AdjustOffset(VerticalOffset, pivot, newScale, oldScale));
+
+        public static double AdjustOffset(double current, double pivot, double oldScale, double newScale) => (current + pivot) * newScale / oldScale - pivot;
 
         public static double GetScrollUnit(double scale, double viewport)
         {
