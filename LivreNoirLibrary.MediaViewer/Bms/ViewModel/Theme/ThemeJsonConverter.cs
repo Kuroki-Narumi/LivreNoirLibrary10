@@ -1,11 +1,11 @@
-﻿using System;
+using System;
 using System.Collections;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 
 namespace LivreNoirLibrary.Windows.Controls.Bms
 {
-    public class ThemeJsonConverter : JsonConverter<Theme>
+    public sealed class ThemeJsonConverter : JsonConverter<Theme>
     {
         public const string Prop_CommonColors = "common_colors";
         public const string Prop_Conductor = "conductor";

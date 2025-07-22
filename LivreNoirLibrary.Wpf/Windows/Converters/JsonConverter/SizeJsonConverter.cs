@@ -1,11 +1,11 @@
-﻿using System;
+using System;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Windows;
 
 namespace LivreNoirLibrary.Windows
 {
-    public class SizeJsonConverter : JsonConverter<Size>
+    public sealed class SizeJsonConverter : JsonConverter<Size>
     {
         public override Size Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
         {

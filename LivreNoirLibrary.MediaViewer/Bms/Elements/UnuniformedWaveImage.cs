@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Windows;
 using System.Windows.Media;
 using LivreNoirLibrary.Collections;
@@ -149,7 +149,7 @@ namespace LivreNoirLibrary.Windows.Controls.Bms
                  */
                 var pos = new Rational((long)(contentHeight - offset), scaleY);
                 var sample = (double)counter.Interval(position, pos) * sampleRate + sampleOffset;
-                return Math.Clamp((int)sample * channels, 0, dataLength);
+                return (int)Math.Clamp(sample * channels, 0, dataLength);
             }
             int GetX(float value) => (int)(value * levelScale) + cx;
             var lastPos = GetPosition(offset + top);

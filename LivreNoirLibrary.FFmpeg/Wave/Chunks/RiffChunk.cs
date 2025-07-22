@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Text.Json;
@@ -30,7 +30,6 @@ namespace LivreNoirLibrary.Media.Wave
             ChunkIds.LTxt => reader.ReadRiffChunk<LTxt>(),
             ChunkIds.Sampler => reader.ReadRiffChunk<Sampler>(),
             ChunkIds.Struct => reader.ReadRiffChunk<Struct>(),
-            ChunkIds.ID3 => reader.ReadRiffChunk<ID3>(),
             _ => Chunk.Load(chid, reader),
         };
     }

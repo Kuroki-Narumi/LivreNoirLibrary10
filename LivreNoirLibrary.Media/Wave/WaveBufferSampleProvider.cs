@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using NAudio.Wave;
 
 namespace LivreNoirLibrary.Media.Wave
@@ -6,11 +6,14 @@ namespace LivreNoirLibrary.Media.Wave
     public class WaveBufferSampleProvider(IWaveBuffer source) : ISampleProvider
     {
         public const float MaxVolume = 2;
+        public const double MinSpeed = 1.0 / 16.0;
+        public const double MaxSpeed = 16.0;
 
         private readonly WeakReference<IWaveBuffer> _source = new(source);
         private readonly WaveFormat _format = WaveFormat.CreateIeeeFloatWaveFormat(source.SampleRate, source.Channels);
 
         private float _volume = 1.0f;
+        private double _speed = 1.0;
         private long _position;
         private long _end_position;
         private bool _loop;
@@ -19,11 +22,9 @@ namespace LivreNoirLibrary.Media.Wave
 
         public WaveFormat WaveFormat => _format;
 
-        public float Volume
-        {
-            get => _volume;
-            set => _volume = Math.Clamp(value, 0, MaxVolume);
-        }
+        public float Volume { get => _volume; set => _volume = Math.Clamp(value, 0, MaxVolume); }
+        public double Speed { get => _speed; set => _speed = Math.Clamp(value, MinSpeed, MaxSpeed); }
+        public double Pitch { get => Math.Log2(_speed) * 1200; set => Speed = Math.Pow(2.0, value / 1200); }
 
         /// <summary>
         /// Prepare for play by <see cref="IWavePlayer"/> as <see cref="ISampleProvider"/>

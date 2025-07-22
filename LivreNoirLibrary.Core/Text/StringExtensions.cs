@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Runtime.InteropServices;
 using System.Text.RegularExpressions;
 
@@ -60,5 +60,13 @@ namespace LivreNoirLibrary.Text
 
         [LibraryImport("shlwapi", EntryPoint = $"{nameof(StrCmpLogical)}W", StringMarshalling = StringMarshalling.Utf16)]
         internal static partial int StrCmpLogical(string str1, string str2);
+
+        public static string AutoFormat(this TimeSpan time) => time.Ticks switch
+        {
+            >= TimeSpan.TicksPerDay => time.ToString(@"d\d\ h\:mm\:ss"),
+            >= TimeSpan.TicksPerHour => time.ToString(@"h\:mm\:ss\.f"),
+            >= TimeSpan.TicksPerMinute => time.ToString(@"m\:ss\.ff"),
+            _ => time.ToString(@"s\.ffff"),
+        };
     }
 }

@@ -1,10 +1,10 @@
-﻿using System;
+using System;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 
 namespace LivreNoirLibrary.YuGiOh.Converters
 {
-    public class AbilityJsonConverter : JsonConverter<Ability>
+    public sealed class AbilityJsonConverter : JsonConverter<Ability>
     {
         public override Ability Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
         {

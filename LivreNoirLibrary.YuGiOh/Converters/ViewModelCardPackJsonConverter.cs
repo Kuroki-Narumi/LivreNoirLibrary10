@@ -1,10 +1,10 @@
-﻿using System;
+using System;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 
 namespace LivreNoirLibrary.YuGiOh.Converters
 {
-    public class ViewModelCardPackJsonConverter : JsonConverter<ViewModel.CardPack>
+    public sealed class ViewModelCardPackJsonConverter : JsonConverter<ViewModel.CardPack>
     {
         public override ViewModel.CardPack? Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
         {

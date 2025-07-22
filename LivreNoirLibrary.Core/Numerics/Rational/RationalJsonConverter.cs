@@ -1,11 +1,11 @@
-﻿using System;
+using System;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using LivreNoirLibrary.Numerics;
 
 namespace LivreNoirLibrary.Text
 {
-    public class RationalJsonConverter : JsonConverter<Rational>
+    public sealed class RationalJsonConverter : JsonConverter<Rational>
     {
         public override Rational Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
         {

@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Numerics;
 using System.Runtime.CompilerServices;
 
@@ -84,17 +84,9 @@ namespace LivreNoirLibrary.Numerics
             {
                 ThrowDivideByZeroException();
             }
-            var num = left._numerator;
-            if (num is 0)
-            {
-                return Zero;
-            }
-            else
-            {
-                var den = left.Denominator;
-                var d = den * right;
-                return new(num - (num / d) * d, den);
-            }
+            var (intPart, num, den) = left.DivRem2();
+            var r = intPart % right;
+            return new(r * den + num, den);
         }
 
         /// <inheritdoc cref="DivRem(in Rational, in Rational)"/>

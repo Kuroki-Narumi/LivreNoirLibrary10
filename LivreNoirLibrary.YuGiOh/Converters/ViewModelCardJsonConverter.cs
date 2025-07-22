@@ -1,10 +1,11 @@
-﻿using System;
+using System;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using LivreNoirLibrary.Text;
 
 namespace LivreNoirLibrary.YuGiOh.Converters
 {
-    public class ViewModelCardJsonConverter : JsonConverter<ViewModel.Card>
+    public sealed class ViewModelCardJsonConverter : JsonConverter<ViewModel.Card>
     {
         public override ViewModel.Card? Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
         {
@@ -19,19 +20,19 @@ namespace LivreNoirLibrary.YuGiOh.Converters
         {
             writer.WriteStartObject();
             writer.WriteNumber(JsonPropertyNames.Id, value._id);
-            Write(writer, JsonPropertyNames.Name, value._name);
-            Write(writer, JsonPropertyNames.Ruby, value._ruby);
-            Write(writer, JsonPropertyNames.EnName, value._enName);
+            writer.WriteIfNotNull(JsonPropertyNames.Name, value._name);
+            writer.WriteIfNotNull(JsonPropertyNames.Ruby, value._ruby);
+            writer.WriteIfNotNull(JsonPropertyNames.EnName, value._enName);
             Write(writer, value._cardType);
-            Write(writer, JsonPropertyNames.Text, value._text);
-            Write(writer, JsonPropertyNames.Unusable, value._unusable);
+            writer.WriteIfNotNull(JsonPropertyNames.Text, value._text);
+            writer.WriteIfTrue(JsonPropertyNames.Unusable, value._unusable);
             if (value._cardType.IsMonster())
             {
                 writer.WritePropertyName(JsonPropertyNames.MonsterInfo);
                 writer.WriteStartObject();
                 Write(writer, value._attribute);
                 Write(writer, value._monsterType);
-                Write(writer, JsonPropertyNames.Effect, value._effect);
+                writer.WriteIfTrue(JsonPropertyNames.Effect, value._effect);
                 Write(writer, value._ability);
                 writer.WriteNumber(JsonPropertyNames.Level, value._level);
                 WriteStatus(writer, JsonPropertyNames.Atk, value._atk);
@@ -42,7 +43,7 @@ namespace LivreNoirLibrary.YuGiOh.Converters
                     writer.WritePropertyName(JsonPropertyNames.PendulumInfo);
                     writer.WriteStartObject();
                     writer.WriteNumber(JsonPropertyNames.Scale, value._pendulumScale);
-                    Write(writer, JsonPropertyNames.Text, value._pendulumText);
+                    writer.WriteIfNotNull(JsonPropertyNames.Text, value._pendulumText);
                     writer.WriteEndObject();
                 }
             }
@@ -60,22 +61,6 @@ namespace LivreNoirLibrary.YuGiOh.Converters
                 writer.WriteEndArray();
             }
             writer.WriteEndObject();
-        }
-
-        public static void Write(Utf8JsonWriter writer, string propertyName, string value)
-        {
-            if (!string.IsNullOrWhiteSpace(value))
-            {
-                writer.WriteString(propertyName, value);
-            }
-        }
-
-        public static void Write(Utf8JsonWriter writer, string propertyName, bool value)
-        {
-            if (value)
-            {
-                writer.WriteBoolean(propertyName, true);
-            }
         }
 
         public static void Write(Utf8JsonWriter writer, CardType value)

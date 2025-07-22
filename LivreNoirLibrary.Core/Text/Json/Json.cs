@@ -1,12 +1,12 @@
-﻿using System;
+using System;
 using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.IO;
+using System.Threading;
 using System.Diagnostics.CodeAnalysis;
 using LivreNoirLibrary.IO;
 using LivreNoirLibrary.Collections;
-using System.Threading;
 
 namespace LivreNoirLibrary.Text
 {
@@ -27,14 +27,14 @@ namespace LivreNoirLibrary.Text
         public static T Parse<T>(string json)
             where T : class
         {
-            var obj = JsonSerializer.Deserialize<T>(json, GetOptions(false));
+            var obj = JsonSerializer.Deserialize<T>(json, GetReaderOptions());
             return GetValueOrThrow(obj);
         }
 
         public static T Parse<T>(ReadOnlySpan<byte> utf8json)
             where T : class
         {
-            var obj = JsonSerializer.Deserialize<T>(utf8json, GetOptions(false));
+            var obj = JsonSerializer.Deserialize<T>(utf8json, GetReaderOptions());
             return GetValueOrThrow(obj);
         }
 
@@ -48,7 +48,7 @@ namespace LivreNoirLibrary.Text
         public static T Load<T>(Stream utf8json)
             where T : class
         {
-            var obj = JsonSerializer.Deserialize<T>(utf8json, GetOptions(false));
+            var obj = JsonSerializer.Deserialize<T>(utf8json, GetReaderOptions());
             return GetValueOrThrow(obj);
         }
 

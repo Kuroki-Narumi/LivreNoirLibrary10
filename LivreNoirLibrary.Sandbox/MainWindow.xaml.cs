@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Text;
 using System.Windows;
 using System.Windows.Controls;
@@ -30,6 +30,10 @@ namespace LivreNoirLibrary.Sandbox
         private void VirtualKeyboard_Pressed(Key key, ModifierKeys modifier)
         {
             //Console.WriteLine($"{key}, {modifier}");
+            if (key is Key.J)
+            {
+                JsonTest.Test();
+            }
         }
 
         private void OnDragOver_Image(object sender, DragEventArgs e)
@@ -59,6 +63,14 @@ namespace LivreNoirLibrary.Sandbox
             {
                 Console.WriteLine(ColorPicker.SelectedColor);
             }
+        }
+
+        private void OnClick_Coprime(object sender, RoutedEventArgs e)
+        {
+            var v = TextBox_Coprime.Value;
+            var prime = GcdTest.CoprimeCount(v);
+            var max = v * v;
+            Console.WriteLine($"v = {v}\tcount = {prime}\ttotal = {max}\tratio = {(double)prime / max}");
         }
     }
 }

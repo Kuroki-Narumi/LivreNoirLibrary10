@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Windows.Input;
@@ -8,7 +8,7 @@ using LivreNoirLibrary.Media;
 
 namespace LivreNoirLibrary.Windows.Controls.Bms
 {
-    public class LaneInfoJsonConverter : JsonConverter<LaneInfo>
+    public sealed class LaneInfoJsonConverter : JsonConverter<LaneInfo>
     {
         public const string SeparatorName = "Separator";
         public const string Prop_Name = "name";

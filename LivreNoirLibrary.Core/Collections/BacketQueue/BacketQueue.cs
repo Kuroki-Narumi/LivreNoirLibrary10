@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Threading;
 using System.Buffers;
@@ -24,7 +24,7 @@ namespace LivreNoirLibrary.Collections
         }
 
         private TOut[] _array = new TOut[Math.Max(capacity, 2)];
-        protected readonly ReaderWriterLockSlim _lock = new();
+        protected readonly ReaderWriterLockSlim _lock = new(LockRecursionPolicy.SupportsRecursion);
 
         private int _head;       // The index from which to dequeue if the queue isn't empty.
         private int _tail;       // The index at which to enqueue if the queue isn't full.

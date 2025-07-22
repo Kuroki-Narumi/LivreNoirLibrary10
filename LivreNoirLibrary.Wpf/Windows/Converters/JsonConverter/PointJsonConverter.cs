@@ -1,11 +1,11 @@
-﻿using System;
+using System;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Windows;
 
 namespace LivreNoirLibrary.Windows
 {
-    public class PointJsonConverter : JsonConverter<Point>
+    public sealed class PointJsonConverter : JsonConverter<Point>
     {
         public override Point Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
         {

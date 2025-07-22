@@ -14,6 +14,10 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Resource Include="..\LivreNoirLibrary.MediaViewer\Resources\IndexLetters.png" Link="Resources\IndexLetters.png" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\LivreNoirLibrary.Core\LivreNoirLibrary.Core.csproj" />
     <ProjectReference Include="..\LivreNoirLibrary.Media\LivreNoirLibrary.Media.csproj" />
     <ProjectReference Include="..\LivreNoirLibrary.SourceGenerator\LivreNoirLibrary.SourceGenerator.csproj">
@@ -21,6 +25,10 @@
         <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
     </ProjectReference>
     <ProjectReference Include="..\LivreNoirLibrary.Wpf\LivreNoirLibrary.Wpf.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Resources\" />
   </ItemGroup>
 
 </Project>

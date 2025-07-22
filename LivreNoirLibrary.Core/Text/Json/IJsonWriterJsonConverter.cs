@@ -1,10 +1,10 @@
-﻿using System;
+using System;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 
 namespace LivreNoirLibrary.Text
 {
-    public class IJsonWriterJsonConverter : JsonConverter<IJsonWriter>
+    public sealed class IJsonWriterJsonConverter : JsonConverter<IJsonWriter>
     {
         public override IJsonWriter? Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
         {

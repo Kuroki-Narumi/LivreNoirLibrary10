@@ -1,10 +1,10 @@
-﻿using System;
+using System;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 
 namespace LivreNoirLibrary.Windows
 {
-    public class VocabDataJsonConverter : JsonConverter<VocabData>
+    public sealed class VocabDataJsonConverter : JsonConverter<VocabData>
     {
         public const string PropertyName_Header = "header";
         public const string PropertyName_Description = "desc";

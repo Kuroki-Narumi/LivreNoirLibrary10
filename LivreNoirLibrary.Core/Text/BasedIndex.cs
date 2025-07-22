@@ -1,8 +1,9 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Numerics;
 using System.Runtime.CompilerServices;
 using System.Text.RegularExpressions;
+using LivreNoirLibrary.Debug;
 
 namespace LivreNoirLibrary.Text
 {
@@ -12,32 +13,36 @@ namespace LivreNoirLibrary.Text
         public const int DecimalRadix = 10;
         public const int HexRadix = 16;
         public const int StandardRadix = 36;
-        public const int MaximumRadix = 62;
-        public const int MaxBufferIndex = 64;
+        public const int MaximumRadix = 64;
+        public const int MaxBufferIndex = 19;
 
         private static readonly Dictionary<char, byte> _s2i;
         private static readonly Dictionary<byte, char> _i2s;
 
         static BasedIndex()
         {
-            _s2i = [];
-            _i2s = [];
+            var s2i = _s2i = [];
+            var i2s = _i2s = [];
             byte i = 0;
+            void Add(char c, byte v)
+            {
+                s2i.Add(c, v);
+                i2s.Add(v, c);
+            }
             for (var c = '0'; c <= '9'; c++, i++)
             {
-                _s2i.Add(c, i);
-                _i2s.Add(i, c);
+                Add(c, i);
             }
             for (var c = 'A'; c <= 'Z'; c++, i++)
             {
-                _s2i.Add(c, i);
-                _i2s.Add(i, c);
+                Add(c, i);
             }
             for (var c = 'a'; c <= 'z'; c++, i++)
             {
-                _s2i.Add(c, i);
-                _i2s.Add(i, c);
+                Add(c, i);
             }
+            Add('+', 62);
+            Add('/', 63);
         }
 
         private static void ThrowIfRadixOutOfRange(int radix)
@@ -58,10 +63,11 @@ namespace LivreNoirLibrary.Text
             }
             ThrowIfRadixOutOfRange(radix);
             var result = 0L;
+            var map = _s2i;
             foreach (var c in index)
             {
                 result *= radix;
-                if (_s2i.TryGetValue(c, out var n))
+                if (map.TryGetValue(c, out var n))
                 {
                     if (n is >= StandardRadix && radix is <= StandardRadix)
                     {
@@ -78,11 +84,16 @@ namespace LivreNoirLibrary.Text
             return result;
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static short ParseToShort(this ReadOnlySpan<char> index, int radix) => (short)ParseToLong(index, radix);
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static int ParseToInt(this ReadOnlySpan<char> index, int radix) => (int)ParseToLong(index, radix);
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static long ParseToLong(this string? index, int radix) => string.IsNullOrEmpty(index) ? 0 : ParseToLong(index.AsSpan(), radix);
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static short ParseToShort(this string? index, int radix) => (short)ParseToLong(index, radix);
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static int ParseToInt(this string? index, int radix) => (int)ParseToLong(index, radix);
 
         public static bool TryParseToLong(this ReadOnlySpan<char> index, int radix, out long value)
@@ -93,10 +104,11 @@ namespace LivreNoirLibrary.Text
                 return false;
             }
             var result = 0L;
+            var map = _s2i;
             foreach (var c in index)
             {
                 result *= radix;
-                if (_s2i.TryGetValue(c, out var n))
+                if (map.TryGetValue(c, out var n))
                 {
                     if (n is >= StandardRadix && radix is <= StandardRadix)
                     {
@@ -145,6 +157,7 @@ namespace LivreNoirLibrary.Text
         }
 
         private delegate bool TryParseStringDelegate<T>(ReadOnlySpan<char> index, int radix, out T value);
+
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private static bool TryParseStringCore<T>(this string? index, int radix, out T value, TryParseStringDelegate<T> del)
             where T : struct
@@ -167,56 +180,81 @@ namespace LivreNoirLibrary.Text
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static bool TryParseToInt(this string? index, int radix, out int value) => TryParseStringCore(index, radix, out value, TryParseToInt);
 
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static string ToBased(this short index, int radix, int digits = 0) => ToBased((long)index, radix, digits);
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static string ToBased(this int index, int radix, int digits = 0) => ToBased((long)index, radix, digits);
-
-        public static string ToBased(this long index, int radix, int digits = 0)
+        public static string ToBased(this long index, int radix, int minDigits = 0, int maxDigits = 0)
         {
             ThrowIfRadixOutOfRange(radix);
             if (index is <= 0)
             {
-                return (digits is <= 0 ? "0" : new string('0', digits)).Shared();
+                return (minDigits is <= 0 ? "0" : new string('0', minDigits)).Shared();
             }
             var buffer = (stackalloc char[MaxBufferIndex]);
             var i = MaxBufferIndex - 1;
+            var map = _i2s;
             while (index >= radix)
             {
                 (index, var r) = Math.DivRem(index, radix);
-                buffer[i] = _i2s[(byte)r];
+                buffer[i] = map[(byte)r];
                 i--;
             }
-            buffer[i] = _i2s[(byte)index];
+            buffer[i] = map[(byte)index];
             var count = MaxBufferIndex - i;
-            if (digits is > 0)
+            if (maxDigits is > 0 && count > maxDigits)
             {
-                if (count > digits)
+                i = MaxBufferIndex - maxDigits;
+            }
+            else if (minDigits is > 0)
+            {
+                while (count < minDigits)
                 {
-                    i = MaxBufferIndex - digits;
-                }
-                else
-                {
-                    while (count < digits)
-                    {
-                        count++;
-                        i--;
-                        buffer[i] = '0';
-                    }
+                    count++;
+                    i--;
+                    buffer[i] = '0';
                 }
             }
             return new string(buffer[i..]).Shared();
         }
 
-        private delegate string ToBasedDelegate<T>(T index, int radix, int digits);
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static string ToBased(this short index, int radix, int minDigits = 0, int maxDigits = 0) => ToBased((long)index, radix, minDigits, maxDigits);
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static string ToBased(this int index, int radix, int minDigits = 0, int maxDigits = 0) => ToBased((long)index, radix, minDigits, maxDigits);
 
-        private static string GetIndexListTextCore<T>(IEnumerable<T> source, ToBasedDelegate<T> func, T start, int radix, int digits)
+        public static void ToBased(this long index, Span<char> target, int radix, int digits = 2)
+        {
+            ThrowIfRadixOutOfRange(radix);
+            if (digits is <= 0)
+            {
+                throw new ArgumentException($"digits must be > 0.", nameof(digits));
+            }
+            if (index is <= 0)
+            {
+                target[..digits].Fill('0');
+            }
+            else
+            {
+                var map = _i2s;
+                for (var i = digits - 1; i >= 0; i--)
+                {
+                    (index, var r) = Math.DivRem(index, radix);
+                    target[i] = map[(byte)r];
+                }
+            }
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static void ToBased(this short index, Span<char> target, int radix, int digits = 2) => ToBased((long)index, target, radix, digits);
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static void ToBased(this int index, Span<char> target, int radix, int digits = 2) => ToBased((long)index, target, radix, digits);
+
+        private delegate string ToBasedDelegate<T>(T index, int radix, int minDgits, int maxDigits);
+
+        private static string GetIndexListTextCore<T>(IEnumerable<T> source, ToBasedDelegate<T> func, T start, int radix, int minDgits, int maxDigits)
             where T : INumber<T>
         {
             List<Segment> list = [];
             foreach (var index in source)
             {
-                var text = func(index, radix, digits);
+                var text = func(index, radix, minDgits, maxDigits);
                 if (index == ++start)
                 {
                     list[^1].End = text;
@@ -231,14 +269,14 @@ namespace LivreNoirLibrary.Text
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static string GetIndexListText(IEnumerable<long> source, int radix = DecimalRadix, int digits = 0)
-            => GetIndexListTextCore(source, ToBased, long.MinValue, radix, digits);
+        public static string GetIndexListText(IEnumerable<long> source, int radix = DecimalRadix, int minDigits = 0, int maxDigits = 0)
+            => GetIndexListTextCore(source, ToBased, long.MinValue, radix, minDigits, maxDigits);
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static string GetIndexListText(IEnumerable<int> source, int radix = DecimalRadix, int digits = 0)
-            => GetIndexListTextCore(source, ToBased, int.MinValue, radix, digits);
+        public static string GetIndexListText(IEnumerable<int> source, int radix = DecimalRadix, int minDigits = 0, int maxDigits = 0)
+            => GetIndexListTextCore(source, ToBased, int.MinValue, radix, minDigits, maxDigits);
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static string GetIndexListText(IEnumerable<short> source, int radix = DecimalRadix, int digits = 0)
-            => GetIndexListTextCore(source, ToBased, short.MinValue, radix, digits);
+        public static string GetIndexListText(IEnumerable<short> source, int radix = DecimalRadix, int minDigits = 0, int maxDigits = 0)
+            => GetIndexListTextCore(source, ToBased, short.MinValue, radix, minDigits, maxDigits);
 
         private class Segment(string start)
         {

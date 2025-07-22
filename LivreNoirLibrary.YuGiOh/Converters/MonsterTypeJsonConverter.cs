@@ -1,10 +1,10 @@
-﻿using System;
+using System;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 
 namespace LivreNoirLibrary.YuGiOh.Converters
 {
-    internal class MonsterTypeJsonConverter : JsonConverter<MonsterType>
+    public sealed class MonsterTypeJsonConverter : JsonConverter<MonsterType>
     {
         public override MonsterType Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
         {

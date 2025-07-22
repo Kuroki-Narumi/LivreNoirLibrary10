@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Windows.Media;
@@ -6,7 +6,7 @@ using LivreNoirLibrary.Media;
 
 namespace LivreNoirLibrary.Windows.Converters
 {
-    public class ColorJsonConverter : JsonConverter<Color>
+    public sealed class ColorJsonConverter : JsonConverter<Color>
     {
         public override Color Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
         {

@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -7,7 +7,6 @@ using System.Windows;
 using System.Windows.Media;
 using LivreNoirLibrary.Media;
 using LivreNoirLibrary.Media.Bms;
-using LivreNoirLibrary.Media.Bms.ViewModels;
 using LivreNoirLibrary.Numerics;
 
 namespace LivreNoirLibrary.Windows.Controls.Bms

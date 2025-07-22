@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Numerics;
 using System.Runtime.CompilerServices;
 
@@ -97,10 +97,14 @@ namespace LivreNoirLibrary.Numerics
         public static Rational operator checked /(Rational left, Rational right) => Multiply(left._numerator, left.Denominator, right.Denominator, right._numerator, true);
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static Rational operator %(Rational left, Rational right) => (left / right).Remainder();
+        public static Rational operator %(Rational left, Rational right) => (left / right).Remainder() * right;
 
         /// <inheritdoc cref="int.DivRem"/>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static (long Quotient, Rational Remainder) DivRem(in Rational left, in Rational right) => (left / right).DivRem();
+        public static (long Quotient, Rational Remainder) DivRem(Rational left, Rational right)
+        {
+            var (q, r) = (left / right).DivRem();
+            return (q, r * right);
+        }
     }
 }

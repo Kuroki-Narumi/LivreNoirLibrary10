@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
 using LivreNoirLibrary.Collections;
@@ -146,7 +146,7 @@ namespace LivreNoirLibrary.Windows.Controls.Bms
         private static (string?, string?) GetString(BaseData source, HeaderType type, object? defaultValue = null)
         {
             var h = source.Headers;
-            return (h.Get(type), h.GetParent(type) ?? (defaultValue?.ToString()));
+            return (h.GetActual(type), h.GetParent(type) ?? (defaultValue?.ToString()));
         }
 
         private void OnPlayerChanged(PlayerType value) => ProcessHeaderChange(() => _currentData.Player = value);

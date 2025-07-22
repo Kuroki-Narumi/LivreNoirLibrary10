@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Numerics;
@@ -94,9 +94,10 @@ namespace LivreNoirLibrary.Collections
         public Span<T> AsSpan() => _ptr is null ? [] : new(_ptr, _size);
         public Span<T> AsSpan(int index) => Slice(index);
         public Span<T> AsSpan(int index, int count) => Slice(index, count);
+        public Span<T> AsSpan(Index index, int count) => Slice(index, count);
 
         public static implicit operator Span<T>(UnmanagedArray<T> obj) => obj.AsSpan();
-        public static implicit operator ReadOnlySpan<T>(UnmanagedArray<T> obj) => obj.AsSpan();
+        public static implicit operator ReadOnlySpan<T>(UnmanagedArray<T> obj) => (ReadOnlySpan<T>)obj.AsSpan();
 
         private Span<T> ThrowOutOfRange(int index)
         {
@@ -135,6 +136,8 @@ namespace LivreNoirLibrary.Collections
                 return ThrowOutOfRange(index, count);
             }
         }
+
+        public Span<T> Slice(Index index, int count) => Slice(index.GetOffset(_size), count);
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private static void ClearCore(T* ptr, int count)

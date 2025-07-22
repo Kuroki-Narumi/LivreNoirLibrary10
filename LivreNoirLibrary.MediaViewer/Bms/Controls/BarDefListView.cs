@@ -1,7 +1,6 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Windows;
-using LivreNoirLibrary.Media.Bms.ViewModels;
 
 namespace LivreNoirLibrary.Windows.Controls.Bms
 {

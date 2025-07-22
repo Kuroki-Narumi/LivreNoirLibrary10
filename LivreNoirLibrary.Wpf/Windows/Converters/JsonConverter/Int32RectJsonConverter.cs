@@ -1,11 +1,11 @@
-﻿using System;
+using System;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Windows;
 
 namespace LivreNoirLibrary.Windows
 {
-    public class Int32RectJsonConverter : JsonConverter<Int32Rect>
+    public sealed class Int32RectJsonConverter : JsonConverter<Int32Rect>
     {
         public override Int32Rect Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
         {
