@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Windows;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
@@ -17,7 +17,7 @@ namespace LivreNoirLibrary.Windows.Controls
         public const int BufferSize = Stride * CanvasHeight;
         public static readonly Int32Rect BitmapRect = new(0, 0, CanvasWidth, CanvasHeight);
 
-        private static WriteableBitmap CreateBitmap() => new(CanvasWidth, CanvasHeight, 96, 96, PixelFormats.Pbgra32, null);
+        private static WriteableBitmap CreateBitmap() => Bitmap.Create(CanvasWidth, CanvasHeight);
 
         private readonly WriteableBitmap _src_r = CreateBitmap();
         private readonly WriteableBitmap _src_g = CreateBitmap();

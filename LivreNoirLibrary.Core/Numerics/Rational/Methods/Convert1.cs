@@ -1,4 +1,5 @@
-﻿using System;
+using LivreNoirLibrary.Debug;
+using System;
 using System.Numerics;
 using System.Runtime.CompilerServices;
 
@@ -12,112 +13,64 @@ namespace LivreNoirLibrary.Numerics
         public const ulong DefaultConvertDenLimit = 10_000_000_000;
         public static readonly Int128 Int128MaxValueAsLong = long.MaxValue;
 
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void Deconstruct(out long numerator, out long denominator)
         {
-            numerator = _numerator;
+            numerator = Numerator;
             denominator = Denominator;
         }
 
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static implicit operator Rational(in (int num, int den) tuple) => new(tuple.num, tuple.den);
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static implicit operator Rational(in (long num, long den) tuple) => new(tuple.num, tuple.den);
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static implicit operator Rational(byte value) => new(value);
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static implicit operator Rational(sbyte value) => new(value);
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static implicit operator Rational(short value) => new(value);
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static implicit operator Rational(ushort value) => new(value);
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static implicit operator Rational(int value) => new(value);
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static implicit operator Rational(uint value) => new(value);
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static explicit operator Rational(nint value) => new(value);
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static explicit operator Rational(nuint value) => new((long)value);
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static implicit operator Rational(long value) => new(value);
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static explicit operator Rational(ulong value) => new((long)value);
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static explicit operator checked Rational(ulong value) => new(checked((long)value));
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static explicit operator checked Rational(nuint value) => new(checked((long)value));
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static explicit operator Rational(Int128 value) => new((long)value);
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static explicit operator checked Rational(Int128 value) => new(checked((long)value));
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static explicit operator Rational(UInt128 value) => new((long)value);
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static explicit operator checked Rational(UInt128 value) => new(checked((long)value));
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static explicit operator Rational(Half value) => ConvertBySBT(value);
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static explicit operator Rational(float value) => ConvertBySBT(value);
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static explicit operator Rational(double value) => ConvertBySBT(value);
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static explicit operator Rational(decimal value) => ConvertBySBT(value);
 
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static explicit operator byte(in Rational value) => (byte)(value._numerator / value.Denominator);
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static explicit operator checked byte(in Rational value) => checked((byte)(value._numerator / value.Denominator));
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static explicit operator sbyte(in Rational value) => (sbyte)(value._numerator / value.Denominator);
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static explicit operator checked sbyte(in Rational value) => checked((sbyte)(value._numerator / value.Denominator));
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static explicit operator short(in Rational value) => (short)(value._numerator / value.Denominator);
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static explicit operator checked short(in Rational value) => checked((short)(value._numerator / value.Denominator));
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static explicit operator ushort(in Rational value) => (ushort)(value._numerator / value.Denominator);
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static explicit operator checked ushort(in Rational value) => checked((ushort)(value._numerator / value.Denominator));
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static explicit operator int(in Rational value) => (int)value._numerator / (int)value.Denominator;
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static explicit operator checked int(in Rational value) => checked((int)(value._numerator / value.Denominator));
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static explicit operator uint(in Rational value) => (uint)value._numerator / (uint)value.Denominator;
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static explicit operator checked uint(in Rational value) => checked((uint)(value._numerator / value.Denominator));
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static explicit operator nint(in Rational value) => (nint)value._numerator / (nint)value.Denominator;
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static explicit operator checked nint(in Rational value) => checked((nint)value._numerator) / (nint)value.Denominator;
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static explicit operator nuint(in Rational value) => (nuint)value._numerator / (nuint)value.Denominator;
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static explicit operator checked nuint(in Rational value) => checked((nuint)value._numerator) / (nuint)value.Denominator;
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static explicit operator long(in Rational value) => value._numerator / value.Denominator;
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static explicit operator ulong(in Rational value) => (ulong)value._numerator / (ulong)value.Denominator;
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static explicit operator checked ulong(in Rational value) => checked((ulong)value._numerator) / (ulong)value.Denominator;
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static explicit operator Int128(in Rational value) => (Int128)value._numerator / (Int128)value.Denominator;
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static explicit operator UInt128(in Rational value) => (UInt128)value._numerator / (UInt128)value.Denominator;
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static explicit operator checked UInt128(in Rational value) => checked((UInt128)value._numerator) / (UInt128)value.Denominator;
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static explicit operator Half(in Rational value) => (Half)value._numerator / (Half)value.Denominator;
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static explicit operator checked Half(in Rational value) => checked((Half)value._numerator) / checked((Half)value.Denominator);
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static explicit operator float(in Rational value) => (float)value._numerator / value.Denominator;
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static explicit operator double(in Rational value) => (double)value._numerator / value.Denominator;
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static explicit operator decimal(in Rational value) => (decimal)value._numerator / value.Denominator;
+        public static implicit operator (long, long)(in Rational value) => (value.Numerator, value.Denominator);
+        public static implicit operator (int, int)(in Rational value) => ((int)value.Numerator, (int)value.Denominator);
+        public static explicit operator byte(in Rational value) => (byte)(value.Numerator / value.Denominator);
+        public static explicit operator checked byte(in Rational value) => checked((byte)(value.Numerator / value.Denominator));
+        public static explicit operator sbyte(in Rational value) => (sbyte)(value.Numerator / value.Denominator);
+        public static explicit operator checked sbyte(in Rational value) => checked((sbyte)(value.Numerator / value.Denominator));
+        public static explicit operator short(in Rational value) => (short)(value.Numerator / value.Denominator);
+        public static explicit operator checked short(in Rational value) => checked((short)(value.Numerator / value.Denominator));
+        public static explicit operator ushort(in Rational value) => (ushort)(value.Numerator / value.Denominator);
+        public static explicit operator checked ushort(in Rational value) => checked((ushort)(value.Numerator / value.Denominator));
+        public static explicit operator int(in Rational value) => (int)value.Numerator / (int)value.Denominator;
+        public static explicit operator checked int(in Rational value) => checked((int)(value.Numerator / value.Denominator));
+        public static explicit operator uint(in Rational value) => (uint)value.Numerator / (uint)value.Denominator;
+        public static explicit operator checked uint(in Rational value) => checked((uint)(value.Numerator / value.Denominator));
+        public static explicit operator nint(in Rational value) => (nint)value.Numerator / (nint)value.Denominator;
+        public static explicit operator checked nint(in Rational value) => checked((nint)value.Numerator) / (nint)value.Denominator;
+        public static explicit operator nuint(in Rational value) => (nuint)value.Numerator / (nuint)value.Denominator;
+        public static explicit operator checked nuint(in Rational value) => checked((nuint)value.Numerator) / (nuint)value.Denominator;
+        public static explicit operator long(in Rational value) => value.Numerator / value.Denominator;
+        public static explicit operator ulong(in Rational value) => (ulong)value.Numerator / (ulong)value.Denominator;
+        public static explicit operator checked ulong(in Rational value) => checked((ulong)value.Numerator) / (ulong)value.Denominator;
+        public static explicit operator Int128(in Rational value) => (Int128)value.Numerator / (Int128)value.Denominator;
+        public static explicit operator UInt128(in Rational value) => (UInt128)value.Numerator / (UInt128)value.Denominator;
+        public static explicit operator checked UInt128(in Rational value) => checked((UInt128)value.Numerator) / (UInt128)value.Denominator;
+        public static explicit operator Half(in Rational value) => (Half)value.Numerator / (Half)value.Denominator;
+        public static explicit operator checked Half(in Rational value) => checked((Half)value.Numerator) / checked((Half)value.Denominator);
+        public static explicit operator float(in Rational value) => (float)value.Numerator / value.Denominator;
+        public static explicit operator double(in Rational value) => (double)value.Numerator / value.Denominator;
+        public static explicit operator decimal(in Rational value) => (decimal)value.Numerator / value.Denominator;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private static bool CheckValue(Half value)
@@ -380,16 +333,80 @@ namespace LivreNoirLibrary.Numerics
             public Int128 Convert2Int128(decimal value) => (Int128)value;
         }
 
+        public static (long Numerator, long Denominator) LimitNumDen(long numerator, long denominator, ulong denLimit = DefaultConvertDenLimit)
+        {
+            var negative = numerator is < 0;
+            var num = (Int128)(negative ? -numerator : numerator);
+            var den = (Int128)denominator;
+            var limit = (Int128)denLimit;
+            if (num <= limit && den <= limit)
+            {
+                return (numerator, denominator);
+            }
+            Int128 p, q, r, s;
+            p = s = 0;
+            q = r = 1;
+            while (true)
+            {
+                var pr = p + r;
+                var qs = q + s;
+                if (pr > limit || qs > limit)
+                {
+                    break;
+                }
+                switch ((pr * den).CompareTo(num * qs))
+                {
+                    case 0:
+                        return ((long)pr, (long)qs);
+                    case -1:
+                        p = pr;
+                        q = qs;
+                        break;
+                    case 1:
+                        r = pr;
+                        s = qs;
+                        break;
+
+                }
+            }
+            /**
+             * a - pq = num/den - p/q
+             * rs - a = r/s - num/den
+             * 
+             * k = *den*q*s
+             * X = (a-pq)k = num*q*s - p*den*s
+             * Y = (rs-a)k = r*den*q - num*q*s
+             */
+            var a2 = num * q * s * 2;
+            var xx = p * den * s;
+            var yy = r * den * q;
+            if (a2 < (xx + yy))
+            {
+                return ((long)(negative ? -p : p), (long)q);
+            }
+            else
+            {
+                return ((long)(negative ? -r : r), (long)s);
+            }
+        }
+
+        public Rational LimitNumDen(ulong denLimit = DefaultConvertDenLimit)
+        {
+            var (n, d) = LimitNumDen(Numerator, Denominator, denLimit);
+            return new Rational(false, n, d);
+        }
+
         public Rational LimitDen(ulong denLimit = DefaultConvertDenLimit)
         {
-            var n = _numerator;
-            var negative = n is < 0;
-            var num = (Int128)(negative ? -n : n);
-            var den = (Int128)(_denominatorMinusOne + 1);
+            var numerator = Numerator;
+            var denominator = Denominator;
+            var negative = numerator is < 0;
+            var num = (Int128)(negative ? -numerator : numerator);
+            var den = (Int128)denominator;
             var limit = (Int128)denLimit;
             if (den <= limit)
             {
-                return this;
+                return (numerator, denominator);
             }
 
             // Reference: https://atcoder.jp/contests/abc333/editorial/7937
@@ -444,11 +461,11 @@ namespace LivreNoirLibrary.Numerics
             var yy = yn * den * xd;
             if (a2 < (xx + yy))
             {
-                return new(true, (long)(negative ? -xn : xn), (long)xd);
+                return ((long)(negative ? -xn : xn), (long)xd);
             }
             else
             {
-                return new(true, (long)(negative ? -yn : yn), (long)yd);
+                return ((long)(negative ? -yn : yn), (long)yd);
             }
         }
     }

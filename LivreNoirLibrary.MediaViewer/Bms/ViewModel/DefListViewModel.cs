@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Collections.Specialized;
@@ -25,7 +25,7 @@ namespace LivreNoirLibrary.Windows.Controls.Bms
             }
         }
 
-        public ArrayEnumerator<DefListItem> GetEnumerator() => new(_items, _count);
+        public ArrayEnumerator<DefListItem> GetEnumerator() => new(_items, 0, _count);
         IEnumerator<DefListItem> IEnumerable<DefListItem>.GetEnumerator() => GetEnumerator();
         IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 

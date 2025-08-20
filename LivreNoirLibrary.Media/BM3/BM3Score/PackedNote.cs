@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Runtime.InteropServices;
@@ -44,9 +44,9 @@ namespace LivreNoirLibrary.Media.BM3
          * , : 2
          * ; : 3
          * { : 8
-         * Ctrl : 4,5
-         * SdCh : 9,5
-         * Mark : 14,5
+         * Ctrl{ : 4,5
+         * SdCh{ : 9,5
+         * Mark{ : 14,5
          */
         private static readonly byte[] _bytes_cache = [.. "}-,;Ctrl{SdCh{Mark{"u8];
 

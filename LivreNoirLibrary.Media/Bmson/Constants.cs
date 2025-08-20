@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Text.Json.Serialization;
 using LivreNoirLibrary.Media.Bms;
@@ -13,6 +13,6 @@ namespace LivreNoirLibrary.Media.Bmson
         public const double DefaultTotal = 100;
         public const long DefaultResolution = 240;
 
-        public const decimal DefaultScrollRate = 1;
+        public const double DefaultRate = 1;
     }
 }

@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using LivreNoirLibrary.IO;
@@ -99,14 +99,14 @@ namespace LivreNoirLibrary.Media.Midi
 
         public SortKey GetSortKey(SortKeyType key1, SortKeyType key2, SortKeyType key3, int index) => new(GetSortKey(key1), GetSortKey(key2), GetSortKey(key3), index);
 
-        public double GetSortKey(SortKeyType type) => type switch
+        public float GetSortKey(SortKeyType type) => type switch
         {
             SortKeyType.NN => _nn,
             SortKeyType.NNI => -_nn,
             SortKeyType.Vel => _vel,
             SortKeyType.VelI => -_vel,
-            SortKeyType.Gate => (double)_length,
-            SortKeyType.GateI => -(double)_length,
+            SortKeyType.Gate => (float)_length,
+            SortKeyType.GateI => -(float)_length,
             _ => 0,
         };
 

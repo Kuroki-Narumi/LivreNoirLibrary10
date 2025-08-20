@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.IO.Compression;
@@ -157,7 +157,7 @@ namespace LivreNoirLibrary.Media.BM3
             {
                 foreach (var track in CollectionsMarshal.AsSpan(_tracks))
                 {
-                    track.Options.SwapSideChain(index, index - 1);
+                    track.Options.OnTrackIndexChanged(index, index - 1);
                 }
                 return true;
             }
@@ -170,7 +170,7 @@ namespace LivreNoirLibrary.Media.BM3
             {
                 foreach (var track in CollectionsMarshal.AsSpan(_tracks))
                 {
-                    track.Options.SwapSideChain(index, index + 1);
+                    track.Options.OnTrackIndexChanged(index, index + 1);
                 }
                 return true;
             }
@@ -184,7 +184,7 @@ namespace LivreNoirLibrary.Media.BM3
                 _tracks.RemoveAt(index);
                 foreach (var track in CollectionsMarshal.AsSpan(_tracks))
                 {
-                    track.Options.RemoveSideChain(index);
+                    track.Options.OnTrackRemoved(index);
                 }
                 return true;
             }
@@ -239,10 +239,10 @@ namespace LivreNoirLibrary.Media.BM3
 
             var options = Options.BmsConvertOptions;
             var data = BmsData.Create();
-            data.Genre = GetBasename(options.Genre);
-            data.Title = GetBasename(options.Title);
-            data.Artist = GetBasename(options.Artist);
-            data.ExtendConductor(this, GetLastPosition());
+            data.Headers.Genre = GetBasename(options.Genre);
+            data.Headers.Title = GetBasename(options.Title);
+            data.Headers.Artist = GetBasename(options.Artist);
+            data.ExtendConductor(this, this.GetLastPosition());
             if (!Options.SetupBar)
             {
                 data.InsertBar(0, 1);
@@ -290,10 +290,6 @@ namespace LivreNoirLibrary.Media.BM3
                 }
             }
             defId -= defInterval;
-            if (defId >= Constants.DefMax_Default)
-            {
-                target.Base = Constants.Base_Extended;
-            }
             return defId;
         }
     }

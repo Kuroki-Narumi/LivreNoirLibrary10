@@ -1,12 +1,12 @@
-﻿using System;
+using System;
 
 namespace LivreNoirLibrary.Media.Midi
 {
-    public readonly struct SortKey(double v1, double v2, double v3, int v4) : IComparable<SortKey>
+    public readonly struct SortKey(float v1, float v2, float v3, int v4) : IComparable<SortKey>
     {
-        private readonly double _v1 = v1;
-        private readonly double _v2 = v2;
-        private readonly double _v3 = v3;
+        private readonly float _v1 = v1;
+        private readonly float _v2 = v2;
+        private readonly float _v3 = v3;
         private readonly int _v4 = v4;
 
         public int CompareTo(SortKey other)

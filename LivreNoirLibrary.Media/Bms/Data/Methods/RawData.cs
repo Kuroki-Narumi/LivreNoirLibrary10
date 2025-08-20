@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
 using LivreNoirLibrary.Collections;
@@ -10,166 +10,6 @@ namespace LivreNoirLibrary.Media.Bms
 {
     public partial class BaseData
     {
-        internal void SetRawData(int bar, Channel channel, string data)
-        {
-            RawData.Set(bar, channel, data, Base);
-        }
-
-        private delegate void AddProc(BarPosition p, int id);
-
-        private void AddRational(DefType defType, int id, Action<Rational> addProc)
-        {
-            if (DefLists.GetInherited(defType, id) is string text && Rational.TryParse(text, out var value))
-            {
-                addProc(value);
-            }
-        }
-
-        internal void ExtractRawData(BaseData? parent = null)
-        {
-            ProcessInherit(parent, ExtractRawDataCore);
-        }
-
-        protected virtual void ExtractRawDataCore()
-        {
-            var raw = RawData;
-            var lastBar = RawData.LastBar;
-
-            int barNumber = 0;
-            var defaultBarLength = (Rational)Constants.DefaultBarLength;
-            var barLength = defaultBarLength;
-
-            HashSet<int> lastNote_ln = []; // LN-channel type
-            var lnobj = LnObj;
-
-            void ProcessAdd(ChannelData data, AddProc addProc)
-            {
-                var resolution = data.Length;
-                var basePos = barLength / resolution;
-                for (int k = 0; k < resolution; k++)
-                {
-                    if (data[k] is not 0)
-                    {
-                        addProc(new(barNumber, basePos * k), data[k]);
-                    }
-                }
-            }
-
-            for (; barNumber <= lastBar; barNumber++)
-            {
-                if (!raw.TryGetValue(barNumber, out var barData))
-                {
-                    continue;
-                }
-                // barLength
-                if (barData.Length is not 1)
-                {
-                    try
-                    {
-                        barLength = Rational.ConvertBySBT(barData.Length * Constants.DefaultBarLength, Constants.BarLengthDenominatorLimit);
-                        if (barLength.IsNegativeOrZero())
-                        {
-                            ExConsole.Write($"#CAUTION# bar length is too small ({barNumber.GetBarText()}: {barData.Length})");
-                            barLength = Rational.Epsilon;
-                        }
-                    }
-                    catch (OverflowException)
-                    {
-                        ExConsole.Write($"#CAUTION# bar length is too large ({barNumber.GetBarText()}: {barData.Length})");
-                        barLength = Rational.MaxValue;
-                    }
-                    Bars.Set(barNumber, barLength);
-                }
-                else
-                {
-                    barLength = defaultBarLength;
-                }
-                // bgm
-                var list = barData.Bgms;
-                var count = list.Count;
-                for (int i = 0; i < count; i++)
-                {
-                    ProcessAdd(list[i], (p, id) => AddNote(p, NoteType.Normal, -i, id));
-                }
-                // channel data
-                list = barData.Channels;
-                count = list.Count;
-                for (int i = 0; i < count; i++)
-                {
-                    var data = list[i];
-                    var ch = data.Channel;
-                    AddProc addProc;
-                    switch (ch)
-                    {
-                        case Channel.Bpm_Base:
-                            addProc = (p, id) => AddTempo(p, id);
-                            break;
-                        case Channel.Bpm:
-                            addProc = (p, id) => AddRational(DefType.Bpm, id, v => AddTempo(p, v));
-                            break;
-                        case Channel.Stop:
-                            addProc = (p, id) => AddRational(DefType.Stop, id, v => AddStop(p, BmsUtils.GetStopLength(v)));
-                            break;
-                        case Channel.Scroll:
-                            Root.UseExtendedConductor = true;
-                            addProc = (p, id) => AddRational(DefType.Scroll, id, v => AddScroll(p, v));
-                            break;
-                        case Channel.Speed:
-                            Root.UseExtendedConductor = true;
-                            addProc = (p, id) => AddRational(DefType.Speed, id, v => AddSpeed(p, v));
-                            break;
-                        default:
-                            var type = ch.GetNoteType();
-                            var lane = ch.GetLane();
-                            if (ch.IsLong())
-                            {
-                                addProc = (p, v) =>
-                                {
-                                    if (lastNote_ln.Remove(lane))
-                                    {
-                                        AddNote(p, NoteType.LongEnd, lane, v);
-                                    }
-                                    else
-                                    {
-                                        AddNote(p, NoteType.Normal, lane, v);
-                                        lastNote_ln.Add(lane);
-                                    }
-                                };
-                            }
-                            else if (ch.IsVisible())
-                            {
-                                addProc = (p, v) =>
-                                {
-                                    if (v == lnobj)
-                                    {
-                                        AddNote(p, NoteType.LongEnd, lane, 0);
-                                    }
-                                    else
-                                    {
-                                        AddNote(p, NoteType.Normal, lane, v);
-                                    }
-                                };
-                            }
-                            else
-                            {
-                                if (ch.IsExtendedBga())
-                                {
-                                    Root.UseExtendedBga = true;
-                                }
-                                addProc = (p, v) => AddNote(p, type, lane, v);
-                            }
-                            break;
-                    }
-                    ProcessAdd(data, addProc);
-                }
-            }
-            RawData.Clear();
-            DefLists.Remove(DefType.Bpm);
-            DefLists.Remove(DefType.Stop);
-            DefLists.Remove(DefType.Scroll);
-            DefLists.Remove(DefType.Speed);
-        }
-
         protected void CreateRawData()
         {
             var raw = RawData;
@@ -186,7 +26,7 @@ namespace LivreNoirLibrary.Media.Bms
             foreach (var (pos, note) in Timeline)
             {
                 var bar = raw.GetBar(pos.Bar);
-                var innerPos = pos.Beat / bars.Get(pos.Bar);
+                var innerPos = pos.Offset / bars.Get(pos.Bar);
                 var exist = lastNotes.TryGetValue(note.Lane, out var last);
                 var lane = note.Lane;
                 if (note.IsTempo())

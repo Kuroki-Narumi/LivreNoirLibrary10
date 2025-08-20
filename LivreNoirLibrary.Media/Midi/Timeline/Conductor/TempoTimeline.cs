@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using LivreNoirLibrary.Numerics;
@@ -66,9 +66,7 @@ namespace LivreNoirLibrary.Media.Midi
 
         public int Get(Rational position) => Get(position, DefaultTempo);
         public double GetBpm(Rational position) => TimeUtils.MicroSeconds2Bpm(Get(position));
-        public decimal GetBpmM(Rational position) => TimeUtils.MicroSeconds2BpmM(Get(position));
         public void SetBpm(Rational position, double value) => Set(position, TimeUtils.Bpm2MicroSeconds(value));
-        public void SetBpm(Rational position, decimal value) => Set(position, TimeUtils.Bpm2MicroSeconds(value));
 
         public IEnumerable<(Rational Position, double Value)> EachBpm()
         {

@@ -1,17 +1,32 @@
-﻿using System;
+using System;
 using System.Windows;
 
 namespace LivreNoirLibrary.Windows
 {
-    public class DragMoveOptions
+    public readonly struct DragMoveOptions(
+        double moveThreshold = DragMoveOptions.DefaultMoveThreshold,
+        double snapThreshold = DragMoveOptions.DefaultSnapThreshold,
+        RectChangedEventHandler? changing = null,
+        RectChangedEventHandler? finished = null
+        )
     {
         public const double DefaultMoveThreshold = 10;
         public const double DefaultSnapThreshold = 16;
 
-        public double MoveThreshold { get; set; } = DefaultMoveThreshold;
-        public double SnapThreshold { get; set; } = DefaultSnapThreshold;
+        private readonly double _moveThreshold = moveThreshold - DefaultMoveThreshold;
+        private readonly double _snapThreshold = snapThreshold - DefaultSnapThreshold;
 
-        public RectChangedEventHandler? Changing { get; set; }
-        public RectChangedEventHandler? Finished { get; set; }
+        public readonly double MoveThreshold => _moveThreshold + DefaultMoveThreshold;
+        public readonly double SnapThreshold => _snapThreshold + DefaultSnapThreshold;
+        public readonly RectChangedEventHandler? Changing = changing;
+        public readonly RectChangedEventHandler? Finished = finished;
+
+        public void Deconstruct(out double moveThreshold, out double snapThreshold, out RectChangedEventHandler? changing, out RectChangedEventHandler? finished)
+        {
+            moveThreshold = MoveThreshold;
+            snapThreshold = SnapThreshold;
+            changing = Changing;
+            finished = Finished;
+        }
     }
 }

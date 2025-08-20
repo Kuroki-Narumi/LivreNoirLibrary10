@@ -612,6 +612,54 @@ namespace LivreNoirLibrary.Collections
             }
         }
 
+        private static unsafe void ShiftLeftCore<T>(T* destination, int shiftCount, int length)
+            where T : unmanaged, IBinaryInteger<T>
+        {
+            var count = Vector<T>.Count;
+            var dstVec = (Vector<T>*)destination;
+            for (; length >= count; length -= count, dstVec++)
+            {
+                *dstVec <<= shiftCount;
+            }
+            destination = (T*)dstVec;
+            for (; length is > 0; length--, destination++)
+            {
+                *destination <<= shiftCount;
+            }
+        }
+
+        private static unsafe void ShiftRightArithmeticCore<T>(T* destination, int shiftCount, int length)
+            where T : unmanaged, IBinaryInteger<T>
+        {
+            var count = Vector<T>.Count;
+            var dstVec = (Vector<T>*)destination;
+            for (; length >= count; length -= count, dstVec++)
+            {
+                *dstVec >>= shiftCount;
+            }
+            destination = (T*)dstVec;
+            for (; length is > 0; length--, destination++)
+            {
+                *destination >>= shiftCount;
+            }
+        }
+
+        private static unsafe void ShiftRightLogicalCore<T>(T* destination, int shiftCount, int length)
+            where T : unmanaged, IBinaryInteger<T>
+        {
+            var count = Vector<T>.Count;
+            var dstVec = (Vector<T>*)destination;
+            for (; length >= count; length -= count, dstVec++)
+            {
+                *dstVec >>>= shiftCount;
+            }
+            destination = (T*)dstVec;
+            for (; length is > 0; length--, destination++)
+            {
+                *destination >>>= shiftCount;
+            }
+        }
+
         private static unsafe void NotCore<T>(T* destination, int length)
             where T : unmanaged, IBinaryInteger<T>
         {

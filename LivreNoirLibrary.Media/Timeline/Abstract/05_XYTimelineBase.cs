@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
@@ -83,7 +83,7 @@ namespace LivreNoirLibrary.Media
             for (int i = s; i < e; i++)
             {
                 var pos = p[i];
-                while (!_operator.Equals(_pos_list[index], pos)) { index++; }
+                while (_operator.Compare(_pos_list[index], pos) is not 0) { index++; }
                 RemovePosKey(key, index);
             }
         }
@@ -226,7 +226,7 @@ namespace LivreNoirLibrary.Media
 
         public sealed override void Move(TX from, TX to)
         {
-            if (_operator.Equals(from, to))
+            if (_operator.Compare(from, to) is 0)
             {
                 return;
             }
@@ -292,7 +292,7 @@ namespace LivreNoirLibrary.Media
 
         public void Move(TY key, TX from, TX to)
         {
-            if (_operator.Equals(from, to))
+            if (_operator.Compare(from, to) is 0)
             {
                 return;
             }
@@ -393,7 +393,7 @@ namespace LivreNoirLibrary.Media
                 var pos = p[i];
                 var newPos = add ? _operator.Add(pos, amount) : _operator.Subtract(pos, amount);
                 p[i] = newPos;
-                while (!_operator.Equals(_pos_list[index], pos)) { index++; }
+                while (_operator.Compare(_pos_list[index], pos) is not 0) { index++; }
                 RemovePosKey(key, index);
                 moveList.Add(pos);
             }

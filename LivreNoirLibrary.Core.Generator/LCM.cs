@@ -1,7 +1,7 @@
-﻿using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis;
 using System.Text;
 
-namespace LivreNoirLibrary.Core;
+namespace LivreNoirLibrary.Core.Generator;
 using static Utils;
 
 [Generator]

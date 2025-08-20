@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Buffers;
 using System.Collections;
 using System.Collections.Generic;
@@ -12,10 +12,10 @@ namespace LivreNoirLibrary.Collections
     public class SharedBuffer<T> : DisposableBase, IList<T>
     {
         public const int DefaultCapacity = 32;
-        protected static readonly bool IsRefType = RuntimeHelpers.IsReferenceOrContainsReferences<T>();
+        public static readonly bool IsRefType = RuntimeHelpers.IsReferenceOrContainsReferences<T>();
 
-        protected T[] _array;
-        protected int _size;
+        private T[] _array;
+        private int _size;
         protected readonly ReaderWriterLockSlim _lock = new(LockRecursionPolicy.SupportsRecursion);
 
         public int Capacity => _array.Length;

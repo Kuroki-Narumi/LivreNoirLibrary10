@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Numerics;
 using System.Runtime.CompilerServices;
 
@@ -45,7 +45,7 @@ namespace LivreNoirLibrary.Numerics
         public Rational Invert()
         {
             var num = _numerator;
-            var den = _denominatorMinusOne + 1;
+            var den = Denominator;
             if (den is <= 0)
             {
                 ThrowDivideByZeroException(DenominatorMustBeNonZero);

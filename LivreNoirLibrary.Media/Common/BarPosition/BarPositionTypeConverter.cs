@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics.CodeAnalysis;
@@ -48,7 +48,7 @@ namespace LivreNoirLibrary.Media
                 }
                 else if (destinationType == typeof(Rational))
                 {
-                    return v.Beat;
+                    return v.Offset;
                 }
                 else if (destinationType == typeof(string))
                 {

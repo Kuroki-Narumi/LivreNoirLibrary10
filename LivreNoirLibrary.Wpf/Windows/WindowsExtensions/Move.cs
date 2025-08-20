@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Windows;
 using System.Windows.Input;
 using Forms = System.Windows.Forms;
@@ -6,6 +6,7 @@ using DrPoint = System.Drawing.Point;
 using DrRect = System.Drawing.Rectangle;
 using LivreNoirLibrary.Windows.Input;
 using LivreNoirLibrary.Debug;
+using LivreNoirLibrary.Media;
 
 namespace LivreNoirLibrary.Windows
 {
@@ -107,18 +108,17 @@ namespace LivreNoirLibrary.Windows
             window.Top = y;
         }
 
-        public static void DragMoveWithSnap(this Window window, DragMoveOptions? options = null)
+        public static void DragMoveWithSnap(this Window window, DragMoveOptions options = default)
         {
             var rect = window.GetRect();
-            var bounds = GetScreenBounds(window);
-            var (initLeft, initTop, width, height) = rect;
+            var (limitLeft, limitTop, limitWidth, limitHeight) = GetScreenBounds(window);
+            var (initLeft, initTop, initWidth, initHeight) = rect;
             var (initCursorX, initCursorY) = GetCursorPos();
-
-            options ??= new();
-            var m_th = options.MoveThreshold;
-            var s_th = options.SnapThreshold;
-            var changing = options.Changing;
-            var finished = options.Finished;
+            var minX = limitLeft - initLeft;
+            var maxX = minX + limitWidth - initWidth;
+            var minY = limitTop - initTop;
+            var maxY = minY + limitHeight - initHeight;
+            var (m_th, s_th, changing, finished) = options;
 
             bool moving = false;
 
@@ -127,6 +127,14 @@ namespace LivreNoirLibrary.Windows
                 var pos = GetCursorPos();
                 var dX = pos.X - initCursorX;
                 var dY = pos.Y - initCursorY;
+                // スナップ
+                if (KeyInput.IsCtrlDown())
+                {
+                    dX = Math.Clamp(dX, minX, maxX);
+                    dY = Math.Clamp(dY, minY, maxY);
+                    RectSelection.ProcessSnap(ref dX, minX, maxX, 2, s_th);
+                    RectSelection.ProcessSnap(ref dY, minY, maxY, 2, s_th);
+                }
                 // 移動しきい値
                 if (!moving)
                 {
@@ -161,46 +169,8 @@ namespace LivreNoirLibrary.Windows
                     }
                 }
                 // 移動先の計算
-                var newX = initLeft + dX;
-                var newY = initTop + dY;
-                // スナップ
-                if (KeyInput.IsCtrlDown())
-                {
-                    newX -= bounds.X;
-                    newY -= bounds.Y;
-                    var pW = bounds.Width - window.Width;
-                    var pH = bounds.Height - window.Height;
-                    var pW2 = pW / 2;
-                    var pH2 = pH / 2;
-                    if (newX <= s_th)
-                    {
-                        newX = 0;
-                    }
-                    else if (newX >= pW - s_th)
-                    {
-                        newX = pW;
-                    }
-                    else if (newX >= pW2 - s_th && newX <= pW2 + s_th)
-                    {
-                        newX = pW2;
-                    }
-                    if (newY <= s_th)
-                    {
-                        newY = 0;
-                    }
-                    else if (newY >= pH - s_th)
-                    {
-                        newY = pH;
-                    }
-                    else if (newY >= pH2 - s_th && newY <= pH2 + s_th)
-                    {
-                        newY = pH2;
-                    }
-                    newX += bounds.X;
-                    newY += bounds.Y;
-                }
-                window.Left = newX;
-                window.Top = newY;
+                window.Left = initLeft + dX;
+                window.Top = initTop + dY;
                 changing?.Invoke(window, new(rect, window.GetRect()));
                 e.Handled = true;
             }

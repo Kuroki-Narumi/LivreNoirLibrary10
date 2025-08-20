@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Diagnostics.CodeAnalysis;
 using System.Windows;
 using System.Windows.Controls;
@@ -200,7 +200,7 @@ namespace LivreNoirLibrary.Windows.Controls.Bms
             return r + _quantize * (int)Math.Round((offset - d) / _scale_y / _quantize);
         }
 
-        public virtual BarPosition GetBarPosition(Rational beat) => new(0, beat);
+        public virtual BarPosition GetBarPosition(Rational absolutePosition) => new(0, absolutePosition);
 
         public void ScrollIntoView(Rational position, double ratio = 1.0, bool force = false)
         {

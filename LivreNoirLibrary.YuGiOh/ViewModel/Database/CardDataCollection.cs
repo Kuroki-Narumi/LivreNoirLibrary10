@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Runtime.InteropServices;
@@ -8,11 +8,8 @@ using LivreNoirLibrary.Text;
 
 namespace LivreNoirLibrary.YuGiOh.ViewModel
 {
-    public class CardDataCollection : ObservableSortedList<int, Card>, IJsonWriter
+    public class CardDataCollection : DataCollectionBase<int, Card>
     {
-        private readonly Dictionary<string, int> _name2idx = [];
-        private int _last_version = -1;
-
         protected override int GetKey(Card item) => item.Id;
 
         public void Load(List<Serializable.Card> source, CardPackCollection? packs)
@@ -38,56 +35,11 @@ namespace LivreNoirLibrary.YuGiOh.ViewModel
             NotifyCollectionReset();
         }
 
-        public void WriteJson(Utf8JsonWriter writer, JsonSerializerOptions options)
-        {
-            writer.WriteStartArray();
-            foreach (var item in CollectionsMarshal.AsSpan(_list))
-            {
-                JsonSerializer.Serialize(writer, item, options);
-            }
-            writer.WriteEndArray();
-        }
-
         public bool Contains(int id) => _key_list.Contains(id);
-
-        public void Update(Card card)
-        {
-            if (TryUpdate(card, out var index, out var current))
-            {
-                OnCollectionReplaced(current, current, index);
-            }
-            else
-            {
-                OnCollectionAdded(card, index);
-            }
-        }
-
-        public void UpdateWithoutNotify(Card card) => TryUpdate(card, out _, out _);
-
-        private bool TryUpdate(Card item, out int index, [MaybeNullWhen(false)] out Card current)
-        {
-            var key = GetKey(item);
-            index = _key_list.BinarySearch(key);
-            if (index is >= 0)
-            {
-                current = _list[index];
-                current.Update(item);
-                OnUpdate();
-                return true;
-            }
-            else
-            {
-                index = ~index;
-                current = default;
-                AddItem(index, item);
-                OnUpdate();
-                return false;
-            }
-        }
 
         public Card Get(int id)
         {
-            var index = _key_list.BinarySearch(id);
+            var index = IndexOfKey(id);
             Card card;
             if (index is >= 0)
             {
@@ -116,7 +68,7 @@ namespace LivreNoirLibrary.YuGiOh.ViewModel
 
         public bool TryGet(int id, [MaybeNullWhen(false)] out Card card)
         {
-            var index = _key_list.BinarySearch(id);
+            var index = IndexOfKey(id);
             if (index is >= 0)
             {
                 card = _list[index];
@@ -140,17 +92,7 @@ namespace LivreNoirLibrary.YuGiOh.ViewModel
             return false;
         }
 
-        private Dictionary<string, int> CheckUpdate()
-        {
-            if (_version != _last_version)
-            {
-                Refresh();
-                _last_version = _version;
-            }
-            return _name2idx;
-        }
-
-        public void Refresh()
+        public override void Refresh()
         {
             _name2idx.Clear();
             var c = _list.Count;

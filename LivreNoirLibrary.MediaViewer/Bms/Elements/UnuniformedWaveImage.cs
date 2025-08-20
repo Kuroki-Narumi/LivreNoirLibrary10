@@ -7,6 +7,7 @@ using LivreNoirLibrary.Media.Wave;
 using LivreNoirLibrary.Media.Bms;
 using LivreNoirLibrary.Numerics;
 using LivreNoirLibrary.Windows.Controls.Wave;
+using System.Numerics;
 
 namespace LivreNoirLibrary.Windows.Controls.Bms
 {
@@ -121,7 +122,7 @@ namespace LivreNoirLibrary.Windows.Controls.Bms
             return 0;
         }
 
-        protected override unsafe void RenderWaveImage(IWaveBuffer source, int* bitPtr, double offset, int top, int bottom, int bitmapWidth)
+        protected override unsafe void RenderWaveImage(IWaveBuffer source, uint* bitPtr, double offset, int top, int bottom, int bitmapWidth)
         {
             if (_timeCounter is not TimeCounter counter)
             {
@@ -136,7 +137,7 @@ namespace LivreNoirLibrary.Windows.Controls.Bms
             var cx = bitmapWidth / 2;
             var scaleY = (long)_scaleY;
             var position = _positionOffset;
-            var color = ColorOperation.ToInt(_color);
+            var color = ColorOperation.ToUInt(_color);
             var contentHeight = _bottom;
 
             // 参照する位置
@@ -158,13 +159,13 @@ namespace LivreNoirLibrary.Windows.Controls.Bms
                 // 描画するサンプル範囲の計算
                 var pos = GetPosition(offset + y + 1);
                 var length = lastPos - pos;
-                new Span<int>(bitPtr, bitmapWidth).Clear();
+                SimdOperations.Clear(bitPtr, bitmapWidth);
                 if (length is > 0)
                 {
                     var (min, max) = data.Slice(pos, length).MinMax();
                     var left = Math.Clamp(GetX(min), 0, cx - 1);
                     var right = Math.Clamp(GetX(max), cx, bitmapWidth);
-                    new Span<int>(bitPtr + left, right - left).Fill(color);
+                    SimdOperations.CopyFrom(bitPtr + left, color, right - left);
                 }
                 lastPos = pos;
             }

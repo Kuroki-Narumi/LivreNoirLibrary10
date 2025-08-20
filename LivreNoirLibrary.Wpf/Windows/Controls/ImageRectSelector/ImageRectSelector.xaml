@@ -1,11 +1,11 @@
-﻿<UserControl x:Class="LivreNoirLibrary.Windows.Controls.ImageRectSelector"
+<UserControl x:Class="LivreNoirLibrary.Windows.Controls.ImageRectSelector"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:LivreNoirLibrary.Windows.Controls"
              mc:Ignorable="d"
-             d:DesignHeight="450" d:DesignWidth="800" Background="White">
+             d:DesignHeight="450" d:DesignWidth="800" Background="White" FontSize="12">
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
@@ -27,60 +27,51 @@
                     <Setter Property="IsEditable" Value="True"/>
                 </Style>
                 <Style TargetType="local:RangeSlider">
+                    <Setter Property="Width" Value="150"/>
+                    <Setter Property="Minimum" Value="0"/>
                     <Setter Property="Margin" Value="4,2"/>
+                    <Setter Property="VerticalAlignment" Value="Center"/>
                 </Style>
                 <Style TargetType="local:IntTextBlock" BasedOn="{StaticResource RangeSlider_TextBox}">
                     <Setter Property="Margin" Value="2"/>
                     <Setter Property="MinWidth" Value="36"/>
+                    <Setter Property="Minimum" Value="0"/>
+                    <Setter Property="VerticalAlignment" Value="Center"/>
                 </Style>
             </Grid.Resources>
             <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="Auto"/>
                 <ColumnDefinition Width="Auto"/>
                 <ColumnDefinition Width="*"/>
                 <ColumnDefinition Width="Auto"/>
             </Grid.ColumnDefinitions>
             <StackPanel x:Name="LeftStackPanel" Grid.Column="0" HorizontalAlignment="Left" Orientation="Horizontal"/>
-            <StackPanel Grid.Column="1" Orientation="Horizontal">
-                <TextBlock x:Name="Text_Scale"/>
-                <ComboBox 
-                    x:Name="ComboBox_Scale" MaxWidth="100" PreviewMouseWheel="OnPreviewMouseWheel_Scale"
-                    Text="{Binding ScaleExpression, ElementName=SelectorView}"
-                    ItemsSource="{x:Static local:ImageRectSelectorView.ScaleExpressionList}"/>
-                <local:Button x:Name="Text_AutoScale" Click="OnClick_Scale_Auto"/>
-                <local:Button Content="100%" Click="OnClick_Scale_100"/>
-            </StackPanel>
-            <Grid Grid.Column="2">
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="Auto"/>
-                    <ColumnDefinition Width="*" MaxWidth="200"/>
-                    <ColumnDefinition Width="Auto"/>
-                    <ColumnDefinition Width="*" MaxWidth="200"/>
-                    <ColumnDefinition Width="Auto"/>
-                    <ColumnDefinition Width="Auto"/>
-                    <ColumnDefinition Width="Auto"/>
-                    <ColumnDefinition Width="Auto"/>
-                </Grid.ColumnDefinitions>
-                <TextBlock x:Name="Text_Horizontal" Grid.Column="0"/>
-                <local:RangeSlider 
-                    Grid.Column="1"
-                    Minimum="0" Maximum="{Binding Selection.OriginalWidth, ElementName=SelectorView}"
-                    Value1="{Binding Selection.Left, ElementName=SelectorView}" Value2="{Binding Selection.Right, ElementName=SelectorView}"/>
-                <TextBlock x:Name="Text_Vertical" Grid.Column="2"/>
-                <local:RangeSlider 
-                    Grid.Column="3"
-                    Minimum="0" Maximum="{Binding Selection.OriginalHeight, ElementName=SelectorView}"
-                    Value1="{Binding Selection.Top, ElementName=SelectorView}" Value2="{Binding Selection.Bottom, ElementName=SelectorView}"/>
-                <TextBlock x:Name="Text_Width" Grid.Column="4"/>
-                <local:IntTextBlock
-                    Grid.Column="5"
-                    Minimum="0" Maximum="{Binding Selection.OriginalWidth, ElementName=SelectorView}" Value="{Binding Selection.RectWidth, ElementName=SelectorView}"/>
-                <TextBlock x:Name="Text_Height" Grid.Column="6"/>
-                <local:IntTextBlock
-                    Grid.Column="7"
-                    Minimum="0" Maximum="{Binding Selection.OriginalHeight, ElementName=SelectorView}" Value="{Binding Selection.RectHeight, ElementName=SelectorView}"/>
-            </Grid>
-            <StackPanel x:Name="RightStackPanel" Grid.Column="3" Orientation="Horizontal"/>
+            <WrapPanel Grid.Column="1" Orientation="Horizontal">
+                <StackPanel Orientation="Horizontal">
+                    <TextBlock x:Name="Text_Scale"/>
+                    <ComboBox x:Name="ComboBox_Scale" MaxWidth="100" PreviewMouseWheel="OnPreviewMouseWheel_Scale" Text="{Binding ScaleExpression, ElementName=SelectorView}" ItemsSource="{x:Static local:ImageRectSelectorView.ScaleExpressionList}"/>
+                    <local:Button x:Name="Text_AutoScale" Click="OnClick_Scale_Auto"/>
+                    <local:Button Content="100%" Click="OnClick_Scale_100"/>
+                </StackPanel>
+                <StackPanel Orientation="Horizontal">
+                    <TextBlock x:Name="Text_Horizontal"/>
+                    <local:RangeSlider Maximum="{Binding OriginalWidth, ElementName=SelectorView}" Value1="{Binding SelectedLeft, ElementName=SelectorView}" Value2="{Binding SelectedRight, ElementName=SelectorView}"/>
+                </StackPanel>
+                <StackPanel Orientation="Horizontal">
+                    <TextBlock x:Name="Text_Vertical"/>
+                    <local:RangeSlider Maximum="{Binding OriginalHeight, ElementName=SelectorView}" Value1="{Binding SelectedTop, ElementName=SelectorView}" Value2="{Binding SelectedBottom, ElementName=SelectorView}"/>
+                </StackPanel>
+                <StackPanel Orientation="Horizontal">
+                    <TextBlock x:Name="Text_Width"/>
+                    <local:IntTextBlock Maximum="{Binding OriginalWidth, ElementName=SelectorView}" Value="{Binding SelectedWidth, ElementName=SelectorView}"/>
+                </StackPanel>
+                <StackPanel Orientation="Horizontal">
+                    <TextBlock x:Name="Text_Height"/>
+                    <local:IntTextBlock Maximum="{Binding OriginalHeight, ElementName=SelectorView}" Value="{Binding SelectedHeight, ElementName=SelectorView}"/>
+                </StackPanel>
+                <local:Button x:Name="Text_AutoRange" Click="OnClick_Range_Auto"/>
+                <TextBlock Margin="4" Text="{Binding AspectRatioExpression, ElementName=SelectorView}"/>
+            </WrapPanel>
+            <StackPanel x:Name="RightStackPanel" Grid.Column="2" Orientation="Horizontal"/>
         </Grid>
         <local:ImageRectSelectorView Grid.Row="1" x:Name="SelectorView"/>
     </Grid>

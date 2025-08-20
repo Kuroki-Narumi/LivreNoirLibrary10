@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
 
@@ -7,7 +7,7 @@ namespace LivreNoirLibrary.YuGiOh.ViewModel
     public class CheckableCardList : SortedCardWrapperList<CheckableCard>
     {
         public CheckableCardList() { }
-        public CheckableCardList(CheckableCardList list) => Load(list);
+        public CheckableCardList(CheckableCardList list) => this.Load(list);
         public CheckableCardList(IEnumerable<Card> list) => Load(list);
 
         public override void Add(Card card) => Add(new CheckableCard(card));

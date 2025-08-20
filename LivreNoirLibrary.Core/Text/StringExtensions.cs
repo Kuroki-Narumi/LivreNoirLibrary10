@@ -38,24 +38,40 @@ namespace LivreNoirLibrary.Text
 
         public static string Shared(this string text) => StringPool.Get(text);
 
-        public static int CompareByNaturalOrder(this string? left, string? right)
+        /// <summary>
+        /// Compares two <see cref="string"/>s and returns a value indicating whether one is less than, equal to, or greater than the other.
+        /// </summary>
+        /// <param name="x">The first object to compare.</param>
+        /// <param name="y">The second object to compare.</param>
+        /// <param name="isNullMinimum">If <see cref="bool">true</see>, an empty <see cref="string"/> is always considered minimum. Otherwise, it is maximum.</param>
+        /// <returns>
+        /// A signed integer that indicates the relative values of <paramref name="x"/> and <paramref name="y"/>, as shown in the following table.<br/>
+        /// <b>Value</b> - Meaning<br/>
+        /// <b>Less than zero</b> - <paramref name="x"/> is less than <paramref name="y"/>.<br/>
+        /// <b>Zero</b> - <paramref name="x"/> equals <paramref name="y"/>.<br/>
+        /// <b>Greater than zero</b> - <paramref name="x"/> is greater than <paramref name="y"/>.<br/>
+        /// </returns>
+        public static int CompareByNaturalOrder(this string? x, string? y, bool isNullMinimum = true)
         {
-            if (!string.IsNullOrEmpty(left))
+            if (string.IsNullOrEmpty(x))
             {
-                if (!string.IsNullOrEmpty(right))
+                if (string.IsNullOrEmpty(y))
                 {
-                    return StrCmpLogical(left, right);
+                    return 0;
                 }
                 else
                 {
-                    return 1;
+                    return isNullMinimum ? -1 : 1;
                 }
             }
-            else if (!string.IsNullOrEmpty(right))
+            else if (string.IsNullOrEmpty(y))
             {
-                return -1;
+                return isNullMinimum ? 1 : -1;
             }
-            return 0;
+            else
+            {
+                return StrCmpLogical(x, y);
+            }
         }
 
         [LibraryImport("shlwapi", EntryPoint = $"{nameof(StrCmpLogical)}W", StringMarshalling = StringMarshalling.Utf16)]

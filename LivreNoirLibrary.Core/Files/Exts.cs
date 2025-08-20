@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Text.RegularExpressions;
@@ -85,6 +85,7 @@ namespace LivreNoirLibrary.Files
         public const string MP3 = "mp3";
         public const string Flac = "flac";
         public const string Aiff = "aiff";
+        public const string Aif = "aif";
         public const string AAC = "aac";
 
         public const string Png = "png";
@@ -129,7 +130,7 @@ namespace LivreNoirLibrary.Files
 
         public static readonly string[] MidiExts = [Mid, Midi];
         public static readonly string[] AudioExts = [Wav, Wave, Vorbis, MP3];
-        public static readonly string[] ExAudioExts = [Wav, Wave, Vorbis, MP3, Flac, Aiff, AAC];
+        public static readonly string[] ExAudioExts = [Wav, Wave, Vorbis, MP3, Flac, Aiff, Aif, AAC];
         public static readonly string[] CompatibleImageExts = [Png, Bmp, Dib, Gif, Tif, Tiff];
         public static readonly string[] ImageExts = [Png, Bmp, Dib, Gif, Tif, Tiff, Jpg, Jpeg];
         public static readonly string[] ExImageExts = [Png, Bmp, Dib, Gif, Tif, Tiff, Jpg, Jpeg, Wmf, Ras, Eps, Pcs, Pcd, Tga];

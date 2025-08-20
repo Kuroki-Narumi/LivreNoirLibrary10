@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using LivreNoirLibrary.Numerics;
 
 namespace LivreNoirLibrary.Media
@@ -9,21 +9,18 @@ namespace LivreNoirLibrary.Media
 
         public static IBarPositionProvider Default { get; } = new DefaultProvider();
 
-        public BarPosition MaxBarPosition => BarPosition.MaxValue;
         public Rational GetBarLength(int number);
-        public Rational GetBeat(BarPosition positoin);
-        public BarPosition GetPosition(Rational beat);
+        public Rational GetAbsolutePosition(BarPosition position);
+        public BarPosition GetBarPosition(Rational absolutePosition);
 
         private sealed class DefaultProvider : IBarPositionProvider
         {
             public Rational GetBarLength(int number) => DefaultBarLength;
-
-            public Rational GetBeat(BarPosition position) => position.Bar + position.Beat;
-
-            public BarPosition GetPosition(Rational beat)
+            public Rational GetAbsolutePosition(BarPosition position) => position.Bar + position.Offset;
+            public BarPosition GetBarPosition(Rational absolutePosition)
             {
-                var bar = (long)beat;
-                var inner = beat - bar;
+                var bar = (long)absolutePosition;
+                var inner = absolutePosition - bar;
                 return new((int)bar, inner);
             }
         }

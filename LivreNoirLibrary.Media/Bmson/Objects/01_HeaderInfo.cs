@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using System.Text.Json.Serialization;
 using LivreNoirLibrary.Media.Bms;
 
@@ -31,7 +31,7 @@ namespace LivreNoirLibrary.Media.Bmson
         public int Level { get; set; }
 
         [JsonPropertyName("init_bpm")]
-        public decimal InitialBpm { get; set; }
+        public double InitialBpm { get; set; }
 
         [JsonIgnore]
         public double JudgeRank { get; set; } = Constants.DefaultJudgeRank;

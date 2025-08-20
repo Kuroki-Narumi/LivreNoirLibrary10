@@ -1,92 +1,117 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
 
 namespace LivreNoirLibrary.Collections
 {
+    using SliceEnumer = IEnumerable<(int Index, int Count)>;
+
     public static partial class CollectionExtensions
     {
-        public static IEnumerable<T[]> EachSlice<T>(this T[] array, int n)
+        public static SliceEnumer EachSlice(int n, int start, int count)
         {
             if (n is <= 0) { yield break; }
-            var len = array.Length;
-            var buffer = new T[n];
-            var max = len / n * n;
-            for (var i = 0; i < max; i += n)
+            var end = count / n * n;
+            count -= end;
+            for (var i = 0; i < end; i += n)
             {
-                Array.Copy(array, i, buffer, 0, n);
-                yield return buffer;
+                yield return (start + i, n);
             }
-            if (max < len)
+            if (count is > 0)
             {
-                yield return array[max..len];
+                yield return (start + end, count);
             }
         }
 
-        public static IEnumerable<T[]> EachGroup<T>(this T[] array, int n)
-        {
-            if (n is <= 0) { return []; }
-            var llen = (array.Length + n - 1) / n;
-            return EachSlice(array, llen);
-        }
-
-        public static IEnumerable<T[]> EachSlice<T>(this List<T> list, int n)
+        public static SliceEnumer EachCons(int n, int start, int count)
         {
             if (n is <= 0) { yield break; }
-            var len = list.Count;
-            var buffer = new T[n];
-            var max = len / n * n;
-            for (var i = 0; i < max; i += n)
+            if (count >= n)
             {
-                CollectionsMarshal.AsSpan(list)[i..(i + n)].CopyTo(buffer.AsSpan());
-                yield return buffer;
+                count -= n;
+                for (var i = 0; i <= count; i++)
+                {
+                    yield return (start + i, n);
+                }
             }
-            if (max < len)
+            else
             {
-                yield return CollectionsMarshal.AsSpan(list)[max..len].ToArray();
-            }
-        }
-
-        public static IEnumerable<T[]> EachSlice<T>(this IList<T> list, int n)
-        {
-            if (n is <= 0) { yield break; }
-            var len = list.Count;
-            var buffer = new T[n];
-            var max = len / n * n;
-            for (var i = 0; i < max; i += n)
-            {
-                Each_CopyToBuffer(list, buffer, i, n);
-                yield return buffer;
-            }
-            if (max < len)
-            {
-                n = len - max;
-                buffer = new T[n];
-                Each_CopyToBuffer(list, buffer, max, n);
-                yield return buffer;
+                yield return (start, count);
             }
         }
 
-        private static void Each_CopyToBuffer<T>(IList<T> source, T[] target, int i, int n)
+        public static SliceEnumer EachGroup(int n, int start, int count) => n is > 0 ? EachSlice((count + n - 1) / n, start, count) : [];
+
+        public static SliceEnumer EachSlice<T>(this T[] array, int n, int start = 0, int count = 0)
         {
-            for (var j = 0; j < n; j++)
-            {
-                target[j] = source[i + j];
-            }
+            SimdOperations.AdjustArgs(array.Length, ref start, ref count);
+            return EachSlice(n, start, count);
         }
 
-        public static IEnumerable<T[]> EachGroup<T>(this List<T> list, int n)
+        public static SliceEnumer EachCons<T>(this T[] array, int n, int start = 0, int count = 0)
         {
-            if (n is <= 0) { return []; }
-            var llen = (list.Count + n - 1) / n;
-            return EachSlice(list, llen);
+            SimdOperations.AdjustArgs(array.Length, ref start, ref count);
+            return EachCons(n, start, count);
         }
 
-        public static IEnumerable<T[]> EachGroup<T>(this IList<T> list, int n)
+        public static SliceEnumer EachGroup<T>(this T[] array, int n, int start = 0, int count = 0)
         {
-            if (n is <= 0) { return []; }
-            var llen = (list.Count + n - 1) / n;
-            return EachSlice(list, llen);
+            SimdOperations.AdjustArgs(array.Length, ref start, ref count);
+            return EachGroup(n, start, count);
+        }
+
+        public static SliceEnumer EachSlice<T>(this ICollection<T> collection, int n, int start = 0, int count = 0)
+        {
+            SimdOperations.AdjustArgs(collection.Count, ref start, ref count);
+            return EachSlice(n, start, count);
+        }
+
+        public static SliceEnumer EachCons<T>(this ICollection<T> collection, int n, int start = 0, int count = 0)
+        {
+            SimdOperations.AdjustArgs(collection.Count, ref start, ref count);
+            return EachCons(n, start, count);
+        }
+
+        public static SliceEnumer EachGroup<T>(this ICollection<T> collection, int n, int start = 0, int count = 0)
+        {
+            SimdOperations.AdjustArgs(collection.Count, ref start, ref count);
+            return EachGroup(n, start, count);
+        }
+
+        public static SliceEnumer EachSlice<T>(this Span<T> span, int n, int start = 0, int count = 0)
+        {
+            SimdOperations.AdjustArgs(span.Length, ref start, ref count);
+            return EachSlice(n, start, count);
+        }
+
+        public static SliceEnumer EachCons<T>(this Span<T> span, int n, int start = 0, int count = 0)
+        {
+            SimdOperations.AdjustArgs(span.Length, ref start, ref count);
+            return EachCons(n, start, count);
+        }
+
+        public static SliceEnumer EachGroup<T>(this Span<T> span, int n, int start = 0, int count = 0)
+        {
+            SimdOperations.AdjustArgs(span.Length, ref start, ref count);
+            return EachGroup(n, start, count);
+        }
+
+        public static SliceEnumer EachSlice<T>(this ReadOnlySpan<T> span, int n, int start = 0, int count = 0)
+        {
+            SimdOperations.AdjustArgs(span.Length, ref start, ref count);
+            return EachSlice(n, start, count);
+        }
+
+        public static SliceEnumer EachCons<T>(this ReadOnlySpan<T> span, int n, int start = 0, int count = 0)
+        {
+            SimdOperations.AdjustArgs(span.Length, ref start, ref count);
+            return EachCons(n, start, count);
+        }
+
+        public static SliceEnumer EachGroup<T>(this ReadOnlySpan<T> span, int n, int start = 0, int count = 0)
+        {
+            SimdOperations.AdjustArgs(span.Length, ref start, ref count);
+            return EachGroup(n, start, count);
         }
     }
 }

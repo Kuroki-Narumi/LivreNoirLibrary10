@@ -1,8 +1,8 @@
-﻿using System;
+using System;
 using System.Text;
 using Microsoft.CodeAnalysis;
 
-namespace LivreNoirLibrary.Core;
+namespace LivreNoirLibrary.Core.Generator;
 
 using static Utils;
 
@@ -36,6 +36,9 @@ internal class SimdOperations : IIncrementalGenerator
         GenerateCore(context, Code_Vector_Overload, Code_Vector_Ptr, methods, types);
         GenerateCore(context, Code_Scalar_Overload, Code_Scalar_Ptr, methods, types, suffix: "S");
         GenerateCore(context, Code_Unary_Overload, Code_Unary_Ptr, ["Not"], types);
+        methods = ["ShiftLeft", "ShiftRightLogical"];
+        GenerateCore(context, Code_Shift_Overload, Code_Shift_Ptr, methods, types);
+        GenerateCore(context, Code_Shift_Overload, Code_Shift_Ptr, ["ShiftRightArithmetic"], [SByte, Short, Int, IntPtr, Long]);
     }
 
     private static void GenerateCore(IncrementalGeneratorPostInitializationContext context, string overloadCode, string pointerCode, Span<string> methods, Span<string> types, string suffix = "")
@@ -340,6 +343,33 @@ namespace LivreNoirLibrary.Collections
     const string Code_Unary_Readonly_Ptr = $$"""
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static {{PH_Return}} {{PH_Method}}({{PH_Type}}* source, int length) => {{PH_Method}}Core(source, length);
+""";
+
+    const string Code_Shift_Overload = $$"""
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static void {{PH_Method}}(this {{PH_Destination}} destination, int shiftCount)
+        {
+            var dst = {{PH_DestinationConvert}};
+            fixed ({{PH_Type}}* dstPtr = dst)
+            {
+                {{PH_Method}}Core(dstPtr, shiftCount, dst.Length);
+            }
+        }
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static void {{PH_Method}}(this {{PH_Destination}} destination, int shiftCount, int offset, int length)
+        {
+            var dst = {{PH_DestinationConvert}};
+            AdjustArgs(dst.Length, ref offset, ref length);
+            fixed ({{PH_Type}}* dstPtr = dst)
+            {
+                {{PH_Method}}Core(dstPtr + offset, shiftCount, length);
+            }
+        }
+""";
+
+    const string Code_Shift_Ptr = $$"""
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static void {{PH_Method}}({{PH_Type}}* destination, int shiftCount, int length) => {{PH_Method}}Core(destination, shiftCount, length);
 """;
 
     const string Code_EqualsAll_Overload = $$"""

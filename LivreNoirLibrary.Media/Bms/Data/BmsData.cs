@@ -6,7 +6,7 @@ using LivreNoirLibrary.Text;
 
 namespace LivreNoirLibrary.Media.Bms
 {
-    public sealed partial class BmsData : BaseData
+    public sealed partial class BmsData : BaseData, IRootData
     {
         private readonly List<FlowContainer> _flows = [];
         private readonly List<FlowData> _flow_data = [];
@@ -17,8 +17,9 @@ namespace LivreNoirLibrary.Media.Bms
         public bool UseExtendedBga { get; internal set; }
 
         public override BmsData Root => this;
+        public BarLengthCache BarLengthCache { get; } = new();
         public ReadOnlySpan<FlowContainer> Flows => CollectionsMarshal.AsSpan(_flows);
-        public bool ContainsFlow => _flows.Count is > 0;
+        public ReadOnlySpan<FlowData> FlowData => CollectionsMarshal.AsSpan(_flow_data);
 
         public override void Clear()
         {

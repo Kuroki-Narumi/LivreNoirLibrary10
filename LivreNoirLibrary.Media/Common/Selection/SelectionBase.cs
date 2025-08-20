@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Runtime.InteropServices;
@@ -10,7 +10,7 @@ namespace LivreNoirLibrary.Media
     public abstract class SelectionBase<T> : RationalMultiTimeline<T>
         where T : ISelectionItem
     {
-        public void Add(T item) => Add(item.ActualPosition, item);
+        public void Add(T item) => Add(item.AbsolutePosition, item);
 
         public IEnumerable<T> EachItem()
         {
@@ -46,7 +46,7 @@ namespace LivreNoirLibrary.Media
                 return Rational.Zero;
             }
             var item = _value_list[0][0];
-            return item.ActualPosition;
+            return item.AbsolutePosition;
         }
 
         protected void ProcessDump(BinaryWriter writer, Rational offset, ValueWriter<T> valueWriter, string chid)

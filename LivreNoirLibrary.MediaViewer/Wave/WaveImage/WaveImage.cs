@@ -1,9 +1,10 @@
-﻿using System;
+using System;
 using System.Buffers;
 using LivreNoirLibrary.Numerics;
 using LivreNoirLibrary.Collections;
 using LivreNoirLibrary.Media.Wave;
 using LivreNoirLibrary.Windows.Controls.Wave;
+using LivreNoirLibrary.Media;
 
 namespace LivreNoirLibrary.Windows.Controls
 {
@@ -16,7 +17,7 @@ namespace LivreNoirLibrary.Windows.Controls
 
         private static double CoerceSamplesPerPixel(double value) => Math.Max(value, MinimumSamplesPerPixel);
 
-        protected override unsafe void RenderWaveImage(IWaveBuffer source, int* bitPtr, double offset, int top, int bottom, int bitmapWidth)
+        protected override unsafe void RenderWaveImage(IWaveBuffer source, uint* bitPtr, double offset, int top, int bottom, int bitmapWidth)
         {
             var channels = Math.Min(source.Channels, 2);
             var levelScale = LevelScale;
@@ -25,9 +26,9 @@ namespace LivreNoirLibrary.Windows.Controls
             var cx = bitmapWidth / 2;
 
             // 描画用のピクセルデータ
-            var colors = stackalloc int[2];
-            colors[0] = Bits_Red | Bits_Alpha;
-            colors[1] = Bits_Blue | Bits_Alpha;
+            var colors = stackalloc uint[2];
+            colors[0] = ColorOperation.Mask_Red | ColorOperation.Mask_Alpha;
+            colors[1] = ColorOperation.Mask_Blue | ColorOperation.Mask_Alpha;
 
             int GetX(float value) => (int)(value * levelScale) + cx;
 
@@ -38,7 +39,7 @@ namespace LivreNoirLibrary.Windows.Controls
                 for (var y = top; y < bottom; y++, bitPtr += bitmapWidth)
                 {
                     // この一列の内容をクリア
-                    new Span<int>(bitPtr, bitmapWidth).Clear();
+                    SimdOperations.Clear(bitPtr, bitmapWidth);
                     // 参照するサンプル位置
                     var pos = ((offset + y) * timeScale).RoundToInt();
                     for (int c = 0; c < channels; c++)
@@ -48,7 +49,7 @@ namespace LivreNoirLibrary.Windows.Controls
                         var (min, max) = bufferSpan.MinMax();
                         var left = Math.Clamp(GetX(min), 0, cx);
                         var right = Math.Clamp(GetX(max), cx, bitmapWidth);
-                        new Span<int>(bitPtr + left, right - left).Or(colors[c]);
+                        SimdOperations.Or(bitPtr + left, colors[c], right - left);
                     }
                 }
             }

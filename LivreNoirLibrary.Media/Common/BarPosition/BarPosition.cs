@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
@@ -14,62 +14,52 @@ namespace LivreNoirLibrary.Media
 {
     [JsonConverter(typeof(BarPositionJsonConverter))]
     [TypeConverter(typeof(BarPositionTypeConverter))]
-    public readonly partial struct BarPosition(int bar, Rational beat) : 
+    public readonly partial struct BarPosition(int bar, Rational offset) : 
         IEquatable<BarPosition>, IComparable<BarPosition>, IFormattable, IParsable<BarPosition>, IDumpable<BarPosition>,
-        IEqualityOperators<BarPosition, BarPosition, bool>, IComparisonOperators<BarPosition, BarPosition, bool>,
-        IAdditionOperators<BarPosition, BarPosition, BarPosition>, ISubtractionOperators<BarPosition, BarPosition, BarPosition>,
-        IAdditionOperators<BarPosition, Rational, BarPosition>, ISubtractionOperators<BarPosition, Rational, BarPosition>,
-        IAdditionOperators<BarPosition, long, BarPosition>, ISubtractionOperators<BarPosition, long, BarPosition>
+        IEqualityOperators<BarPosition, BarPosition, bool>, IComparisonOperators<BarPosition, BarPosition, bool>
     {
         public const int MaxNumber = short.MaxValue;
-        public const string TextFormat = "#{0:D3}";
+        public const string BarTextFormat = "#{0:D3}";
 
         public static readonly BarPosition Zero = new(0, Rational.Zero);
         public static readonly BarPosition Invalid = new(-1, Rational.Zero);
         public static readonly BarPosition MaxValue = new(MaxNumber, Rational.Zero);
 
         private readonly int _bar = bar;
-        private readonly Rational _beat = beat;
+        private readonly Rational _offset = offset;
 
         public int Bar => _bar;
-        public Rational Beat => _beat;
+        public Rational Offset => _offset;
 
         public BarPosition(int bar) : this(bar, Rational.Zero) { }
         public BarPosition(int bar, long beatNum, long beatDen = 1) : this(bar, new Rational(beatNum, beatDen)) { }
 
         public static implicit operator BarPosition(Rational value) => new(0, value);
 
-        public int CompareTo(BarPosition other) => _bar == other._bar ? _beat.CompareTo(other._beat) : _bar < other._bar ? -1 : 1;
-        public bool Equals(BarPosition other) => _bar == other._bar && _beat == other._beat;
+        public int CompareTo(BarPosition other) => _bar == other._bar ? _offset.CompareTo(other._offset) : _bar.CompareTo(other._bar);
+        public bool Equals(BarPosition other) => this == other;
         public override bool Equals(object? obj) => obj is BarPosition pos && Equals(pos);
-        public override int GetHashCode() => HashCode.Combine(_bar, _beat);
+        public override int GetHashCode() => HashCode.Combine(_bar, _offset);
 
-        public static bool operator ==(BarPosition left, BarPosition right) => left._bar == right._bar && left._beat == right._beat;
-        public static bool operator !=(BarPosition left, BarPosition right) => left._bar != right._bar || left._beat != right._beat;
-        public static bool operator <(BarPosition left, BarPosition right) => left._bar < right._bar || left._bar == right._bar && left._beat < right._beat;
-        public static bool operator <=(BarPosition left, BarPosition right) => left._bar < right._bar || left._bar == right._bar && left._beat <= right._beat;
-        public static bool operator >(BarPosition left, BarPosition right) => left._bar > right._bar || left._bar == right._bar && left._beat > right._beat;
-        public static bool operator >=(BarPosition left, BarPosition right) => left._bar > right._bar || left._bar == right._bar && left._beat >= right._beat;
+        public static bool operator ==(BarPosition left, BarPosition right) => left._bar == right._bar && left._offset == right._offset;
+        public static bool operator !=(BarPosition left, BarPosition right) => left._bar != right._bar || left._offset != right._offset;
+        public static bool operator <(BarPosition left, BarPosition right) => left._bar < right._bar || left._bar == right._bar && left._offset < right._offset;
+        public static bool operator <=(BarPosition left, BarPosition right) => left._bar < right._bar || left._bar == right._bar && left._offset <= right._offset;
+        public static bool operator >(BarPosition left, BarPosition right) => left._bar > right._bar || left._bar == right._bar && left._offset > right._offset;
+        public static bool operator >=(BarPosition left, BarPosition right) => left._bar > right._bar || left._bar == right._bar && left._offset >= right._offset;
 
-        public static BarPosition Max(in BarPosition x, in BarPosition y) => x < y ? y : x;
-        public static BarPosition Min(in BarPosition x, in BarPosition y) => x > y ? y : x;
+        public static BarPosition Max(BarPosition x, BarPosition y) => x < y ? y : x;
+        public static BarPosition Min(BarPosition x, BarPosition y) => x > y ? y : x;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static string GetBarText(int number) => string.Format(TextFormat, number);
-        public override string ToString() => $"{GetBarText(_bar)}:{_beat}";
+        public static string GetBarText(int number) => string.Format(BarTextFormat, number);
+        public override string ToString() => $"{GetBarText(_bar)}:{_offset}";
         public string ToString(string? format, IFormatProvider? formatProvider) => ToString();
-
-        public static BarPosition operator +(BarPosition left, BarPosition right) => new(left._bar + right._bar, left._beat + right._beat);
-        public static BarPosition operator +(BarPosition left, Rational right) => new(left._bar, left._beat + right);
-        public static BarPosition operator +(BarPosition left, long right) => new(left._bar, left._beat + right);
-        public static BarPosition operator -(BarPosition left, BarPosition right) => new(left._bar - right._bar, left._beat - right._beat);
-        public static BarPosition operator -(BarPosition left, Rational right) => new(left._bar, left._beat - right);
-        public static BarPosition operator -(BarPosition left, long right) => new(left._bar, left._beat - right);
 
         public void Dump(BinaryWriter writer)
         {
             writer.Write((short)_bar);
-            writer.Write(_beat);
+            writer.Write(_offset);
         }
 
         public static BarPosition Load(BinaryReader reader)
@@ -82,17 +72,15 @@ namespace LivreNoirLibrary.Media
         public void Deconstruct(out int bar, out Rational beat)
         {
             bar = _bar;
-            beat = _beat;
+            beat = _offset;
         }
 
         public void Deconstruct(out int bar, out long beatNumerator, out long beatDenominator)
         {
             bar = _bar;
-            beatNumerator = _beat.Numerator;
-            beatDenominator = _beat.Denominator;
+            beatNumerator = _offset.Numerator;
+            beatDenominator = _offset.Denominator;
         }
-
-        public BarPosition Reduct(IBarPositionProvider prov) => prov.GetPosition(prov.GetBeat(this));
 
         private static void ThrowFormatException(string message = "") => throw new FormatException(message);
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -137,7 +125,7 @@ namespace LivreNoirLibrary.Media
             return false;
         }
 
-        [GeneratedRegex(@"^\s*?(?:#?\s*?(?<bar>\d+)\s*?)(?::(?<beat>.+))?$")]
+        [GeneratedRegex(@"^\s*?(?:#\s*?(?<bar>\d+)\s*?)(?::(?<beat>.+))?$")]
         public static partial Regex BarPositionRegex { get; }
     }
 }

@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Text;
 using System.Linq;
@@ -105,7 +105,7 @@ namespace LivreNoirLibrary.Files
         public static readonly string Vorbis = Create(nameof(Vorbis), "OGG Vorbis", Exts.Vorbis);
         public static readonly string MP3 = Create(nameof(MP3), "MPEG-1 Audio Layer-3", Exts.MP3);
         public static readonly string Flac = Create(nameof(Flac), "Free Lossless Audio Codec", Exts.Flac);
-        public static readonly string Aiff = Create(nameof(Aiff), "Audio Interchange File Format", Exts.Aiff);
+        public static readonly string Aiff = Create(nameof(Aiff), "Audio Interchange File Format", Exts.Aiff, Exts.Aif);
         public static readonly string AAC = Create(nameof(AAC), "Advanced Audio Coding", Exts.AAC);
         public static readonly string Audio = Create(nameof(Audio), "Audio File", Exts.AudioExts);
         public static readonly string ExAudio = Create(nameof(ExAudio), "Audio File", Exts.ExAudioExts);

@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Drawing;
 using System.Text;
 using LivreNoirLibrary.Numerics;
@@ -27,7 +27,7 @@ namespace LivreNoirLibrary.Windows.Controls.Bms
 
         public string IndexText => _text;
         public string BarText => Position.Bar.GetBarText();
-        public string BeatText => Position.Beat.ToString();
+        public string BeatText => Position.Offset.ToString();
         public string LaneText => Lane.GetLaneName();
 
         public bool IsSelected

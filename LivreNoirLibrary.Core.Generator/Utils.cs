@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 
 namespace LivreNoirLibrary.Core
 {
@@ -26,11 +26,14 @@ namespace LivreNoirLibrary.Core
         public static readonly string[] BinaryInteger = [Byte, SByte, Short, UShort, Int, UInt, IntPtr, UIntPtr, Long, ULong];
         public static readonly string[] Signed = [SByte, Short, Int, IntPtr, Long, Float, Double];
         public static readonly string[] Integer = [Int, UInt, Long, ULong, Int128, UInt128];
+        public static readonly string[] Comparable = [Byte, SByte, Short, UShort, Int, UInt, Long, ULong, Float, Double, Decimal, Rational];
 
         public const string PH_Target = "#TARGET#";
         public const string PH_Return = "#RETURN#";
         public const string PH_Method = "#METHOD#";
         public const string PH_Type = "#TYPE#";
+        public const string PH_Type1 = "#TYPE1#";
+        public const string PH_Type2 = "#TYPE2#";
         public const string PH_Destination = "#D-TYPE#";
         public const string PH_Source = "#S-TYPE#";
         public const string PH_DestinationConvert = "#D-CONVERT#";

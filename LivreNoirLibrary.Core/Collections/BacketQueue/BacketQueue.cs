@@ -59,7 +59,7 @@ namespace LivreNoirLibrary.Collections
 
         protected virtual void OnClear() { }
 
-        public bool SetCapacity(int size)
+        public bool EnsureCapacity(int size)
         {
             var current = _array.Length;
             if (size <= current)
@@ -109,7 +109,7 @@ namespace LivreNoirLibrary.Collections
             {
                 if (AutoResize)
                 {
-                    SetCapacity(_size + 1);
+                    EnsureCapacity(_size + 1);
                 }
                 var buffer = _array;
                 var tail = _tail;

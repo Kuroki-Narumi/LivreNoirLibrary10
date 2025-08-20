@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Runtime.InteropServices;
@@ -23,7 +23,7 @@ namespace LivreNoirLibrary.Media.BM3
             bars.Clear();
             data.Timeline.RemoveIf((_, item) => item.IsTempo() || item.IsStop());
             TempoTimeline conductor = new(score);
-            data.Bpm = conductor.GetBpmM(Rational.Zero);
+            data.Headers.Bpm = conductor.GetBpm(Rational.Zero);
             var @enum = conductor.GetEnumerator();
             var exists = @enum.MoveNext();
             foreach (var info in score.EachBar(length))
@@ -37,10 +37,10 @@ namespace LivreNoirLibrary.Media.BM3
                 {
                     var (pos, tempo) = @enum.Current;
                     if (pos >= limit) { break; }
-                    var bpm = TimeUtils.MicroSeconds2BpmM(tempo);
+                    var bpm = TimeUtils.MicroSeconds2Bpm(tempo);
                     if (pos.IsZero())
                     {
-                        data.Bpm = bpm;
+                        data.Headers.Bpm = bpm;
                     }
                     else
                     {

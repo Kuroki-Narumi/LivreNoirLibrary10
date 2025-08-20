@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Text.Json.Serialization;
 using LivreNoirLibrary.ObjectModel;
@@ -31,11 +31,11 @@ namespace LivreNoirLibrary.YuGiOh.ViewModel
         {
             NumberedCard w = new(card, card.GetNumber(_productId));
             var key = GetKey(w);
-            var index = _key_list.BinarySearch(key);
+            var index = IndexOfKey(key);
             if (index is < 0)
             {
                 index = ~index;
-                AddItem(index, w);
+                InsertItem(index, key, w);
                 OnCollectionAdded(w, index);
             }
         }
@@ -43,12 +43,10 @@ namespace LivreNoirLibrary.YuGiOh.ViewModel
         internal void AddWithoutNotify(Card card)
         {
             NumberedCard w = new(card, card.GetNumber(_productId));
-            var key = GetKey(w);
-            var index = _key_list.BinarySearch(key);
+            var (key, index) = GetKeyAndIndex(w);
             if (index is < 0)
             {
-                index = ~index;
-                AddItem(index, w);
+                InsertItem(~index, key, w);
             }
         }
 

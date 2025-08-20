@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 
 namespace LivreNoirLibrary.Collections
 {
@@ -6,8 +6,8 @@ namespace LivreNoirLibrary.Collections
         where TIn : allows ref struct
         where TSelf : IBacket<TIn, TSelf>
     {
-        public static abstract TSelf Create(TIn input);
-        public void SetData(TIn input);
+        public static abstract TSelf Create(in TIn input);
+        public void SetData(in TIn input);
         public void ClearData();
     }
 }

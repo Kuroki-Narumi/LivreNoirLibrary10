@@ -1,4 +1,4 @@
-﻿using LivreNoirLibrary.Collections;
+using LivreNoirLibrary.Collections;
 using LivreNoirLibrary.Text;
 using System;
 using System.Collections.Generic;
@@ -7,11 +7,8 @@ using System.Text.Json;
 
 namespace LivreNoirLibrary.YuGiOh.ViewModel
 {
-    public class CardPackCollection : ObservableSortedList<(DateTime, string), CardPack>, IJsonWriter
+    public class CardPackCollection : DataCollectionBase<(DateTime, string), CardPack>
     {
-        private readonly Dictionary<string, int> _id2idx = [];
-        private int _last_version = -1;
-
         protected override (DateTime, string) GetKey(CardPack item) => (item.Date, item.ProductId);
 
         public void Load(List<Serializable.CardPack> source)
@@ -27,16 +24,6 @@ namespace LivreNoirLibrary.YuGiOh.ViewModel
                 _key_list.Add(GetKey(pack));
             }
             NotifyCollectionReset();
-        }
-
-        public void WriteJson(Utf8JsonWriter writer, JsonSerializerOptions options)
-        {
-            writer.WriteStartArray();
-            foreach (var item in CollectionsMarshal.AsSpan(_list))
-            {
-                JsonSerializer.Serialize(writer, item, options);
-            }
-            writer.WriteEndArray();
         }
 
         public bool Contains(string pid) => CheckUpdate().ContainsKey(pid);
@@ -78,7 +65,7 @@ namespace LivreNoirLibrary.YuGiOh.ViewModel
                 pid = $"{pid}e";
             }
             var key = (date, pid);
-            var index = _key_list.BinarySearch(key);
+            var index = IndexOfKey(key);
             CardPack pack;
             if (index is >= 0)
             {
@@ -92,30 +79,20 @@ namespace LivreNoirLibrary.YuGiOh.ViewModel
                     Name = pname,
                     ProductId = pid,
                 };
-                AddItem(~index, pack);
+                InsertItem(~index, key, pack);
             }
             card.PackInfo.Add(new() { ProductId = pid, Number = number });
             pack.Add(card);
         }
 
-        private Dictionary<string, int> CheckUpdate()
+        public override void Refresh()
         {
-            if (_version != _last_version)
-            {
-                Refresh();
-                _last_version = _version;
-            }
-            return _id2idx;
-        }
-
-        private void Refresh()
-        {
-            _id2idx.Clear();
+            _name2idx.Clear();
             var c = _list.Count;
             for (int i = 0; i < c; i++)
             {
                 var id = _list[i].ProductId;
-                _id2idx.TryAdd(id, i);
+                _name2idx.TryAdd(id, i);
             }
         }
     }

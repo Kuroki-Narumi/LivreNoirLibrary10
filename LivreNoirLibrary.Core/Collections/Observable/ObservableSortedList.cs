@@ -1,30 +1,18 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Diagnostics.CodeAnalysis;
-using System.Runtime.InteropServices;
 
 namespace LivreNoirLibrary.Collections
 {
-    public abstract class ObservableSortedList<TKey, TValue> : ObservableCollectionBase<TValue>
+    public abstract class ObservableSortedList<TKey, TValue> : ObservableCollectionBase<TValue>, ICollection<TValue>
         where TKey : IComparable<TKey>
     {
         protected readonly IComparer<TKey>? _comparer = null;
         protected readonly List<TKey> _key_list = [];
 
-        public TValue this[int index]
-        {
-            get
-            {
-                if ((uint)index < (uint)_list.Count)
-                {
-                    return _list[index];
-                }
-                throw new ArgumentOutOfRangeException(nameof(index));
-            }
-        }
+        public TValue this[int index] => GetItemAt(index);
 
-        public ObservableSortedList(IComparer<TKey>? comparer = null) : base()
+        public ObservableSortedList(IComparer<TKey>? comparer = null) : base(0)
         {
             _comparer = comparer;
         }
@@ -34,18 +22,23 @@ namespace LivreNoirLibrary.Collections
             _comparer = comparer;
         }
 
-        public ObservableSortedList(IEnumerable<TValue> collection, IComparer<TKey>? comparer = null) : base()
+        public ObservableSortedList(IEnumerable<TValue> collection, IComparer<TKey>? comparer = null) : base(0)
         {
             _comparer = comparer;
-            foreach (var item in collection.OrderBy(GetKey))
+            foreach (var item in collection)
             {
-                _list.Add(item);
-                _key_list.Add(GetKey(item));
+                AddWithoutNotify(item);
             }
         }
 
         protected abstract TKey GetKey(TValue item);
         public sealed override int IndexOf(TValue item) => IndexOfKey(GetKey(item));
+        public (TKey Key, int Index) GetKeyAndIndex(TValue item)
+        {
+            var key = GetKey(item);
+            var index = IndexOfKey(key);
+            return (key, index);
+        }
 
         public bool ContainsKey(TKey key) => (uint)IndexOfKey(key) < (uint)_key_list.Count;
         public int IndexOfKey(TKey key) => _key_list.BinarySearch(key, _comparer);
@@ -62,6 +55,19 @@ namespace LivreNoirLibrary.Collections
             return false;
         }
 
+        public void Add(TValue item, out int index)
+        {
+            AddItem(item, out var replaced, out index, out var oldItem);
+            if (replaced)
+            {
+                OnCollectionReplaced(item, oldItem, index);
+            }
+            else
+            {
+                OnCollectionAdded(item, index);
+            }
+        }
+
         public bool RemoveKey(TKey key)
         {
             if (TryRemoveKey(key, out var index, out var current))
@@ -72,56 +78,168 @@ namespace LivreNoirLibrary.Collections
             return false;
         }
 
-        protected sealed override bool TryAdd(TValue item, out int index, [MaybeNullWhen(false)] out TValue current) => AddOrReplace(item, out index, out current);
-
-        protected override bool AddRangeCore(IEnumerable<TValue> items)
-        {
-            switch (items)
-            {
-                case TValue[] ary:
-                    foreach (var item in ary)
-                    {
-                        AddOrReplace(item, out _, out _);
-                    }
-                    return ary.Length is > 0;
-                case List<TValue> list:
-                    foreach (var item in CollectionsMarshal.AsSpan(list))
-                    {
-                        AddOrReplace(item, out _, out _);
-                    }
-                    return list.Count is > 0;
-                case IList<TValue> list:
-                    var c = list.Count;
-                    for (var i = 0; i < c; i++)
-                    {
-                        AddOrReplace(list[i], out _, out _);
-                    }
-                    return list.Count is > 0;
-                default:
-                    var flag = false;
-                    foreach (var item in items)
-                    {
-                        flag = true;
-                        AddOrReplace(item, out _, out _);
-                    }
-                    return flag;
-            }
-        }
-
-        protected override bool AddRangeCore(ReadOnlySpan<TValue> items)
-        {
-            foreach (var item in items)
-            {
-                AddOrReplace(item, out _, out _);
-            }
-            return items.Length is > 0;
-        }
-
         public bool RemoveKeyWithoutNotify(TKey key) => TryRemoveKey(key, out _, out _);
+
+        /// <inheritdoc cref="List{T}.AddRange"/>
+        public void AddRange(IEnumerable<TValue> collection)
+        {
+            foreach (var item in collection)
+            {
+                AddItem(item, out _, out _, out _);
+            }
+            OnCollectionReset();
+        }
+
+        /// <inheritdoc cref="System.Collections.Generic.CollectionExtensions.AddRange"/>
+        public void AddRange(params ReadOnlySpan<TValue> source)
+        {
+            foreach (var item in source)
+            {
+                AddItem(item, out _, out _, out _);
+            }
+            OnCollectionReset();
+        }
+
+        public int RemoveRange(IEnumerable<TValue> collection)
+        {
+            var count = 0;
+            foreach (var item in collection)
+            {
+                if (RemoveItem(item) is >= 0)
+                {
+                    count++;
+                }
+            }
+            if (count is > 0)
+            {
+                OnCollectionReset();
+            }
+            return count;
+        }
+
+        public int RemoveRange(params ReadOnlySpan<TValue> source)
+        {
+            var count = 0;
+            foreach (var item in source)
+            {
+                if (RemoveItem(item) is >= 0)
+                {
+                    count++;
+                }
+            }
+            if (count is > 0)
+            {
+                OnCollectionReset();
+            }
+            return count;
+        }
+
+        public int RemoveKeys(IEnumerable<TKey> collection)
+        {
+            var count = 0;
+            foreach (var item in collection)
+            {
+                if (TryRemoveKey(item, out _, out _))
+                {
+                    count++;
+                }
+            }
+            if (count is > 0)
+            {
+                OnCollectionReset();
+            }
+            return count;
+        }
+
+        public int RemoveKeys(params ReadOnlySpan<TKey> source)
+        {
+            var count = 0;
+            foreach (var item in source)
+            {
+                if (TryRemoveKey(item, out _, out _))
+                {
+                    count++;
+                }
+            }
+            if (count is > 0)
+            {
+                OnCollectionReset();
+            }
+            return count;
+        }
+
+        public int RemoveAll(Func<TKey, TValue, bool> match)
+        {
+            var count = 0;
+            for (var i = 0; i < _list.Count;)
+            {
+                if (match(_key_list[i], _list[i]))
+                {
+                    RemoveItem(i);
+                    count++;
+                }
+                else
+                {
+                    i++;
+                }
+            }
+            if (count is > 0)
+            {
+                OnCollectionReset();
+            }
+            return count;
+        }
+
+        protected override void ClearItems()
+        {
+            _key_list.Clear();
+            base.ClearItems();
+        }
+
+        protected override void AddItem(TValue item, out bool replaced, out int index, out TValue? oldItem)
+        {
+            (var key, index) = GetKeyAndIndex(item);
+            if (index is >= 0)
+            {
+                replaced = true;
+                oldItem = _list[index];
+                _list[index] = item;
+            }
+            else
+            {
+                index = ~index;
+                replaced = false;
+                oldItem = default;
+                InsertItem(index, key, item);
+            }
+        }
+
+        protected override int RemoveItem(TValue item)
+        {
+            var (_, index) = GetKeyAndIndex(item);
+            if (index is >= 0 && Equals(_list[index], item))
+            {
+                RemoveItem(index);
+                return index;
+            }
+            return -1;
+        }
+
+        protected void InsertItem(int index, TKey key, TValue item)
+        {
+            _list.Insert(index, item);
+            _key_list.Insert(index, key);
+        }
+
+        protected void RemoveItem(int index)
+        {
+            _list.RemoveAt(index);
+            _key_list.RemoveAt(index);
+        }
 
         protected bool TryRemoveKey(TKey key, out int index, [MaybeNullWhen(false)] out TValue current)
         {
-            index = _key_list.BinarySearch(key);
+            index = IndexOfKey(key);
             if (index is >= 0)
             {
                 current = _list[index];
@@ -130,24 +248,6 @@ namespace LivreNoirLibrary.Collections
             }
             current = default;
             return false;
-        }
-
-        protected sealed override void ClearItems()
-        {
-            _key_list.Clear();
-            base.ClearItems();
-        }
-
-        protected override void AddItem(int index, TValue item)
-        {
-            _key_list.Insert(index, GetKey(item));
-            base.AddItem(index, item);
-        }
-
-        protected override void RemoveItem(int index)
-        {
-            _key_list.RemoveAt(index);
-            base.RemoveItem(index);
         }
     }
 }

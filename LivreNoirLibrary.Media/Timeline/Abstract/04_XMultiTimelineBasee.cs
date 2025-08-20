@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
@@ -243,7 +243,7 @@ namespace LivreNoirLibrary.Media
             {
                 var pos = _pos_list[i];
                 var newPos = converter(pos);
-                if (_operator.Equals(pos, newPos)) { continue; }
+                if (_operator.Compare(pos, newPos) is 0) { continue; }
                 if (!move.TryGetValue(newPos, out var mList))
                 {
                     mList = [];
@@ -273,7 +273,7 @@ namespace LivreNoirLibrary.Media
 
         public void MoveIf(TX from, TX to, Predicate<TValue> predicate)
         {
-            if (_operator.Equals(from, to))
+            if (_operator.Compare(from, to) is 0)
             {
                 return;
             }

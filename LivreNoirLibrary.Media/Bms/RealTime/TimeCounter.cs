@@ -15,9 +15,9 @@ namespace LivreNoirLibrary.Media.Bms
         private readonly List<Rational> _second_list = [];
         private readonly List<Second2BeatItem> _second_item_list = [];
 
-        public TimeCounter(BaseData data)
+        public TimeCounter(IBmsData data)
         {
-            var tempo = (Rational)data.Bpm;
+            var tempo = (Rational)data.Headers.Bpm;
             var rZero = Rational.Zero;
             var lastBeat = rZero;
             var spb = 240 / tempo;
@@ -49,7 +49,7 @@ namespace LivreNoirLibrary.Media.Bms
                 var stopExists = !curStop.IsZero();
                 if (tempoChanged || stopExists)
                 {
-                    var beat = data.GetBeat(pos);
+                    var beat = data.GetAbsolutePosition(pos);
                     second += spb * (beat - lastBeat);
                     lastBeat = beat;
                     if (tempoChanged)

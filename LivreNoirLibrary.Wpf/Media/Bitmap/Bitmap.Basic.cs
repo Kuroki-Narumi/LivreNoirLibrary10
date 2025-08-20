@@ -1,9 +1,13 @@
-﻿using System;
+using LivreNoirLibrary.Collections;
+using LivreNoirLibrary.Debug;
+using System;
+using System.Buffers;
+using System.Numerics;
+using System.Reflection;
+using System.Runtime.CompilerServices;
 using System.Windows;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
-using System.Numerics;
-using System.Runtime.CompilerServices;
 
 namespace LivreNoirLibrary.Media
 {
@@ -45,14 +49,14 @@ namespace LivreNoirLibrary.Media
 
         public static unsafe byte* GetPtr(this WriteableBitmap bitmap) => (byte*)bitmap.BackBuffer;
         public static unsafe byte* GetPtr(this WriteableBitmap bitmap, int x, int y) => (byte*)bitmap.BackBuffer + x * 4 + y * bitmap.BackBufferStride;
-        public static unsafe int* GetIntPtr(this WriteableBitmap bitmap) => (int*)bitmap.BackBuffer;
-        public static unsafe int* GetIntPtr(this WriteableBitmap bitmap, int x, int y) => (int*)bitmap.BackBuffer + x + y * bitmap.PixelWidth;
+        public static unsafe uint* GetUIntPtr(this WriteableBitmap bitmap) => (uint*)bitmap.BackBuffer;
+        public static unsafe uint* GetUIntPtr(this WriteableBitmap bitmap, int x, int y) => (uint*)bitmap.BackBuffer + x + y * bitmap.PixelWidth;
 
         public static unsafe Color GetPixel(this WriteableBitmap bitmap, int x, int y)
         {
             if ((uint)x < (uint)bitmap.PixelWidth || (uint)y <= (uint)bitmap.PixelHeight)
             {
-                var ptr = GetIntPtr(bitmap, x, y);
+                var ptr = GetUIntPtr(bitmap, x, y);
                 return ColorOperation.ToColor(*ptr);
             }
             else
@@ -68,8 +72,8 @@ namespace LivreNoirLibrary.Media
                 bitmap.Lock();
                 try
                 {
-                    var ptr = GetIntPtr(bitmap, x, y);
-                    *ptr = ColorOperation.ToInt(color);
+                    var ptr = GetUIntPtr(bitmap, x, y);
+                    *ptr = ColorOperation.ToUInt(color);
                 }
                 finally
                 {
@@ -81,37 +85,90 @@ namespace LivreNoirLibrary.Media
 
         public static unsafe void Clear(this WriteableBitmap bitmap)
         {
-            bitmap.Lock();
-            try
-            {
-                new Span<int>(GetIntPtr(bitmap), bitmap.PixelWidth * bitmap.PixelHeight).Clear();
-            }
-            finally
-            {
-                bitmap.AddDirtyRect();
-                bitmap.Unlock();
-            }
+            using var ptr = new BitmapPointer(bitmap);
+            SimdOperations.Clear(GetUIntPtr(bitmap), bitmap.PixelWidth * bitmap.PixelHeight);
         }
 
         public static unsafe void Clear(this WriteableBitmap bitmap, int x, int y, int width, int height)
         {
             AdjustRect(bitmap, ref x, ref y, ref width, ref height);
-            bitmap.Lock();
-            try
+            using var ptr = new BitmapPointer(bitmap);
+            for (var yy = 0; yy < height; yy++)
             {
-                var offset = GetIntPtr(bitmap, x, y);
-                for (var yy = 0; yy < height; yy++)
-                {
-                    new Span<int>(GetIntPtr(bitmap, x, y + yy), width).Clear();
-                }
-            }
-            finally
-            {
-                bitmap.AddDirtyRect(new(x, y, width, height));
-                bitmap.Unlock();
+                SimdOperations.Clear(ptr.AsUIntSpan(y + yy, x, width));
             }
         }
 
         public static void Clear(this WriteableBitmap bitmap, Int32Rect rect) => Clear(bitmap, rect.X, rect.Y, rect.Width, rect.Height);
+
+        public static unsafe Int32Rect GetOpaqueRect(this BitmapSource bitmap, byte threshold = 0)
+        {
+            if (bitmap is WriteableBitmap w)
+            {
+                return GetOpaqueRect((uint*)w.BackBuffer, bitmap.PixelWidth, bitmap.PixelHeight, threshold);
+            }
+            var stride = bitmap.PixelWidth * 4;
+            var height = bitmap.PixelHeight;
+            var buffer = ArrayPool<byte>.Shared.Rent(stride * height);
+            try
+            {
+                fixed (byte* ptr = buffer)
+                {
+                    bitmap.CopyPixels(GetRect(bitmap), (nint)ptr, stride * height, stride);
+                    return GetOpaqueRect((uint*)ptr, bitmap.PixelWidth, bitmap.PixelHeight, threshold);
+                }
+            }
+            finally
+            {
+                ArrayPool<byte>.Shared.Return(buffer);
+            }
+        }
+
+        public static unsafe Int32Rect GetOpaqueRect(uint* pointer, int width, int height, uint threshold)
+        {
+            var left = width;
+            var right = 0;
+            var top = -1;
+            var bottom = -1;
+            threshold <<= 24; // Alphaの位置にビットシフト
+            for (var y = 0; y < height; y++)
+            {
+                var currentLeft = -1;
+                var currentRight = -1;
+                for (var x = 0; x < width; x++, pointer++)
+                {
+                    if (*pointer > threshold)
+                    {
+                        if (currentLeft is -1)
+                        {
+                            currentLeft = x;
+                        }
+                        currentRight = x;
+                    }
+                }
+                // 不透明ピクセルがあった場合
+                if (currentLeft is not -1)
+                {
+                    // 左右端の更新
+                    left = Math.Min(left, currentLeft);
+                    right = Math.Max(right, currentRight);
+                    // 上下端の更新
+                    if (top is -1)
+                    {
+                        top = y;
+                    }
+                    bottom = y;
+                }
+            }
+            // 全て透明
+            if (top is -1)
+            {
+                return new(0, 0, 0, 0);
+            }
+            else
+            {
+                return new(left, top, right - left + 1, bottom - top + 1);
+            }
+        }
     }
 }

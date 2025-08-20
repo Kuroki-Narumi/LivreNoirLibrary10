@@ -93,6 +93,7 @@ namespace LivreNoirLibrary.Collections
 
         public Span<T> AsSpan() => _ptr is null ? [] : new(_ptr, _size);
         public Span<T> AsSpan(int index) => Slice(index);
+        public Span<T> AsSpan(Index index) => Slice(index);
         public Span<T> AsSpan(int index, int count) => Slice(index, count);
         public Span<T> AsSpan(Index index, int count) => Slice(index, count);
 
@@ -124,6 +125,8 @@ namespace LivreNoirLibrary.Collections
                 return ThrowOutOfRange(index);
             }
         }
+
+        public Span<T> Slice(Index index) => Slice(index.GetOffset(_size));
 
         public Span<T> Slice(int index, int count)
         {
@@ -165,6 +168,8 @@ namespace LivreNoirLibrary.Collections
                 ThrowOutOfRange(index);
             }
         }
+
+        public void Clear(Index index) => Clear(index.GetOffset(_size));
 
         public void Clear(int index, int count)
         {

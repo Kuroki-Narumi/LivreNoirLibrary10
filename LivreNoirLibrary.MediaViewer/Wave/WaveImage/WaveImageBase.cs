@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Windows.Media;
 using LivreNoirLibrary.Media;
 using LivreNoirLibrary.Media.Wave;
@@ -92,7 +92,7 @@ namespace LivreNoirLibrary.Windows.Controls.Wave
             {
                 bitmap.Lock();
                 // ピクセル(4byte)単位で操作するためのポインタ
-                var bitPtr = (int*)bitmap.BackBuffer;
+                var bitPtr = (uint*)bitmap.BackBuffer;
                 var top = 0;
                 var bottom = h;
                 // 前回描画した部分と重複する領域の除外
@@ -140,7 +140,7 @@ namespace LivreNoirLibrary.Windows.Controls.Wave
             }
         }
 
-        protected virtual unsafe void RenderWaveImage(IWaveBuffer source, int* bitPtr, double offset, int top, int bottom, int bitmapWidth)
+        protected virtual unsafe void RenderWaveImage(IWaveBuffer source, uint* bitPtr, double offset, int top, int bottom, int bitmapWidth)
         {
         }
     }

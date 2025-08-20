@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.IO;
 using LivreNoirLibrary.IO;
 using LivreNoirLibrary.Numerics;
@@ -7,7 +7,7 @@ namespace LivreNoirLibrary.Media
 {
     public interface ISelectionItem
     {
-        public Rational ActualPosition { get; }
+        public Rational AbsolutePosition { get; }
         public void ReplaceToClone();
     }
 }

@@ -11,15 +11,16 @@ namespace LivreNoirLibrary.Media.Bms
         [GeneratedRegex(@"(?<title>.+)(?<chart>\[\w+\]|\(\w+\)|{\w+}|<\w+>)$")]
         private static partial Regex Regex_ChartName { get; }
 
-        public Bmson.BmsonData ConvertToBmson(long resolution = 0, ILaneConverter? converter = null, Predicate<Note>? noteSelector = null)
+        public static Bmson.BmsonData ConvertToBmson(BmsData source, long resolution = 0, ILaneConverter? converter = null, Predicate<Note>? noteSelector = null)
         {
             Bmson.BmsonData data = new();
-            var keyType = Root.GetKeyType();
+            var keyType = source.Root.GetKeyType();
             converter ??= ILaneConverter.GetAuto(keyType);
             noteSelector ??= n => true;
             // header info
             var info = data.Info;
-            var title = Title ?? "";
+            var headers = source.Headers;
+            var title = headers.Title ?? "";
             var match = Regex_ChartName.Match(title);
             if (match.Success)
             {
@@ -30,26 +31,26 @@ namespace LivreNoirLibrary.Media.Bms
             {
                 info.Title = title;
             }
-            info.SubTitle = SubTitle;
-            info.Artist = Artist;
-            var str = SubArtist;
+            info.SubTitle = headers.SubTitle;
+            info.Artist = headers.Artist;
+            var str = headers.SubArtist;
             if (!string.IsNullOrEmpty(str))
             {
                 info.SubArtists = [str];
             }
-            info.Genre = Genre;
+            info.Genre = headers.Genre;
             info.ModeHint = keyType;
-            info.Level = PlayLevel;
-            info.InitialBpm = Bpm;
-            info.JudgeRank = ExRank;
-            info.Total = CalcTotal() * 100 / BmsUtils.CalcTotal(GetNotesCount());
-            info.LnType = LnMode;
-            info.BannerImage = Headers.GetActual(HeaderType.Banner);
-            info.EyecatchImage = Headers.GetActual(HeaderType.StageFile);
-            info.PreviewMusic = Headers.GetActual(HeaderType.Preview);
+            info.Level = headers.PlayLevel;
+            info.InitialBpm = headers.Bpm;
+            info.JudgeRank = headers.ExRank;
+            info.Total = source.CalcTotal() * 100 / BmsUtils.CalcTotal(source.GetNotesCount());
+            info.LnType = headers.LnMode;
+            info.BannerImage = headers.Banner;
+            info.EyecatchImage = headers.StageFile;
+            info.PreviewMusic = headers.Preview;
             if (resolution is <= 0)
             {
-                resolution = CalcResolution();
+                resolution = (long)source.CalcResolution();
                 if (resolution % 4 is 0)
                 {
                     resolution /= 4;
@@ -67,7 +68,7 @@ namespace LivreNoirLibrary.Media.Bms
             var bga_layer = BmsUtils.GetLane(Channel.Bga_Layer1);
             var bga_poor = BmsUtils.GetLane(Channel.Bga_Poor);
             Bmson.BgaInfo bga = new();
-            if (DefLists.TryGetValue(DefType.Bmp, out var defList))
+            if (source.DefLists.TryGetValue(DefType.Bmp, out var defList))
             {
                 List<Bmson.BgaHeader> list = [];
                 foreach (var (id, name) in defList)
@@ -84,7 +85,7 @@ namespace LivreNoirLibrary.Media.Bms
             List<Bmson.RateEvent> speedList = [];
             List<Bmson.Note>? GetNoteList(int id)
             {
-                var name = DefLists.Get(DefType.Wav, id);
+                var name = source.DefLists.Get(DefType.Wav, id);
                 if (!string.IsNullOrEmpty(name))
                 {
                     if (!soundList.TryGetValue(id, out var list))
@@ -97,13 +98,13 @@ namespace LivreNoirLibrary.Media.Bms
                 return null;
             }
             var lastBar = 0;
-            foreach (var (pos, list) in Timeline.EachList())
+            foreach (var (pos, list) in source.Timeline.EachList())
             {
                 lastBar = pos.Bar;
-                var time = Convert(GetBeat(pos));
-                decimal tempo = 0;
-                decimal scroll = 0;
-                decimal speed = 0;
+                var time = Convert(source.GetAbsolutePosition(pos));
+                var tempo = 0d;
+                var scroll = 0d;
+                var speed = 0d;
                 var totalStop = Rational.Zero;
                 foreach (var note in CollectionsMarshal.AsSpan(list))
                 {

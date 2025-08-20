@@ -1,5 +1,6 @@
 using LivreNoirLibrary.Debug;
 using LivreNoirLibrary.Media.Midi.RawData;
+using LivreNoirLibrary.Media.Wave.Chunks;
 using LivreNoirLibrary.Numerics;
 using LivreNoirLibrary.Text;
 using System;
@@ -139,6 +140,14 @@ namespace LivreNoirLibrary.Media.Bms.RawData
             {
                 ExtractRawData(state);
             }
+            foreach (var state in CollectionsMarshal.AsSpan(_states))
+            {
+                var defList = state.Data.DefLists;
+                defList.Remove(DefType.Bpm);
+                defList.Remove(DefType.Stop);
+                defList.Remove(DefType.Scroll);
+                defList.Remove(DefType.Speed);
+            }
             return _root;
         }
 
@@ -149,6 +158,7 @@ namespace LivreNoirLibrary.Media.Bms.RawData
             return state;
         }
 
+        private delegate void AddProc(BarPosition p, int id);
         private void ExtractRawData(ParseState state)
         {
             var data = state.Data;
@@ -158,6 +168,29 @@ namespace LivreNoirLibrary.Media.Bms.RawData
 
             HashSet<int> lastNote_ln = []; // LN-channel
             var lnobj = data.Headers.LnObj;
+
+            void ProcessAdd(int number, ChannelData data, AddProc addProc)
+            {
+                var resolution = data.Length;
+                for (var k = 0; k < resolution; k++)
+                {
+                    if (data[k] is not 0)
+                    {
+                        addProc(new(number, k, resolution), data[k]);
+                    }
+                }
+            }
+            void AddNote(BarPosition pos, NoteType type, int lane, int id)
+            {
+                timeline.Add(pos, new(type, lane, id));
+            }
+            void AddMeta(DefType defType, int id, Action<Rational> addProc)
+            {
+                if (defList.GetInherited(defType, id) is string text && Rational.TryParse(text, out var value))
+                {
+                    addProc(value);
+                }
+            }
 
             foreach (var (number, bar) in state.RawData)
             {
@@ -180,7 +213,77 @@ namespace LivreNoirLibrary.Media.Bms.RawData
                     }
                     bars.Set(number, barLength);
                 }
-
+                var list = bar.Bgms;
+                var count = list.Count;
+                for (var i = 0; i < count; i++)
+                {
+                    ProcessAdd(number, list[i], (p, id) => AddNote(p, NoteType.Normal, -i, id));
+                }
+                // channel data
+                list = bar.Channels;
+                count = list.Count;
+                for (var i = 0; i < count; i++)
+                {
+                    var line = list[i];
+                    var ch = line.Channel;
+                    AddProc addProc;
+                    switch (ch)
+                    {
+                        case Channel.Bpm_Base:
+                            addProc = (p, id) => timeline.Add(p, Note.Tempo(id));
+                            break;
+                        case Channel.Bpm:
+                            addProc = (p, id) => AddMeta(DefType.Bpm, id, v => timeline.Add(p, Note.Tempo(v)));
+                            break;
+                        case Channel.Stop:
+                            addProc = (p, id) => AddMeta(DefType.Stop, id, v => timeline.Add(p, Note.Stop(BmsUtils.GetStopLength(v))));
+                            break;
+                        case Channel.Scroll:
+                            addProc = (p, id) => AddMeta(DefType.Scroll, id, v => timeline.Add(p, Note.Scroll(v)));
+                            break;
+                        case Channel.Speed:
+                            addProc = (p, id) => AddMeta(DefType.Speed, id, v => timeline.Add(p, Note.Speed(v)));
+                            break;
+                        default:
+                            var type = ch.GetNoteType();
+                            var lane = ch.GetLane();
+                            if (ch.IsLong())
+                            {
+                                addProc = (p, v) =>
+                                {
+                                    if (lastNote_ln.Remove(lane))
+                                    {
+                                        AddNote(p, NoteType.LongEnd, lane, v);
+                                    }
+                                    else
+                                    {
+                                        AddNote(p, NoteType.Normal, lane, v);
+                                        lastNote_ln.Add(lane);
+                                    }
+                                };
+                            }
+                            else if (ch.IsVisible())
+                            {
+                                addProc = (p, v) =>
+                                {
+                                    if (v == lnobj)
+                                    {
+                                        AddNote(p, NoteType.LongEnd, lane, 0);
+                                    }
+                                    else
+                                    {
+                                        AddNote(p, NoteType.Normal, lane, v);
+                                    }
+                                };
+                            }
+                            else
+                            {
+                                addProc = (p, v) => AddNote(p, type, lane, v);
+                            }
+                            break;
+                    }
+                    ProcessAdd(number, line, addProc);
+                }
             }
         }
 
@@ -237,12 +340,6 @@ namespace LivreNoirLibrary.Media.Bms.RawData
         private void AddComment(string text)
         {
             _comment_builder.AppendLine(text.Trim());
-        }
-
-        private void AddHeader(Match match)
-        {
-            ForceEndFlow();
-            _current?.Data.Headers.SetAuto(match.Groups[1].Value, match.Groups[2].Value.Trim());
         }
 
         private void AddDef(DefType type, Match match)
@@ -373,7 +470,11 @@ namespace LivreNoirLibrary.Media.Bms.RawData
         public void Parse_Bar(Match match) => AddBar(match);
         public void Parse_Channel(Match match) => AddBar(match);
         public void Parse_Base(Match match) { }
-        public void Parse_Header(Match match) => AddHeader(match);
+        public void Parse_Header(Match match)
+        {
+            ForceEndFlow();
+            _current?.Data.Headers.SetAuto(match.Groups[1].Value, match.Groups[2].Value.Trim());
+        }
 
         [GeneratedRegex(@"^\s*$")]
         private static partial Regex GR_Empty { get; }

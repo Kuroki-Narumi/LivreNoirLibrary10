@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Globalization;
 using System.Runtime.CompilerServices;
 
@@ -111,7 +111,7 @@ namespace LivreNoirLibrary.Numerics
 
         public string ToMixedString()
         {
-            var den = _denominatorMinusOne + 1;
+            var den = Denominator;
             if (den is 1)
             {
                 return $"{_numerator}";

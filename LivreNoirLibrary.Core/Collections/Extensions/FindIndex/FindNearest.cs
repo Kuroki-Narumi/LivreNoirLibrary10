@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Numerics;
@@ -180,7 +180,7 @@ namespace LivreNoirLibrary.Collections
                     {
                         var v1 = list[lower];
                         var v2 = list[upper];
-                        if (comparer.IsCloser(v1, v2, value))
+                        if (comparer.IsXCloserThanY(v1, v2, value))
                         {
                             actualValue = v1;
                             index = lower;
@@ -249,7 +249,7 @@ namespace LivreNoirLibrary.Collections
                     {
                         var v1 = span[lower];
                         var v2 = span[upper];
-                        if (comparer.IsCloser(v1, v2, value))
+                        if (comparer.IsXCloserThanY(v1, v2, value))
                         {
                             actualValue = v1;
                             index = lower;

@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using LivreNoirLibrary.Collections;
 
@@ -24,14 +24,12 @@ namespace LivreNoirLibrary.YuGiOh.ViewModel
             return result;
         }
 
-        public (CardList, CardList) Split(int count)
-        {
-            CardList left = [], right = [];
-            CopyTo(left, 0, count);
-            CopyTo(right, count, Count - count);
-            return (left, right);
-        }
-
         public IEnumerable<Card> EnumCards() => _list;
+
+        public void Load(IEnumerable<Card> source)
+        {
+            ClearWithoutNotify();
+            AddRange(source);
+        }
     }
 }

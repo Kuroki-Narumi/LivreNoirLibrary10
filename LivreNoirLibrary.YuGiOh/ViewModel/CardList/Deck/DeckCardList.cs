@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Runtime.InteropServices;
@@ -50,7 +50,7 @@ namespace LivreNoirLibrary.YuGiOh.ViewModel
         {
             CountedCard? item = null;
             var key = GetKey(card);
-            var index = _key_list.BinarySearch(key);
+            var index = IndexOfKey(key);
             if (index is >= 0)
             {
                 var current = _list[index];
@@ -78,7 +78,7 @@ namespace LivreNoirLibrary.YuGiOh.ViewModel
                 {
                     item.Count = count;
                 }
-                AddItem(index, item);
+                InsertItem(index, key, item);
                 OnCollectionAdded(item, index);
             }
             UpdateCount();
@@ -98,7 +98,7 @@ namespace LivreNoirLibrary.YuGiOh.ViewModel
         public bool TryGet(Card card, [MaybeNullWhen(false)] out CountedCard item)
         {
             var key = GetKey(card);
-            var index = _key_list.BinarySearch(key);
+            var index = IndexOfKey(key);
             if (index is >= 0)
             {
                 item = _list[index];
@@ -147,8 +147,7 @@ namespace LivreNoirLibrary.YuGiOh.ViewModel
             {
                 var key = source._key_list[i];
                 var value = source._list[i];
-                _key_list.Add(key);
-                _list.Add(new(value.Card, value.Count));
+                InsertItem(_list.Count, key, new(value.Card, value.Count));
             }
             NotifyCollectionReset();
         }
@@ -166,7 +165,7 @@ namespace LivreNoirLibrary.YuGiOh.ViewModel
         internal void AddWithoutNotify(Card card)
         {
             var key = GetKey(card);
-            var index = _key_list.BinarySearch(key);
+            var index = IndexOfKey(key);
             if (index is >= 0)
             {
                 _list[index].Count += 1;
@@ -183,7 +182,7 @@ namespace LivreNoirLibrary.YuGiOh.ViewModel
                 {
                     item.Count = 1;
                 }
-                AddItem(index, item);
+                InsertItem(index, key, item);
             }
         }
     }

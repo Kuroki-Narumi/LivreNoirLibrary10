@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.InteropServices;
@@ -8,6 +8,7 @@ using System.Windows;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using LivreNoirLibrary.Media;
+using LivreNoirLibrary.Collections;
 
 namespace LivreNoirLibrary.Windows.Controls.Bms
 {
@@ -40,7 +41,10 @@ namespace LivreNoirLibrary.Windows.Controls.Bms
             {
                 var source = NoteRectRenderer.GetTextSource(text);
                 bitmap = Bitmap.Create(source);
-                bitmap.Multiply(_textColor);
+                using (var ptr = new BitmapPointer(bitmap))
+                {
+                    ptr.AsUIntSpan().And(ColorOperation.ToUInt(_textColor));
+                }
                 _source_cache.Add(text, bitmap);
             }
             return bitmap;

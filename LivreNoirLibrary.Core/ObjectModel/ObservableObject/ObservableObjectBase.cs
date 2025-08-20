@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
@@ -9,13 +9,13 @@ namespace LivreNoirLibrary.ObjectModel
     public abstract class ObservableObjectBase : INotifyPropertyChanged
     {
         private static readonly Dictionary<string, PropertyChangedEventArgs> _args_cache = [];
-        private static readonly Func<string, PropertyChangedEventArgs> _args_create = n => new(n);
+        private readonly Func<string, PropertyChangedEventArgs> _args_create = n => new(n);
 
-        public static PropertyChangedEventArgs GetPropertyChangedEventArgs(string propertyName) => _args_cache.GetOrAdd(propertyName, _args_create);
+        public PropertyChangedEventArgs GetPropertyChangedEventArgs(string propertyName) => _args_cache.GetOrAdd(propertyName, _args_create);
 
         public event PropertyChangedEventHandler? PropertyChanged;
 
-        protected virtual bool SetProperty<T>(ref T field, T value, [CallerMemberName] string propertyName = "")
+        protected virtual bool SetProperty<T>(ref T field, T value, [CallerMemberName] string propertyName = "", params ReadOnlySpan<string> relatedProperties)
         {
             if (Equals(field, value))
             {
@@ -23,6 +23,10 @@ namespace LivreNoirLibrary.ObjectModel
             }
             field = value;
             SendPropertyChanged(propertyName);
+            foreach (var prop in relatedProperties)
+            {
+                SendPropertyChanged(prop);
+            }
             return true;
         }
 

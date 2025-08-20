@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using LivreNoirLibrary.Text;
 using LivreNoirLibrary.ObjectModel;
@@ -85,7 +85,7 @@ namespace LivreNoirLibrary.Media.BM3
             return flag;
         }
 
-        public void SwapSideChain(int index1, int index2)
+        public void OnTrackIndexChanged(int index1, int index2)
         {
             var sc = _sideChainSources;
             var flag1 = sc.Remove(index1);
@@ -100,7 +100,7 @@ namespace LivreNoirLibrary.Media.BM3
             }
         }
 
-        public void RemoveSideChain(int index)
+        public void OnTrackRemoved(int index)
         {
             SortedSet<int> sc = [];
             foreach (var item in _sideChainSources)

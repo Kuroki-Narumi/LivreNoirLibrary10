@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.IO;
 using LivreNoirLibrary.Collections;
 
@@ -8,8 +8,8 @@ namespace LivreNoirLibrary.Media
     {
         public static abstract T Zero { get; }
 
-        /// <inheritdoc cref="IComparer{T1,T2}.Equals"/>
-        public bool Equals(T x, T y);
+        /// <inheritdoc cref="IComparer{T1,T2}.Compare"/>
+        public int Compare(T x, T y);
 
         /// <summary>
         /// 

@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Windows;
 using System.Windows.Controls;
@@ -26,15 +26,11 @@ namespace LivreNoirLibrary.Windows.Controls
         [DependencyProperty(SetterScope = ObjectModel.Scope.Private)]
         private int _maxFrame = 0;
 
-        private Int32Animation? _gif_animation;
-        private GifBitmapDecoder? _gif_decoder;
+        private Int32Animation? _animation;
+        private BitmapDecoder? _decoder;
         private readonly List<int> _timings = [];
 
-        public new ImageSource? Source
-        {
-            get => GetValue(SourceProperty) as ImageSource;
-            set => SetValue(SourceProperty, value);
-        }
+        public new ImageSource? Source { get => GetValue(SourceProperty) as ImageSource; set => SetValue(SourceProperty, value); }
 
         private void OnSourceChanged(ImageSource? source)
         {
@@ -55,9 +51,9 @@ namespace LivreNoirLibrary.Windows.Controls
         {
             if (value)
             {
-                if (_gif_decoder is not null && _gif_animation is not null)
+                if (_decoder is not null && _animation is not null)
                 {
-                    BeginAnimation(FrameProperty, _gif_animation);
+                    BeginAnimation(FrameProperty, _animation);
                 }
                 else
                 {
@@ -74,15 +70,15 @@ namespace LivreNoirLibrary.Windows.Controls
         {
             if ((uint)value < (uint)_timings.Count)
             {
-                base.Source = _gif_decoder?.Frames[_timings[value]];
+                base.Source = _decoder?.Frames[_timings[value]];
             }
         }
 
         public void ClearAnimation()
         {
             IsAnimating = false;
-            _gif_animation = null;
-            _gif_decoder = null;
+            _animation = null;
+            _decoder = null;
             _timings.Clear();
         }
 
@@ -97,10 +93,10 @@ namespace LivreNoirLibrary.Windows.Controls
             {
                 decoder = BitmapDecoder.Create(bitmap.StreamSource, BitmapCreateOptions.PreservePixelFormat, BitmapCacheOption.Default);
             }
-            if (decoder is GifBitmapDecoder d && d.Frames.Count > 1)
+            if (decoder is GifBitmapDecoder && decoder.Frames.Count > 1)
             {
-                _gif_decoder = d;
-                MaxFrame = _gif_decoder.Frames.Count;
+                _decoder = decoder;
+                MaxFrame = decoder.Frames.Count;
                 return true;
             }
             else
@@ -112,11 +108,11 @@ namespace LivreNoirLibrary.Windows.Controls
 
         private void CreateAnimation()
         {
-            if (_gif_decoder is null) { return; }
+            if (_decoder is null) { return; }
             var timings = _timings;
             timings.Clear();
             int time = 0;
-            var frames = _gif_decoder.Frames;
+            var frames = _decoder.Frames;
             for (int i = 0; i < frames.Count; i++)
             {
                 var delay = frames[i].Metadata is BitmapMetadata meta ? (ushort)meta.GetQuery("/grctlext/Delay") : DefaultFrameDelay;
@@ -126,7 +122,7 @@ namespace LivreNoirLibrary.Windows.Controls
                     timings.Add(i);
                 }
             }
-            _gif_animation = new Int32Animation()
+            _animation = new Int32Animation()
             {
                 From = 0,
                 To = time,

@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Runtime.InteropServices;
@@ -114,7 +114,7 @@ namespace LivreNoirLibrary.Media
 
         public sealed override void Move(TX from, TX to)
         {
-            if (_operator.Equals(from, to))
+            if (_operator.Compare(from, to) is 0)
             {
                 return;
             }

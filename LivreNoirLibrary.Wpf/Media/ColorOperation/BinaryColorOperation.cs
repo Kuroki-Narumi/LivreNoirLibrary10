@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Runtime.CompilerServices;
 
 namespace LivreNoirLibrary.Media
@@ -26,7 +26,7 @@ namespace LivreNoirLibrary.Media
             }
             else
             {
-                var na = 255 - a;
+                var na = 255u - a;
                 target[0] = (byte)(ColorOperation.Multiply(target[0], na) + source[0]);
                 target[1] = (byte)(ColorOperation.Multiply(target[1], na) + source[1]);
                 target[2] = (byte)(ColorOperation.Multiply(target[2], na) + source[2]);
@@ -41,9 +41,9 @@ namespace LivreNoirLibrary.Media
         public unsafe void Apply(byte* source, byte* target)
         {
             var a = source[3];
-            target[0] = ColorOperation.LimitMaximum(target[0] + source[0]);
-            target[1] = ColorOperation.LimitMaximum(target[1] + source[1]);
-            target[2] = ColorOperation.LimitMaximum(target[2] + source[2]);
+            target[0] = ColorOperation.LimitMaximum((uint)target[0] + (uint)source[0]);
+            target[1] = ColorOperation.LimitMaximum((uint)target[1] + (uint)source[1]);
+            target[2] = ColorOperation.LimitMaximum((uint)target[2] + (uint)source[2]);
         }
     }
 
@@ -53,9 +53,9 @@ namespace LivreNoirLibrary.Media
         public unsafe void Apply(byte* source, byte* target)
         {
             var a = source[3];
-            target[0] = ColorOperation.LimitMaximum(target[0] - source[0]);
-            target[1] = ColorOperation.LimitMaximum(target[1] - source[1]);
-            target[2] = ColorOperation.LimitMaximum(target[2] - source[2]);
+            target[0] = ColorOperation.LimitMinimum(target[0] - source[0]);
+            target[1] = ColorOperation.LimitMinimum(target[1] - source[1]);
+            target[2] = ColorOperation.LimitMinimum(target[2] - source[2]);
         }
     }
 

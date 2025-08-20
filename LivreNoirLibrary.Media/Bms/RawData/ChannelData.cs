@@ -8,25 +8,58 @@ using LivreNoirLibrary.Text;
 
 namespace LivreNoirLibrary.Media.Bms.RawData
 {
-    public partial class ChannelData(Channel channel) : IComparable, IComparable<ChannelData>
+    public partial class ChannelData : IComparable, IComparable<ChannelData>
     {
         public static uint LengthLimit { get; set; } = 4233600; // 2^7 * 3^3 * 5^2 * 7^2
 
-        private readonly SortedList<Rational, ushort> _data = [];
+        private ushort[] _data;
 
-        public Channel Channel { get; } = channel;
+        public Channel Channel { get; }
+        public ReadOnlySpan<ushort> Data => _data;
+        public int Length => _data.Length;
 
-        public ChannelData(Channel channel, string data, int radix) : this(channel)
+        public ref ushort this[int pos] => ref _data[pos];
+
+        private ChannelData(Channel channel, ushort[] data)
+        {
+            Channel = channel;
+            _data = data;
+        }
+
+        public ChannelData(Channel channel) : this(channel, new ushort[1]) { }
+        private ChannelData(Channel channel, int length) : this(channel, new ushort[length]) { }
+
+        public ChannelData(Channel channel, string data, int radix)
         {
             Channel = channel;
             if (BmsUtils.IsHex(channel))
             {
                 radix = 16;
             }
-            GetData(data, radix);
+            _data = GetData(data, radix);
         }
 
         public static ChannelData Empty(Channel channel) => new(channel);
+        public static ChannelData Create(Channel channel, string data, int radix)
+        {
+            if (BmsUtils.IsHex(channel))
+            {
+                radix = 16;
+            }
+            return new(channel, GetData(data, radix));
+        }
+
+        public ChannelData Clone()
+        {
+            ChannelData data = new(Channel, Length);
+            Data.CopyTo(data._data);
+            return data;
+        }
+
+        public bool IsEmpty()
+        {
+            return Length is 0 || (Length is 1 && _data[0] is 0);
+        }
 
         private static bool CorrectPosition(ref Rational position)
         {

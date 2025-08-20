@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Windows;
@@ -10,7 +10,7 @@ namespace LivreNoirLibrary.Media
 {
     public static partial class Bitmap
     {
-        public static PixelFormat PixelFormat => PixelFormats.Pbgra32;
+        public static PixelFormat PixelFormat => PixelFormats.Bgra32;
         public const double DefaultDpi = 96;
 
         public static WriteableBitmap Empty() => Create(1, 1);

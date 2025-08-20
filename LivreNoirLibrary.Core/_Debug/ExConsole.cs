@@ -1,10 +1,12 @@
-﻿using System;
+using System;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Collections;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Text;
 using LivreNoirLibrary.Collections;
+using System.IO;
 
 namespace LivreNoirLibrary.Debug
 {
@@ -65,6 +67,19 @@ namespace LivreNoirLibrary.Debug
         {
             Log.RemoveAt(Log.Count - 1);
             Write(obj);
+        }
+
+        public static void PipeFromConsole()
+        {
+            Console.SetOut(new DebugTextWriter());
+        }
+
+        private class DebugTextWriter : TextWriter
+        {
+            public override Encoding Encoding => Encoding.UTF8;
+            public override void Write(char value) => ExConsole.Write(value.ToString());
+            public override void Write(string? value) => ExConsole.Write(value);
+            public override void WriteLine(string? value) => ExConsole.WriteLine(value);
         }
     }
 

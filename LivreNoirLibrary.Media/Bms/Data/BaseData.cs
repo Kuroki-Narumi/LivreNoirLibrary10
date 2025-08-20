@@ -1,23 +1,21 @@
 using System;
 using System.Collections.Generic;
-using LivreNoirLibrary.Media.Bms.RawData;
 using LivreNoirLibrary.Numerics;
 
 namespace LivreNoirLibrary.Media.Bms
 {
     public abstract partial class BaseData : ObjectBase, IBmsData
     {
-        public List<string> Comments { get; protected set; } = [];
-        public HeaderCollection Headers { get; protected set; } = new();
-        public DefListCollection DefLists { get; protected set; } = new() { { DefType.Wav, new() }, { DefType.Bmp, new() } };
-        public BarLengthCollection Bars { get; protected set; } = [];
-        public NoteTimeline Timeline { get; protected set; } = [];
-
-        public decimal Bpm => Headers.Bpm;
+        public List<string> Comments { get; } = [];
+        public HeaderCollection Headers { get; } = new();
+        public DefListCollection DefLists { get; } = new() { { DefType.Wav, new() }, { DefType.Bmp, new() } };
+        public BarLengthCollection Bars { get; } = [];
+        public NoteTimeline Timeline { get;} = [];
 
         public abstract BmsData Root { get; }
+        IRootData IBmsData.Root => Root;
         public BaseData? Parent { get; protected set; }
-        protected NoteTimeline? InheritedTimeline { get; set; }
+        internal NoteTimeline? InheritedTimeline { get; set; }
 
         public virtual void Clear()
         {
@@ -29,68 +27,9 @@ namespace LivreNoirLibrary.Media.Bms
             Insulate();
         }
 
-        public int GetNotesCount(bool countEnd = false)
-        {
-            int result = 0;
-            foreach (var (_, note) in Timeline)
-            {
-                if (note.IsVisibleKey(countEnd))
-                {
-                    result++;
-                }
-            }
-            return result;
-        }
-
-        public int GetNotesCount(Predicate<Note> selector)
-        {
-            int result = 0;
-            foreach (var (_, note) in Timeline)
-            {
-                if (selector(note))
-                {
-                    result++;
-                }
-            }
-            return result;
-        }
-
-        public double CalcTotal(double defaultValue = 0)
-        {
-            var t = Headers.Total;
-            if (t is <= 0)
-            {
-                t = defaultValue;
-            }
-            if (t is <= 0)
-            {
-                t = BmsUtils.CalcTotal(GetNotesCount());
-            }
-            return t;
-        }
-
-        public long CalcResolution()
-        {
-            var result = 1L;
-            foreach (var (pos, _) in Timeline.EachList())
-            {
-                result = result.LCM(GetBeat(pos).Denominator);
-            }
-            return result;
-        }
-
-        public int GetMaxBgmLane()
-        {
-            int max = 0;
-            foreach (var (_, note) in Timeline)
-            {
-                if (note.IsBgm() && note.Lane < max)
-                {
-                    max = note.Lane;
-                }
-            }
-            return 1 - max;
-        }
+        public Rational GetBarLength(int number) => Bars.Get(number);
+        public Rational GetAbsolutePosition(BarPosition position) => Root.BarLengthCache.GetAbsolutePosition(position, Bars);
+        public BarPosition GetBarPosition(Rational absolutePosition) => Root.BarLengthCache.GetBarPosition(absolutePosition, Bars);
 
         public void Merge(BaseData data)
         {
@@ -103,7 +42,7 @@ namespace LivreNoirLibrary.Media.Bms
 
         public void Inherit(BaseData parent)
         {
-            Root.ClearBarCache();
+            Root.BarLengthCache.Clear();
             Parent = parent;
             Headers.Parent = parent.Headers;
             DefLists.Parent = parent.DefLists;
@@ -137,7 +76,7 @@ namespace LivreNoirLibrary.Media.Bms
 
         public void Insulate()
         {
-            Root.ClearBarCache();
+            Root.BarLengthCache.Clear();
             Parent = null;
             InheritedTimeline = null;
             Headers.Parent = null;
@@ -165,5 +104,28 @@ namespace LivreNoirLibrary.Media.Bms
                 Insulate();
             }
         }
+
+        public IEnumerable<NoteInfo> EachNote<T>(bool inherit = false)
+        {
+            if (inherit)
+            {
+                if (InheritedTimeline is not null)
+                {
+                    foreach (var (pos, item) in InheritedTimeline)
+                    {
+                        yield return new(pos, GetAbsolutePosition(pos), item);
+                    }
+                }
+            }
+            else
+            {
+                foreach (var (pos, item) in Timeline)
+                {
+                    yield return new(pos, GetAbsolutePosition(pos), item);
+                }
+            }
+        }
     }
+
+    public readonly record struct NoteInfo(BarPosition Position, Rational AbsolutePosition, Note Note) : INoteWrapper;
 }

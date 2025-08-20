@@ -61,7 +61,7 @@ namespace LivreNoirLibrary.Media.Bms
                 {
                     var (pos, note) = notes.Current;
                     if (pos.Bar > barNumber) { break; }
-                    var beat = pos.Beat;
+                    var beat = pos.Offset;
                     if (note.IsTempo())
                     {
                         data.Tempo.Add((beat, note.Value));

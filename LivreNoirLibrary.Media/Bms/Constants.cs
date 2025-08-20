@@ -28,10 +28,10 @@ namespace LivreNoirLibrary.Media.Bms
         public const int MaxLane = MetaOffset + Base_Default * Base_Default - 1;
 
         public const PlayerType DefaultPlayer = PlayerType.Single;
-        public const decimal DefaultBpm = 130;
+        public const double DefaultBpm = 130;
         public static readonly Rational DefaultBpmRational = (Rational)DefaultBpm;
         public const Rank DefaultRank = Rank.Easy;
-        public const decimal DefaultTotal = 260;
+        public const double DefaultTotal = 260;
         public const int DefaultLevel = 1;
         public const string DefaultDifficulty = "1";
 
@@ -43,7 +43,7 @@ namespace LivreNoirLibrary.Media.Bms
         public const int DefMax_Extended = Base_Extended * Base_Extended;
 
         public const LongNoteMode DefaultLnMode = LongNoteMode.Auto;
-        public const decimal DefaultExRank = 100;
+        public const double DefaultExRank = 100;
 
         public const string DefaultStageFile = "_stagefile.png";
         public const string DefaultBanner = "_banner.png";

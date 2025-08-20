@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Text;
 using System.Text.RegularExpressions;
@@ -64,7 +64,7 @@ namespace LivreNoirLibrary.Files
         public static readonly Regex WavVorbis = Create(Exts.Wav, Exts.Wave, Exts.Vorbis);
         public static readonly Regex MP3 = Create(Exts.MP3);
         public static readonly Regex Flac = Create(Exts.Flac);
-        public static readonly Regex Aiff = Create(Exts.Aiff);
+        public static readonly Regex Aiff = Create(Exts.Aiff, Exts.Aif);
         public static readonly Regex AAC = Create(Exts.AAC);
 
         public static readonly Regex Audio = Create(Exts.AudioExts);

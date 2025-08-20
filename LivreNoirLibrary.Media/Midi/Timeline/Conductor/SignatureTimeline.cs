@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using LivreNoirLibrary.Numerics;
@@ -95,17 +95,17 @@ namespace LivreNoirLibrary.Media.Midi
 
         public Rational GetBarLength(int number) => Get(number).ToRational();
 
-        public BarPosition GetPosition(Rational beat)
+        public BarPosition GetBarPosition(Rational absolutePosition)
         {
-            var number = GetNumber(beat);
-            var pos = beat - GetHead(number);
-            return new(number, pos);
+            var number = GetNumber(absolutePosition);
+            var pos = absolutePosition - GetHead(number);
+            return new(number, pos * Get(number));
         }
 
-        public Rational GetBeat(BarPosition position)
+        public Rational GetAbsolutePosition(BarPosition position)
         {
             var head = GetHead(position.Bar);
-            return head + position.Beat;
+            return head + position.Offset / Get(position.Bar);
         }
 
         private void EnsureNumberList()

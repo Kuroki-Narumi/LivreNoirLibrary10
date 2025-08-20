@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 
 namespace LivreNoirLibrary.Collections
@@ -13,15 +13,15 @@ namespace LivreNoirLibrary.Collections
             while (max >= min)
             {
                 var i = min + (max - min) / 2;
-                switch (item.CompareTo(list[i]))
+                switch (list[i].CompareTo(item))
                 {
                     case 0:
                         return i;
                     case < 0:
-                        max = i - 1;
+                        min = i + 1;
                         break;
                     default:
-                        min = i + 1;
+                        max = i - 1;
                         break;
                 }
             }
@@ -37,17 +37,16 @@ namespace LivreNoirLibrary.Collections
             {
                 var i = min + (max - min) / 2;
                 var p = list[i];
-                if (comparer.Equals(p, item))
+                switch (comparer.Compare(list[i], item))
                 {
-                    return i;
-                }
-                else if (comparer.LessThan(p, item))
-                {
-                    min = i + 1;
-                }
-                else
-                {
-                    max = i - 1;
+                    case 0:
+                        return i;
+                    case < 0:
+                        min = i + 1;
+                        break;
+                    default:
+                        max = i - 1;
+                        break;
                 }
             }
             return ~min;
@@ -64,18 +63,16 @@ namespace LivreNoirLibrary.Collections
             while (max >= min)
             {
                 var i = min + (max - min) / 2;
-                var p = span[i];
-                if (comparer.Equals(p, item))
+                switch (comparer.Compare(span[i], item))
                 {
-                    return i;
-                }
-                else if (comparer.LessThan(p, item))
-                {
-                    min = i + 1;
-                }
-                else
-                {
-                    max = i - 1;
+                    case 0:
+                        return i;
+                    case < 0:
+                        min = i + 1;
+                        break;
+                    default:
+                        max = i - 1;
+                        break;
                 }
             }
             return ~min;

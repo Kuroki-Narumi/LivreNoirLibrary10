@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.IO;
 using LivreNoirLibrary.IO;
 using LivreNoirLibrary.Media.Midi;
@@ -12,16 +12,16 @@ namespace LivreNoirLibrary.Media.BM3
 
         public TrackOptions Options { get; set; } = new();
 
-        public bool NeedsPack() => ContainsNote() && Options.ApplyToBms;
+        public bool NeedsPack() => this.ContainsNote() && Options.ApplyToBms;
 
         public void Dump(BinaryWriter writer)
         {
             writer.WriteChid(DumpHeader);
             writer.Write((sbyte)_port);
             writer.Write((sbyte)_channel);
-            writer.Write(_title ?? string.Empty);
+            writer.Write(Title ?? string.Empty);
             writer.Write(Options.GetJsonText(false));
-            _timeline.Dump(writer);
+            Timeline.Dump(writer);
             foreach (var b in _keySwitch)
             {
                 b.Dump(writer);
@@ -31,16 +31,16 @@ namespace LivreNoirLibrary.Media.BM3
         public void ProcessLoad(BinaryReader reader)
         {
             reader.CheckChid(DumpHeader);
-            Clear();
+            this.Clear();
             _port = reader.ReadSByte();
             _channel = reader.ReadSByte();
-            _title = reader.ReadString().GetNullIfEmpty();
+            Title = reader.ReadString().GetNullIfEmpty();
             var json = reader.ReadString();
             if (Json.TryParse<TrackOptions>(json, out var options))
             {
                 Options = options;
             }
-            _timeline.ProcessLoad(reader);
+            Timeline.ProcessLoad(reader);
             for (var i = 0; i < 128; i++)
             {
                 _keySwitch[i] = KeySwitchOption.Load(reader);

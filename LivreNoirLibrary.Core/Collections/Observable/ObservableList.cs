@@ -1,7 +1,6 @@
-﻿using System;
+using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
 using System.Runtime.InteropServices;
 
 namespace LivreNoirLibrary.Collections
@@ -10,217 +9,155 @@ namespace LivreNoirLibrary.Collections
     {
         public T this[int index]
         {
-            get => _list[index];
-            set
-            {
-                var current = _list[index];
-                ReplaceItem(index, value);
-                OnCollectionReplaced(value, current, index);
-            }
+            get => GetItemAt(index);
+            set => Replace(index, value);
         }
 
-        public ObservableList() : base() { }
-        public ObservableList(int capacy) : base(capacy) { }
-        public ObservableList(IEnumerable<T> collection) : base([.. collection]) { }
+        public ObservableList() : base(0) { }
+        public ObservableList(int capacity) : base(capacity) { }
+        public ObservableList(IEnumerable<T> collection) : base(collection) { }
 
-        public void ReplaceWithoutNotify(int index, T item)
-        {
-            if ((uint)index < (uint)_list.Count)
-            {
-                ReplaceItem(index, item);
-            }
-        }
-
-        public void Insert(int index, T item)
-        {
-            if ((uint)index <= (uint)_list.Count)
-            {
-                AddItem(index, item);
-                OnCollectionAdded(item, index);
-            }
-        }
-
-        public void InsertWithoutNotify(int index, T item)
-        {
-            if ((uint)index <= (uint)_list.Count)
-            {
-                AddItem(index, item);
-            }
-        }
-
+        /// <inheritdoc cref="List{T}.RemoveAt(int)"/>
         public void RemoveAt(int index)
         {
-            if (TryRemove(index, out var current))
-            {
-                OnCollectionRemoved(current, index);
-            }
+            var current = _list[index];
+            _list.RemoveAt(index);
+            OnCollectionRemoved(current, index);
         }
 
-        public void RemoveAtWithoutNotify(int index)
+        /// <inheritdoc cref="List{T}.RemoveAt(int)"/>
+        public void RemoveAtWithoutNotify(int index) => _list.RemoveAt(index);
+
+        /// <inheritdoc cref="List{T}.Insert"/>
+        public void Insert(int index, T item)
         {
-            TryRemove(index, out _);
+            _list.Insert(index, item);
+            OnCollectionAdded(item, index);
         }
 
+        /// <inheritdoc cref="List{T}.Insert"/>
+        public void InsertWithoutNotify(int index, T item) => _list.Insert(index, item);
+
+        public void Replace(int index, T item)
+        {
+            var current = _list[index];
+            _list[index] = item;
+            OnCollectionReplaced(item, current, index);
+        }
+
+        public void ReplaceWithoutNotify(int index, T item) => _list[index] = item;
+
+        /// <inheritdoc cref="List{T}.AddRange"/>
+        public void AddRange(IEnumerable<T> collection)
+        {
+            _list.AddRange(collection);
+            OnCollectionReset();
+        }
+
+        /// <inheritdoc cref="System.Collections.Generic.CollectionExtensions.AddRange"/>
+        public void AddRange(params ReadOnlySpan<T> source)
+        {
+            _list.AddRange(source);
+            OnCollectionReset();
+        }
+
+        /// <inheritdoc cref="List{T}.InsertRange"/>
+        public void InsertRange(int index, IEnumerable<T> collection)
+        {
+            _list.InsertRange(index, collection);
+            OnCollectionReset();
+        }
+
+        /// <inheritdoc cref="System.Collections.Generic.CollectionExtensions.InsertRange"/>
+        public void InsertRange(int index, params ReadOnlySpan<T> source)
+        {
+            _list.InsertRange(index, source);
+            OnCollectionReset();
+        }
+
+        /// <inheritdoc cref="List{T}.RemoveRange"/>
         public void RemoveRange(int index, int count)
         {
-            var c = _list.Count;
-            if ((uint)index < (uint)c)
-            {
-                if (index + count >= c)
-                {
-                    count = c - index;
-                }
-                if (count is > 0)
-                {
-                    _list.RemoveRange(index, count);
-                    NotifyCollectionReset();
-                }
-            }
+            _list.RemoveRange(index, count);
+            OnCollectionReset();
         }
 
-        public void RemoveRangeWithoutNotify(int index, int count)
+        public int RemoveRange(IEnumerable<T> collection)
         {
-            var c = _list.Count;
-            if ((uint)index < (uint)c)
+            var count = 0;
+            foreach (var item in collection)
             {
-                if (index + count >= c)
+                if (RemoveItem(item) is >= 0)
                 {
-                    count = c - index;
-                }
-                if (count is > 0)
-                {
-                    _list.RemoveRange(index, count);
-                    OnUpdate();
+                    count++;
                 }
             }
+            if (count is > 0)
+            {
+                OnCollectionReset();
+            }
+            return count;
         }
 
-        public bool TryDequeue([MaybeNullWhen(false)] out T item)
+        public int RemoveRange(params ReadOnlySpan<T> source)
         {
-            if (_list.Count is > 0)
+            var count = 0;
+            foreach (var item in source)
             {
-                item = _list[0];
-                RemoveAt(0);
-                return true;
+                if (RemoveItem(item) is >= 0)
+                {
+                    count++;
+                }
             }
-            item = default;
-            return false;
+            if (count is > 0)
+            {
+                OnCollectionReset();
+            }
+            return count;
         }
 
-        public void CopyTo(List<T> target, int index, int count)
+        /// <inheritdoc cref="List{T}.RemoveAll"/>
+        public int RemoveAll(Predicate<T> match)
         {
-            var c = _list.Count;
-            if ((uint)index < (uint)c)
+            var count = _list.RemoveAll(match);
+            if (count is > 0)
             {
-                if (index + count >= c)
-                {
-                    count = c - index;
-                }
-                if (count is > 0)
-                {
-                    target.AddRange(CollectionsMarshal.AsSpan(_list).Slice(index, count));
-                }
+                OnCollectionReset();
             }
-        }
-
-        public void CopyTo(ObservableCollectionBase<T> target, int index, int count)
-        {
-            var c = _list.Count;
-            if ((uint)index < (uint)c)
-            {
-                if (index + count >= c)
-                {
-                    count = c - index;
-                }
-                if (count is > 0)
-                {
-                    target.AddRange(CollectionsMarshal.AsSpan(_list).Slice(index, count));
-                    RemoveRange(index, count);
-                }
-            }
-        }
-
-        public void MoveTo(List<T> target, int index, int count)
-        {
-            var c = _list.Count;
-            if ((uint)index < (uint)c)
-            {
-                if (index + count >= c)
-                {
-                    count = c - index;
-                }
-                if (count is > 0)
-                {
-                    target.AddRange(CollectionsMarshal.AsSpan(_list).Slice(index, count));
-                    RemoveRange(index, count);
-                }
-            }
-        }
-
-        public void MoveTo(ObservableCollectionBase<T> target, int index, int count)
-        {
-            var c = _list.Count;
-            if ((uint)index < (uint)c)
-            {
-                if (index + count >= c)
-                {
-                    count = c - index;
-                }
-                if (count is > 0)
-                {
-                    target.AddRange(CollectionsMarshal.AsSpan(_list).Slice(index, count));
-                    RemoveRange(index, count);
-                }
-            }
-        }
-
-        public void Move(int oldIndex, int newIndex)
-        {
-            var c = (uint)_list.Count;
-            if ((uint)oldIndex < c && (uint)newIndex < c)
-            {
-                var item = _list[oldIndex];
-                RemoveItem(oldIndex);
-                AddItem(newIndex, item);
-                OnCollectionMoved(item, newIndex, oldIndex);
-            }
+            return count;
         }
 
         public void Swap(int index1, int index2)
         {
-            var c = (uint)_list.Count;
-            if ((uint)index1 < c && (uint)index2 < c)
-            {
-                var item1 = _list[index1];
-                var item2 = _list[index2];
-                ReplaceItem(index1, item2);
-                ReplaceItem(index2, item1);
-                if (index1 > index2)
-                {
-                    (index1, index2) = (index2, index1);
-                }
-                OnCollectionMoved(item1, index2, index1);
-                OnCollectionMoved(item2, index1, index2);
-            }
+            var item1 = _list[index1];
+            var item2 = _list[index2];
+            _list[index1] = item2;
+            _list[index2] = item1;
+            OnCollectionMoved(item1, index2, index1);
+            OnCollectionMoved(item2, index1, index2);
         }
 
-        public bool CanMoveDown(int index) => index is >= 0 && index < _list.Count - 1;
-        public bool CanMoveUp(int index) => index is > 0 && index < _list.Count;
+        public bool CanMoveDown(int index) => _list.CanMoveDown(index);
+        public bool CanMoveUp(int index) => _list.CanMoveUp(index);
 
-        public void MoveDown(int index)
+        public bool MoveDown(int index)
         {
             if (CanMoveDown(index))
             {
                 Swap(index, index + 1);
+                return true;
             }
+            return false;
         }
 
-        public void MoveUp(int index)
+        public bool MoveUp(int index)
         {
             if (CanMoveUp(index))
             {
                 Swap(index, index - 1);
+                return true;
             }
+            return false;
         }
 
         public void Reverse() => Reverse(0, _list.Count);
@@ -253,8 +190,54 @@ namespace LivreNoirLibrary.Collections
             NotifyCollectionReset();
         }
 
+        public void CopyTo(ICollection<T> target, int index, int count)
+        {
+            if ((uint)index >= (uint)Count)
+            {
+                throw new ArgumentOutOfRangeException(nameof(index), "Index is out of range.");
+            }
+            if ((uint)count > (uint)(Count - index))
+            {
+                throw new ArgumentOutOfRangeException(nameof(count), "Count is out of range.");
+            }
+            for (var i = 0; i < count; i++)
+            {
+                target.Add(_list[index + i]);
+            }
+        }
+
+        public void CopyTo(ObservableCollectionBase<T> target, int index, int count)
+        {
+            if ((uint)index >= (uint)Count)
+            {
+                throw new ArgumentOutOfRangeException(nameof(index), "Index is out of range.");
+            }
+            if ((uint)count > (uint)(Count - index))
+            {
+                throw new ArgumentOutOfRangeException(nameof(count), "Count is out of range.");
+            }
+            for (var i = 0; i < count; i++)
+            {
+                target.AddWithoutNotify(_list[index + i]);
+            }
+            target.NotifyCollectionReset();
+        }
+
+        public void MoveTo(ICollection<T> target, int index, int count)
+        {
+            CopyTo(target, index, count);
+            RemoveRange(index, count);
+        }
+
+        public void MoveTo(ObservableCollectionBase<T> target, int index, int count)
+        {
+            CopyTo(target, index, count);
+            RemoveRange(index, count);
+        }
+
         bool IList.IsFixedSize => false;
         bool IList.IsReadOnly => false;
+
         object? IList.this[int index]
         {
             get => _list[index];
@@ -293,6 +276,5 @@ namespace LivreNoirLibrary.Collections
             }
         }
         void IList.RemoveAt(int index) => RemoveAt(index);
-        void ICollection.CopyTo(Array array, int index) => (_list as IList).CopyTo(array, index);
     }
 }

@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using LivreNoirLibrary.Collections;
 
@@ -13,5 +13,11 @@ namespace LivreNoirLibrary.YuGiOh.ViewModel
         public SortedCardList(IEnumerable<Card> collection) : base(collection) { }
 
         public IEnumerable<Card> EnumCards() => _list;
+
+        public void Load(IEnumerable<Card> source)
+        {
+            ClearWithoutNotify();
+            AddRange(source);
+        }
     }
 }

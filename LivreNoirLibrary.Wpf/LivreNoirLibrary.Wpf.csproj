@@ -15,11 +15,19 @@
 	</PropertyGroup>
 
 	<ItemGroup>
+	  <None Remove="Media\Effects\Shaders\border.ps" />
+	</ItemGroup>
+
+	<ItemGroup>
 		<ProjectReference Include="..\LivreNoirLibrary.Core\LivreNoirLibrary.Core.csproj" />
 		<ProjectReference Include="..\LivreNoirLibrary.SourceGenerator\LivreNoirLibrary.SourceGenerator.csproj">
 			<OutputItemType>Analyzer</OutputItemType>
 			<ReferenceOutputAssembly>false</ReferenceOutputAssembly>
 		</ProjectReference>
+	</ItemGroup>
+
+	<ItemGroup>
+	  <Resource Include="Media\Effects\Shaders\border.ps" />
 	</ItemGroup>
 
 </Project>

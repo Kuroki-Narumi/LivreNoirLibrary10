@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Reflection;
 using System.Runtime.InteropServices;
@@ -24,7 +24,7 @@ namespace LivreNoirLibrary.Media.Bms
 
         public BarEditResult InsertBar(int number, in Rational length)
         {
-            ProcessMove(p => new(p.Bar + 1, p.Beat), new(number), null);
+            ProcessMove(p => new(p.Bar + 1, p.Offset), new(number), null);
             Bars.Insert(number, length);
             Root.ClearBarCache(number);
             return BarEditResult.Applied;
@@ -35,7 +35,7 @@ namespace LivreNoirLibrary.Media.Bms
             BarPosition first = new(number);
             BarPosition last = new(number + 1);
             Timeline.RemoveRange(RangeUtils.Get(first, last));
-            ProcessMove(p => new(p.Bar - 1, p.Beat), last, null);
+            ProcessMove(p => new(p.Bar - 1, p.Offset), last, null);
             Bars.Delete(number);
             Root.ClearBarCache(number);
             return BarEditResult.NeedRefresh;
@@ -133,7 +133,7 @@ namespace LivreNoirLibrary.Media.Bms
             var ratio = newLength / oldLength;
             BarPosition first = new(number);
             BarPosition last = new(number + 1);
-            ProcessMove(p => new(p.Bar, p.Beat * ratio), first, last);
+            ProcessMove(p => new(p.Bar, p.Offset * ratio), first, last);
             SetBarLength(number, newLength);
         }
 
@@ -152,15 +152,15 @@ namespace LivreNoirLibrary.Media.Bms
         public BarEditResult AddBarLineAt(BarPosition pos)
         {
             var number = pos.Bar;
-            var beat = pos.Beat;
+            var beat = pos.Offset;
             var current = GetBarLength(number);
             if (beat.IsNegativeOrZero() || beat >= current)
             {
                 return BarEditResult.NoEffect;
             }
             BarPosition nextBar = new(number + 1);
-            ProcessMove(p => new(p.Bar + 1, p.Beat), nextBar, null);
-            ProcessMove(p => new(number + 1, p.Beat - beat), pos, nextBar);
+            ProcessMove(p => new(p.Bar + 1, p.Offset), nextBar, null);
+            ProcessMove(p => new(number + 1, p.Offset - beat), pos, nextBar);
             Bars.Set(number, current - beat);
             Bars.Insert(number, beat);
             Root.ClearBarCache(number);
@@ -177,7 +177,7 @@ namespace LivreNoirLibrary.Media.Bms
             BarPosition last = new(number + count);
             var firstBeat = GetBeat(first);
             ProcessMove(p => new(number, GetBeat(p) - firstBeat), first, last);
-            ProcessMove(p => new(p.Bar - count + 1, p.Beat), last, null);
+            ProcessMove(p => new(p.Bar - count + 1, p.Offset), last, null);
             Bars.MergeLines(number, count);
             Root.ClearBarCache(number);
             return BarEditResult.Applied;

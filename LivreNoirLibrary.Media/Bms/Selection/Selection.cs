@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
@@ -71,7 +71,7 @@ namespace LivreNoirLibrary.Media.Bms
                 return Rational.Zero;
             }
             var item = _value_list[0][0];
-            return item.ActualPosition - item.Position.Beat;
+            return item.ActualPosition - item.Position.Offset;
         }
 
         public HashSet<Note> GetNoteHash() => [.. EachItem().Select(item => item.Note)];
