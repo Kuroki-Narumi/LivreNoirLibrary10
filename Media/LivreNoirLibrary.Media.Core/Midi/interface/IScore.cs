@@ -1,0 +1,28 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
+using System.Text;
+using LivreNoirLibrary.Numerics;
+
+namespace LivreNoirLibrary.Media.Midi
+{
+    public interface IScore : IBarPositionProvider
+    {
+        public string? Title { get; set; }
+        public string? Copyright { get; set; }
+
+        public void InitializeTracks(int count);
+        public int TrackCount { get; }
+        public ITrack GetTrack(int index);
+        public bool TryGetTrack(int index, [MaybeNullWhen(false)] out ITrack track);
+        public bool TryGetTrackByTitle(string? title, out int index, [MaybeNullWhen(false)] out ITrack track);
+        public IEnumerable<(int Index, ITrack Track)> EachTrack();
+
+        public TimeSignature GetTimeSignature(Rational position);
+        public TimeSignature GetTimeSignatureByNumber(int number);
+        public void SetTimeSignature(Rational position, TimeSignature value);
+        public void SetTimeSignatureByNumber(int number, TimeSignature value);
+        public IEnumerable<BarInfo> EachBar(Rational end);
+        public IEnumerable<BarLineInfo> EachLine(Rational end);
+    }
+}

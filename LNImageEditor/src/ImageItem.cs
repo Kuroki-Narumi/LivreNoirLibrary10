@@ -1,4 +1,5 @@
 using System;
+using System.Globalization;
 using System.IO;
 using System.Windows;
 using System.Windows.Media.Imaging;
@@ -10,7 +11,7 @@ namespace LNImageEditor
 {
     public class ImageItemList : ObservableSortedList<string, ImageItem>
     {
-        public ImageItemList() : base(new NaturalStringComparer(false)) { }
+        public ImageItemList() : base(StringExtensions.NaturalOrderComparer) { }
 
         protected override string GetKey(ImageItem item) => item.FullPath;
 
@@ -26,9 +27,7 @@ namespace LNImageEditor
 
     public partial class ImageItem(string path) : ObservableObjectBase
     {
-        [ObservableProperty(SetterScope = Scope.Private)]
-        private BitmapImage _image = CreateImage(path);
-
+        public BitmapImage Image { get; private set => SetValue(ref field, value); } = CreateImage(path);
         public string FullPath { get; } = path;
         public string Filename => Path.GetFileName(FullPath);
         public Size Size => new(Image.PixelWidth, Image.PixelHeight);

@@ -1,0 +1,237 @@
+using System;
+using System.Collections.Generic;
+using System.Text.Json;
+using System.IO;
+using System.Runtime.InteropServices;
+using LivreNoirLibrary.Text;
+using LivreNoirLibrary.IO;
+using System.Diagnostics.CodeAnalysis;
+
+namespace LivreNoirLibrary.Media.Bms
+{
+    public class HeaderCollection : IJsonWriter, IHeaderCollection, IDumpable, ILoadable<HeaderCollection>
+    {
+        private readonly Dictionary<HeaderType, double> _doubleValues = [];
+        private readonly Dictionary<HeaderType, string> _stringValues = [];
+        private readonly List<(string Key, string Value)> _sub = [];
+
+        public List<(string Key, string Value)> SubHeaders => _sub;
+
+        public bool HasValue => _doubleValues.Count is not 0 || _stringValues.Count is not 0 || _sub.Count is not 0;
+
+        public void Clear()
+        {
+            _doubleValues.Clear();
+            _stringValues.Clear();
+            _sub.Clear();
+        }
+
+        public void SetDefault()
+        {
+            Clear();
+            _stringValues[HeaderType.Title] = Constants.DefaultTitle;
+            _doubleValues[HeaderType.Player] = (double)Constants.DefaultPlayer;
+            _doubleValues[HeaderType.Bpm] = Constants.DefaultBpm;
+            _stringValues[HeaderType.PlayLevel] = Constants.DefaultPlayLevel;
+            _stringValues[HeaderType.Difficulty] = Constants.DefaultDifficulty;
+            _doubleValues[HeaderType.Rank] = (double)Constants.DefaultRank;
+            _doubleValues[HeaderType.Total] = Constants.DefaultTotal;
+            _stringValues[HeaderType.StageFile] = Constants.DefaultStageFile;
+            _stringValues[HeaderType.Banner] = Constants.DefaultBanner;
+            _stringValues[HeaderType.BackBmp] = Constants.DefaultBackBmp;
+            _stringValues[HeaderType.Preview] = Constants.DefaultPreview;
+        }
+
+        public bool TryGetNumber(HeaderType type, out double value) => _doubleValues.TryGetValue(type, out value);
+
+        public bool TryGetInt(HeaderType type, out int value)
+        {
+            if (_doubleValues.TryGetValue(type, out var dValue))
+            {
+                value = (int)dValue;
+                return true;
+            }
+            value = default;
+            return false;
+        }
+
+        public bool TryGetEnum<T>(HeaderType type, out T value)
+            where T : struct, Enum
+        {
+            if (_doubleValues.TryGetValue(type, out var dVal))
+            {
+                value = (T)Enum.ToObject(typeof(T), (long)dVal);
+                return true;
+            }
+            value = default;
+            return false;
+        }
+
+        public bool TryGetText(HeaderType type, [MaybeNullWhen(false)]out string value) => _stringValues.TryGetValue(type, out value);
+
+        public bool Remove(HeaderType type) => _doubleValues.Remove(type) || _stringValues.Remove(type);
+
+        public void Set(HeaderType type, double value)
+        {
+            if (BmsUtils.IsNumberHeader(type))
+            {
+                _doubleValues[type] = value;
+            }
+            else
+            {
+                _stringValues[type] = value.ToString();
+            }
+        }
+
+        public void Set<T>(HeaderType type, T value) where T : struct, Enum => Set(type, (value as IConvertible).ToDouble(null));
+
+        public void Set(HeaderType type, string value)
+        {
+            if (BmsUtils.IsNumberHeader(type))
+            {
+                if (double.TryParse(value, out var result))
+                {
+                    _doubleValues[type] = result;
+                }
+            }
+            else
+            {
+                _stringValues[type] = value;
+            }
+        }
+
+        public void Dump(BmsTextWriter writer)
+        {
+            var radix = writer.Radix;
+            for (var t = HeaderType.Player; t is <= HeaderType.Comment; t++)
+            {
+                var key = t.ToString().ToUpper();
+                if (BmsUtils.IsNumberHeader(t))
+                {
+                    if (_doubleValues.TryGetValue(t, out var value))
+                    {
+                        if (t is HeaderType.LnObj)
+                        {
+                            writer.WriteLine($"#{key} {BmsUtils.ToBased((int)value, radix)}");
+                        }
+                        else
+                        {
+                            writer.WriteLine($"#{key} {value}");
+                        }
+                    }
+                }
+                else if (_stringValues.TryGetValue(t, out var value))
+                {
+                    writer.WriteLine($"#{key} {value}");
+                }
+            }
+            foreach (var (key, value) in CollectionsMarshal.AsSpan(_sub))
+            {
+                writer.WriteLine($"#{key.ToUpper()} {value}");
+            }
+            if (radix is not Constants.Base_Default)
+            {
+                writer.WriteLine($"#BASE {radix}");
+            }
+        }
+
+        public void Dump(BinaryWriter writer)
+        {
+            writer.Write(_doubleValues.Count);
+            foreach (var (key, value) in _doubleValues)
+            {
+                writer.Write((byte)key);
+                writer.Write(value);
+            }
+            writer.Write(_stringValues.Count);
+            foreach (var (key, value) in _stringValues)
+            {
+                writer.Write((byte)key);
+                writer.Write(value);
+            }
+            writer.Write(_sub.Count);
+            foreach (var (key, value) in _sub)
+            {
+                writer.Write(key);
+                writer.Write(value);
+            }
+        }
+
+        public static HeaderCollection Load(BinaryReader reader)
+        {
+            HeaderCollection result = new();
+            result.ProcessLoad(reader);
+            return result;
+        }
+
+        public void ProcessLoad(BinaryReader reader)
+        {
+            Clear();
+            var doubles = _doubleValues;
+            var strings = _stringValues;
+            var sub = _sub;
+            var count = reader.ReadInt32();
+            for (var i = 0; i < count; i++)
+            {
+                var key = (HeaderType)reader.ReadByte();
+                var value = reader.ReadDouble();
+                doubles[key] = value;
+            }
+            count = reader.ReadInt32();
+            for (var i = 0; i < count; i++)
+            {
+                var key = (HeaderType)reader.ReadByte();
+                var value = reader.ReadString();
+                strings[key] = value;
+            }
+            count = reader.ReadInt32();
+            for (var i = 0; i < count; i++)
+            {
+                var key = reader.ReadString();
+                var value = reader.ReadString();
+                sub.Add((key, value));
+            }
+        }
+
+        public void Merge(HeaderCollection src)
+        {
+            foreach (var (k, v) in src._doubleValues)
+            {
+                _doubleValues[k] = v;
+            }
+            foreach (var (k, v) in src._stringValues)
+            {
+                _stringValues[k] = v;
+            }
+            foreach (var header in CollectionsMarshal.AsSpan(src._sub))
+            {
+                _sub.Add(header);
+            }
+        }
+
+        public void WriteJson(Utf8JsonWriter writer, JsonSerializerOptions options)
+        {
+            writer.WriteStartArray();
+            for (var t = HeaderType.Player; t is <= HeaderType.Comment; t++)
+            {
+                var key = t.ToString().ToUpper();
+                if (BmsUtils.IsNumberHeader(t))
+                {
+                    if (_doubleValues.TryGetValue(t, out var value))
+                    {
+                        writer.WriteStringValue($"#{key} {value}");
+                    }
+                }
+                else if (_stringValues.TryGetValue(t, out var value))
+                {
+                    writer.WriteStringValue($"#{key} {value}");
+                }
+            }
+            foreach (var (key, value) in CollectionsMarshal.AsSpan(_sub))
+            {
+                writer.WriteStringValue($"#{key.ToUpper()} {value}");
+            }
+            writer.WriteEndArray();
+        }
+    }
+}

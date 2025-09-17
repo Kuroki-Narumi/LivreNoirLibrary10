@@ -1,0 +1,93 @@
+using System;
+using System.Globalization;
+using System.Text;
+using LivreNoirLibrary.Collections;
+
+namespace LivreNoirLibrary.Text
+{
+    public static partial class StringExtensions
+    {
+        public static string[] SplitLines(this string? text, bool trim = false)
+        {
+            using SharedBuffer<string> buffer = new(256);
+            foreach (var span in text.AsSpan().EnumerateLines())
+            {
+                buffer.Add(new(trim ? span.Trim() : span));
+            }
+            return [.. buffer];
+        }
+
+        public static int CountLine(this string? text, bool countEmptyLine = true)
+        {
+            if (string.IsNullOrEmpty(text))
+            {
+                return countEmptyLine ? 1 : 0;
+            }
+            var count = 1;
+            foreach (var span in text.AsSpan().EnumerateLines())
+            {
+                if (countEmptyLine || (span.Length is > 0 && !span.IsWhiteSpace()) )
+                {
+                    count++;
+                }
+            }
+            return count;
+        }
+
+        public static int LengthWithoutSpace(this string? text)
+        {
+            if (string.IsNullOrEmpty(text))
+            {
+                return 0;
+            }
+            var count = 0;
+            foreach (var rune in text.EnumerateRunes())
+            {
+                if (!Rune.IsWhiteSpace(rune))
+                {
+                    count++;
+                }
+            }
+            return count;
+        }
+
+        public static string? GetNullIfEmpty(this string? text) => string.IsNullOrEmpty(text) ? null : text;
+        public static string? GetNullIfWhiteSpace(this string? text) => string.IsNullOrWhiteSpace(text) ? null : text;
+
+        public static string Shared(this string text) => StringPool.Get(text);
+
+        public static StringComparer NaturalOrderComparer { get; } = StringComparer.Create(CultureInfo.InvariantCulture, CompareOptions.NumericOrdering);
+
+        public static int CompareByNaturalOrder(this string? left, string? right) => NaturalOrderComparer.Compare(left, right);
+        public static int CompareByNaturalOrder(this string? left, string? right, bool isNullMinimum)
+        {
+            if (string.IsNullOrEmpty(left))
+            {
+                if (string.IsNullOrEmpty(right))
+                {
+                    return 0;
+                }
+                else
+                {
+                    return isNullMinimum ? -1 : 1;
+                }
+            }
+            else if (string.IsNullOrEmpty(right))
+            {
+                return isNullMinimum ? 1 : -1;
+            }
+            else
+            {
+                return NaturalOrderComparer.Compare(left, right);
+            }
+        }
+
+        public static string AutoFormat(this TimeSpan time) => time.Ticks switch
+        {
+            >= TimeSpan.TicksPerDay => time.ToString(@"d\d\ h\:mm\:ss"),
+            >= TimeSpan.TicksPerHour => time.ToString(@"h\:mm\:ss\.f"),
+            >= TimeSpan.TicksPerMinute => time.ToString(@"m\:ss\.ff"),
+            _ => time.ToString(@"s\.ffff"),
+        };
+    }
+}

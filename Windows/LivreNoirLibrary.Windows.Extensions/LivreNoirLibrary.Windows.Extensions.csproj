@@ -1,0 +1,24 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+	<PropertyGroup>
+		<TargetFramework>net10.0-windows</TargetFramework>
+		<LangVersion>preview</LangVersion>
+		<ImplicitUsings>disable</ImplicitUsings>
+		<Nullable>enable</Nullable>
+		<UseWPF>true</UseWPF>
+		<UseWindowsForms>true</UseWindowsForms>
+		<AllowUnsafeBlocks>True</AllowUnsafeBlocks>
+		<Authors>Kuroki-Narumi</Authors>
+		<Company>LivreNoir</Company>
+		<RepositoryUrl>https://github.com/Kuroki-Narumi/LivreNoirLibrary10</RepositoryUrl>
+		<RootNamespace>LivreNoirLibrary.Windows</RootNamespace>
+		<EmitCompilerGeneratedFiles>true</EmitCompilerGeneratedFiles>
+		<BaseOutputPath>..\..\bin</BaseOutputPath>
+	</PropertyGroup>
+
+	<ItemGroup>
+	  <ProjectReference Include="..\LivreNoirLibrary.Windows.Core\LivreNoirLibrary.Windows.Core.csproj" />
+	  <ProjectReference Include="..\LivreNoirLibrary.Windows.Media\LivreNoirLibrary.Windows.Media.csproj" />
+	</ItemGroup>
+
+</Project>

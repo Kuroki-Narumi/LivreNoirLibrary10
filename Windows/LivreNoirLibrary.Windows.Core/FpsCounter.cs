@@ -1,0 +1,75 @@
+﻿using System;
+using System.Windows;
+using System.Diagnostics;
+
+namespace LivreNoirLibrary.Windows
+{
+    public class FpsCounter(int bufferSize) : DependencyObject
+    {
+        public const int DefaultBufferSize = 30;
+
+        private readonly int _buffer_size = bufferSize;
+        private readonly long[] _buffer = new long[bufferSize];
+        private int _index;
+        private long _total;
+        private long _t0;
+        private readonly double _ticks_per_buffer = bufferSize * TimeSpan.TicksPerSecond;
+
+        public void StartCount()
+        {
+            _t0 = Stopwatch.GetTimestamp();
+        }
+
+        public void FinishCount(Action<double> action)
+        {
+            if (FinishCountCore(out var fps))
+            {
+                action(fps);
+            }
+        }
+
+        public void FinishCount(DependencyObject d, DependencyProperty property)
+        {
+            if (FinishCountCore(out var fps))
+            {
+                d.SetValue(property, fps);
+            }
+        }
+
+        public void FinishCount(DependencyObject d, DependencyPropertyKey propertyKey)
+        {
+            if (FinishCountCore(out var fps))
+            {
+                d.SetValue(propertyKey, fps);
+            }
+        }
+
+        private bool FinishCountCore(out double fps)
+        {
+            var t = Stopwatch.GetTimestamp() - _t0;
+            var buffer = _buffer;
+            var index = _index;
+            var total = _total;
+            try
+            {
+                total -= buffer[index];
+                total += t;
+                buffer[index] = t;
+                index++;
+                if (index >= _buffer_size)
+                {
+                    fps = _ticks_per_buffer / total;
+                    index = 0;
+                    return true;
+                }
+                fps = 0;
+                return false;
+            }
+            finally
+            {
+                _index = index;
+                _total = total;
+            }
+        }
+    }
+}

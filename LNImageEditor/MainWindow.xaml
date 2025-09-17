@@ -4,10 +4,10 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:LNImageEditor"
-        xmlns:ctrl="clr-namespace:LivreNoirLibrary.Windows.Controls;assembly=LivreNoirLibrary.Wpf"
-        xmlns:effects="clr-namespace:LivreNoirLibrary.Media.Effects;assembly=LivreNoirLibrary.Wpf"
+        xmlns:ctrl="clr-namespace:LivreNoirLibrary.Windows.Controls;assembly=LivreNoirLibrary.Windows.Controls"
+        xmlns:conv="clr-namespace:LivreNoirLibrary.Windows.Converters;assembly=LivreNoirLibrary.Windows.Controls"
         mc:Ignorable="d" d:DataContext="{d:DesignInstance Type=local:MainWindow}"
-        Title="LN Image Editor" Height="720" Width="1280" FontSize="14" AllowDrop="True">
+        Title="LN Image Editor" Height="720" Width="1280" FontSize="14" AllowDrop="True" UseLayoutRounding="True">
     <Grid>
         <Grid x:Name="MainUI">
             <Grid.ColumnDefinitions>
