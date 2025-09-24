@@ -1,0 +1,46 @@
+﻿<Window x:Class="LivreNoirLibrary.SandBox.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:LivreNoirLibrary.SandBox"
+        xmlns:ct="clr-namespace:LivreNoirLibrary.Windows.Controls;assembly=LivreNoirLibrary.Windows.Controls"
+        mc:Ignorable="d" d:DataContext="{d:DesignInstance Type=local:ViewModel}"
+        Title="MainWindow" Height="450" Width="800" AllowDrop="True">
+    <Grid>
+        <Grid x:Name="MainUI">
+            <Grid.Resources>
+                <Style TargetType="ct:Button">
+                    <Setter Property="Margin" Value="4"/>
+                </Style>
+                <Style TargetType="ct:LabeledSlider">
+                    <Setter Property="Margin" Value="4"/>
+                    <Setter Property="SliderWidth" Value="160"/>
+                    <Setter Property="IsTextEditable" Value="True"/>
+                    <Setter Property="Minimum" Value="256"/>
+                    <Setter Property="Maximum" Value="1920"/>
+                    <Setter Property="IsSnapToTickEnabled" Value="True"/>
+                    <Setter Property="TickFrequency" Value="16"/>
+                    <EventSetter Event="PreviewMouseWheel" Handler="LabeledSlider_PreviewMouseWheel"/>
+                </Style>
+                <Style TargetType="ComboBox" BasedOn="{StaticResource ComboBoxBase}">
+                    <Setter Property="Margin" Value="4"/>
+                    <EventSetter Event="PreviewMouseWheel" Handler="ComboBox_PreviewMouseWheel"/>
+                </Style>
+            </Grid.Resources>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
+            <WrapPanel Orientation="Horizontal">
+                <ct:Button Icon="{x:Static ct:Icons.Open}" Command="ApplicationCommands.Open"/>
+                <ct:Button Icon="{x:Static ct:Icons.Wave}" Click="OnClick_Assemble"/>
+                <ComboBox ItemsSource="{x:Static local:ViewModel.SizeList}" SelectedItem="{Binding BgaSize}"/>
+                <ComboBox ItemsSource="{x:Static local:ViewModel.FpsList}" SelectedItem="{Binding Fps}"/>
+                <ct:Button Icon="{x:Static ct:Icons.Save}" Command="ApplicationCommands.Save"/>
+            </WrapPanel>
+            <Image Grid.Row="0" Stretch="None" HorizontalAlignment="Left" VerticalAlignment="Top"/>
+        </Grid>
+        <ct:TaskProgressBar x:Name="TaskProgressBar"/>
+    </Grid>
+</Window>

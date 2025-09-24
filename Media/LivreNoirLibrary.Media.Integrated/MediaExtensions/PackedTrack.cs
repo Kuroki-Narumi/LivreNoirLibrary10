@@ -34,7 +34,6 @@ namespace LivreNoirLibrary.Media.Integrated
             this PackedTrack packed, 
             BM3Score source, 
             string baseFilename, 
-            ScoreOptions scoreOptions,
             PackOptions packOptions)
         {
             var trackId = packed.TrackId;
@@ -58,7 +57,7 @@ namespace LivreNoirLibrary.Media.Integrated
                 return target;
             }
 
-            if (scoreOptions.SetupBarEnabled)
+            if (source.Options.SetupBarEnabled)
             {
                 var endPos = source.GetTimeSignature(default).ToRational();
                 headroom += (int)Math.Ceiling((double)endPos * 4);

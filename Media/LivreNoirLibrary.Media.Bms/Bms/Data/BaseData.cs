@@ -1,7 +1,7 @@
 ﻿using LivreNoirLibrary.Numerics;
-using System;
 using System.Collections.Generic;
-using static System.Runtime.InteropServices.JavaScript.JSType;
+using System.IO;
+using System.Runtime.InteropServices;
 
 namespace LivreNoirLibrary.Media.Bms
 {
@@ -18,6 +18,15 @@ namespace LivreNoirLibrary.Media.Bms
         IHeaderCollection IBmsData.Headers => Headers;
         IDefListCollection IBmsData.DefLists => DefLists;
         ITimeline IBmsData.Timeline => Timeline;
+
+        public void Clear()
+        {
+            Headers.Clear();
+            DefLists.Clear();
+            Bars.Clear();
+            Timeline.Clear();
+            Flows.Clear();
+        }
 
         public IEnumerable<BaseData> EachData()
         {
@@ -91,12 +100,12 @@ namespace LivreNoirLibrary.Media.Bms
             ClearBarLengthCache(number);
         }
 
-        public void DeleteBar(int number)
+        public void DeleteBar(int number, int count)
         {
             foreach (var data in EachData())
             {
                 data.Bars.Delete(number);
-                data.Timeline.DeleteBar(number);
+                data.Timeline.DeleteBar(number, count);
             }
             ClearBarLengthCache(number);
         }
@@ -106,5 +115,56 @@ namespace LivreNoirLibrary.Media.Bms
         internal virtual Rational GetAbsolutePosition(BarPosition position, IBarPositionProvider provider) => Parent!.GetAbsolutePosition(position, provider);
         internal virtual BarPosition GetBarPosition(Rational absolutePosition, IBarPositionProvider provider) => Parent!.GetBarPosition(absolutePosition, provider);
         internal virtual IEnumerable<BarInfo> EnumerateBars(int first, int last, IBarPositionProvider provider) => Parent!.EnumerateBars(first, last, provider);
+
+        public void Merge(BaseData data)
+        {
+            Note += data.Note;
+            Headers.Merge(data.Headers);
+            DefLists.Merge(data.DefLists);
+            Bars.Merge(data.Bars);
+            data.Timeline.CopyTo(Timeline);
+        }
+
+        public void DumpHeader(BmsTextWriter writer)
+        {
+            var radix = writer.Radix;
+            if (Headers.HasValue || radix is not Constants.Base_Default)
+            {
+                Headers.Dump(writer);
+            }
+            if (DefLists.HasValue)
+            {
+                DefLists.Dump(writer);
+            }
+        }
+
+        internal void DumpMain(BinaryWriter writer)
+        {
+            WriteNote(writer);
+            Headers.Dump(writer);
+            DefLists.Dump(writer);
+            Bars.Dump(writer);
+            Timeline.Dump(writer);
+            writer.Write(Flows.Count);
+            foreach (var flow in CollectionsMarshal.AsSpan(Flows))
+            {
+                flow.Dump(writer);
+            }
+        }
+
+        internal void LoadMain(BinaryReader reader)
+        {
+            Note = ReadNote(reader);
+            Headers.ProcessLoad(reader);
+            DefLists.ProcessLoad(reader);
+            Bars.ProcessLoad(reader);
+            Timeline.ReplaceBy(reader);
+            Flows.Clear();
+            var count = reader.ReadInt32();
+            for (var i = 0; i < count; i++)
+            {
+                Flows.Add(FlowContainer.Load(reader, this));
+            }
+        }
     }
 }

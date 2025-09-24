@@ -23,6 +23,8 @@ namespace LivreNoirLibrary.Media.FFmpeg
             return new(stream);
         }
 
+        public StreamInfo CreateAudioStream(AudioEncodeOptions options) => CreateAudioStream(0, options);
+
         public StreamInfo CreateAudioStream(AVCodecID codec, AudioEncodeOptions options)
         {
             if (codec is AVCodecID.AV_CODEC_ID_NONE)

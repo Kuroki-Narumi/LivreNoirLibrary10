@@ -18,6 +18,6 @@ namespace LivreNoirLibrary.Media.Bms
         public void ClearBarLength();
         public void SetBarLength(int number, Rational value);
         public void InsertBar(int number, Rational value);
-        public void DeleteBar(int number);
+        public void DeleteBar(int number, int count);
     }
 }

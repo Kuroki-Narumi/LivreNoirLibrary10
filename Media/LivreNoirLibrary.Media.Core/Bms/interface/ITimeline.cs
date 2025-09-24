@@ -7,7 +7,6 @@ namespace LivreNoirLibrary.Media.Bms
     public interface ITimeline : IXMultiTimeline<BarPosition, INote>
     {
         public void InsertBar(int number);
-        public void DeleteBar(int number);
-        public void CutBar(IBarPositionProvider provider, Dictionary<int, BarResizeInfo> newValues, bool overlap);
+        public void DeleteBar(int number, int count);
     }
 }

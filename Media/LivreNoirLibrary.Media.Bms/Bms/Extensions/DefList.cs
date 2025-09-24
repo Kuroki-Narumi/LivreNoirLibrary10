@@ -66,6 +66,16 @@ namespace LivreNoirLibrary.Media.Bms
             return false;
         }
 
+        public static bool TryGetMediaPath(this IBmsData data, int index, string root, [MaybeNullWhen(false)] out string name, [MaybeNullWhen(false)] out string path)
+        {
+            if (TryGetDef(data, DefType.Bmp, index, out name) && FileUtils.TryGetMediaFileName(Path.GetFullPath(name, root), out path))
+            {
+                return true;
+            }
+            path = null;
+            return false;
+        }
+
         public static int FindFreeDefIndex(this IBmsData data, DefType type, int start = 1)
         {
             while (TryGetDef(data, type, start, out _))
@@ -209,6 +219,14 @@ namespace LivreNoirLibrary.Media.Bms
                         break;
                 }
             }
+            if (data.LnObj == index1)
+            {
+                data.LnObj = index2;
+            }
+            else if (data.LnObj == index2)
+            {
+                data.LnObj = index1;
+            }
         }
 
         private static void DefSwapCore(IBmsData data, DefType type, int index1, int index2)
@@ -307,6 +325,7 @@ namespace LivreNoirLibrary.Media.Bms
                         break;
                 }
             }
+            data.LnObj = map[data.LnObj];
         }
 
         private static void DefMapCore(IBmsData data, DefType type, DefIndexMap map)

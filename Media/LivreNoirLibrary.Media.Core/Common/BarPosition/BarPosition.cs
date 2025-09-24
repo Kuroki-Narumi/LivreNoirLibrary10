@@ -34,8 +34,6 @@ namespace LivreNoirLibrary.Media
         public BarPosition(int bar) : this(bar, Rational.Zero) { }
         public BarPosition(int bar, long offsetNum, long offsetDen = 1) : this(bar, new Rational(offsetNum, offsetDen)) { }
 
-        public static implicit operator BarPosition(Rational value) => new(0, value);
-
         public int CompareTo(BarPosition other) => _bar == other._bar ? _offset.CompareTo(other._offset) : _bar.CompareTo(other._bar);
         public bool Equals(BarPosition other) => this == other;
         public override bool Equals(object? obj) => obj is BarPosition pos && Equals(pos);

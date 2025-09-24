@@ -58,6 +58,11 @@ namespace LivreNoirLibrary.Windows
             point.Y = Math.Truncate(point.Y);
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static (int Width, int Height) ToInt(this in Point size) => ((int)size.X, (int)size.Y);
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static (int Width, int Height) ToInt(this in Size size) => ((int)size.Width, (int)size.Height);
+
         public static void Deconstruct(this in Rect rect, out double x, out double y, out double width, out double height)
         {
             x = rect.X;

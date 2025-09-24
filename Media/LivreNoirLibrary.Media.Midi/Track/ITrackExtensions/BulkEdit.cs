@@ -21,7 +21,7 @@ namespace LivreNoirLibrary.Media.Midi
             {
                 meta = sysex = cc = note = true;
             }
-            var numbers = options.Numbers;
+            var numbers = options._numbers;
             var numberP = numbers.Count is > 0;
 
             var q_pos = options.PositionQuantize;

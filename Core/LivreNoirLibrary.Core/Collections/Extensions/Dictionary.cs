@@ -396,6 +396,26 @@ namespace LivreNoirLibrary.Collections
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static void AddRange<TKey, TValue, TInner>(this IDictionary<TKey, TInner> dic, IEnumerable<KeyValuePair<TKey, TValue>> values)
+            where TInner : ICollection<TValue>, new()
+        {
+            foreach (var (key, value) in values)
+            {
+                Add(dic, key, value);
+            }
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static void AddRange<TKey, TValue, TInner>(this IDictionary<TKey, TInner> dic, IEnumerable<(TKey, TValue)> values)
+            where TInner : ICollection<TValue>, new()
+        {
+            foreach (var (key, value) in values)
+            {
+                Add(dic, key, value);
+            }
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static void Merge<TKey, TValue, TInner>(this IDictionary<TKey, TInner> dic, TKey key, IEnumerable<TValue> values)
             where TInner : ICollection<TValue>, new()
         {

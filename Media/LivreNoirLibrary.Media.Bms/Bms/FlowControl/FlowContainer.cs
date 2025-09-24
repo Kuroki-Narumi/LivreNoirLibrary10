@@ -31,6 +31,10 @@ namespace LivreNoirLibrary.Media.Bms
             return branch;
         }
 
+        public string GetBmsHeader(FlowBranch branch) => Type is FlowType.Random
+                ? branch.Condition is Constants.DefaultCondition ? Tags.Else : $"{Tags.If} {branch.Condition}"
+                : branch.Condition is Constants.DefaultCondition ? Tags.Default : $"{Tags.Case} {branch.Condition}";
+
         public IEnumerable<BaseData> EnumerateBranches()
         {
             foreach (var branch in Branches)

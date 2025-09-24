@@ -1,8 +1,5 @@
-﻿using LivreNoirLibrary.Numerics;
-using System;
-using System.Collections.Generic;
+﻿using System;
 using System.Diagnostics.CodeAnalysis;
-using System.Linq;
 
 namespace LivreNoirLibrary.Media.Bms
 {
@@ -129,7 +126,36 @@ namespace LivreNoirLibrary.Media.Bms
             public LongNoteMode LnMode { get => data.GetEnumHeader(HeaderType.LnMode, Constants.DefaultLnMode); set => data.SetHeader(HeaderType.LnMode, value); }
             public double ExRank { get => data.GetDoubleHeader(HeaderType.DefExRank, Constants.DefaultExRank); set => data.SetHeader(HeaderType.DefExRank, value); }
             public string? Comment { get => data.GetTextHeader(HeaderType.Comment); set => data.SetHeader(HeaderType.Comment, value); }
-        }
 
+            public int LnObj
+            {
+                get
+                {
+                    if (data is IRootData root)
+                    {
+                        return root.GetIntHeader(HeaderType.LnObj);
+                    }
+                    else if (data.Parent is { } parent)
+                    {
+                        return parent.LnObj;
+                    }
+                    else
+                    {
+                        return 0;
+                    }
+                }
+                set
+                {
+                    if (data is IRootData root)
+                    {
+                        root.SetHeader(HeaderType.LnObj, value);
+                    }
+                    else if (data.Parent is { } parent)
+                    {
+                        parent.LnObj = value;
+                    }
+                }
+            }
+        }
     }
 }

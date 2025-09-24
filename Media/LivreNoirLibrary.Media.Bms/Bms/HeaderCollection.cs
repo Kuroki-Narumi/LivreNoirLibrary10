@@ -11,9 +11,9 @@ namespace LivreNoirLibrary.Media.Bms
 {
     public class HeaderCollection : IJsonWriter, IHeaderCollection, IDumpable, ILoadable<HeaderCollection>
     {
-        private readonly Dictionary<HeaderType, double> _doubleValues = [];
-        private readonly Dictionary<HeaderType, string> _stringValues = [];
-        private readonly List<(string Key, string Value)> _sub = [];
+        internal readonly Dictionary<HeaderType, double> _doubleValues = [];
+        internal readonly Dictionary<HeaderType, string> _stringValues = [];
+        internal readonly List<(string Key, string Value)> _sub = [];
 
         public List<(string Key, string Value)> SubHeaders => _sub;
 
@@ -100,9 +100,8 @@ namespace LivreNoirLibrary.Media.Bms
             }
         }
 
-        public void Dump(BmsTextWriter writer)
+        public IEnumerable<(string, string)> EnumerateHeaders(int radix = 0)
         {
-            var radix = writer.Radix;
             for (var t = HeaderType.Player; t is <= HeaderType.Comment; t++)
             {
                 var key = t.ToString().ToUpper();
@@ -110,28 +109,37 @@ namespace LivreNoirLibrary.Media.Bms
                 {
                     if (_doubleValues.TryGetValue(t, out var value))
                     {
-                        if (t is HeaderType.LnObj)
+                        if (radix is not 0 && t is HeaderType.LnObj)
                         {
-                            writer.WriteLine($"#{key} {BmsUtils.ToBased((int)value, radix)}");
+                            yield return (key, BmsUtils.ToBased((int)value, radix));
                         }
                         else
                         {
-                            writer.WriteLine($"#{key} {value}");
+                            yield return (key, value.ToString());
                         }
                     }
                 }
                 else if (_stringValues.TryGetValue(t, out var value))
                 {
-                    writer.WriteLine($"#{key} {value}");
+                    yield return (key, value);
                 }
             }
-            foreach (var (key, value) in CollectionsMarshal.AsSpan(_sub))
+            foreach (var (key, value) in _sub)
             {
-                writer.WriteLine($"#{key.ToUpper()} {value}");
+                yield return (key.ToUpper(), value);
             }
-            if (radix is not Constants.Base_Default)
+            if (radix is not (0 or Constants.Base_Default))
             {
-                writer.WriteLine($"#BASE {radix}");
+                yield return ("BASE", radix.ToString());
+            }
+        }
+
+        public void Dump(BmsTextWriter writer)
+        {
+            var radix = writer.Radix;
+            foreach (var (key, value) in EnumerateHeaders(radix))
+            {
+                writer.WriteLine($"#{key} {value}");
             }
         }
 
@@ -212,24 +220,9 @@ namespace LivreNoirLibrary.Media.Bms
         public void WriteJson(Utf8JsonWriter writer, JsonSerializerOptions options)
         {
             writer.WriteStartArray();
-            for (var t = HeaderType.Player; t is <= HeaderType.Comment; t++)
+            foreach (var (key, value) in EnumerateHeaders())
             {
-                var key = t.ToString().ToUpper();
-                if (BmsUtils.IsNumberHeader(t))
-                {
-                    if (_doubleValues.TryGetValue(t, out var value))
-                    {
-                        writer.WriteStringValue($"#{key} {value}");
-                    }
-                }
-                else if (_stringValues.TryGetValue(t, out var value))
-                {
-                    writer.WriteStringValue($"#{key} {value}");
-                }
-            }
-            foreach (var (key, value) in CollectionsMarshal.AsSpan(_sub))
-            {
-                writer.WriteStringValue($"#{key.ToUpper()} {value}");
+                writer.WriteStringValue($"#{key} {value}");
             }
             writer.WriteEndArray();
         }

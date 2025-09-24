@@ -9,13 +9,13 @@
 		<Authors>Kuroki-Narumi</Authors>
 		<Company>LivreNoir</Company>
 		<RepositoryUrl>https://github.com/Kuroki-Narumi/LivreNoirLibrary10</RepositoryUrl>
-		<RootNamespace>LivreNoirLibrary.Media.Bms</RootNamespace>
+		<RootNamespace>LivreNoirLibrary.Media</RootNamespace>
 		<EmitCompilerGeneratedFiles>true</EmitCompilerGeneratedFiles>
 		<BaseOutputPath>..\..\bin</BaseOutputPath>
 	</PropertyGroup>
 
 	<ItemGroup>
-	  <ProjectReference Include="..\LivreNoirLibrary.Media.Core\LivreNoirLibrary.Media.Core.csproj" />
+		<ProjectReference Include="..\LivreNoirLibrary.Media.Core\LivreNoirLibrary.Media.Core.csproj" />
 	</ItemGroup>
 
 </Project>

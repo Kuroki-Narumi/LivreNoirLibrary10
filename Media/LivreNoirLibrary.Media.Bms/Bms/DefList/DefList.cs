@@ -14,8 +14,8 @@ namespace LivreNoirLibrary.Media.Bms
 {
     public class DefList : IDefList, IDumpable, ILoadable<DefList>
     {
-        private readonly List<short> _keys;
-        private readonly List<string> _values;
+        internal readonly List<short> _keys;
+        internal readonly List<string> _values;
         private int _version;
 
         public DefList()

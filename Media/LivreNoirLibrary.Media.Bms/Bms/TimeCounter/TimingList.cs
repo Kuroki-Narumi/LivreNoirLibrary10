@@ -14,7 +14,7 @@ namespace LivreNoirLibrary.Media.Bms
         public long FirstTick => _last is 0 ? 0 : _first;
         public long LastTick => _last;
 
-        public static TimingList Create(BaseData data, TimeCounter counter, Predicate<INote>? selector = null, long length = 0)
+        public static TimingList Create(IBmsData data, TimeCounter counter, Predicate<ISoundNote>? selector = null, long length = 0)
         {
             selector ??= n => n.IsPlayableSound(false, out _);
             return CreateCore(length, list =>
@@ -28,18 +28,18 @@ namespace LivreNoirLibrary.Media.Bms
                     }
                     foreach (var note in CollectionsMarshal.AsSpan(notes))
                     {
-                        if (selector(note))
+                        if (note is ISoundNote s && selector(s))
                         {
-                            list.Add(tick, note);
+                            list.Add(tick, s);
                         }
                     }
                 }
             });
         }
 
-        public static TimingList Create(Selection selection, TimeCounter counter, Predicate<INote>? selector = null, long length = 0)
+        public static TimingList Create(Selection selection, TimeCounter counter, Predicate<ISoundNote>? selector = null, long length = 0)
         {
-            selector ??= n => n.IsPlayableSound();
+            selector ??= n => n.IsPlayableSound(false, out _);
             return CreateCore(length, list =>
             {
                 foreach (var (_, beat, note) in selection)
@@ -49,21 +49,21 @@ namespace LivreNoirLibrary.Media.Bms
                     {
                         break;
                     }
-                    if (selector(note))
+                    if (note is ISoundNote s && selector(s))
                     {
-                        list.Add(tick, note);
+                        list.Add(tick, s);
                     }
                 }
             });
         }
 
-        public static TimingList Create(BaseData data, Predicate<Note>? selector = null, long length = 0)
+        public static TimingList Create(IBmsData data, Predicate<ISoundNote>? selector = null, long length = 0)
         {
             TimeCounter counter = new(data);
             return Create(data, counter, selector, length);
         }
 
-        public static TimingList Create(BaseData data, Selection selection, Predicate<Note>? selector = null, long length = 0)
+        public static TimingList Create(IBmsData data, Selection selection, Predicate<ISoundNote>? selector = null, long length = 0)
         {
             TimeCounter counter = new(data);
             return Create(selection, counter, selector, length);
@@ -84,9 +84,9 @@ namespace LivreNoirLibrary.Media.Bms
             _last = long.MaxValue;
         }
 
-        public void Add<T>(long ticks, T note) where T : INote
+        public void Add(long ticks, ISoundNote note)
         {
-            var id = note.Id;
+            var id = note.Value;
             if (id is > 0)
             {
                 Add(id, ticks, note.Lane is > 0);

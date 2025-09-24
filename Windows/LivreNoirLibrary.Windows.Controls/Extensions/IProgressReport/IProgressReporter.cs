@@ -29,6 +29,17 @@ namespace LivreNoirLibrary.Windows.Controls
             ip.WorkingTask = ProcessTask(ip, progress, args);
         }
 
+        public static void StartTask(this IProgressReporter ip, ProgressHandler mainProcess, bool isAbortable = true, ProgressReport initialReport = default, TaskFinishedHandler? finished = null)
+        {
+            StartTask(ip, new StartTaskArgs()
+            {
+                IsAbortable = isAbortable,
+                MainProcess = mainProcess,
+                InitialReport = initialReport,
+                Finished = finished,
+            });
+        }
+
         public static void PrepareTask(this IProgressReporter ip, in ProgressReport report, bool abortable = false)
         {
             ip.MainElement.IsEnabled = false;

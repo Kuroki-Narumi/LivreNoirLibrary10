@@ -13,7 +13,7 @@ namespace LivreNoirLibrary.Media.Bms
         private readonly List<decimal> _second_list = [];
         private readonly List<Second2BeatItem> _second_item_list = [];
 
-        public TimeCounter(BaseData data)
+        public TimeCounter(IBmsData data)
         {
             var tempo = (decimal)data.Bpm;
             var lastBeat = 0m;
