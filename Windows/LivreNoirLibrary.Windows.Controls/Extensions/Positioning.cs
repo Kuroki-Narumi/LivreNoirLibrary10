@@ -4,7 +4,7 @@ using System.Windows.Controls;
 
 namespace LivreNoirLibrary.Windows.Controls
 {
-    public static partial class ControlExtension
+    public static partial class ControlExtensions
     {
         public static Point GetLeftTopPosition(this Control control, ListView listView, int index)
         {

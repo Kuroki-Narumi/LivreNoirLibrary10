@@ -17,27 +17,18 @@ namespace LivreNoirLibrary.Windows.Controls
 
     public static class IProgressExtension
     {
-        public static void StartTask(this IProgressReporter ip, StartTaskArgs args)
-        {
-            try
-            {
-                ip.WorkingTask?.Wait();
-            }
-            catch { }
-            PrepareTask(ip, args.InitialReport, args.IsAbortable);
-            ProgressReporter progress = new(ip.ProgressBar.OnProgressChanged);
-            ip.WorkingTask = ProcessTask(ip, progress, args);
-        }
+        public static void StartTask(this IProgressReporter ip, StartTaskArgs args) => StartTask(ip, args.MainProcess, args.IsAbortable, args.InitialReport, args.Finished);
 
         public static void StartTask(this IProgressReporter ip, ProgressHandler mainProcess, bool isAbortable = true, ProgressReport initialReport = default, TaskFinishedHandler? finished = null)
         {
-            StartTask(ip, new StartTaskArgs()
+            if (ip.WorkingTask is { } task)
             {
-                IsAbortable = isAbortable,
-                MainProcess = mainProcess,
-                InitialReport = initialReport,
-                Finished = finished,
-            });
+                task.ConfigureAwait(false);
+                task.Wait();
+            }
+            PrepareTask(ip, initialReport, isAbortable);
+            ProgressReporter progress = new(ip.ProgressBar.OnProgressChanged);
+            ip.WorkingTask = ProcessTask(ip, progress, mainProcess, finished);
         }
 
         public static void PrepareTask(this IProgressReporter ip, in ProgressReport report, bool abortable = false)
@@ -65,7 +56,7 @@ namespace LivreNoirLibrary.Windows.Controls
             e.Cancel = true;
         }
 
-        private static async Task ProcessTask(IProgressReporter ip, ProgressReporter p, StartTaskArgs args)
+        private static async Task ProcessTask(IProgressReporter ip, ProgressReporter p, ProgressHandler mainProcess, TaskFinishedHandler? finished)
         {
             var aborted = false;
             var c = ip.ProgressBar.CreateCancellationTokenSource();
@@ -76,7 +67,7 @@ namespace LivreNoirLibrary.Windows.Controls
                 {
                     try
                     {
-                        args.MainProcess(p, token);
+                        mainProcess(p, token);
                     }
                     catch (OperationCanceledException)
                     {
@@ -86,12 +77,41 @@ namespace LivreNoirLibrary.Windows.Controls
             }
             finally
             {
-                _ = ip.Dispatcher.BeginInvoke(() =>
+                await ip.Dispatcher.BeginInvoke(() =>
                 {
                     ip.WorkingTask = null;
-                    args.Finished?.Invoke(aborted);
+                    finished?.Invoke(aborted);
                     FinishTask(ip);
                 });
+            }
+        }
+
+        public static void StartTaskSynchronized(this IProgressReporter ip, StartTaskArgs args) => StartTaskSynchronized(ip, args.MainProcess, args.IsAbortable, args.InitialReport, args.Finished);
+
+        public static void StartTaskSynchronized(this IProgressReporter ip, ProgressHandler mainProcess, bool isAbortable = true, ProgressReport initialReport = default, TaskFinishedHandler? finished = null)
+        {
+            if (ip.WorkingTask is { } task)
+            {
+                task.ConfigureAwait(false);
+                task.Wait();
+            }
+            PrepareTask(ip, initialReport, isAbortable);
+            ProgressReporter progress = new(ip.ProgressBar.OnProgressChanged);
+            var aborted = false;
+            var c = ip.ProgressBar.CreateCancellationTokenSource();
+            var token = c.Token;
+            try
+            {
+                mainProcess(progress, token);
+            }
+            catch (OperationCanceledException)
+            {
+                aborted = true;
+            }
+            finally
+            {
+                finished?.Invoke(aborted);
+                FinishTask(ip);
             }
         }
     }

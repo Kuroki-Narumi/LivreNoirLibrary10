@@ -1,14 +1,11 @@
-using LivreNoirLibrary.Collections;
-using LivreNoirLibrary.Debug;
 using System;
 using System.Buffers;
-using System.Numerics;
-using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Windows;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using LivreNoirLibrary.Media;
+using LivreNoirLibrary.Collections;
 
 namespace LivreNoirLibrary.Windows.Media
 {
@@ -16,37 +13,6 @@ namespace LivreNoirLibrary.Windows.Media
     {
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static Int32Rect GetRect(this BitmapSource bitmap) => new(0, 0, bitmap.PixelWidth, bitmap.PixelHeight);
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static void AddDirtyRect(this WriteableBitmap bitmap) => bitmap.AddDirtyRect(GetRect(bitmap));
-
-        public static void AdjustRect(this BitmapSource bitmap, ref int x, ref int y, ref int width, ref int height)
-        {
-            if (x is < 0)
-            {
-                width += x;
-                x = 0;
-            }
-            if (y is < 0)
-            {
-                height += y;
-                y = 0;
-            }
-            var max = bitmap.PixelWidth - x;
-            if (width > max)
-            {
-                width = max;
-            }
-            max = bitmap.PixelHeight - y;
-            if (height > max)
-            {
-                height = max;
-            }
-            if (width is <= 0 || height is <= 0)
-            {
-                width = 0;
-                height = 0;
-            }
-        }
 
         public static unsafe byte* GetPtr(this WriteableBitmap bitmap) => (byte*)bitmap.BackBuffer;
         public static unsafe byte* GetPtr(this WriteableBitmap bitmap, int x, int y) => (byte*)bitmap.BackBuffer + x * 4 + y * bitmap.BackBufferStride;
@@ -92,12 +58,8 @@ namespace LivreNoirLibrary.Windows.Media
 
         public static unsafe void Clear(this WriteableBitmap bitmap, int x, int y, int width, int height)
         {
-            AdjustRect(bitmap, ref x, ref y, ref width, ref height);
             using var ptr = new BitmapPointer(bitmap);
-            for (var yy = 0; yy < height; yy++)
-            {
-                SimdOperations.Clear(ptr.AsUIntSpan(y + yy, x, width));
-            }
+            BitmapOperation.Clear(ptr, new(x, y, width, height));
         }
 
         public static void Clear(this WriteableBitmap bitmap, Int32Rect rect) => Clear(bitmap, rect.X, rect.Y, rect.Width, rect.Height);
@@ -106,7 +68,7 @@ namespace LivreNoirLibrary.Windows.Media
         {
             if (bitmap is WriteableBitmap w)
             {
-                return GetOpaqueRect((uint*)w.BackBuffer, bitmap.PixelWidth, bitmap.PixelHeight, threshold);
+                return BitmapOperation.GetOpaqueRect(new((void*)w.BackBuffer, w.PixelWidth, w.PixelHeight), margin, threshold).ToInt32Rect();
             }
             var stride = bitmap.PixelWidth * 4;
             var height = bitmap.PixelHeight;
@@ -116,59 +78,12 @@ namespace LivreNoirLibrary.Windows.Media
                 fixed (byte* ptr = buffer)
                 {
                     bitmap.CopyPixels(GetRect(bitmap), (nint)ptr, stride * height, stride);
-                    return GetOpaqueRect((uint*)ptr, bitmap.PixelWidth, bitmap.PixelHeight, threshold);
+                    return BitmapOperation.GetOpaqueRect(new(ptr, bitmap.PixelWidth, bitmap.PixelHeight), margin, threshold).ToInt32Rect();
                 }
             }
             finally
             {
                 ArrayPool<byte>.Shared.Return(buffer);
-            }
-        }
-
-        public static unsafe Int32Rect GetOpaqueRect(uint* pointer, int width, int height, int margin = 0, uint threshold = 1)
-        {
-            var left = width;
-            var right = 0;
-            var top = -1;
-            var bottom = -1;
-            threshold <<= 24; // Alphaの位置にビットシフト
-            for (var y = 0; y < height; y++)
-            {
-                var currentLeft = -1;
-                var currentRight = -1;
-                for (var x = 0; x < width; x++, pointer++)
-                {
-                    if (*pointer >= threshold)
-                    {
-                        if (currentLeft is -1)
-                        {
-                            currentLeft = x;
-                        }
-                        currentRight = x;
-                    }
-                }
-                // 不透明ピクセルがあった場合
-                if (currentLeft is not -1)
-                {
-                    // 左右端の更新
-                    left = Math.Min(left, currentLeft);
-                    right = Math.Max(right, currentRight);
-                    // 上下端の更新
-                    if (top is -1)
-                    {
-                        top = y;
-                    }
-                    bottom = y;
-                }
-            }
-            // 全て透明
-            if (top is -1)
-            {
-                return new(0, 0, 0, 0);
-            }
-            else
-            {
-                return new(Math.Max(left - margin, 0), Math.Max(top - margin, 0), Math.Min(right - left + 1 + margin, width), Math.Min(bottom - top + 1 + margin, height));
             }
         }
     }

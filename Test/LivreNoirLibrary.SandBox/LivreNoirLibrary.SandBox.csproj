@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <OutputType>WinExe</OutputType>
+    <OutputType>Exe</OutputType>
     <TargetFramework>net10.0-windows</TargetFramework>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
@@ -25,6 +25,7 @@
   <ItemGroup>
     <ProjectReference Include="..\..\Media\LivreNoirLibrary.Media.Integrated\LivreNoirLibrary.Media.Integrated.csproj" />
     <ProjectReference Include="..\..\Windows\LivreNoirLibrary.Windows.Controls\LivreNoirLibrary.Windows.Controls.csproj" />
+    <ProjectReference Include="..\..\Windows\LivreNoirLibrary.Windows.Media.Integrated\LivreNoirLibrary.Windows.Media.Integrated.csproj" />
   </ItemGroup>
 
 </Project>

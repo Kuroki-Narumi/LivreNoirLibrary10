@@ -17,6 +17,7 @@
 	</PropertyGroup>
 
 	<ItemGroup>
+	  <ProjectReference Include="..\..\Media\LivreNoirLibrary.Media.Bitmap\LivreNoirLibrary.Media.Bitmap.csproj" />
 	  <ProjectReference Include="..\LivreNoirLibrary.Windows.Core\LivreNoirLibrary.Windows.Core.csproj" />
 	</ItemGroup>
 

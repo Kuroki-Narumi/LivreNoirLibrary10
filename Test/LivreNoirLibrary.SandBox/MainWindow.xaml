@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:LivreNoirLibrary.SandBox"
         xmlns:ct="clr-namespace:LivreNoirLibrary.Windows.Controls;assembly=LivreNoirLibrary.Windows.Controls"
-        mc:Ignorable="d" d:DataContext="{d:DesignInstance Type=local:ViewModel}"
+        mc:Ignorable="d" d:DataContext="{d:DesignInstance Type=local:BmsVideoCreator}"
         Title="MainWindow" Height="450" Width="800" AllowDrop="True">
     <Grid>
         <Grid x:Name="MainUI">
@@ -35,11 +35,11 @@
             <WrapPanel Orientation="Horizontal">
                 <ct:Button Icon="{x:Static ct:Icons.Open}" Command="ApplicationCommands.Open"/>
                 <ct:Button Icon="{x:Static ct:Icons.Wave}" Click="OnClick_Assemble"/>
-                <ComboBox ItemsSource="{x:Static local:ViewModel.SizeList}" SelectedItem="{Binding BgaSize}"/>
-                <ComboBox ItemsSource="{x:Static local:ViewModel.FpsList}" SelectedItem="{Binding Fps}"/>
+                <ComboBox ItemsSource="{x:Static local:BmsVideoCreator.SizeList}" SelectedItem="{Binding Size}"/>
+                <ComboBox ItemsSource="{x:Static local:BmsVideoCreator.FpsList}" SelectedItem="{Binding FrameRate}"/>
                 <ct:Button Icon="{x:Static ct:Icons.Save}" Command="ApplicationCommands.Save"/>
             </WrapPanel>
-            <Image Grid.Row="0" Stretch="None" HorizontalAlignment="Left" VerticalAlignment="Top"/>
+            <Image Grid.Row="1" Source="{Binding RenderTarget}"/>
         </Grid>
         <ct:TaskProgressBar x:Name="TaskProgressBar"/>
     </Grid>

@@ -4,9 +4,9 @@ using System.Windows.Controls;
 
 namespace LivreNoirLibrary.Windows.Controls
 {
-    public static partial class ControlExtension
+    public static partial class ControlExtensions
     {
-        static ControlExtension()
+        static ControlExtensions()
         {
             Input.InputManager.RegisterHorizontalWheelClassHandler<ScrollViewer>(HandleHorizontalWheel);
         }

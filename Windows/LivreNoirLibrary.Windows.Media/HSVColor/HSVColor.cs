@@ -63,8 +63,9 @@ namespace LivreNoirLibrary.Windows.Media
 
         public static implicit operator HsvColor(in Color color) => FromColor(color);
         public static implicit operator HsvColor(in Drawing.Color color) => FromColor(color);
-        public static explicit operator Color(in HsvColor color) => color.ToColor();
-        public static explicit operator Drawing.Color(in HsvColor color) => color.ToDrawingColor();
+        public static implicit operator Color(in HsvColor color) => color.ToColor();
+        public static implicit operator Drawing.Color(in HsvColor color) => color.ToDrawingColor();
+        public static implicit operator LnColor(in HsvColor color) => color.ToLnColor();
 
         public void Deconstruct(out float a, out float r, out float g, out float b)
         {
@@ -86,6 +87,12 @@ namespace LivreNoirLibrary.Windows.Media
         {
             var (a, r, g, b) = GetBytes();
             return Drawing.Color.FromArgb(a, r, g, b);
+        }
+
+        public LnColor ToLnColor()
+        {
+            var (a, r, g, b) = GetBytes();
+            return new(a, r, g, b);
         }
 
         public string GetColorCode(bool alpha = true)

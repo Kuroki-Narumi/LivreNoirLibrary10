@@ -1,14 +1,16 @@
-﻿using System.Text;
+﻿using LivreNoirLibrary.Collections;
+using LivreNoirLibrary.Files;
+using LivreNoirLibrary.Media;
+using LivreNoirLibrary.Media.Bms;
+using LivreNoirLibrary.Media.Integrated;
+using LivreNoirLibrary.ObjectModel;
+using LivreNoirLibrary.Windows;
+using LivreNoirLibrary.Windows.Controls;
+using System.IO;
+using System.Text;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
-using System.IO;
-using LivreNoirLibrary.Files;
-using LivreNoirLibrary.Media.Bms;
-using LivreNoirLibrary.Windows;
-using LivreNoirLibrary.Windows.Controls;
-using LivreNoirLibrary.ObjectModel;
-using LivreNoirLibrary.Media.Integrated;
 
 namespace LivreNoirLibrary.SandBox
 {
@@ -17,7 +19,7 @@ namespace LivreNoirLibrary.SandBox
     /// </summary>
     public partial class MainWindow : Window, IProgressReporter
     {
-        private readonly ViewModel _viewModel;
+        private readonly BmsVideoCreator _viewModel;
         private ConsoleWindow? _consoleWindow;
 
         UIElement IProgressReporter.MainElement => MainUI;
@@ -89,7 +91,8 @@ namespace LivreNoirLibrary.SandBox
         {
             if (_viewModel.BmsData is not null)
             {
-                this.StartTask(_viewModel.AssembleBms, finished: Assemble_Finished);
+                _viewModel.AssembleOptions.Adjust = true;
+                this.StartTask(_viewModel.Assemble, finished: Assemble_Finished);
             }
         }
 
@@ -105,10 +108,20 @@ namespace LivreNoirLibrary.SandBox
 
         private void OnExecuted_Save(object sender, ExecutedRoutedEventArgs e)
         {
-            var path = Path.ChangeExtension(_viewModel.BmsPath, Exts.MP4);
-            if (this.SaveFileDialog(FileDialogOptions.WithInitialPath(path), Filters.MP4) is { } savePath)
+            if (_viewModel.BmsData is not null)
             {
-                this.StartTask((p, c) => _viewModel.CreateVideo(savePath, p, c));
+                _viewModel.AssembleOptions.Adjust = false;
+                this.StartTask(_viewModel.Assemble, finished: Construct_Assemble_Finished);
+            }
+        }
+
+        private void Construct_Assemble_Finished(bool aborted)
+        {
+            var path = Path.ChangeExtension(_viewModel.BmsPath, Exts.MP4);
+            if (_viewModel.TryFlushAssembledData(out var waveData) &&
+                this.SaveFileDialog(FileDialogOptions.WithInitialPath(path), Filters.MP4) is { } savePath)
+            {
+                this.StartTaskSynchronized((p, c) => _viewModel.CreateVideo(savePath, waveData, p, c));
             }
         }
     }

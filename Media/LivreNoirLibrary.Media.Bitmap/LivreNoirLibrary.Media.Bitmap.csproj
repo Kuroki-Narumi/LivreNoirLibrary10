@@ -15,7 +15,7 @@
 	</PropertyGroup>
 
 	<ItemGroup>
-		<ProjectReference Include="..\LivreNoirLibrary.Media.Core\LivreNoirLibrary.Media.Core.csproj" />
+	  <ProjectReference Include="..\..\Core\LivreNoirLibrary.Core\LivreNoirLibrary.Core.csproj" />
 	</ItemGroup>
 
 </Project>

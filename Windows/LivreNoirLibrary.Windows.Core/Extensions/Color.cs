@@ -1,11 +1,17 @@
 ﻿using System;
+using System.Runtime.CompilerServices;
 using System.Windows.Media;
-using static LivreNoirLibrary.Media.ColorUtils;
+using LivreNoirLibrary.Media;
 
-namespace LivreNoirLibrary.Windows.Media
+namespace LivreNoirLibrary.Windows
 {
-    public static partial class ColorExtension
+    public static partial class StructExtensions
     {
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static Color ToColor(this in LnColor color) => Color.FromArgb(color.A, color.R, color.G, color.B);
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static LnColor ToLnColor(this in Color color) => new(color.A, color.R, color.G, color.B);
+
         public static string GetColorCode(this Color color, bool alpha = true)
         {
             return alpha ? $"#{color.A:X2}{color.R:X2}{color.G:X2}{color.B:X2}" : $"#{color.R:X2}{color.G:X2}{color.B:X2}";
@@ -13,7 +19,7 @@ namespace LivreNoirLibrary.Windows.Media
 
         public static Color ToColor(this string colorCode)
         {
-            if (TryParseColorCodeToByte(colorCode, out var a, out var r, out var g, out var b))
+            if (ColorUtils.TryParseColorCodeToByte(colorCode, out var a, out var r, out var g, out var b))
             {
                 return Color.FromArgb(a, r, g, b);
             }
@@ -22,7 +28,7 @@ namespace LivreNoirLibrary.Windows.Media
 
         public static bool TryParseToColor(this string colorCode, out Color color)
         {
-            if (TryParseColorCodeToByte(colorCode, out var a, out var r, out var g, out var b))
+            if (ColorUtils.TryParseColorCodeToByte(colorCode, out var a, out var r, out var g, out var b))
             {
                 color = Color.FromArgb(a, r, g, b);
                 return true;

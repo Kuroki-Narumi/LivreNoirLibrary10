@@ -130,6 +130,8 @@ namespace LivreNoirLibrary.Media.Bms
         public static bool IsBga(this Channel channel) => _bga.Contains(channel);
         private static readonly SortedSet<Channel> _bga = [.. BgaChannelList];
 
+        public static bool IsMissLayer(this Channel channel) => channel is Channel.Bga_Poor;
+
         public static bool IsExtendedBga(this Channel channel) => channel is Channel.SwBga or Channel.Bga_Layer2;
 
         public static bool IsArgb(this Channel channel) => _argb.Contains(channel);

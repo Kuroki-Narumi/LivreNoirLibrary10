@@ -13,11 +13,27 @@ namespace LivreNoirLibrary.Media.Bms
         private readonly List<decimal> _second_list = [];
         private readonly List<Second2BeatItem> _second_item_list = [];
 
+        public TimeCounter() { }
+
         public TimeCounter(IBmsData data)
+        {
+            LoadInternal(data);
+        }
+
+        public void Load(IBmsData data)
+        {
+            _beat_list.Clear();
+            _beat_item_list.Clear();
+            _second_list.Clear();
+            _second_item_list.Clear();
+            LoadInternal(data);
+        }
+
+        private void LoadInternal(IBmsData data)
         {
             var tempo = (decimal)data.Bpm;
             var lastBeat = 0m;
-            var spb = 240m / tempo;
+            var spb = 240 / tempo;
             var second = 0m;
             InitList(tempo);
             foreach (var (pos, list) in data.Timeline.EachList())
@@ -75,7 +91,7 @@ namespace LivreNoirLibrary.Media.Bms
             _second_item_list.Add(new(0, tempo));
         }
 
-        internal void AddBeat2Second(decimal beat, decimal second, decimal tempo, decimal stop)
+        private void AddBeat2Second(decimal beat, decimal second, decimal tempo, decimal stop)
         {
             Beat2SecondItem item = new(second, tempo, stop);
             if (beat is 0)
@@ -89,7 +105,7 @@ namespace LivreNoirLibrary.Media.Bms
             }
         }
 
-        internal void AddSecond2Beat(decimal second, decimal beat, decimal tempo)
+        private void AddSecond2Beat(decimal second, decimal beat, decimal tempo)
         {
             Second2BeatItem item = new(beat, tempo);
             if (second is 0)
@@ -103,24 +119,23 @@ namespace LivreNoirLibrary.Media.Bms
             }
         }
 
-        internal void AddStop(decimal second, decimal duration)
+        private void AddStop(decimal second, decimal duration)
         {
             var index = _second_list.Count - 1;
             var preSec = _second_list[index];
             var prev = _second_item_list[index];
             var beat = prev.Beat;
             var tempo = prev.Tempo;
-            var zero = decimal.Zero;
             var bps = prev.BeatsPerSecond;
             if (preSec == second)
             {
-                _second_item_list[index] = new(beat, zero);
+                _second_item_list[index] = new(beat, 0);
             }
             else
             {
                 beat += (second - preSec) * bps;
                 _second_list.Add(second);
-                _second_item_list.Add(new(beat, zero));
+                _second_item_list.Add(new(beat, 0));
             }
             _second_list.Add(second + duration);
             _second_item_list.Add(new(beat, tempo));
@@ -139,7 +154,7 @@ namespace LivreNoirLibrary.Media.Bms
                 var item = items[i - 1];
                 list.Add(new(item.Tempo, curSec, nextSec));
             }
-            list.Add(new(items[^1].Tempo, seconds[^1], decimal.MinusOne, true));
+            list.Add(new(items[^1].Tempo, seconds[^1], -1, true));
             return list;
         }
 

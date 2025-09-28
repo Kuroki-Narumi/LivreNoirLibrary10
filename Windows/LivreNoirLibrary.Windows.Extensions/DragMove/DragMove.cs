@@ -26,7 +26,7 @@ namespace LivreNoirLibrary.Windows
 
         public static Rect GetScreenBounds(this Point point)
         {
-            if (Forms.Screen.FromPoint(point.ToFormsPoint()) is { } screen)
+            if (Forms.Screen.FromPoint(point.ToDrawingPoint()) is { } screen)
             {
                 return screen.Bounds.ToRect();
             }
@@ -35,7 +35,7 @@ namespace LivreNoirLibrary.Windows
 
         public static Rect GetScreenBounds(this Window window)
         {
-            var screen = Forms.Screen.FromRectangle(GetDisplayRect(window).ToFormsRect()) ?? Forms.Screen.PrimaryScreen;
+            var screen = Forms.Screen.FromRectangle(GetDisplayRect(window).ToDrawingRect()) ?? Forms.Screen.PrimaryScreen;
             if (screen is not null)
             {
                 return screen.Bounds.ToRect();

@@ -27,10 +27,10 @@ namespace LivreNoirLibrary.Windows.YuGiOh
             GradientStop g = new(ColorExtension.ToColor(c1), 0.0);
             g.Freeze();
             brush.GradientStops.Add(g);
-            g = new(ColorExtension.ToColor(c2), 0.6);
+            g = new(c2.ToColor(), 0.6);
             g.Freeze();
             brush.GradientStops.Add(g);
-            g = new(ColorExtension.ToColor(c3), 1.0);
+            g = new(c3.ToColor(), 1.0);
             g.Freeze();
             brush.GradientStops.Add(g);
             brush.Freeze();

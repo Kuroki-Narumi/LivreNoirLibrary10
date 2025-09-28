@@ -18,7 +18,7 @@ namespace LivreNoirLibrary.Windows.Controls
         public static SolidColorBrush GetBrush(string? name)
         {
             Color color = default;
-            if (!string.IsNullOrEmpty(name) && !ColorExtension.TryParseToColor(name, out color))
+            if (!string.IsNullOrEmpty(name) && !name.TryParseToColor(out color))
             {
                 color = (Color)ColorConverter.ConvertFromString(name);
             }

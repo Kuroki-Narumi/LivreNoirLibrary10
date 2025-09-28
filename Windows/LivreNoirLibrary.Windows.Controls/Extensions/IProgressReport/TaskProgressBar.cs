@@ -73,7 +73,7 @@ namespace LivreNoirLibrary.Windows.Controls
             _ct_source = null;
         }
 
-        internal void OnProgressChanged(ProgressReport p)
+        public void OnProgressChanged(ProgressReport p)
         {
             if (p.Caption is not null)
             {

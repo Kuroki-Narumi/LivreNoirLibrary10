@@ -1,12 +1,35 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Numerics;
 using System.Runtime.CompilerServices;
 
 namespace LivreNoirLibrary.Media
 {
     public static class ColorUtils
     {
+        public const float FloatFactor = 255f;
         public const float InvertFactor = 1f / 255f;
         public const float InvertFactor4bits = 1f / 15f;
+        public const float Epsilon = 1e-6f;
+        public const float RoundOffset = 0.5f;
+
+        public const uint Mask_A = 0xFF000000;
+        public const uint Mask_R = 0x00FF0000;
+        public const uint Mask_G = 0x0000FF00;
+        public const uint Mask_B = 0x000000FF;
+
+        public const byte ColorIndex_A = 3;
+        public const byte ColorIndex_R = 2;
+        public const byte ColorIndex_G = 1;
+        public const byte ColorIndex_B = 0;
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static uint GetMask(int index, byte value = 255) => (uint)value << (index * 8);
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static (uint Clear, uint Set) GetClearSetMask(int index, byte value) => (~GetMask(index), GetMask(index, value));
+
+        public static uint ToUInt(byte a, byte r, byte g, byte b) => ((uint)a << 24) | ((uint)r << 16) | ((uint)g << 8) | b;
+        public static (byte A, byte R, byte G, byte B) ToColor(uint value) => unchecked(((byte)(value >> 24), (byte)(value >> 16), (byte)(value >> 8), (byte)value));
 
         public static float NormalizeHue(float h)
         {
@@ -92,8 +115,8 @@ namespace LivreNoirLibrary.Media
         public static float Blend(float value1, float value2, float ratio = 0.5f) => value1 * (1 - ratio) + value2 * ratio;
         public static byte Blend(byte value1, byte value2, float ratio = 0.5f) => (byte)Math.Clamp(MathF.Round(value1 * (1 - ratio) + value2 * ratio), 0, 255);
 
-        public static string GetColroCode(byte r, byte g, byte b) => $"#{r:X2}{g:X2}{b:X2}";
-        public static string GetColroCode(byte a, byte r, byte g, byte b) => $"#{a:X2}{r:X2}{g:X2}{b:X2}";
+        public static string GetColorCode(byte r, byte g, byte b) => $"#{r:X2}{g:X2}{b:X2}";
+        public static string GetColorCode(byte a, byte r, byte g, byte b) => $"#{a:X2}{r:X2}{g:X2}{b:X2}";
         public static string GetColorCode(float r, float g, float b) => $"#{GetByte(r):X2}{GetByte(g):X2}{GetByte(b):X2}";
         public static string GetColorCode(float a, float r, float g, float b) => $"#{GetByte(a):X2}{GetByte(r):X2}{GetByte(g):X2}{GetByte(b):X2}";
 
@@ -199,8 +222,8 @@ namespace LivreNoirLibrary.Media
             return false;
         }
 
-        public static byte GetByte(float value) => (byte)MathF.Round(255 * value);
-        public static int GetInt(float value) => (int)MathF.Round(255 * value);
+        public static byte GetByte(float value) => (byte)Math.Clamp(FloatFactor * value + RoundOffset, 0, FloatFactor);
+        public static int GetInt(float value) => (int)Math.Clamp(FloatFactor * value + RoundOffset, 0, FloatFactor);
         public static float GetFloat(byte value) => value * InvertFactor;
         public static float GetFloat(int value) => value * InvertFactor;
     }

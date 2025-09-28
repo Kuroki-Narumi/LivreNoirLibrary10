@@ -29,12 +29,6 @@ namespace LivreNoirLibrary.Windows.Media
             }
         }
 
-        public static WriteableBitmap Create(BitmapSource source, int x, int y, int width, int height)
-        {
-            AdjustRect(source, ref x, ref y, ref width, ref height);
-            return Create(new CroppedBitmap(source, new(x, y, width, height)));
-        }
-
         public static WriteableBitmap FromClipboard()
         {
             if (Clipboard.GetImage() is BitmapSource source)

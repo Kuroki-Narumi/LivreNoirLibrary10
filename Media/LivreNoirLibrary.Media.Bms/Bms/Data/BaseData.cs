@@ -138,6 +138,11 @@ namespace LivreNoirLibrary.Media.Bms
             }
         }
 
+        internal void DumpMain(BmsTextWriter writer)
+        {
+
+        }
+
         internal void DumpMain(BinaryWriter writer)
         {
             WriteNote(writer);

@@ -156,7 +156,7 @@ namespace LivreNoirLibrary.Media.Bms
                 var den = value.Length / 2;
                 for (var i = 0; i < den; i++)
                 {
-                    if (BasedNumber.TryParseToLong(value[..2], radix, out var v))
+                    if (BasedNumber.TryParseToLong(value[..2], radix, out var v) && v is not 0)
                     {
                         tl.Add(new(number, i, den), noteCreator(v));
                     }

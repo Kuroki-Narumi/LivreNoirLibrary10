@@ -12,7 +12,7 @@ namespace LivreNoirLibrary.Windows.Converters
         {
             if (reader.TokenType is JsonTokenType.String)
             {
-                if (reader.GetString() is string code && ColorExtension.TryParseToColor(code, out var value))
+                if (reader.GetString() is string code && code.TryParseToColor(out var value))
                 {
                     return value;
                 }
@@ -36,7 +36,7 @@ namespace LivreNoirLibrary.Windows.Converters
 
         public override void Write(Utf8JsonWriter writer, Color value, JsonSerializerOptions options)
         {
-            writer.WriteStringValue(ColorExtension.GetColorCode(value));
+            writer.WriteStringValue(value.GetColorCode());
         }
     }
 }

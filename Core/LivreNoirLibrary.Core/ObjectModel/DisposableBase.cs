@@ -6,6 +6,8 @@ namespace LivreNoirLibrary.ObjectModel
     {
         private bool _disposed;
 
+        public bool IsDisposed => _disposed;
+
         public virtual void VerifyAccess() => ObjectDisposedException.ThrowIf(_disposed, this);
 
         protected void Dispose(bool disposing)

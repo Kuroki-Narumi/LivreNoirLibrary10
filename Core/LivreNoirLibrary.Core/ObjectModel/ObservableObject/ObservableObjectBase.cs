@@ -39,6 +39,32 @@ namespace LivreNoirLibrary.ObjectModel
             return result;
         }
 
+        protected virtual bool SetValue<T>(ref T field, T value, Action<T, T> changed, [CallerMemberName] string propertyName = "")
+        {
+            var oldValue = field;
+            var result = SetValue(ref field, value, propertyName);
+            if (result)
+            {
+                changed(oldValue, value);
+            }
+            return result;
+        }
+
+        protected virtual bool SetValue<T>(ref T field, T value, ReadOnlySpan<string> relatedProperties, Action<T, T> changed, [CallerMemberName] string propertyName = "")
+        {
+            var oldValue = field;
+            var result = SetValue(ref field, value, propertyName);
+            if (result)
+            {
+                foreach (var prop in relatedProperties)
+                {
+                    SendPropertyChanged(prop);
+                }
+                changed(oldValue, value);
+            }
+            return result;
+        }
+
         protected void SendPropertyChanged([CallerMemberName] string propertyName = "")
         {
             PropertyChanged?.Invoke(this, GetPropertyChangedEventArgs(propertyName));

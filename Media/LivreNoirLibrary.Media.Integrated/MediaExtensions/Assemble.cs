@@ -19,7 +19,7 @@ namespace LivreNoirLibrary.Media.Integrated
         {
             reporter?.Report("Creating Timeline ...", 0, 100);
             var selector = options.Target.GetSelector([], options.PlayLongEnd && data.LnObj is 0);
-            var list = TimingList.Create(data, selector);
+            var list = SoundTimingList.Create(data, selector);
             return AssembleCore(data, options, directory, list, options.Adjust ? list.FirstTick : 0, 0, reporter, c);
         }
 
@@ -28,7 +28,7 @@ namespace LivreNoirLibrary.Media.Integrated
         {
             reporter?.Report("Creating Timeline ...", 0, 100);
             var lnEnd = options.PlayLongEnd && data.LnObj is 0;
-            var list = TimingList.Create(data, selection, n => n.IsPlayableSound(lnEnd, out _));
+            var list = SoundTimingList.Create(data, selection, n => n.IsPlayableSound(lnEnd, out _));
             return AssembleCore(data, options, directory, list, list.FirstTick, 0, reporter, c);
         }
 
@@ -42,7 +42,7 @@ namespace LivreNoirLibrary.Media.Integrated
             var b = ToTicks(options.PreviewBody);
             var fo = ToTicks(options.PreviewFadeOut);
 
-            var list = TimingList.Create(data, counter, null, start + b + fo);
+            var list = SoundTimingList.Create(data, counter, null, start + b + fo);
 
             var fi = ToTicks(options.PreviewFadeIn);
             if (fi > start)
@@ -66,7 +66,7 @@ namespace LivreNoirLibrary.Media.Integrated
             return result;
         }
 
-        private static WaveData AssembleCore(IBmsData data, AssembleOptions options, string directory, TimingList timings, long headroom, long lengthLimit, ProgressReporter? reporter, CancellationToken c)
+        private static WaveData AssembleCore(IBmsData data, AssembleOptions options, string directory, SoundTimingList timings, long headroom, long lengthLimit, ProgressReporter? reporter, CancellationToken c)
         {
             c.ThrowIfCancellationRequested();
             var ogain = options.Gain;
