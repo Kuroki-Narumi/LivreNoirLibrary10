@@ -47,10 +47,10 @@ namespace LivreNoirLibrary.Media.Bms
             return false;
         }
 
-        extension(IRationalValueNote note)
+        extension(IDecimalValueNote note)
         {
-            public double DoubleValue { get => (double)note.Value; set => note.Value = Rational.ConvertBySBT(value); }
-            public decimal DecimalValue { get => (decimal)note.Value; set => note.Value = Rational.ConvertBySBT(value); }
+            public double DoubleValue { get => (double)note.Value; set => note.Value = (decimal)value; }
+            public Rational RationalValue { get => Rational.ConvertBySBT(note.Value); set => note.Value = (decimal)value; }
         }
 
         extension(INote note)
@@ -105,12 +105,16 @@ namespace LivreNoirLibrary.Media.Bms
             public bool IsStop() => note.Channel is Channel.Stop;
             public bool IsScroll() => note.Channel is Channel.Scroll;
             public bool IsSpeed() => note.Channel is Channel.Speed;
+
+            public HistoryNote ToHistory() => new(note);
         }
 
         extension(IMetaNote note)
         {
             public bool IsBga() => BmsUtils.IsBga(note.Channel);
             public bool IsDef() => BmsUtils.IsDefChannel(note.Channel);
+
+            public HistoryNote ToHistory() => new(note);
         }
 
         extension(ISoundNote note)
@@ -124,6 +128,8 @@ namespace LivreNoirLibrary.Media.Bms
             public bool IsVisibleKey(bool includeLongEnd = false) => BmsUtils.IsKeyLane(note.Lane) && IsNormal(note, includeLongEnd);
             public bool IsPlayableSound(bool includeLongEnd = false) => BmsUtils.IsBgmLane(note.Lane) || IsNormal(note, includeLongEnd);
             public bool IsInvalidMeta() => BmsUtils.IsBgmLane(note.Lane) && note.Type is not NoteType.Normal;
+
+            public HistoryNote ToHistory() => new(note);
         }
     }
 }

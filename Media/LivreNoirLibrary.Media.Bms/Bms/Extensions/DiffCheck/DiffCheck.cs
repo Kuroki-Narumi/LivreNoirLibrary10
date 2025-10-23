@@ -55,8 +55,8 @@ namespace LivreNoirLibrary.Media.Bms
                             branches.Add(index, new()
                             {
                                 Address = flowAddress.Append(index),
-                                OldValue = leftFlow.GetBmsHeader(leftBranch),
-                                NewValue = rightFlow.GetBmsHeader(rightBranch),
+                                OldValue = leftFlow.GetBranchHeader(leftBranch),
+                                NewValue = rightFlow.GetBranchHeader(rightBranch),
                                 DataDifference = diff
                             });
                         }
@@ -66,7 +66,7 @@ namespace LivreNoirLibrary.Media.Bms
                         branches.Add(index, new()
                         {
                             Address = flowAddress.Append(index),
-                            OldValue = leftFlow.GetBmsHeader(leftBranch),
+                            OldValue = leftFlow.GetBranchHeader(leftBranch),
                         });
                     }
                 }
@@ -75,7 +75,7 @@ namespace LivreNoirLibrary.Media.Bms
                     branches.Add(index, new()
                     {
                         Address = flowAddress.Append(index),
-                        NewValue = rightFlow.GetBmsHeader(rightBranch),
+                        NewValue = rightFlow.GetBranchHeader(rightBranch),
                     });
                 }
                 rightBranches.Clear();

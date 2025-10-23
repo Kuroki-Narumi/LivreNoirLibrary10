@@ -65,7 +65,7 @@ namespace LivreNoirLibrary.YuGiOh.Data
         {
             if (_list_map.TryGetValue(value, out var list))
             {
-                foreach (var card in list)
+                foreach (var card in list.AsSpan())
                 {
                     _list.Remove(card);
                     card.OnLimitChanged();

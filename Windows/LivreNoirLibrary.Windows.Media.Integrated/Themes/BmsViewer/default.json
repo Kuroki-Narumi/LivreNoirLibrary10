@@ -1,0 +1,1396 @@
+{
+  "common_colors": {
+    "HeaderText": "#FF80FF80",
+    "Bar": "#E0FFFFFF",
+    "Beat": "#48FFFFFF",
+    "SubBeat": "#24FFFFFF",
+    "LaneBorder": "#60FFFFFF",
+    "Mine": "#FFC86418",
+    "LongEnd": "#FFC864FF",
+    "Selected": "#FFA0FFFF",
+    "SelectedLong": "#FF40C0C0"
+  },
+  "conductor": [
+    {
+      "name": "Extended",
+      "lanes": [
+        {
+          "name": "Bpm",
+          "lane": 1008,
+          "width": 3,
+          "back": "#FF180C00",
+          "note": "#FFFF9018"
+        },
+        {
+          "name": "Stop",
+          "lane": 1009,
+          "width": 3,
+          "back": "#FF18000C",
+          "note": "#FFFF18C8"
+        },
+        {
+          "name": "Scroll",
+          "lane": 2020,
+          "width": 3,
+          "back": "#FF181800",
+          "note": "#FFC8C818"
+        },
+        {
+          "name": "Speed",
+          "lane": 2033,
+          "width": 3,
+          "back": "#FF180C0C",
+          "note": "#FFFF9090"
+        }
+      ]
+    },
+    {
+      "name": "Basic",
+      "lanes": [
+        {
+          "name": "Bpm",
+          "lane": 1008,
+          "width": 3,
+          "back": "#FF180C00",
+          "note": "#FFFF9018"
+        },
+        {
+          "name": "Stop",
+          "lane": 1009,
+          "width": 3,
+          "back": "#FF18000C",
+          "note": "#FFFF18C8"
+        }
+      ]
+    }
+  ],
+  "meta": [
+    {
+      "name": "BGA",
+      "lanes": [
+        {
+          "name": "Bga",
+          "lane": 1004,
+          "width": 2,
+          "back": "#FF00180C",
+          "note": "#FF18FF90"
+        },
+        {
+          "name": "Layer",
+          "lane": 1007,
+          "width": 2,
+          "back": "#FF00180C",
+          "note": "#FF18FF90"
+        },
+        {
+          "name": "Poor",
+          "lane": 1006,
+          "width": 2,
+          "back": "#FF00180C",
+          "note": "#FF18FF90"
+        }
+      ]
+    },
+    {
+      "name": "EX BGA",
+      "lanes": [
+        {
+          "name": "Base",
+          "lane": 1004,
+          "width": 2,
+          "back": "#FF00180C",
+          "note": "#FF18FF90"
+        },
+        {
+          "name": "L1",
+          "lane": 1007,
+          "width": 2,
+          "back": "#FF00180C",
+          "note": "#FF18FF90"
+        },
+        {
+          "name": "L2",
+          "lane": 1010,
+          "width": 2,
+          "back": "#FF00180C",
+          "note": "#FF18FF90"
+        },
+        {
+          "name": "Poor",
+          "lane": 1006,
+          "width": 2,
+          "back": "#FF00180C",
+          "note": "#FF18FF90"
+        },
+        {
+          "name": "Key",
+          "lane": 1365,
+          "width": 2,
+          "back": "#FF00180C",
+          "note": "#FF18FF90"
+        }
+      ]
+    }
+  ],
+  "key": [
+    {
+      "type": "Beat",
+      "scratch": {
+        "name": "SCR",
+        "lane": 6,
+        "width": 2,
+        "back": "#FF180000",
+        "note": "#FFFF1818",
+        "long": "#FFB43C3C",
+        "key": "A"
+      },
+      "name": "Beat-7k",
+      "lanes": [
+        {
+          "name": "1",
+          "lane": 1,
+          "width": 2,
+          "back": "#FF0C0C0C",
+          "note": "#FF909090",
+          "long": "#FF787878",
+          "key": "Z"
+        },
+        {
+          "name": "2",
+          "lane": 2,
+          "width": 2,
+          "back": "#FF000018",
+          "note": "#FF1818FF",
+          "long": "#FF3C3CB4",
+          "key": "S"
+        },
+        {
+          "name": "3",
+          "lane": 3,
+          "width": 2,
+          "back": "#FF0C0C0C",
+          "note": "#FF909090",
+          "long": "#FF787878",
+          "key": "X"
+        },
+        {
+          "name": "4",
+          "lane": 4,
+          "width": 2,
+          "back": "#FF000018",
+          "note": "#FF1818FF",
+          "long": "#FF3C3CB4",
+          "key": "D"
+        },
+        {
+          "name": "5",
+          "lane": 5,
+          "width": 2,
+          "back": "#FF0C0C0C",
+          "note": "#FF909090",
+          "long": "#FF787878",
+          "key": "C"
+        },
+        {
+          "name": "6",
+          "lane": 8,
+          "width": 2,
+          "back": "#FF000018",
+          "note": "#FF1818FF",
+          "long": "#FF3C3CB4",
+          "key": "F"
+        },
+        {
+          "name": "7",
+          "lane": 9,
+          "width": 2,
+          "back": "#FF0C0C0C",
+          "note": "#FF909090",
+          "long": "#FF787878",
+          "key": "V"
+        }
+      ]
+    },
+    {
+      "type": "Beat",
+      "name": "Beat-14k",
+      "lanes": [
+        {
+          "name": "1-SC",
+          "lane": 6,
+          "width": 2,
+          "back": "#FF180000",
+          "note": "#FFFF1818",
+          "long": "#FFB43C3C",
+          "key": "A"
+        },
+        {
+          "name": "1-1",
+          "lane": 1,
+          "width": 2,
+          "back": "#FF0C0C0C",
+          "note": "#FF909090",
+          "long": "#FF787878",
+          "key": "Z"
+        },
+        {
+          "name": "1-2",
+          "lane": 2,
+          "width": 2,
+          "back": "#FF000018",
+          "note": "#FF1818FF",
+          "long": "#FF3C3CB4",
+          "key": "S"
+        },
+        {
+          "name": "1-3",
+          "lane": 3,
+          "width": 2,
+          "back": "#FF0C0C0C",
+          "note": "#FF909090",
+          "long": "#FF787878",
+          "key": "X"
+        },
+        {
+          "name": "1-4",
+          "lane": 4,
+          "width": 2,
+          "back": "#FF000018",
+          "note": "#FF1818FF",
+          "long": "#FF3C3CB4",
+          "key": "D"
+        },
+        {
+          "name": "1-5",
+          "lane": 5,
+          "width": 2,
+          "back": "#FF0C0C0C",
+          "note": "#FF909090",
+          "long": "#FF787878",
+          "key": "C"
+        },
+        {
+          "name": "1-6",
+          "lane": 8,
+          "width": 2,
+          "back": "#FF000018",
+          "note": "#FF1818FF",
+          "long": "#FF3C3CB4",
+          "key": "F"
+        },
+        {
+          "name": "1-7",
+          "lane": 9,
+          "width": 2,
+          "back": "#FF0C0C0C",
+          "note": "#FF909090",
+          "long": "#FF787878",
+          "key": "V"
+        },
+        "Separator",
+        {
+          "name": "2-1",
+          "lane": 37,
+          "width": 2,
+          "back": "#FF0C0C0C",
+          "note": "#FF909090",
+          "long": "#FF787878",
+          "key": "OemComma"
+        },
+        {
+          "name": "2-2",
+          "lane": 38,
+          "width": 2,
+          "back": "#FF000018",
+          "note": "#FF1818FF",
+          "long": "#FF3C3CB4",
+          "key": "L"
+        },
+        {
+          "name": "2-3",
+          "lane": 39,
+          "width": 2,
+          "back": "#FF0C0C0C",
+          "note": "#FF909090",
+          "long": "#FF787878",
+          "key": "OemPeriod"
+        },
+        {
+          "name": "2-4",
+          "lane": 40,
+          "width": 2,
+          "back": "#FF000018",
+          "note": "#FF1818FF",
+          "long": "#FF3C3CB4",
+          "key": "OemPlus"
+        },
+        {
+          "name": "2-5",
+          "lane": 41,
+          "width": 2,
+          "back": "#FF0C0C0C",
+          "note": "#FF909090",
+          "long": "#FF787878",
+          "key": "OemQuestion"
+        },
+        {
+          "name": "2-6",
+          "lane": 44,
+          "width": 2,
+          "back": "#FF000018",
+          "note": "#FF1818FF",
+          "long": "#FF3C3CB4",
+          "key": "Oem1"
+        },
+        {
+          "name": "2-7",
+          "lane": 45,
+          "width": 2,
+          "back": "#FF0C0C0C",
+          "note": "#FF909090",
+          "long": "#FF787878",
+          "key": "OemBackslash"
+        },
+        {
+          "name": "2-SC",
+          "lane": 42,
+          "width": 2,
+          "back": "#FF180000",
+          "note": "#FFFF1818",
+          "long": "#FFB43C3C",
+          "key": "Oem6"
+        }
+      ]
+    },
+    {
+      "type": "Beat",
+      "name": "Beat-5k",
+      "lanes": [
+        {
+          "name": "1",
+          "lane": 1,
+          "width": 2,
+          "back": "#FF0C0C0C",
+          "note": "#FF909090",
+          "long": "#FF787878",
+          "key": "Z"
+        },
+        {
+          "name": "2",
+          "lane": 2,
+          "width": 2,
+          "back": "#FF000018",
+          "note": "#FF1818FF",
+          "long": "#FF3C3CB4",
+          "key": "S"
+        },
+        {
+          "name": "3",
+          "lane": 3,
+          "width": 2,
+          "back": "#FF0C0C0C",
+          "note": "#FF909090",
+          "long": "#FF787878",
+          "key": "X"
+        },
+        {
+          "name": "4",
+          "lane": 4,
+          "width": 2,
+          "back": "#FF000018",
+          "note": "#FF1818FF",
+          "long": "#FF3C3CB4",
+          "key": "D"
+        },
+        {
+          "name": "5",
+          "lane": 5,
+          "width": 2,
+          "back": "#FF0C0C0C",
+          "note": "#FF909090",
+          "long": "#FF787878",
+          "key": "C"
+        },
+        {
+          "name": "SCR",
+          "lane": 6,
+          "width": 2,
+          "back": "#FF180000",
+          "note": "#FFFF1818",
+          "long": "#FFB43C3C",
+          "key": "V"
+        }
+      ]
+    },
+    {
+      "type": "Beat",
+      "name": "Beat-10k",
+      "lanes": [
+        {
+          "name": "1-1",
+          "lane": 1,
+          "width": 2,
+          "back": "#FF0C0C0C",
+          "note": "#FF909090",
+          "long": "#FF787878",
+          "key": "Z"
+        },
+        {
+          "name": "1-2",
+          "lane": 2,
+          "width": 2,
+          "back": "#FF000018",
+          "note": "#FF1818FF",
+          "long": "#FF3C3CB4",
+          "key": "S"
+        },
+        {
+          "name": "1-3",
+          "lane": 3,
+          "width": 2,
+          "back": "#FF0C0C0C",
+          "note": "#FF909090",
+          "long": "#FF787878",
+          "key": "X"
+        },
+        {
+          "name": "1-4",
+          "lane": 4,
+          "width": 2,
+          "back": "#FF000018",
+          "note": "#FF1818FF",
+          "long": "#FF3C3CB4",
+          "key": "D"
+        },
+        {
+          "name": "1-5",
+          "lane": 5,
+          "width": 2,
+          "back": "#FF0C0C0C",
+          "note": "#FF909090",
+          "long": "#FF787878",
+          "key": "C"
+        },
+        {
+          "name": "1-SC",
+          "lane": 6,
+          "width": 2,
+          "back": "#FF180000",
+          "note": "#FFFF1818",
+          "long": "#FFB43C3C",
+          "key": "V"
+        },
+        "Separator",
+        {
+          "name": "2-1",
+          "lane": 37,
+          "width": 2,
+          "back": "#FF0C0C0C",
+          "note": "#FF909090",
+          "long": "#FF787878",
+          "key": "OemComma"
+        },
+        {
+          "name": "2-2",
+          "lane": 38,
+          "width": 2,
+          "back": "#FF000018",
+          "note": "#FF1818FF",
+          "long": "#FF3C3CB4",
+          "key": "L"
+        },
+        {
+          "name": "2-3",
+          "lane": 39,
+          "width": 2,
+          "back": "#FF0C0C0C",
+          "note": "#FF909090",
+          "long": "#FF787878",
+          "key": "OemPeriod"
+        },
+        {
+          "name": "2-4",
+          "lane": 40,
+          "width": 2,
+          "back": "#FF000018",
+          "note": "#FF1818FF",
+          "long": "#FF3C3CB4",
+          "key": "OemPlus"
+        },
+        {
+          "name": "2-5",
+          "lane": 41,
+          "width": 2,
+          "back": "#FF0C0C0C",
+          "note": "#FF909090",
+          "long": "#FF787878",
+          "key": "OemQuestion"
+        },
+        {
+          "name": "2-SC",
+          "lane": 42,
+          "width": 2,
+          "back": "#FF180000",
+          "note": "#FFFF1818",
+          "long": "#FFB43C3C",
+          "key": "OemBackslash"
+        }
+      ]
+    },
+    {
+      "type": "Popn",
+      "name": "Popn-9k",
+      "lanes": [
+        {
+          "name": "LW",
+          "lane": 1,
+          "width": 2,
+          "back": "#FF0C0C0C",
+          "note": "#FF909090",
+          "long": "#FF787878",
+          "key": "Z"
+        },
+        {
+          "name": "LY",
+          "lane": 2,
+          "width": 2,
+          "back": "#FF0C0C00",
+          "note": "#FFC8C818",
+          "long": "#FF78783C",
+          "key": "S"
+        },
+        {
+          "name": "LG",
+          "lane": 3,
+          "width": 2,
+          "back": "#FF001800",
+          "note": "#FF18FF18",
+          "long": "#FF3CB43C",
+          "key": "X"
+        },
+        {
+          "name": "LB",
+          "lane": 4,
+          "width": 2,
+          "back": "#FF000018",
+          "note": "#FF1818FF",
+          "long": "#FF3C3CB4",
+          "key": "D"
+        },
+        {
+          "name": "CR",
+          "lane": 5,
+          "width": 2,
+          "back": "#FF180000",
+          "note": "#FFFF1818",
+          "long": "#FFB43C3C",
+          "key": "C"
+        },
+        {
+          "name": "RB",
+          "lane": 38,
+          "width": 2,
+          "back": "#FF000018",
+          "note": "#FF1818FF",
+          "long": "#FF3C3CB4",
+          "key": "F"
+        },
+        {
+          "name": "RG",
+          "lane": 39,
+          "width": 2,
+          "back": "#FF001800",
+          "note": "#FF18FF18",
+          "long": "#FF3CB43C",
+          "key": "V"
+        },
+        {
+          "name": "RY",
+          "lane": 40,
+          "width": 2,
+          "back": "#FF0C0C00",
+          "note": "#FFC8C818",
+          "long": "#FF78783C",
+          "key": "G"
+        },
+        {
+          "name": "RW",
+          "lane": 41,
+          "width": 2,
+          "back": "#FF0C0C0C",
+          "note": "#FF909090",
+          "long": "#FF787878",
+          "key": "B"
+        }
+      ]
+    },
+    {
+      "type": "Popn",
+      "name": "Popn-18k",
+      "lanes": [
+        {
+          "name": "1-LW",
+          "lane": 1,
+          "width": 2,
+          "back": "#FF0C0C0C",
+          "note": "#FF909090",
+          "long": "#FF787878",
+          "key": "Z"
+        },
+        {
+          "name": "1-LY",
+          "lane": 2,
+          "width": 2,
+          "back": "#FF0C0C00",
+          "note": "#FFC8C818",
+          "long": "#FF78783C",
+          "key": "S"
+        },
+        {
+          "name": "1-LG",
+          "lane": 3,
+          "width": 2,
+          "back": "#FF001800",
+          "note": "#FF18FF18",
+          "long": "#FF3CB43C",
+          "key": "X"
+        },
+        {
+          "name": "1-LB",
+          "lane": 4,
+          "width": 2,
+          "back": "#FF000018",
+          "note": "#FF1818FF",
+          "long": "#FF3C3CB4",
+          "key": "D"
+        },
+        {
+          "name": "1-CR",
+          "lane": 5,
+          "width": 2,
+          "back": "#FF180000",
+          "note": "#FFFF1818",
+          "long": "#FFB43C3C",
+          "key": "C"
+        },
+        {
+          "name": "1-RB",
+          "lane": 8,
+          "width": 2,
+          "back": "#FF000018",
+          "note": "#FF1818FF",
+          "long": "#FF3C3CB4",
+          "key": "F"
+        },
+        {
+          "name": "1-RG",
+          "lane": 9,
+          "width": 2,
+          "back": "#FF001800",
+          "note": "#FF18FF18",
+          "long": "#FF3CB43C",
+          "key": "V"
+        },
+        {
+          "name": "1-RY",
+          "lane": 6,
+          "width": 2,
+          "back": "#FF0C0C00",
+          "note": "#FFC8C818",
+          "long": "#FF78783C",
+          "key": "G"
+        },
+        {
+          "name": "1-RW",
+          "lane": 7,
+          "width": 2,
+          "back": "#FF0C0C0C",
+          "note": "#FF909090",
+          "long": "#FF787878",
+          "key": "B"
+        },
+        "Separator",
+        {
+          "name": "2-LW",
+          "lane": 37,
+          "width": 2,
+          "back": "#FF0C0C0C",
+          "note": "#FF909090",
+          "long": "#FF787878",
+          "key": "M"
+        },
+        {
+          "name": "2-LY",
+          "lane": 38,
+          "width": 2,
+          "back": "#FF0C0C00",
+          "note": "#FFC8C818",
+          "long": "#FF78783C",
+          "key": "K"
+        },
+        {
+          "name": "2-LG",
+          "lane": 39,
+          "width": 2,
+          "back": "#FF001800",
+          "note": "#FF18FF18",
+          "long": "#FF3CB43C",
+          "key": "OemComma"
+        },
+        {
+          "name": "2-LB",
+          "lane": 40,
+          "width": 2,
+          "back": "#FF000018",
+          "note": "#FF1818FF",
+          "long": "#FF3C3CB4",
+          "key": "L"
+        },
+        {
+          "name": "2-CR",
+          "lane": 41,
+          "width": 2,
+          "back": "#FF180000",
+          "note": "#FFFF1818",
+          "long": "#FFB43C3C",
+          "key": "OemPeriod"
+        },
+        {
+          "name": "2-RB",
+          "lane": 44,
+          "width": 2,
+          "back": "#FF000018",
+          "note": "#FF1818FF",
+          "long": "#FF3C3CB4",
+          "key": "OemPlus"
+        },
+        {
+          "name": "2-RG",
+          "lane": 45,
+          "width": 2,
+          "back": "#FF001800",
+          "note": "#FF18FF18",
+          "long": "#FF3CB43C",
+          "key": "OemQuestion"
+        },
+        {
+          "name": "2-RY",
+          "lane": 42,
+          "width": 2,
+          "back": "#FF0C0C00",
+          "note": "#FFC8C818",
+          "long": "#FF78783C",
+          "key": "Oem1"
+        },
+        {
+          "name": "2-RW",
+          "lane": 43,
+          "width": 2,
+          "back": "#FF0C0C0C",
+          "note": "#FF909090",
+          "long": "#FF787878",
+          "key": "OemBackslash"
+        }
+      ]
+    },
+    {
+      "type": "Generic",
+      "name": "Generic-24k",
+      "lanes": [
+        {
+          "name": "1",
+          "lane": 1,
+          "width": 2,
+          "back": "#FF0C0C0C",
+          "note": "#FF909090",
+          "long": "#FF787878"
+        },
+        {
+          "name": "2",
+          "lane": 2,
+          "width": 2,
+          "back": "#FF000018",
+          "note": "#FF1818FF",
+          "long": "#FF3C3CB4"
+        },
+        {
+          "name": "3",
+          "lane": 3,
+          "width": 2,
+          "back": "#FF0C0C0C",
+          "note": "#FF909090",
+          "long": "#FF787878"
+        },
+        {
+          "name": "4",
+          "lane": 4,
+          "width": 2,
+          "back": "#FF000018",
+          "note": "#FF1818FF",
+          "long": "#FF3C3CB4"
+        },
+        {
+          "name": "5",
+          "lane": 5,
+          "width": 2,
+          "back": "#FF0C0C0C",
+          "note": "#FF909090",
+          "long": "#FF787878"
+        },
+        {
+          "name": "6",
+          "lane": 6,
+          "width": 2,
+          "back": "#FF0C0C0C",
+          "note": "#FF909090",
+          "long": "#FF787878"
+        },
+        {
+          "name": "7",
+          "lane": 7,
+          "width": 2,
+          "back": "#FF000018",
+          "note": "#FF1818FF",
+          "long": "#FF3C3CB4"
+        },
+        {
+          "name": "8",
+          "lane": 8,
+          "width": 2,
+          "back": "#FF0C0C0C",
+          "note": "#FF909090",
+          "long": "#FF787878"
+        },
+        {
+          "name": "9",
+          "lane": 9,
+          "width": 2,
+          "back": "#FF000018",
+          "note": "#FF1818FF",
+          "long": "#FF3C3CB4"
+        },
+        {
+          "name": "10",
+          "lane": 10,
+          "width": 2,
+          "back": "#FF0C0C0C",
+          "note": "#FF909090",
+          "long": "#FF787878"
+        },
+        {
+          "name": "11",
+          "lane": 11,
+          "width": 2,
+          "back": "#FF000018",
+          "note": "#FF1818FF",
+          "long": "#FF3C3CB4"
+        },
+        {
+          "name": "12",
+          "lane": 12,
+          "width": 2,
+          "back": "#FF0C0C0C",
+          "note": "#FF909090",
+          "long": "#FF787878"
+        },
+        "Separator",
+        {
+          "name": "13",
+          "lane": 13,
+          "width": 2,
+          "back": "#FF0C0C0C",
+          "note": "#FF909090",
+          "long": "#FF787878"
+        },
+        {
+          "name": "14",
+          "lane": 14,
+          "width": 2,
+          "back": "#FF000018",
+          "note": "#FF1818FF",
+          "long": "#FF3C3CB4"
+        },
+        {
+          "name": "15",
+          "lane": 15,
+          "width": 2,
+          "back": "#FF0C0C0C",
+          "note": "#FF909090",
+          "long": "#FF787878"
+        },
+        {
+          "name": "16",
+          "lane": 16,
+          "width": 2,
+          "back": "#FF000018",
+          "note": "#FF1818FF",
+          "long": "#FF3C3CB4"
+        },
+        {
+          "name": "17",
+          "lane": 17,
+          "width": 2,
+          "back": "#FF0C0C0C",
+          "note": "#FF909090",
+          "long": "#FF787878"
+        },
+        {
+          "name": "18",
+          "lane": 18,
+          "width": 2,
+          "back": "#FF0C0C0C",
+          "note": "#FF909090",
+          "long": "#FF787878"
+        },
+        {
+          "name": "19",
+          "lane": 19,
+          "width": 2,
+          "back": "#FF000018",
+          "note": "#FF1818FF",
+          "long": "#FF3C3CB4"
+        },
+        {
+          "name": "20",
+          "lane": 20,
+          "width": 2,
+          "back": "#FF0C0C0C",
+          "note": "#FF909090",
+          "long": "#FF787878"
+        },
+        {
+          "name": "21",
+          "lane": 21,
+          "width": 2,
+          "back": "#FF000018",
+          "note": "#FF1818FF",
+          "long": "#FF3C3CB4"
+        },
+        {
+          "name": "22",
+          "lane": 22,
+          "width": 2,
+          "back": "#FF0C0C0C",
+          "note": "#FF909090",
+          "long": "#FF787878"
+        },
+        {
+          "name": "23",
+          "lane": 23,
+          "width": 2,
+          "back": "#FF000018",
+          "note": "#FF1818FF",
+          "long": "#FF3C3CB4"
+        },
+        {
+          "name": "24",
+          "lane": 24,
+          "width": 2,
+          "back": "#FF0C0C0C",
+          "note": "#FF909090",
+          "long": "#FF787878"
+        }
+      ]
+    },
+    {
+      "type": "Generic",
+      "name": "Generic-48k",
+      "lanes": [
+        {
+          "name": "1",
+          "lane": 1,
+          "width": 2,
+          "back": "#FF0C0C0C",
+          "note": "#FF909090",
+          "long": "#FF787878"
+        },
+        {
+          "name": "2",
+          "lane": 2,
+          "width": 2,
+          "back": "#FF000018",
+          "note": "#FF1818FF",
+          "long": "#FF3C3CB4"
+        },
+        {
+          "name": "3",
+          "lane": 3,
+          "width": 2,
+          "back": "#FF0C0C0C",
+          "note": "#FF909090",
+          "long": "#FF787878"
+        },
+        {
+          "name": "4",
+          "lane": 4,
+          "width": 2,
+          "back": "#FF000018",
+          "note": "#FF1818FF",
+          "long": "#FF3C3CB4"
+        },
+        {
+          "name": "5",
+          "lane": 5,
+          "width": 2,
+          "back": "#FF0C0C0C",
+          "note": "#FF909090",
+          "long": "#FF787878"
+        },
+        {
+          "name": "6",
+          "lane": 6,
+          "width": 2,
+          "back": "#FF0C0C0C",
+          "note": "#FF909090",
+          "long": "#FF787878"
+        },
+        {
+          "name": "7",
+          "lane": 7,
+          "width": 2,
+          "back": "#FF000018",
+          "note": "#FF1818FF",
+          "long": "#FF3C3CB4"
+        },
+        {
+          "name": "8",
+          "lane": 8,
+          "width": 2,
+          "back": "#FF0C0C0C",
+          "note": "#FF909090",
+          "long": "#FF787878"
+        },
+        {
+          "name": "9",
+          "lane": 9,
+          "width": 2,
+          "back": "#FF000018",
+          "note": "#FF1818FF",
+          "long": "#FF3C3CB4"
+        },
+        {
+          "name": "10",
+          "lane": 10,
+          "width": 2,
+          "back": "#FF0C0C0C",
+          "note": "#FF909090",
+          "long": "#FF787878"
+        },
+        {
+          "name": "11",
+          "lane": 11,
+          "width": 2,
+          "back": "#FF000018",
+          "note": "#FF1818FF",
+          "long": "#FF3C3CB4"
+        },
+        {
+          "name": "12",
+          "lane": 12,
+          "width": 2,
+          "back": "#FF0C0C0C",
+          "note": "#FF909090",
+          "long": "#FF787878"
+        },
+        "Separator",
+        {
+          "name": "13",
+          "lane": 13,
+          "width": 2,
+          "back": "#FF0C0C0C",
+          "note": "#FF909090",
+          "long": "#FF787878"
+        },
+        {
+          "name": "14",
+          "lane": 14,
+          "width": 2,
+          "back": "#FF000018",
+          "note": "#FF1818FF",
+          "long": "#FF3C3CB4"
+        },
+        {
+          "name": "15",
+          "lane": 15,
+          "width": 2,
+          "back": "#FF0C0C0C",
+          "note": "#FF909090",
+          "long": "#FF787878"
+        },
+        {
+          "name": "16",
+          "lane": 16,
+          "width": 2,
+          "back": "#FF000018",
+          "note": "#FF1818FF",
+          "long": "#FF3C3CB4"
+        },
+        {
+          "name": "17",
+          "lane": 17,
+          "width": 2,
+          "back": "#FF0C0C0C",
+          "note": "#FF909090",
+          "long": "#FF787878"
+        },
+        {
+          "name": "18",
+          "lane": 18,
+          "width": 2,
+          "back": "#FF0C0C0C",
+          "note": "#FF909090",
+          "long": "#FF787878"
+        },
+        {
+          "name": "19",
+          "lane": 19,
+          "width": 2,
+          "back": "#FF000018",
+          "note": "#FF1818FF",
+          "long": "#FF3C3CB4"
+        },
+        {
+          "name": "20",
+          "lane": 20,
+          "width": 2,
+          "back": "#FF0C0C0C",
+          "note": "#FF909090",
+          "long": "#FF787878"
+        },
+        {
+          "name": "21",
+          "lane": 21,
+          "width": 2,
+          "back": "#FF000018",
+          "note": "#FF1818FF",
+          "long": "#FF3C3CB4"
+        },
+        {
+          "name": "22",
+          "lane": 22,
+          "width": 2,
+          "back": "#FF0C0C0C",
+          "note": "#FF909090",
+          "long": "#FF787878"
+        },
+        {
+          "name": "23",
+          "lane": 23,
+          "width": 2,
+          "back": "#FF000018",
+          "note": "#FF1818FF",
+          "long": "#FF3C3CB4"
+        },
+        {
+          "name": "24",
+          "lane": 24,
+          "width": 2,
+          "back": "#FF0C0C0C",
+          "note": "#FF909090",
+          "long": "#FF787878"
+        },
+        "Separator",
+        {
+          "name": "25",
+          "lane": 25,
+          "width": 2,
+          "back": "#FF0C0C0C",
+          "note": "#FF909090",
+          "long": "#FF787878"
+        },
+        {
+          "name": "26",
+          "lane": 26,
+          "width": 2,
+          "back": "#FF000018",
+          "note": "#FF1818FF",
+          "long": "#FF3C3CB4"
+        },
+        {
+          "name": "27",
+          "lane": 27,
+          "width": 2,
+          "back": "#FF0C0C0C",
+          "note": "#FF909090",
+          "long": "#FF787878"
+        },
+        {
+          "name": "28",
+          "lane": 28,
+          "width": 2,
+          "back": "#FF000018",
+          "note": "#FF1818FF",
+          "long": "#FF3C3CB4"
+        },
+        {
+          "name": "29",
+          "lane": 29,
+          "width": 2,
+          "back": "#FF0C0C0C",
+          "note": "#FF909090",
+          "long": "#FF787878"
+        },
+        {
+          "name": "30",
+          "lane": 30,
+          "width": 2,
+          "back": "#FF0C0C0C",
+          "note": "#FF909090",
+          "long": "#FF787878"
+        },
+        {
+          "name": "31",
+          "lane": 31,
+          "width": 2,
+          "back": "#FF000018",
+          "note": "#FF1818FF",
+          "long": "#FF3C3CB4"
+        },
+        {
+          "name": "32",
+          "lane": 32,
+          "width": 2,
+          "back": "#FF0C0C0C",
+          "note": "#FF909090",
+          "long": "#FF787878"
+        },
+        {
+          "name": "33",
+          "lane": 33,
+          "width": 2,
+          "back": "#FF000018",
+          "note": "#FF1818FF",
+          "long": "#FF3C3CB4"
+        },
+        {
+          "name": "34",
+          "lane": 34,
+          "width": 2,
+          "back": "#FF0C0C0C",
+          "note": "#FF909090",
+          "long": "#FF787878"
+        },
+        {
+          "name": "35",
+          "lane": 35,
+          "width": 2,
+          "back": "#FF000018",
+          "note": "#FF1818FF",
+          "long": "#FF3C3CB4"
+        },
+        {
+          "name": "36",
+          "lane": 36,
+          "width": 2,
+          "back": "#FF0C0C0C",
+          "note": "#FF909090",
+          "long": "#FF787878"
+        },
+        "Separator",
+        {
+          "name": "37",
+          "lane": 37,
+          "width": 2,
+          "back": "#FF0C0C0C",
+          "note": "#FF909090",
+          "long": "#FF787878"
+        },
+        {
+          "name": "38",
+          "lane": 38,
+          "width": 2,
+          "back": "#FF000018",
+          "note": "#FF1818FF",
+          "long": "#FF3C3CB4"
+        },
+        {
+          "name": "39",
+          "lane": 39,
+          "width": 2,
+          "back": "#FF0C0C0C",
+          "note": "#FF909090",
+          "long": "#FF787878"
+        },
+        {
+          "name": "40",
+          "lane": 40,
+          "width": 2,
+          "back": "#FF000018",
+          "note": "#FF1818FF",
+          "long": "#FF3C3CB4"
+        },
+        {
+          "name": "41",
+          "lane": 41,
+          "width": 2,
+          "back": "#FF0C0C0C",
+          "note": "#FF909090",
+          "long": "#FF787878"
+        },
+        {
+          "name": "42",
+          "lane": 42,
+          "width": 2,
+          "back": "#FF0C0C0C",
+          "note": "#FF909090",
+          "long": "#FF787878"
+        },
+        {
+          "name": "43",
+          "lane": 43,
+          "width": 2,
+          "back": "#FF000018",
+          "note": "#FF1818FF",
+          "long": "#FF3C3CB4"
+        },
+        {
+          "name": "44",
+          "lane": 44,
+          "width": 2,
+          "back": "#FF0C0C0C",
+          "note": "#FF909090",
+          "long": "#FF787878"
+        },
+        {
+          "name": "45",
+          "lane": 45,
+          "width": 2,
+          "back": "#FF000018",
+          "note": "#FF1818FF",
+          "long": "#FF3C3CB4"
+        },
+        {
+          "name": "46",
+          "lane": 46,
+          "width": 2,
+          "back": "#FF0C0C0C",
+          "note": "#FF909090",
+          "long": "#FF787878"
+        },
+        {
+          "name": "47",
+          "lane": 47,
+          "width": 2,
+          "back": "#FF000018",
+          "note": "#FF1818FF",
+          "long": "#FF3C3CB4"
+        },
+        {
+          "name": "48",
+          "lane": 48,
+          "width": 2,
+          "back": "#FF0C0C0C",
+          "note": "#FF909090",
+          "long": "#FF787878"
+        }
+      ]
+    }
+  ],
+  "bgm": {
+    "name": "B",
+    "width": 2,
+    "back": "#FF18000C",
+    "note": "#FFC81864"
+  },
+  "separator_width": 6
+}

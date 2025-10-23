@@ -77,9 +77,9 @@ namespace LivreNoirLibrary.Windows.Controls
             }
             finally
             {
+                ip.WorkingTask = null;
                 await ip.Dispatcher.BeginInvoke(() =>
                 {
-                    ip.WorkingTask = null;
                     finished?.Invoke(aborted);
                     FinishTask(ip);
                 });

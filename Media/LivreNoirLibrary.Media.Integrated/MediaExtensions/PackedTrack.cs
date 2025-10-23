@@ -162,7 +162,7 @@ namespace LivreNoirLibrary.Media.Integrated
                     else
                     {
                         BarPosition p = new(number, (pos - head) / len);
-                        target.Timeline.Add(p, new ConductorNote(Channel.Bpm, (Rational)bpm));
+                        target.Timeline.Add(p, new ConductorNote(Channel.Bpm, (decimal)bpm));
                     }
                     exists = enumer.MoveNext();
                 }

@@ -1,12 +1,14 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.IO;
-using System.Text.RegularExpressions;
-using System.Text.Json;
-using System.Diagnostics.CodeAnalysis;
 using LivreNoirLibrary.Collections;
 using LivreNoirLibrary.IO;
+using System;
+using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
+using System.IO;
+using System.Linq;
+using System.Runtime.InteropServices;
+using System.Text;
+using System.Text.Json;
+using System.Text.RegularExpressions;
 
 namespace LivreNoirLibrary.Media.Bms
 {
@@ -75,9 +77,20 @@ namespace LivreNoirLibrary.Media.Bms
             }
         }
 
+        public void TryEncode(Encoding encoding)
+        {
+            foreach (var (_, list) in this)
+            {
+                foreach (var value in CollectionsMarshal.AsSpan(list._values))
+                {
+                    encoding.GetByteCount(value);
+                }
+            }
+        }
+
         public const string DefFormat = "{0}{1} {2}";
 
-        public void Dump(BmsTextWriter writer)
+        public void Dump(BmsTextWriter writer, bool isRoot)
         {
             var radix = writer.Radix;
             void Write(string type, short key, string value)
@@ -132,7 +145,10 @@ namespace LivreNoirLibrary.Media.Bms
                             Write($"#{t}", key, value);
                         }
                     }
-                    writer.WriteEmpty();
+                    if (isRoot)
+                    {
+                        writer.WriteLine();
+                    }
                 }
             }
         }

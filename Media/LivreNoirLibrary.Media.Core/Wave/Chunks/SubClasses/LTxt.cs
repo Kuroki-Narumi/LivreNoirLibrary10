@@ -40,7 +40,7 @@ namespace LivreNoirLibrary.Media.Wave.Chunks
             }
         }
 
-        public static LTxt LoadContents(BinaryReader reader, uint length)
+        public static LTxt LoadContents(BinaryReader reader, ref uint length)
         {
             LTxt data = new();
             data.ProcessLoad(reader, length);

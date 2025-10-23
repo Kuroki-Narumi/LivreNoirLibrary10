@@ -20,19 +20,19 @@ namespace LivreNoirLibrary.YuGiOh.Converters
         {
             writer.WriteStartObject();
             writer.WriteNumber(JsonPropertyNames.Id, value.Id);
-            writer.WriteIfNotNull(JsonPropertyNames.Name, value.Name);
-            writer.WriteIfNotNull(JsonPropertyNames.Ruby, value.Ruby);
-            writer.WriteIfNotNull(JsonPropertyNames.EnName, value.EnName);
+            writer.WriteStringIfNotNull(JsonPropertyNames.Name, value.Name);
+            writer.WriteStringIfNotNull(JsonPropertyNames.Ruby, value.Ruby);
+            writer.WriteStringIfNotNull(JsonPropertyNames.EnName, value.EnName);
             Write(writer, value.CardType);
-            writer.WriteIfNotNull(JsonPropertyNames.Text, value.Text);
-            writer.WriteIfTrue(JsonPropertyNames.Unusable, value.Unusable);
+            writer.WriteStringIfNotNull(JsonPropertyNames.Text, value.Text);
+            writer.WriteBooleanIfTrue(JsonPropertyNames.Unusable, value.Unusable);
             if (value.CardType.IsMonster())
             {
                 writer.WritePropertyName(JsonPropertyNames.MonsterInfo);
                 writer.WriteStartObject();
                 Write(writer, value.Attribute);
                 Write(writer, value.MonsterType);
-                writer.WriteIfTrue(JsonPropertyNames.HasEffect, value.HasEffect);
+                writer.WriteBooleanIfTrue(JsonPropertyNames.HasEffect, value.HasEffect);
                 Write(writer, value.Ability);
                 writer.WriteNumber(JsonPropertyNames.Level, value.Level);
                 WriteStatus(writer, JsonPropertyNames.Atk, value.Atk);
@@ -43,7 +43,7 @@ namespace LivreNoirLibrary.YuGiOh.Converters
                     writer.WritePropertyName(JsonPropertyNames.PendulumInfo);
                     writer.WriteStartObject();
                     writer.WriteNumber(JsonPropertyNames.Scale, value.PendulumScale);
-                    writer.WriteIfNotNull(JsonPropertyNames.Text, value.PendulumText);
+                    writer.WriteStringIfNotNull(JsonPropertyNames.Text, value.PendulumText);
                     writer.WriteEndObject();
                 }
             }

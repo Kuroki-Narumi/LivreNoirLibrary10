@@ -120,6 +120,10 @@ namespace LivreNoirLibrary.Files
         public const string BM3Project = "bm3prj";
         public const string Mascot = "mascot";
 
+        public const string Xml = "xml";
+        public const string Xaml = "xaml";
+        public const string Html = "html";
+
         public static readonly string[] MidiExts = [Mid, Midi];
         public static readonly string[] AudioExts = [Wav, Wave, Vorbis, MP3];
         public static readonly string[] ExAudioExts = [Wav, Wave, Vorbis, MP3, Flac, Aif, Aiff, AAC];

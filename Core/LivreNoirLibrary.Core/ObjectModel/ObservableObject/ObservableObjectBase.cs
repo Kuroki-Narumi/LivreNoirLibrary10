@@ -15,7 +15,7 @@ namespace LivreNoirLibrary.ObjectModel
 
         public event PropertyChangedEventHandler? PropertyChanged;
 
-        protected virtual bool SetValue<T>(ref T field, T value, [CallerMemberName] string propertyName = "")
+        protected bool SetValue<T>(ref T field, T value, [CallerMemberName] string propertyName = "")
         {
             if (EqualityComparer<T>.Default.Equals(field, value))
             {
@@ -26,7 +26,7 @@ namespace LivreNoirLibrary.ObjectModel
             return true;
         }
 
-        protected virtual bool SetValue<T>(ref T field, T value, ReadOnlySpan<string> relatedProperties, [CallerMemberName] string propertyName = "")
+        protected bool SetValue<T>(ref T field, T value, ReadOnlySpan<string> relatedProperties, [CallerMemberName] string propertyName = "")
         {
             var result = SetValue(ref field, value, propertyName);
             if (result)
@@ -39,7 +39,7 @@ namespace LivreNoirLibrary.ObjectModel
             return result;
         }
 
-        protected virtual bool SetValue<T>(ref T field, T value, Action<T, T> changed, [CallerMemberName] string propertyName = "")
+        protected bool SetValue<T>(ref T field, T value, Action<T, T> changed, [CallerMemberName] string propertyName = "")
         {
             var oldValue = field;
             var result = SetValue(ref field, value, propertyName);
@@ -50,7 +50,7 @@ namespace LivreNoirLibrary.ObjectModel
             return result;
         }
 
-        protected virtual bool SetValue<T>(ref T field, T value, ReadOnlySpan<string> relatedProperties, Action<T, T> changed, [CallerMemberName] string propertyName = "")
+        protected bool SetValue<T>(ref T field, T value, ReadOnlySpan<string> relatedProperties, Action<T, T> changed, [CallerMemberName] string propertyName = "")
         {
             var oldValue = field;
             var result = SetValue(ref field, value, propertyName);

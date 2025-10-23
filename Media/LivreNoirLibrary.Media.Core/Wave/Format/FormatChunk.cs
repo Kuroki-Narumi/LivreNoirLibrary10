@@ -68,7 +68,7 @@ namespace LivreNoirLibrary.Media.Wave
 
         public static FormatChunk Load(BinaryReader reader) => reader.ReadRiffChunk<FormatChunk>(ChunkIds.Format);
         public static FormatChunk LoadWithoudChid(BinaryReader reader) => reader.ReadRiffChunk<FormatChunk>();
-        public static FormatChunk LoadContents(BinaryReader reader, uint length)
+        public static FormatChunk LoadContents(BinaryReader reader, ref uint length)
         {
             var tag = (FormatType)reader.ReadUInt16();
             var channels = reader.ReadUInt16();

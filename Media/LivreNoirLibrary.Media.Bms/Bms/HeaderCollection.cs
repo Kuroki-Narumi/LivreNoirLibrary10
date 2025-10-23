@@ -1,11 +1,13 @@
+using LivreNoirLibrary.Collections;
+using LivreNoirLibrary.IO;
+using LivreNoirLibrary.Text;
 using System;
 using System.Collections.Generic;
-using System.Text.Json;
+using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Runtime.InteropServices;
-using LivreNoirLibrary.Text;
-using LivreNoirLibrary.IO;
-using System.Diagnostics.CodeAnalysis;
+using System.Text;
+using System.Text.Json;
 
 namespace LivreNoirLibrary.Media.Bms
 {
@@ -128,18 +130,31 @@ namespace LivreNoirLibrary.Media.Bms
             {
                 yield return (key.ToUpper(), value);
             }
-            if (radix is not (0 or Constants.Base_Default))
+            if (radix is > Constants.Base_Default)
             {
                 yield return ("BASE", radix.ToString());
             }
         }
 
-        public void Dump(BmsTextWriter writer)
+        public void TryEncode(Encoding encoding)
+        {
+            foreach (var (key, value) in EnumerateHeaders())
+            {
+                encoding.GetByteCount(key);
+                encoding.GetByteCount(value);
+            }
+        }
+
+        public void Dump(BmsTextWriter writer, bool isRoot)
         {
             var radix = writer.Radix;
             foreach (var (key, value) in EnumerateHeaders(radix))
             {
                 writer.WriteLine($"#{key} {value}");
+            }
+            if (isRoot)
+            {
+                writer.WriteLine();
             }
         }
 

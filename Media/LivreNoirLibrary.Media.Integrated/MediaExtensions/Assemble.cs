@@ -37,14 +37,13 @@ namespace LivreNoirLibrary.Media.Integrated
         {
             reporter?.Report("Creating Timeline ...", 0, 100);
             TimeCounter counter = new(data);
-            var start = counter.Beat2Ticks(data.GetAbsolutePosition(options.PreviewStart));
-            static long ToTicks(decimal duration) => (duration * TimeSpan.TicksPerSecond).RoundToLong();
-            var b = ToTicks(options.PreviewBody);
-            var fo = ToTicks(options.PreviewFadeOut);
+            var start = counter.Beat2Tick(data.GetAbsolutePosition(options.PreviewStart));
+            var b = TimeUtils.Seconds2Ticks(options.PreviewBody);
+            var fo = TimeUtils.Seconds2Ticks(options.PreviewFadeOut);
 
             var list = SoundTimingList.Create(data, counter, null, start + b + fo);
 
-            var fi = ToTicks(options.PreviewFadeIn);
+            var fi = TimeUtils.Seconds2Ticks(options.PreviewFadeIn);
             if (fi > start)
             {
                 fi = start;

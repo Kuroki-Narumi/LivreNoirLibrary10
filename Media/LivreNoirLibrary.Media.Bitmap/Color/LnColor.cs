@@ -1,11 +1,17 @@
 ﻿using System;
+using System.ComponentModel;
+using System.Diagnostics.CodeAnalysis;
 using System.Numerics;
 using System.Runtime.InteropServices;
+using System.Text.Json.Serialization;
+using LivreNoirLibrary.Text;
 
 namespace LivreNoirLibrary.Media
 {
     [StructLayout(LayoutKind.Sequential)]
-    public readonly unsafe struct LnColor : IEquatable<LnColor>, IEqualityOperators<LnColor, LnColor, bool>
+    [JsonConverter(typeof(LnColorJsonConverter))]
+    [TypeConverter(typeof(LnColorTypeConverter))]
+    public readonly unsafe struct LnColor : IEquatable<LnColor>, IEqualityOperators<LnColor, LnColor, bool>, ISpanParsable<LnColor>
     {
         public readonly byte B;
         public readonly byte G;
@@ -17,13 +23,6 @@ namespace LivreNoirLibrary.Media
 
         public LnColor(int a, int r, int g, int b) => (A, R, G, B) = ((byte)a, (byte)r, (byte)g, (byte)b);
         public LnColor(int r, int g, int b) => (A, R, G, B) = (255, (byte)r, (byte)g, (byte)b);
-
-        public LnColor(float alpha, uint rgb)
-        {
-            var a = ColorUtils.GetByte(alpha);
-            rgb |= (uint)a << 24;
-            this = *(LnColor*)&rgb;
-        }
 
         public override int GetHashCode()
         {
@@ -61,5 +60,31 @@ namespace LivreNoirLibrary.Media
 
         public (float A, float R, float G, float B) ToFloat() => (ColorUtils.GetFloat(A), ColorUtils.GetFloat(R), ColorUtils.GetFloat(G), ColorUtils.GetFloat(B));
         public static LnColor FromFloat(float a, float r, float g, float b) => new(ColorUtils.GetByte(a), ColorUtils.GetByte(r), ColorUtils.GetByte(g), ColorUtils.GetByte(b));
+
+        public static bool TryParse([NotNullWhen(true)] string? s, [MaybeNullWhen(false)] out LnColor result) => TryParse(s.AsSpan(), null, out result);
+        public static bool TryParse([NotNullWhen(true)] string? s, IFormatProvider? provider, [MaybeNullWhen(false)] out LnColor result) => TryParse(s.AsSpan(), provider, out result);
+        public static bool TryParse(ReadOnlySpan<char> s, [MaybeNullWhen(false)] out LnColor result) => TryParse(s, null, out result);
+        public static bool TryParse(ReadOnlySpan<char> s, IFormatProvider? provider, [MaybeNullWhen(false)] out LnColor result)
+        {
+            if (ColorUtils.TryParseColorCodeToByte(s, out var a, out var r, out var g, out var b))
+            {
+                result = new LnColor(a, r, g, b);
+                return true;
+            }
+            result = default;
+            return false;
+        }
+
+        public static LnColor Parse(string s) => Parse(s.AsSpan(), null);
+        public static LnColor Parse(string s, IFormatProvider? provider) => Parse(s.AsSpan(), provider);
+        public static LnColor Parse(ReadOnlySpan<char> s) => Parse(s, null);
+        public static LnColor Parse(ReadOnlySpan<char> s, IFormatProvider? provider)
+        {
+            if (TryParse(s, provider, out var result))
+            {
+                return result;
+            }
+            throw new FormatException($"The string '{s}' was not recognized as a valid LnColor.");
+        }
     }
 }

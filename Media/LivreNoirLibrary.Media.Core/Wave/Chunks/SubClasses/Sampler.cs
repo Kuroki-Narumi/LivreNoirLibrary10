@@ -47,7 +47,7 @@ namespace LivreNoirLibrary.Media.Wave.Chunks
             };
         }
 
-        public static Sampler LoadContents(BinaryReader reader, uint length)
+        public static Sampler LoadContents(BinaryReader reader, ref uint length)
         {
             Sampler data = new();
             data.ProcessLoad(reader);

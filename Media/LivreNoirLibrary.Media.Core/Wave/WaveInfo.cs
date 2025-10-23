@@ -7,10 +7,12 @@ namespace LivreNoirLibrary.Media.Wave
 {
     public class WaveInfo : IWaveMetaData
     {
-        public long DataPosition { get; private set; }
-        public uint DataLength { get; private set; }
+        public DataChunk Data { get; private set; }
         public FormatChunk Format { get; private set; }
         public List<RiffChunk> Chunks { get; } = [];
+
+        public long DataPosition => Data.Position;
+        public uint DataLength => Data.Length;
 
         public static WaveInfo Create(Stream stream, BinaryReader reader)
         {
@@ -23,19 +25,26 @@ namespace LivreNoirLibrary.Media.Wave
             list.Clear();
             while (stream.Position < endPos)
             {
-                var chid = FourLetterHeader.Read(reader);
-                if (chid is ChunkIds.Data)
+                try
                 {
-                    (result.DataPosition, result.DataLength) = reader.ReadRiffChunk<DataChunk>();
+                    var chid = FourLetterHeader.Read(reader);
+                    if (chid is ChunkIds.Data)
+                    {
+                        result.Data = reader.ReadRiffChunk<DataChunk>();
+                    }
+                    else if (chid is ChunkIds.Format)
+                    {
+                        result.Format = reader.ReadRiffChunk<FormatChunk>();
+                    }
+                    else
+                    {
+                        var chunk = RiffChunk.Create(chid, reader);
+                        list.Add(chunk);
+                    }
                 }
-                else if (chid is ChunkIds.Format)
+                catch (EndOfStreamException)
                 {
-                    result.Format = reader.ReadRiffChunk<FormatChunk>();
-                }
-                else
-                {
-                    var chunk = RiffChunk.Create(chid, reader);
-                    list.Add(chunk);
+                    break;
                 }
             }
             return result;
@@ -66,14 +75,21 @@ namespace LivreNoirLibrary.Media.Wave
                 }
                 while (stream.Position < endPos)
                 {
-                    var chid = FourLetterHeader.Read(reader);
-                    if (chid is ChunkIds.Format)
+                    try
                     {
-                        var format = reader.ReadRiffChunk<FormatChunk>();
-                        return format.TryGetSampleFormat(out _);
+                        var chid = FourLetterHeader.Read(reader);
+                        if (chid is ChunkIds.Format)
+                        {
+                            var format = reader.ReadRiffChunk<FormatChunk>();
+                            return format.TryGetSampleFormat(out _);
+                        }
+                        length = reader.ReadUInt32();
+                        stream.Position += length + (length % 2 is 1 ? 1 : 0);
                     }
-                    length = reader.ReadUInt32();
-                    stream.Position += length + (length % 2 is 1 ? 1 : 0);
+                    catch (EndOfStreamException)
+                    {
+                        break;
+                    }
                 }
                 return false;
             }

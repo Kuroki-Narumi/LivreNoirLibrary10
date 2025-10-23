@@ -61,43 +61,6 @@ namespace LivreNoirLibrary.Media.Integrated
             }
         }
 
-        private void LoadContents_Legacy(BinaryReader reader)
-        {
-            Copyright = reader.ReadString();
-            var json = reader.ReadString();
-            if (Json.TryParse<ScoreOptions>(json, out var options))
-            {
-                Options = options;
-            }
-            TempoTimeline tempo = [];
-            TonalityTimeline tonality = [];
-            tempo.ProcessLoad(reader);
-            _signatures.ProcessLoad(reader);
-            tonality.ProcessLoad(reader);
-            var count = reader.ReadInt32();
-            if (count < _tracks.Count)
-            {
-                _tracks.RemoveRange(count, _tracks.Count - count);
-            }
-            else
-            {
-                InitializeTracks(count);
-            }
-            for (int i = 0; i < count; i++)
-            {
-                _tracks[i].ProcessLoad(reader);
-            }
-            var conductor = _tracks[0].Timeline;
-            foreach (var (pos, value) in tempo)
-            {
-                conductor.Add(pos, new TempoEvent(value));
-            }
-            foreach (var (pos, value) in tonality)
-            {
-                conductor.Add(pos, new TonalityEvent(value));
-            }
-        }
-
         public void Save(string path) => General.Save(path, this, ExtRegs.BM3Score, Exts.BM3Score);
 
         public void Dump(Stream stream)

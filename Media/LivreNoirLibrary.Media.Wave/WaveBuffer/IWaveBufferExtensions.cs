@@ -316,5 +316,11 @@ namespace LivreNoirLibrary.Media.Wave
         {
             return WaveBuffer.GetRms(buffer.Data, sampleOffset, sampleCount, buffer.Channels);
         }
+
+        public static float GetLufs<T>(this T buffer, int sampleOffset = 0, int sampleCount = 0)
+            where T : IWaveBuffer
+        {
+            return WaveBuffer.GetLufs(buffer.Data, sampleOffset, sampleCount, buffer.SampleRate, buffer.Channels);
+        }
     }
 }

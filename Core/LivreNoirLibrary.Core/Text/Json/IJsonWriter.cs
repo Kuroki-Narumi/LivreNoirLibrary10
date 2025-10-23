@@ -16,8 +16,8 @@ namespace LivreNoirLibrary.Text
         public static void WriteJson<T>(this T obj, Stream utf8json, bool pretty = true)
             where T : IJsonWriter
         {
-            using Utf8JsonWriter writer = new(utf8json, Json.GetWriterOption(pretty));
-            obj.WriteJson(writer, Json.CreateOptions(pretty));
+            using Utf8JsonWriter writer = new(utf8json, Json.GetStructWriteOptions(pretty));
+            obj.WriteJson(writer, Json.GetWriteOptions(pretty));
         }
 
         public static void SaveJson<T>(this T obj, string path, bool pretty = true)

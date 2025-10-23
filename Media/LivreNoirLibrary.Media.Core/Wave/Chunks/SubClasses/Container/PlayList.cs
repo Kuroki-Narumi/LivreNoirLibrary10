@@ -6,7 +6,7 @@ namespace LivreNoirLibrary.Media.Wave.Chunks
     {
         public override string Chid => ChunkIds.PlayList;
 
-        public static PlayList LoadContents(BinaryReader s, uint length)
+        public static PlayList LoadContents(BinaryReader s, ref uint length)
         {
             PlayList data = [];
             data.LoadData(s);

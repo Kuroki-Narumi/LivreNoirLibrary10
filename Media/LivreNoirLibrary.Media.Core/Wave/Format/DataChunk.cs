@@ -6,22 +6,22 @@ using LivreNoirLibrary.Text;
 
 namespace LivreNoirLibrary.Media.Wave
 {
-    public readonly struct DataChunk(long beginning, uint length) : IRiffChunk<DataChunk>, IJsonWriter
+    public readonly struct DataChunk(long position, uint length) : IRiffChunk<DataChunk>, IJsonWriter
     {
         public string Chid => ChunkIds.Data;
         public uint ByteSize => Length;
 
-        public readonly long Beginning = beginning;
+        public readonly long Position = position;
         public readonly uint Length = length;
 
-        public static DataChunk LoadContents(BinaryReader reader, uint length)
+        public static DataChunk LoadContents(BinaryReader reader, ref uint length)
         {
             var stream = reader.BaseStream;
             var pos = stream.Position;
             var actualLength = (uint)(stream.Length - pos);
             if (actualLength < length)
             {
-                //ExConsole.Write($"warning: data chunk size is wrong (written:{length}, actual:{actualLength})");
+                IRiffChunk.Assert(ChunkIds.Data, actualLength, length);
                 length = actualLength;
             }
             try
@@ -47,7 +47,7 @@ namespace LivreNoirLibrary.Media.Wave
 
         public void Deconstruct(out long beginning, out uint length)
         {
-            beginning = Beginning;
+            beginning = Position;
             length = Length;
         }
     }

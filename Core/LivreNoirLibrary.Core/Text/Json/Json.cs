@@ -12,6 +12,33 @@ namespace LivreNoirLibrary.Text
 {
     public static partial class Json
     {
+        private static readonly JsonSerializerOptions _readOptions;
+        private static readonly JsonSerializerOptions _writeOptions;
+        private static readonly JsonSerializerOptions _prettyWriteOptions;
+
+        static Json()
+        {
+            _readOptions = new()
+            {
+                Encoder = System.Text.Encodings.Web.JavaScriptEncoder.UnsafeRelaxedJsonEscaping,
+            };
+            var converters = _readOptions.Converters;
+            converters.Add(new DrawingPointFJsonConverter());
+            converters.Add(new DrawingPointJsonConverter());
+            converters.Add(new DrawingSizeJsonConverter());
+            converters.Add(new RectangleJsonConverter());
+
+            _writeOptions = new(_readOptions)
+            {
+                DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull
+            };
+            converters = _writeOptions.Converters;
+            converters.Add(new IJsonWriterJsonConverter());
+
+            _prettyWriteOptions = new(_writeOptions);
+            _prettyWriteOptions.WriteIndented = true;
+        }
+
         private static T GetValueOrThrow<T>(T? value)
         {
             if (value is not null)
@@ -27,14 +54,14 @@ namespace LivreNoirLibrary.Text
         public static T Parse<T>(string json)
             where T : class
         {
-            var obj = JsonSerializer.Deserialize<T>(json, CreateReaderOptions());
+            var obj = JsonSerializer.Deserialize<T>(json, _readOptions);
             return GetValueOrThrow(obj);
         }
 
         public static T Parse<T>(ReadOnlySpan<byte> utf8json)
             where T : class
         {
-            var obj = JsonSerializer.Deserialize<T>(utf8json, CreateReaderOptions());
+            var obj = JsonSerializer.Deserialize<T>(utf8json, _readOptions);
             return GetValueOrThrow(obj);
         }
 
@@ -48,7 +75,7 @@ namespace LivreNoirLibrary.Text
         public static T Load<T>(Stream utf8json)
             where T : class
         {
-            var obj = JsonSerializer.Deserialize<T>(utf8json, CreateReaderOptions());
+            var obj = JsonSerializer.Deserialize<T>(utf8json, _readOptions);
             return GetValueOrThrow(obj);
         }
 
@@ -126,35 +153,17 @@ namespace LivreNoirLibrary.Text
 
         public static void Dump(Stream utf8json, object obj, bool pretty = true)
         {
-            var options = CreateOptions(pretty);
-            using Utf8JsonWriter writer = new(utf8json, GetWriterOption(pretty));
-            JsonSerializer.Serialize(writer, obj, options);
+            using Utf8JsonWriter writer = new(utf8json, GetStructWriteOptions(pretty));
+            JsonSerializer.Serialize(writer, obj, pretty ? _prettyWriteOptions : _writeOptions);
         }
 
         public static string GetJsonText<T>(this T obj, bool pretty = false)
         {
-            return JsonSerializer.Serialize(obj, CreateOptions(pretty));
+            return JsonSerializer.Serialize(obj, pretty ? _prettyWriteOptions : _writeOptions);
         }
 
-        public static JsonSerializerOptions CreateReaderOptions() => new()
-        {
-            ReadCommentHandling = JsonCommentHandling.Skip,
-            Encoder = System.Text.Encodings.Web.JavaScriptEncoder.UnsafeRelaxedJsonEscaping,
-        };
-
-        public static JsonSerializerOptions CreateOptions(bool pretty)
-        {
-            JsonSerializerOptions options = new()
-            {
-                WriteIndented = pretty,
-                DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull,
-                Encoder = System.Text.Encodings.Web.JavaScriptEncoder.UnsafeRelaxedJsonEscaping,
-            };
-            options.Converters.Add(new IJsonWriterJsonConverter());
-            return options;
-        }
-
-        public static JsonWriterOptions GetWriterOption(bool pretty)
+        public static JsonSerializerOptions GetWriteOptions(bool pretty) => pretty ? _prettyWriteOptions : _writeOptions;
+        public static JsonWriterOptions GetStructWriteOptions(bool pretty)
         {
             if (pretty)
             {
@@ -185,7 +194,7 @@ namespace LivreNoirLibrary.Text
 
         public static bool Equals<T>(T left, T right)
         {
-            var op = CreateOptions(false);
+            var op = GetWriteOptions(false);
             lock (_equals_lock)
             {
                 var l = _equals_left_ms;

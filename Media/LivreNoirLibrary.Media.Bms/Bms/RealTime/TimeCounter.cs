@@ -5,7 +5,7 @@ using LivreNoirLibrary.Numerics;
 
 namespace LivreNoirLibrary.Media.Bms
 {
-    public class TimeCounter
+    public class TimeCounter : ITimeCounter
     {
         private readonly List<decimal> _beat_list = [];
         private readonly List<Beat2SecondItem> _beat_item_list = [];
@@ -45,13 +45,13 @@ namespace LivreNoirLibrary.Media.Bms
                 }
                 var tempoExists = false;
                 var curTempo = 0m;
-                var curStop = Rational.Zero;
+                var curStop = 0m;
                 foreach (var note in CollectionsMarshal.AsSpan(list))
                 {
                     switch (note)
                     {
                         case IConductorNote { Channel: Channel.Bpm } c:
-                            curTempo = c.DecimalValue;
+                            curTempo = c.Value;
                             tempoExists = true;
                             break;
                         case IConductorNote { Channel: Channel.Stop } c:
@@ -60,7 +60,7 @@ namespace LivreNoirLibrary.Media.Bms
                     }
                 }
                 var tempoChanged = tempoExists && curTempo != tempo;
-                var stopExists = !curStop.IsZero();
+                var stopExists = curStop is not 0;
                 if (tempoChanged || stopExists)
                 {
                     var beat = (decimal)data.GetAbsolutePosition(pos);
@@ -71,7 +71,7 @@ namespace LivreNoirLibrary.Media.Bms
                         tempo = curTempo;
                         spb = 240 / tempo;
                     }
-                    var ss = curStop * spb;
+                    var ss = curStop * Constants.StopUnit * spb;
                     AddBeat2Second(beat, second, tempo, ss);
                     AddSecond2Beat(second, beat, tempo);
                     if (stopExists)
@@ -158,19 +158,7 @@ namespace LivreNoirLibrary.Media.Bms
             return list;
         }
 
-        public decimal Beat2Tempo(decimal beat)
-        {
-            var index = _beat_list.BinarySearch(beat);
-            if (index is < 0)
-            {
-                index = Math.Max(~index - 1, 0);
-            }
-            return _beat_item_list[index].Tempo;
-        }
-
-        public decimal Beat2Tempo(Rational beat) => Beat2Tempo((decimal)beat);
-
-        public decimal Beat2Second(decimal beat)
+        public decimal Beat2Time(decimal beat)
         {
             var index = _beat_list.BinarySearch(beat);
             if (index is >= 0)
@@ -187,16 +175,7 @@ namespace LivreNoirLibrary.Media.Bms
             }
         }
 
-        public decimal Beat2Second(Rational beat) => Beat2Second((decimal)beat);
-
-        public long Beat2Ticks(Rational beat) => (long)(Beat2Second(beat) * TimeSpan.TicksPerSecond);
-        public TimeSpan Beat2TimeSpan(Rational beat) => TimeSpan.FromTicks((long)(Beat2Second(beat) * TimeSpan.TicksPerSecond));
-
-        public decimal Interval(Rational firstBeat, Rational lastBeat) => Beat2Second(lastBeat) - Beat2Second(firstBeat);
-        public long IntervalTicks(Rational firstBeat, Rational lastBeat) => Beat2Ticks(lastBeat) - Beat2Ticks(firstBeat);
-        public TimeSpan IntervalTimeSpan(Rational firstBeat, Rational lastBeat) => Beat2TimeSpan(lastBeat) - Beat2TimeSpan(firstBeat);
-
-        public decimal Second2Tempo(decimal second)
+        public decimal Time2Tempo(decimal second)
         {
             var index = _second_list.BinarySearch(second);
             if (index is < 0)
@@ -206,7 +185,7 @@ namespace LivreNoirLibrary.Media.Bms
             return _second_item_list[index].Tempo;
         }
 
-        public decimal Second2Beat(decimal second)
+        public decimal Time2Beat(decimal second)
         {
             var index = _second_list.BinarySearch(second);
             if (index is >= 0)

@@ -24,7 +24,7 @@ namespace LivreNoirLibrary.Windows.YuGiOh
             {
                 GradientOrigin = new(0.25, 0.25),
             };
-            GradientStop g = new(ColorExtension.ToColor(c1), 0.0);
+            GradientStop g = new(StructExtensions.ToColor(c1), 0.0);
             g.Freeze();
             brush.GradientStops.Add(g);
             g = new(c2.ToColor(), 0.6);

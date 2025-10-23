@@ -20,10 +20,10 @@ namespace LivreNoirLibrary.Media.Bms
         /// </summary>
         /// <returns></returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static string ToBased(Channel channel) => ((long)channel).ToBased(BasedNumber.StandardRadix, 2);
+        public static string ToBased(this Channel channel) => ((long)channel).ToBased(BasedNumber.StandardRadix, 2);
 
         /// <summary>
-        /// Returns a <see cref="Channel"/> from a.base36 string
+        /// Returns a <see cref="Channel"/> from a base36 string
         /// </summary>
         /// <returns></returns>
         public static Channel ToChannel(string index)
@@ -46,15 +46,7 @@ namespace LivreNoirLibrary.Media.Bms
 
         public static string GetBarText(this int number) => string.Format(Constants.BarTextFormat, number);
 
-        public static readonly Rational StopUnit = new(Constants.DefaultBarLength, Constants.StopResolution);
-        public static Rational GetStopLength(Rational count) => count * StopUnit;
-        public static decimal ConvertBackStopLength(Rational length) => (decimal)(length / StopUnit);
-
-        public static bool IsBgm(this Channel channel) => channel is Channel.Bgm;
-        public static bool IsBar(this Channel channel) => channel is Channel.Bar;
-        public static bool IsBpm(this Channel channel) => channel is Channel.Bpm_Base or Channel.Bpm;
-        public static bool IsExt(this Channel channel) => channel is Channel.Ext;
-        public static bool IsSoundChannel(this Channel channel) => IsBgm(channel) || IsVisible(channel) || IsInvisible(channel) || IsLong(channel) || IsMine(channel);
+        public static bool IsSoundChannel(this Channel channel) => channel is Channel.Bgm || IsVisible(channel) || IsInvisible(channel) || IsLong(channel) || IsMine(channel);
 
         public static NoteType GetNoteType(this Channel channel)
         {
@@ -73,15 +65,18 @@ namespace LivreNoirLibrary.Media.Bms
 
         public static Channel GetChannel(this NoteType type, short lane)
         {
-            return type switch
-            {
-                NoteType.Mine => Channel.P1_Mine + lane,
-                NoteType.Invisible => Channel.P1_Invisible + lane,
-                _ => lane is > 0 ? Channel.P1_Visible + lane : Channel.Bgm
-            };
+            return lane is <= 0 ? Channel.Bgm
+                : type switch
+                {
+                    NoteType.Mine => Channel.P1_Mine + lane,
+                    NoteType.Invisible => Channel.P1_Invisible + lane,
+                    _ => Channel.P1_Visible + lane
+                };
         }
 
-        public static bool IsHex(this Channel channel) => _hex.Contains(channel);
+        public static Channel ToLong(this Channel channel) => channel - Channel.P1_Visible + Channel.P1_Long;
+
+        public static bool IsHex(this Channel channel) => _hex.Contains(channel) || IsMine(channel);
         private static readonly SortedSet<Channel> _hex = 
             [
                 Channel.Bpm_Base,
@@ -198,28 +193,29 @@ namespace LivreNoirLibrary.Media.Bms
             return set;
         }
 
-        public static DefType GetDefType(this Channel channel)
+        public static DefType GetDefType(this Channel channel) => _defTypes.TryGetValue(channel, out var type) ? type : 0;
+        private static Dictionary<Channel, DefType> _defTypes = CreateDefTypes();
+        private static Dictionary<Channel, DefType> CreateDefTypes()
         {
-            if (IsBga(channel))
+            Dictionary<Channel, DefType> dic = [];
+            foreach (var ch in BgaChannelList)
             {
-                return DefType.Bmp;
+                dic[ch] = DefType.Bmp;
             }
-            else if (IsArgb(channel))
+            foreach (var ch in _argb)
             {
-                return DefType.Argb;
+                dic[ch] = DefType.Argb;
             }
-            else
-            {
-                return channel switch
-                {
-                    Channel.ExRank => DefType.ExRank,
-                    Channel.Text => DefType.Text,
-                    Channel.SwBga => DefType.SwBga,
-                    Channel.ChangeOption => DefType.ChangeOption,
-                    _ => 0,
-                };
-            }
-        }
+            dic[Channel.Bpm] = DefType.Bpm;
+            dic[Channel.Stop] = DefType.Stop;
+            dic[Channel.Scroll] = DefType.Scroll;
+            dic[Channel.Speed] = DefType.Speed;
+            dic[Channel.ExRank] = DefType.ExRank;
+            dic[Channel.Text] = DefType.Text;
+            dic[Channel.SwBga] = DefType.SwBga;
+            dic[Channel.ChangeOption] = DefType.ChangeOption;
+            return dic;
+        } 
 
         public static bool IsKeyLane(int lane) => lane is > 0 and < Constants.MaxKeyLane;
         public static bool IsBgmLane(int lane) => lane is <= 0;
@@ -235,5 +231,7 @@ namespace LivreNoirLibrary.Media.Bms
         }
 
         public static bool IsConductor(this DefType type) => type is >= DefType.Bpm and <= DefType.Speed;
+
+        public static bool NeedsBpmDef(decimal value) => value != decimal.Truncate(value) || value is <= 0 || value is > 255;
     }
 }

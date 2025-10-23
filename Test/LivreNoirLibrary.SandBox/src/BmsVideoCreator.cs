@@ -20,6 +20,8 @@ using LivreNoirLibrary.ObjectModel;
 using LivreNoirLibrary.Windows;
 using LivreNoirLibrary.Windows.Media;
 using LivreNoirLibrary.Windows.Media.Bms;
+using LivreNoirLibrary.Windows.Media.Bms.SkinInfo;
+using System.Text.Json.Serialization;
 
 namespace LivreNoirLibrary.SandBox
 {
@@ -28,61 +30,34 @@ namespace LivreNoirLibrary.SandBox
         public static readonly DrSize[] SizeList = [new(640, 480), new(1280, 720), new(1920, 1080)];
         public static readonly Rational[] FpsList = [FrameRates.Fps24, FrameRates.Fps30, FrameRates.Fps50, FrameRates.Fps60, FrameRates.Fps120, FrameRates.Fps240];
 
-        public string? BmsPath { get; set => SetValue(ref field, value, [nameof(BmsDirectory)]); }
-        public string? BmsDirectory => Path.GetDirectoryName(BmsPath);
-        public BmsData? BmsData { get; set => SetValue(ref field, value); }
+        [JsonIgnore]
+        public BmsScreen Screen { get; } = new();
         public AssembleOptions AssembleOptions { get; set => SetValue(ref field, value); } = new() { Marker = false, Gain = -6 };
-
-        public RenderTargetBitmap? RenderTarget { get; set => SetValue(ref field, value); }
-
-        public DrSize Size
-        {
-            get;
-            set
-            {
-                if (SetValue(ref field, value))
-                {
-                    RenderTarget = null;
-                }
-            }
-        } = new(1280, 720);
 
         public Rational FrameRate { get; set => SetValue(ref field, value); } = FrameRates.Fps60;
         public bool IsHevc { get; set => SetValue(ref field, value); } = true;
-        public int ApproximateKbps { get; set => SetValue(ref field, value); } = 5000;
+        public int ApproximateKbps { get; set => SetValue(ref field, value); } = 10000;
+        public double FadeinTime { get; set; } = 0;
+        public double LoadTime { get; set; } = 0;
+        public double LoadCompleteTime { get; set; } = 0;
+        public double FadeoutTime { get; set; } = 1;
 
-        public BgaElement Bga { get; set => SetValue(ref field, value); } = new() { Rect = new(400, 40, 480, 480) };
-
-        public bool OpenBms(string path)
-        {
-            try
-            {
-                var data = BmsData.Open(path);
-                BmsPath = path;
-                BmsData = data;
-                return true;
-            }
-            catch (Exception ex)
-            {
-                ExConsole.Write(ex);
-                BmsData = null;
-                return false;
-            }
-        }
+        public void LoadSkin(Skin? skin) => Screen.LoadSkin(skin);
+        public bool OpenBms(string path) => Screen.OpenBms(path);
 
         private WaveData? _assembledData;
 
         public void Assemble(ProgressReporter p, CancellationToken c)
         {
             _assembledData = null;
-            if (BmsData is { } data)
+            if (Screen.BmsData is { } data)
             {
                 try
                 {
                     p.Report("Assembling...", null);
-                    _assembledData = data.Assemble(AssembleOptions, BmsDirectory!, p, c);
+                    _assembledData = data.Assemble(AssembleOptions, Screen.Directory!, p, c);
                 }
-                catch
+                catch (OperationCanceledException)
                 {
                     _assembledData = null;
                     throw;
@@ -107,9 +82,14 @@ namespace LivreNoirLibrary.SandBox
 
         public void CreateVideo(string path, WaveData waveBuffer, ProgressReporter p, CancellationToken c)
         {
-            if (BmsData is { } data)
+            var screen = Screen;
+            if (screen.BmsData is not null)
             {
-                var (width, height) = Size;
+                screen.DetermineExpressions();
+                screen.SetupPlay(true);
+                var mainCanvas = screen.MainCanvas;
+                var width = (int)mainCanvas.Width;
+                var height = (int)mainCanvas.Height;
 
                 // エンコーダー
                 using FFmpegEncoder encoder = new(path);
@@ -120,47 +100,51 @@ namespace LivreNoirLibrary.SandBox
                 VideoEncodeOptions videoOptions = new(width, height, fps, ApproximateKbps * 1000, codecOptions, hardwareOptions);
                 var video = encoder.CreateVideoStream(videoOptions);
                 var audio = encoder.CreateAudioStream(new AudioEncodeOptions(waveBuffer.SampleRate, waveBuffer.Channels));
-
                 // 読み書きバッファ
-                var drawingVisual = new DrawingVisual();
-                var renderTarget = (RenderTarget ??= new RenderTargetBitmap(width, height, 96, 96, PixelFormats.Pbgra32));
                 var size = width * height * 4;
                 var videoBuffer = ArrayPool<byte>.Shared.Rent(size);
                 var videoSpan = videoBuffer.AsSpan(0, size);
-
+                var renderTarget = new RenderTargetBitmap(width, height, 96, 96, PixelFormats.Pbgra32);
+                var videoBufferStride = width * 4;
                 // 音声
                 var audioIndex = 0;
                 var audioUnit = waveBuffer.SampleRate * waveBuffer.Channels;
+                var audioBuffer = ArrayPool<float>.Shared.Rent(audioUnit);
+                var audioSpan = audioBuffer.AsSpan();
 
-                // BGA
-                var bga = Bga;
-                bga.Load(data, BmsDirectory!);
+                // タイマー
+                var fadeinFinish = TimeUtils.Seconds2Ticks(FadeinTime);
+                var loadingFinish = fadeinFinish + TimeUtils.Seconds2Ticks(LoadTime);
+                var musicStart = loadingFinish + TimeUtils.Seconds2Ticks(LoadCompleteTime);
+                var fadeoutStart = musicStart + TimeUtils.Seconds2Ticks(waveBuffer.TotalSeconds);
+                var totalTime = fadeoutStart + TimeUtils.Seconds2Ticks(FadeoutTime);
+                screen.StartLoading(0);
+                screen.FinishLoading(loadingFinish);
+                screen.StartMusic(musicStart);
 
                 // デバッグ用
                 var t0 = Stopwatch.GetTimestamp();
                 var fps_threshold = fps_den * fps_num;
                 var fps_total = 0L;
-                var totalFrame = (int)(waveBuffer.TotalSeconds * fps);
+                var totalFrame = (int)(TimeUtils.Ticks2Seconds(totalTime) * fps);
 
                 p.Report("Encoding...", null);
                 try
                 {
+                    screen.StartLoading(0);
                     for (var frame = 0; frame < totalFrame; frame++)
                     {
                         var tick = frame * TimeSpan.TicksPerSecond * fps_den / fps_num;
                         c.ThrowIfCancellationRequested();
-                        p.Report($"Write frame {frame}/{totalFrame}({frame / Stopwatch.GetElapsedTime(t0).TotalSeconds:0.000}fps)", frame, totalFrame);
-                        
-                        // 映像フレームの作成
-                        using (var ctx = drawingVisual.RenderOpen())
-                        {
-                            ctx.DrawRectangle(Brushes.White, null, new(0, 0, width, height));
-                            bga.Render(ctx, tick);
-                        }
-                        renderTarget.Render(drawingVisual);
+                        var report = $"Write frame {frame}/{totalFrame}({frame / Stopwatch.GetElapsedTime(t0).TotalSeconds:0.000}fps)";
+                        p.Report(report, frame, totalFrame);
 
+                        screen.Update(tick);
+                        // 画面更新を待つ
+                        DependencyObjectExtensions.WaitForUpdate();
+                        renderTarget.Render(mainCanvas);
+                        renderTarget.CopyPixels(videoBuffer, videoBufferStride, 0);
                         // 映像フレームの書き込み
-                        renderTarget.CopyPixels(renderTarget.GetRect(), videoBuffer, width * 4, 0);
                         encoder.WritePixels(videoSpan);
                         c.ThrowIfCancellationRequested();
 
@@ -173,8 +157,6 @@ namespace LivreNoirLibrary.SandBox
                             fps_total -= fps_threshold;
                         }
 
-                        // 画面を更新するための処理
-                        DependencyObjectExtensions.WaitForUpdate();
                     }
                     while (WriteAudio())
                     {

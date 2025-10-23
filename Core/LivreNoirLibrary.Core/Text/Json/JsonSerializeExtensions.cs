@@ -1,15 +1,12 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Text.Json;
-using System.Threading.Tasks;
 
 namespace LivreNoirLibrary.Text
 {
     public static class JsonSerializeExtensions
     {
-        public static void WriteIfNotNull(this Utf8JsonWriter writer, string propertyName, string? value)
+        public static void WriteStringIfNotNull(this Utf8JsonWriter writer, string propertyName, string? value)
         {
             if (!string.IsNullOrWhiteSpace(value))
             {
@@ -17,7 +14,7 @@ namespace LivreNoirLibrary.Text
             }
         }
 
-        public static void WriteIfTrue(this Utf8JsonWriter writer, string propertyName, bool value = true)
+        public static void WriteBooleanIfTrue(this Utf8JsonWriter writer, string propertyName, bool value = true)
         {
             if (value)
             {
@@ -25,7 +22,34 @@ namespace LivreNoirLibrary.Text
             }
         }
 
-        public static void WriteObjectIfNotNull<T>(this Utf8JsonWriter writer, string propertyName, T? value, JsonSerializerOptions? options)
+        public static void WriteIf<T>(this Utf8JsonWriter writer, string propertyName, T value, bool condition, JsonSerializerOptions? options)
+        {
+            if (condition)
+            {
+                writer.WritePropertyName(propertyName);
+                JsonSerializer.Serialize(writer, value, options);
+            }
+        }
+
+        public static void WriteIfNot<T>(this Utf8JsonWriter writer, string propertyName, T? value, T defaultValue, JsonSerializerOptions? options)
+        {
+            if (!EqualityComparer<T>.Default.Equals(value, defaultValue))
+            {
+                writer.WritePropertyName(propertyName);
+                JsonSerializer.Serialize(writer, value, options);
+            }
+        }
+
+        public static void WriteIfNotDefault<T>(this Utf8JsonWriter writer, string propertyName, T? value, JsonSerializerOptions? options)
+        {
+            if (!EqualityComparer<T>.Default.Equals(value, default))
+            {
+                writer.WritePropertyName(propertyName);
+                JsonSerializer.Serialize(writer, value, options);
+            }
+        }
+
+        public static void WriteIfNotNull<T>(this Utf8JsonWriter writer, string propertyName, T? value, JsonSerializerOptions? options)
             where T : class
         {
             if (value is not null)
@@ -35,7 +59,7 @@ namespace LivreNoirLibrary.Text
             }
         }
 
-        public static void WriteObjectIfNotNull<T>(this Utf8JsonWriter writer, string propertyName, T? value, Action<Utf8JsonWriter, T> writeAction)
+        public static void WriteIfNotNull<T>(this Utf8JsonWriter writer, string propertyName, T? value, Action<Utf8JsonWriter, T> writeAction)
             where T : class
         {
             if (value is not null)

@@ -1,0 +1,156 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Text;
+using Microsoft.CodeAnalysis;
+
+namespace LivreNoirLibrary.Core.Generator;
+
+[Generator]
+internal class TupleConverter : IIncrementalGenerator
+{
+    public readonly static string[] TypeLists = [
+        "",
+        "T1",
+        "T1, T2",
+        "T1, T2, T3",
+        "T1, T2, T3, T4",
+        "T1, T2, T3, T4, T5",
+        "T1, T2, T3, T4, T5, T6",
+        "T1, T2, T3, T4, T5, T6, T7",
+        "T1, T2, T3, T4, T5, T6, T7, T8",
+        ];
+
+    public void Initialize(IncrementalGeneratorInitializationContext context)
+    {
+        context.RegisterPostInitializationOutput(Generate);
+    }
+
+    private void Generate(IncrementalGeneratorPostInitializationContext context)
+    {
+        StringBuilder sb = new();
+        sb.AppendLine(Code_Header);
+        List<string> returnValueList = ["{v1}"];
+        for (var i = 2; i <= 8; i++)
+        {
+            returnValueList.Add($"{{v{i}}}");
+            var typeList = TypeLists[i];
+            Append(CodeSegment_1_1, typeList);
+            for (var j = 1; j <= i; j++)
+            {
+                Append(CodeSegment_1_2, $"T{j}");
+            }
+            Append(CodeSegment_1_3, $"{i}");
+            for (var j = 1; j <= i; j++)
+            {
+                Append(CodeSegment_1_4, $"v{j}", $"T{j}", $"{j - 1}");
+            }
+            Append(CodeSegment_1_5, typeList.Replace('T', 'v'));
+            sb.AppendLine(CodeSegment_1_6);
+
+            Append(CodeSegment_2_1, typeList);
+            for (var j = 1; j <= i; j++)
+            {
+                Append(CodeSegment_2_2, $"T{j}");
+            }
+            Append(CodeSegment_2_3);
+            for (var j = 1; j <= i; j++)
+            {
+                Append(CodeSegment_2_4, $"v{j}", $"{j}");
+            }
+            var values = string.Join("{sep} ", returnValueList);
+            Append(CodeSegment_2_5, values);
+            sb.AppendLine();
+        }
+        sb.AppendLine(Code_Footer);
+        context.AddSource($"TupleStringConverter.g.cs", sb.ToString());
+
+        void Append(string format, params ReadOnlySpan<string> args)
+        {
+            for (var i = 0; i < args.Length; i++)
+            {
+                format = format.Replace($"${i}$", args[i]);
+            }
+            sb.AppendLine(format);
+        }
+    }
+
+    const string Code_Header = """
+using System;
+using System.Diagnostics.CodeAnalysis;
+using System.Globalization;
+
+namespace LivreNoirLibrary.Text
+{
+    public static class TupleStringConverter
+    {
+""";
+
+    const string Code_Footer = """
+    }
+}
+""";
+
+    const string CodeSegment_1_1 = $$"""
+        public static bool TryConvertFromString<$0$>(string? input, [MaybeNullWhen(false)]out ($0$) value, CultureInfo? culture = null, bool strictCount = false)
+""";
+
+    const string CodeSegment_1_2 = $$"""
+            where $0$ : ISpanParsable<$0$>
+""";
+
+    const string CodeSegment_1_3 = $$"""
+        {
+            var text = input.AsSpan().Trim();
+            if (text.Length is 0)
+            {
+                goto ReturnFalse;
+            }
+            culture ??= CultureInfo.CurrentCulture;
+            var sep = culture.TextInfo.ListSeparator;
+            var ranges = (stackalloc Range[$0$ + 1]);
+            var rangesCount = text.Split(ranges, sep);
+            if (strictCount ? rangesCount is not $0$ : rangesCount is < $0$)
+            {
+                goto ReturnFalse;
+            }
+""";
+
+    const string CodeSegment_1_4 = $$"""
+            var $0$ = $1$.Parse(text[ranges[$2$]], culture);
+""";
+
+    const string CodeSegment_1_5 = $$"""
+            value = ($0$);
+""";
+
+    const string CodeSegment_1_6 = $$"""
+            return true;
+        ReturnFalse:
+            value = default;
+            return false;
+        }
+""";
+
+    const string CodeSegment_2_1 = $$"""
+        public static string ConvertToString<$0$>(($0$) tuple, CultureInfo? culture)
+""";
+
+    const string CodeSegment_2_2 = $$"""
+            where $0$ : IFormattable
+""";
+
+    const string CodeSegment_2_3 = $$"""
+        {
+            culture ??= CultureInfo.CurrentCulture;
+            var sep = culture.TextInfo.ListSeparator;
+""";
+
+    const string CodeSegment_2_4 = $$"""
+            var $0$ = tuple.Item$1$.ToString(null, culture);
+""";
+
+    const string CodeSegment_2_5 = $$"""
+            return $"$0$";
+        }
+""";
+}

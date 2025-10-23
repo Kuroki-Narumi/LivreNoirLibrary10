@@ -14,8 +14,10 @@ namespace LivreNoirLibrary.Benchmark
         protected override void OnStartup(StartupEventArgs e)
         {
             base.OnStartup(e);
-            PointerTest.Run();
+            //PointerTest.Run();
             //ColorTest.Check();
+            //JsonTest.Test();
+            BenchmarkRunner.Run<VectorTest>();
         }
     }
 

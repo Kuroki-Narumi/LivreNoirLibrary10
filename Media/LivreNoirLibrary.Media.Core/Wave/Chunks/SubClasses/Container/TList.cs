@@ -6,7 +6,7 @@ namespace LivreNoirLibrary.Media.Wave.Chunks
     {
         public override string Chid => ChunkIds.TList;
 
-        public static TList LoadContents(BinaryReader s, uint length)
+        public static TList LoadContents(BinaryReader s, ref uint length)
         {
             TList data = [];
             data.LoadData(s);

@@ -17,8 +17,16 @@
 	</PropertyGroup>
 
 	<ItemGroup>
+	  <None Remove="Effects\Shaders\transparent.ps" />
+	</ItemGroup>
+
+	<ItemGroup>
 	  <ProjectReference Include="..\..\Media\LivreNoirLibrary.Media.Bitmap\LivreNoirLibrary.Media.Bitmap.csproj" />
 	  <ProjectReference Include="..\LivreNoirLibrary.Windows.Core\LivreNoirLibrary.Windows.Core.csproj" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <Resource Include="Effects\Shaders\transparent.ps" />
 	</ItemGroup>
 
 </Project>

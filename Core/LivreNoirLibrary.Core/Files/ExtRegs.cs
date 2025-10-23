@@ -108,5 +108,9 @@ namespace LivreNoirLibrary.Files
         public static readonly Regex BM3Score = Create(Exts.BM3Score, Exts.Mid, Exts.Midi);
         public static readonly Regex BM3Project = Create(Exts.BM3Project);
         public static readonly Regex Mascot = Create(Exts.Mascot);
+
+        public static readonly Regex Xml = Create(Exts.Xml);
+        public static readonly Regex Xaml = Create(Exts.Xaml);
+        public static readonly Regex Html = Create(Exts.Html);
     }
 }

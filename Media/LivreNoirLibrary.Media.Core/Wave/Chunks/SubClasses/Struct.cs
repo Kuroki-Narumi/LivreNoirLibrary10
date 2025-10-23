@@ -20,7 +20,7 @@ namespace LivreNoirLibrary.Media.Wave.Chunks
         public uint Unknown6 { get; set; }
         public List<Data> DataList { get; } = [];
 
-        public static Struct LoadContents(BinaryReader reader, uint length)
+        public static Struct LoadContents(BinaryReader reader, ref uint length)
         {
             var uk1 = reader.ReadUInt32();
             var dataCount = (int)reader.ReadUInt32();

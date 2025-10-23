@@ -18,7 +18,7 @@ namespace LivreNoirLibrary.Media.Wave.Chunks
         public int Count => SubChunks.Count;
         public bool IsReadOnly => false;
 
-        public static LIST LoadContents(BinaryReader reader, uint length)
+        public static LIST LoadContents(BinaryReader reader, ref uint length)
         {
             var stream = reader.BaseStream;
             var limit = stream.Position + length;

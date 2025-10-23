@@ -17,8 +17,29 @@
 	</PropertyGroup>
 
 	<ItemGroup>
+	  <Page Remove="Themes\BmsSkin\Default\7keys.xaml" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <None Include="Themes\BmsSkin\Default\7keys.xaml">
+	    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+	    <Generator>MSBuild:Compile</Generator>
+	  </None>
+	</ItemGroup>
+
+	<ItemGroup>
     <ProjectReference Include="..\..\Media\LivreNoirLibrary.Media.Integrated\LivreNoirLibrary.Media.Integrated.csproj" />
     <ProjectReference Include="..\LivreNoirLibrary.Windows.Controls\LivreNoirLibrary.Windows.Controls.csproj" />
+		<ProjectReference Include="..\LivreNoirLibrary.Windows.SourceGenerator\LivreNoirLibrary.Windows.SourceGenerator.csproj">
+			<OutputItemType>Analyzer</OutputItemType>
+			<ReferenceOutputAssembly>false</ReferenceOutputAssembly>
+		</ProjectReference>
   </ItemGroup>
+
+	<ItemGroup>
+	  <None Update="Themes\BmsSkin\Default\skin_bm.png">
+	    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+	  </None>
+	</ItemGroup>
 
 </Project>

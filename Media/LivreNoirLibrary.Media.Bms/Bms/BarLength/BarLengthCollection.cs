@@ -15,7 +15,6 @@ namespace LivreNoirLibrary.Media.Bms
         private readonly List<Rational> _values = [];
 
         public int Count => _numbers.Count;
-        public bool IsEmpty() => _numbers.Count is 0;
         public int LastNumber => _numbers.Count is > 0 ? _numbers[^1] : 0;
 
         public void Clear()

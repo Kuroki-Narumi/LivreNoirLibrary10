@@ -186,7 +186,7 @@ namespace LivreNoirLibrary.Text
             {
                 return (minDigits is <= 0 ? "0" : new string('0', minDigits)).Shared();
             }
-            var len = (int)long.Log2(value) + 1;
+            var len = Math.Max((int)long.Log2(value) + 1, minDigits);
             var buffer = (stackalloc char[len]);
             var i = len - 1;
             var map = _i2s;

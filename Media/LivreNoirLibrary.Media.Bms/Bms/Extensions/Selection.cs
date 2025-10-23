@@ -1,8 +1,9 @@
-﻿using System;
+﻿using LivreNoirLibrary.Collections;
+using LivreNoirLibrary.Media.Bmson;
+using LivreNoirLibrary.Numerics;
+using System;
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
-using LivreNoirLibrary.Collections;
-using LivreNoirLibrary.Numerics;
 
 namespace LivreNoirLibrary.Media.Bms
 {
@@ -107,6 +108,8 @@ namespace LivreNoirLibrary.Media.Bms
             }
         }
 
+        private record NoteCache(BarPosition Position, ISoundNote Note);
+
         public static bool ReplaceSelectionAll(this IBmsData data, Selection selection, int asmId, int marginMs, out Selection newSelection)
         {
             // preparation
@@ -117,18 +120,19 @@ namespace LivreNoirLibrary.Media.Bms
                 return false;
             }
             var selectionOffset = firstItem.AbsolutePosition;
-            var offset = counter.Beat2Second(selectionOffset);
-            List<(decimal Offset, ISoundNote Note)> noteList = [];
+            var offset = counter.Beat2Time(selectionOffset);
+            List<(decimal Offset, string DefValue)> noteList = [];
             HashSet<int> longHeadLanes = [];
+            string GetDefValue(int id) => data.TryGetDef(DefType.Wav, id, out var value) ? value : $@"\\\***{id}***\\\";
             foreach (var (_, p, note) in selection)
             {
                 if (note is ISoundNote n)
                 {
                     var lane = n.Lane;
                     var isNormal = n.IsNormal();
-                    if ((n.IsLongEnd() && longHeadLanes.Contains(lane)) || isNormal)
+                    if (isNormal || (n.IsLongEnd() && longHeadLanes.Contains(lane)))
                     {
-                        noteList.Add((counter.Beat2Second(p) - offset, n));
+                        noteList.Add((counter.Beat2Time(p) - offset, GetDefValue(n.Value)));
                         if (isNormal)
                         {
                             longHeadLanes.Add(lane);
@@ -145,74 +149,78 @@ namespace LivreNoirLibrary.Media.Bms
                 newSelection = selection;
                 return false;
             }
-            var i = 0;
-            noteList.Sort((a, b) =>
-            {
-                var c = a.Offset.CompareTo(b.Offset);
-                if (c is 0)
-                {
-                    var an = a.Note;
-                    var bn = b.Note;
-                    c = an.Lane.CompareTo(bn.Lane);
-                    if (c is 0)
-                    {
-                        c = an.Value.CompareTo(bn.Value);
-                    }
-                }
-                i++;
-                return c;
-            });
+            noteList.Sort((a, b) => a.Offset.CompareTo(b.Offset));
 
             // create candidates
-            var firstNoteId = noteList[0].Note.Value;
+            var firstDefValue = noteList[0].DefValue;
             var timeline = data.Timeline;
+            DecimalMultiTimeline<NoteCache> decTimeline = [];
             SortedSet<(BarPosition, decimal, int)> candidatePositions = [];
             foreach (var (pos, note) in timeline)
             {
-                if (note is ISoundNote s && s.Value == firstNoteId)
+                if (note is ISoundNote n)
                 {
-                    candidatePositions.Add((pos, counter.Beat2Second(data.GetAbsolutePosition(pos)), s.Lane));
+                    var time = counter.Beat2Time(data.GetAbsolutePosition(pos));
+                    decTimeline.Add(time, new(pos, n));
+                    if (GetDefValue(n.Value) == firstDefValue)
+                    {
+                        candidatePositions.Add((pos, time, n.Lane));
+                    }
                 }
             }
 
             // replace
             var result = false;
             newSelection = [];
-            List<(BarPosition, ISoundNote)> list = [];
-            var m = marginMs * 0.001m + 0.000001m; // 1us margin
+            var m = marginMs * 0.001m + 0.000001m; // 1us default margin
+            List<(decimal Second, decimal Offset, NoteCache Note)> nearestNotes = [];
+            List<(decimal Second, NoteCache Note)> sequence = [];
             foreach (var (headPos, headSecond, lane) in candidatePositions)
             {
                 var success = true;
-                foreach (var (innerS, note) in CollectionsMarshal.AsSpan(noteList))
+                foreach (var (innerSecond, defValue) in CollectionsMarshal.AsSpan(noteList))
                 {
-                    var second = headSecond + innerS;
-                    var pos = data.GetBarPosition(new((long)(counter.Second2Beat(second) * 1000000), 1000000)); // 1us quantize
-                    var value = note.Value;
-                    bool Pred(INote n) => n is ISoundNote s && s.Value == value;
-                    if (timeline.TryGetNearest(pos, out var actualPos, out var actualList) && // 推定される位置に最も近いリスト
-                        actualList.Find(Pred) is ISoundNote actualNote &&                     // の中にIDの合致するノートが存在し
-                        Math.Abs(counter.Beat2Second(data.GetAbsolutePosition(actualPos)) - second) <= m) // 実際の位置が許容誤差以下の場合
+                    try
                     {
-                        list.Add((actualPos, actualNote));
+                        // マージン範囲全体を探索
+                        var second = headSecond + innerSecond;
+                        foreach (var (actualSecond, nlist) in decTimeline.EachList(RangeUtils.Get(second - m, second + m, true)))
+                        {
+                            if (nlist.Find(pn => GetDefValue(pn.Note.Value) == defValue) is { } actualNote)
+                            {
+                                nearestNotes.Add((actualSecond, Math.Abs(actualSecond - second), actualNote));
+                            }
+                        }
+                        if (nearestNotes.Count is > 0)
+                        {
+                            nearestNotes.Sort((a, b) => a.Offset.CompareTo(b.Offset));
+                            var (actualSecond, _, note) = nearestNotes[0];
+                            sequence.Add((actualSecond, note));
+                        }
+                        else
+                        {
+                            success = false;
+                            break;
+                        }
                     }
-                    else
+                    finally
                     {
-                        success = false;
-                        break;
+                        nearestNotes.Clear();
                     }
                 }
                 if (success)
                 {
                     SoundNote newNote = new(lane, asmId);
-                    foreach (var (pos, note) in CollectionsMarshal.AsSpan(list))
+                    foreach (var (time, note) in CollectionsMarshal.AsSpan(sequence))
                     {
-                        timeline.Remove(pos, note);
+                        timeline.Remove(note.Position, note.Note);
+                        decTimeline.Remove(time, note);
                     }
                     timeline.Add(headPos, newNote);
                     newSelection.Add(data.GetHead(headPos), data.GetAbsolutePosition(headPos), newNote);
                     result = true;
                 }
-                list.Clear();
+                sequence.Clear();
             }
             return result;
         }

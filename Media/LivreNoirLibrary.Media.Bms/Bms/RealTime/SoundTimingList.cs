@@ -30,7 +30,7 @@ namespace LivreNoirLibrary.Media.Bms
             selector ??= n => n.IsPlayableSound(false, out _);
             foreach (var (pos, notes) in data.Timeline.EachList())
             {
-                var tick = counter.Beat2Ticks(data.GetAbsolutePosition(pos));
+                var tick = counter.Beat2Tick(data.GetAbsolutePosition(pos));
                 if (length is not 0 && tick >= length)
                 {
                     break;
@@ -52,7 +52,7 @@ namespace LivreNoirLibrary.Media.Bms
             selector ??= n => n.IsPlayableSound(false, out _);
             foreach (var (_, beat, note) in selection)
             {
-                var tick = counter.Beat2Ticks(beat);
+                var tick = counter.Beat2Tick(beat);
                 if (length is not 0 && tick >= length)
                 {
                     break;

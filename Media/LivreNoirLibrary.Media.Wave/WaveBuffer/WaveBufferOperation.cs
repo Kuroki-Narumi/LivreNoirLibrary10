@@ -424,6 +424,12 @@ namespace LivreNoirLibrary.Media.Wave
             return sum;
         }
 
+        public static float GetLufs(ReadOnlySpan<float> span, int sampleOffset, int sampleCount, int sampleRate, int channels)
+        {
+            AdjustArgs(span, ref sampleOffset, ref sampleCount, channels);
+            return Analysis.CalculateLufs(span.Slice(sampleOffset * channels, sampleCount * channels), sampleRate, channels);
+        }
+
         public static unsafe float[][] SplitChannels(ReadOnlySpan<float> span, int channels, int sampleOffset = 0, int sampleCount = 0)
         {
             AdjustArgs(span, ref sampleOffset, ref sampleCount, channels);

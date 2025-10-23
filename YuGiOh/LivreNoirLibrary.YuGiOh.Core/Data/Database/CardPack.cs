@@ -61,7 +61,7 @@ namespace LivreNoirLibrary.YuGiOh.Data
             Name = source.Name;
             ProductId = source.ProductId;
             ClearWithoutNotify();
-            foreach (var item in source)
+            foreach (var item in source.AsSpan())
             {
                 AddWithoutNotify(item);
             }

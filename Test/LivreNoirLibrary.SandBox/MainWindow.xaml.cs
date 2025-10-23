@@ -3,14 +3,18 @@ using LivreNoirLibrary.Files;
 using LivreNoirLibrary.Media;
 using LivreNoirLibrary.Media.Bms;
 using LivreNoirLibrary.Media.Integrated;
+using LivreNoirLibrary.Media.Wave;
 using LivreNoirLibrary.ObjectModel;
+using LivreNoirLibrary.Text;
 using LivreNoirLibrary.Windows;
 using LivreNoirLibrary.Windows.Controls;
+using LivreNoirLibrary.Windows.Media.Bms.SkinInfo;
 using System.IO;
 using System.Text;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
+using System.Windows.Media;
 
 namespace LivreNoirLibrary.SandBox
 {
@@ -19,20 +23,30 @@ namespace LivreNoirLibrary.SandBox
     /// </summary>
     public partial class MainWindow : Window, IProgressReporter
     {
-        private readonly BmsVideoCreator _viewModel;
         private ConsoleWindow? _consoleWindow;
 
         UIElement IProgressReporter.MainElement => MainUI;
         TaskProgressBar IProgressReporter.ProgressBar => TaskProgressBar;
         Task? IProgressReporter.WorkingTask { get ; set; }
 
+        private readonly BmsVideoCreator _creator;
+        private readonly SkinCollection _skins;
+
         public MainWindow()
         {
-            _viewModel = new();
-            DataContext = _viewModel;
+            _creator = new();
+            DataContext = _creator;
             InitializeComponent();
             this.RegisterCommand(ApplicationCommands.Open, OnExecuted_Open);
             this.RegisterCommand(ApplicationCommands.Save, OnExecuted_Save);
+
+            _skins = new();
+            _skins.Load(Path.GetFullPath(@"Themes\BmsSkin\Default\", IO.General.GetAssemblyDir()));
+            if (_skins.PlaySkins[7] is { } enumer)
+            {
+                _creator.LoadSkin(enumer.First());
+            }
+            var s = _creator.Screen.BgaImageSource;
         }
 
         protected override void OnActivated(EventArgs e)
@@ -53,17 +67,26 @@ namespace LivreNoirLibrary.SandBox
 
         protected override void OnDragOver(DragEventArgs e)
         {
-            e.ApplyEffect(DragDropEffects.Copy, ExtRegs.BeMusic);
+            //e.ApplyEffect(DragDropEffects.Copy, ExtRegs.BeMusic);
+            e.Effects = DragDropEffects.Copy;
         }
 
         protected override void OnDrop(DragEventArgs e)
         {
-            foreach (var path in e.EnumAvailable(ExtRegs.BeMusic))
+            foreach (var path in e.GetFileList())
             {
-                if (_viewModel.OpenBms(path))
+                if (ExtRegs.BeMusic.IsMatch(path) && _creator.OpenBms(path))
                 {
                     e.Handled = true;
                     return;
+                }
+                if (ExtRegs.Audio.IsMatch(path))
+                {
+                    var waveData = WaveBuffer.AutoOpen(path);
+                    var peak = waveData.GetPeak()[0];
+                    var rms = waveData.GetRms()[0];
+                    var lufs = waveData.GetLufs();
+                    Console.WriteLine($"peak={WaveBuffer.Value2Level(peak)}dB, rms={WaveBuffer.Value2Level(rms)}dB, lufs={lufs}dB");
                 }
             }
         }
@@ -81,47 +104,50 @@ namespace LivreNoirLibrary.SandBox
         private void OnExecuted_Open(object sender, ExecutedRoutedEventArgs e)
         {
             e.Handled = true;
-            if (this.OpenFileDialog(FileDialogOptions.WithInitialPath(_viewModel.BmsPath), Filters.Bms) is { } path)
+            if (this.OpenFileDialog(FileDialogOptions.WithInitialPath(_creator.Screen.BmsPath), Filters.Bms) is { } path)
             {
-                _viewModel.OpenBms(path);
+                _creator.OpenBms(path);
+            }
+        }
+
+        private void OnExecuted_Save(object sender, ExecutedRoutedEventArgs e)
+        {
+            if (_creator.Screen.BmsData is { } data &&
+                this.SaveFileDialog(FileDialogOptions.WithInitialPath(_creator.Screen.BmsPath), Filters.Bms_Save) is { } path)
+            {
+                data.Save(path, false, true);
             }
         }
 
         private void OnClick_Assemble(object sender, RoutedEventArgs e)
         {
-            if (_viewModel.BmsData is not null)
-            {
-                _viewModel.AssembleOptions.Adjust = true;
-                this.StartTask(_viewModel.Assemble, finished: Assemble_Finished);
-            }
+            _creator.AssembleOptions.Adjust = true;
+            this.StartTask(_creator.Assemble, finished: Assemble_Finished);
         }
 
         private void Assemble_Finished(bool aborted)
         {
-            var path = Path.ChangeExtension(_viewModel.BmsPath, Exts.Wav);
-            if (_viewModel.TryFlushAssembledData(out var data) &&
+            var path = Path.ChangeExtension(_creator.Screen.BmsPath, Exts.Wav);
+            if (_creator.TryFlushAssembledData(out var data) &&
                 this.SaveFileDialog(FileDialogOptions.WithInitialPath(path), Filters.Wave) is { } savePath)
             {
                 data.Save(savePath);
             }
         }
 
-        private void OnExecuted_Save(object sender, ExecutedRoutedEventArgs e)
+        private void OnClick_Video(object sender, RoutedEventArgs e)
         {
-            if (_viewModel.BmsData is not null)
-            {
-                _viewModel.AssembleOptions.Adjust = false;
-                this.StartTask(_viewModel.Assemble, finished: Construct_Assemble_Finished);
-            }
+            _creator.AssembleOptions.Adjust = false;
+            this.StartTask(_creator.Assemble, finished: Construct_Assemble_Finished);
         }
 
         private void Construct_Assemble_Finished(bool aborted)
         {
-            var path = Path.ChangeExtension(_viewModel.BmsPath, Exts.MP4);
-            if (_viewModel.TryFlushAssembledData(out var waveData) &&
+            var path = Path.ChangeExtension(_creator.Screen.BmsPath, Exts.MP4);
+            if (_creator.TryFlushAssembledData(out var waveData) &&
                 this.SaveFileDialog(FileDialogOptions.WithInitialPath(path), Filters.MP4) is { } savePath)
             {
-                this.StartTaskSynchronized((p, c) => _viewModel.CreateVideo(savePath, waveData, p, c));
+                this.StartTaskSynchronized((p, c) => _creator.CreateVideo(savePath, waveData, p, c));
             }
         }
     }

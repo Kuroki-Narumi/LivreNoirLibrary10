@@ -5,6 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:LivreNoirLibrary.SandBox"
         xmlns:ct="clr-namespace:LivreNoirLibrary.Windows.Controls;assembly=LivreNoirLibrary.Windows.Controls"
+        xmlns:cc="clr-namespace:LivreNoirLibrary.Windows.Media.Bms.SkinInfo;assembly=LivreNoirLibrary.Windows.Media.Integrated"
         mc:Ignorable="d" d:DataContext="{d:DesignInstance Type=local:BmsVideoCreator}"
         Title="MainWindow" Height="450" Width="800" AllowDrop="True">
     <Grid>
@@ -34,12 +35,16 @@
             </Grid.RowDefinitions>
             <WrapPanel Orientation="Horizontal">
                 <ct:Button Icon="{x:Static ct:Icons.Open}" Command="ApplicationCommands.Open"/>
-                <ct:Button Icon="{x:Static ct:Icons.Wave}" Click="OnClick_Assemble"/>
-                <ComboBox ItemsSource="{x:Static local:BmsVideoCreator.SizeList}" SelectedItem="{Binding Size}"/>
-                <ComboBox ItemsSource="{x:Static local:BmsVideoCreator.FpsList}" SelectedItem="{Binding FrameRate}"/>
                 <ct:Button Icon="{x:Static ct:Icons.Save}" Command="ApplicationCommands.Save"/>
+                <ct:Button Icon="{x:Static ct:Icons.Wave}" Click="OnClick_Assemble"/>
+                <ComboBox ItemsSource="{x:Static local:BmsVideoCreator.FpsList}" SelectedItem="{Binding FrameRate}"/>
+                <ct:Button Icon="{x:Static ct:Icons.Camera}" Click="OnClick_Video"/>
             </WrapPanel>
-            <Image Grid.Row="1" Source="{Binding RenderTarget}"/>
+            <Rectangle Grid.Row="1">
+                <Rectangle.Fill>
+                    <VisualBrush Visual="{Binding Screen.MainCanvas}" Stretch="Uniform"/>
+                </Rectangle.Fill>
+            </Rectangle>
         </Grid>
         <ct:TaskProgressBar x:Name="TaskProgressBar"/>
     </Grid>

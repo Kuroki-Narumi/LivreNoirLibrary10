@@ -1,7 +1,12 @@
-﻿using LivreNoirLibrary.Numerics;
+﻿using LivreNoirLibrary.Collections;
+using LivreNoirLibrary.Numerics;
+using LivreNoirLibrary.ObjectModel;
+using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
+using System.Text;
 
 namespace LivreNoirLibrary.Media.Bms
 {
@@ -123,24 +128,6 @@ namespace LivreNoirLibrary.Media.Bms
             DefLists.Merge(data.DefLists);
             Bars.Merge(data.Bars);
             data.Timeline.CopyTo(Timeline);
-        }
-
-        public void DumpHeader(BmsTextWriter writer)
-        {
-            var radix = writer.Radix;
-            if (Headers.HasValue || radix is not Constants.Base_Default)
-            {
-                Headers.Dump(writer);
-            }
-            if (DefLists.HasValue)
-            {
-                DefLists.Dump(writer);
-            }
-        }
-
-        internal void DumpMain(BmsTextWriter writer)
-        {
-
         }
 
         internal void DumpMain(BinaryWriter writer)

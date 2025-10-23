@@ -90,7 +90,7 @@ namespace LivreNoirLibrary.Media.Bms
             switch (Note)
             {
                 case IConductorNote c:
-                    valueText = c.Channel is Channel.Stop ? c.Value.ToString() : c.DecimalValue.ToString();
+                    valueText = c.Value.ToString();
                     laneText = c.Channel.ToString();
                     break;
                 case IMetaNote m:

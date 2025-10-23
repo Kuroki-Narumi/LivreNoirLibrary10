@@ -18,6 +18,14 @@ namespace LivreNoirLibrary.Media.Wave
         public uint ByteSize { get; }
         public void DumpContents(BinaryWriter writer);
         public void WriteJsonContents(Utf8JsonWriter writer, JsonSerializerOptions options);
+
+        public static void Assert(string chid, uint expectedSize, uint givenSize)
+        {
+            if (expectedSize != givenSize)
+            {
+                Console.WriteLine($"warning: wrong chunk size: chid=\"{chid}\", expected={expectedSize}, given={givenSize})");
+            }
+        }
     }
 
     public interface IDataChunk : IRiffChunk
@@ -33,7 +41,7 @@ namespace LivreNoirLibrary.Media.Wave
     public interface IRiffChunk<TSelf> : IRiffChunk
         where TSelf : IRiffChunk<TSelf>
     {
-        public static abstract TSelf LoadContents(BinaryReader reader, uint length);
+        public static abstract TSelf LoadContents(BinaryReader reader, ref uint length);
     }
 
     public static class IRiffChunkExtensions
@@ -49,7 +57,7 @@ namespace LivreNoirLibrary.Media.Wave
             where T : IRiffChunk<T>
         {
             var size = reader.ReadUInt32();
-            var chunk = T.LoadContents(reader, size);
+            var chunk = T.LoadContents(reader, ref size);
             if (size % 2 is 1)
             {
                 _ = reader.ReadByte();
@@ -109,16 +117,16 @@ namespace LivreNoirLibrary.Media.Wave
             }
         }
 
-        public static string GetText<T>(this T obj, System.Text.Encoding? encoding = null)
+        public static string GetText<T>(this T obj, Encoding? encoding = null)
             where T : IDataChunk
         {
-            return (encoding ?? System.Text.Encoding.UTF8).GetString(obj.Data).TrimEnd('\u0000');
+            return (encoding ?? Encoding.UTF8).GetString(obj.Data).TrimEnd('\u0000');
         }
 
-        public static void SetText<T>(this T obj, string text, System.Text.Encoding? encoding = null)
+        public static void SetText<T>(this T obj, string text, Encoding? encoding = null)
             where T : IDataChunk
         {
-            obj.Data = (encoding ?? System.Text.Encoding.UTF8).GetBytes(text);
+            obj.Data = (encoding ?? Encoding.UTF8).GetBytes(text);
         }
     }
 }

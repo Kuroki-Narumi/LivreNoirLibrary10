@@ -6,7 +6,7 @@ namespace LivreNoirLibrary.Media.Wave.Chunks
     {
         public override string Chid => ChunkIds.Cue;
 
-        public static Cue LoadContents(BinaryReader s, uint length)
+        public static Cue LoadContents(BinaryReader s, ref uint length)
         {
             Cue data = [];
             data.LoadData(s);

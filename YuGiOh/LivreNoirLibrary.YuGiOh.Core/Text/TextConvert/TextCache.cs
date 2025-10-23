@@ -20,7 +20,7 @@ namespace LivreNoirLibrary.YuGiOh
         {
             await Task.Run(() =>
             {
-                foreach (var card in CardPool.Instance.Cards)
+                foreach (var card in CardPool.Instance.Cards.AsSpan())
                 {
                     GetTextCache(card);
                 }

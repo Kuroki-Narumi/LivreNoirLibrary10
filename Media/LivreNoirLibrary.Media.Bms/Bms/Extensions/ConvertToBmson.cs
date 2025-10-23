@@ -63,7 +63,7 @@ namespace LivreNoirLibrary.Media.Bms
             }
             info.Resolution = resolution;
             //
-            long Convert(Rational position) => ((decimal)position * resolution * 4).RoundToLong();
+            long Convert(decimal position) => (position * resolution * 4).RoundToLong();
             // bar
             List<Bmson.BarLine> barList = [];
             data.BarList = barList;
@@ -114,11 +114,11 @@ namespace LivreNoirLibrary.Media.Bms
             foreach (var (pos, list) in source.Timeline.EachList())
             {
                 lastBar = pos.Bar;
-                var time = Convert(source.GetAbsolutePosition(pos));
+                var time = Convert((decimal)source.GetAbsolutePosition(pos));
                 var tempo = 0d;
                 var scroll = 0d;
                 var speed = 0d;
-                var totalStop = Rational.Zero;
+                var totalStop = 0m;
                 foreach (var note in CollectionsMarshal.AsSpan(list))
                 {
                     if (note is ConductorNote conductor)
@@ -183,9 +183,9 @@ namespace LivreNoirLibrary.Media.Bms
                 {
                     bpmList.Add(new() { Y = time, Tempo = tempo });
                 }
-                if (!totalStop.IsZero())
+                if (totalStop is not 0)
                 {
-                    stopList.Add(new() { Y = time, Duration = Convert(totalStop) });
+                    stopList.Add(new() { Y = time, Duration = Convert(totalStop * Constants.StopUnit) });
                 }
                 if (scroll is not 0)
                 {

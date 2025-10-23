@@ -136,9 +136,10 @@ namespace LivreNoirLibrary.Media
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static bool TryParseColorCodeToByte(string colorCode, out byte a, out byte r, out byte g, out byte b)
+        public static bool TryParseColorCodeToByte(string? colorCode, out byte a, out byte r, out byte g, out byte b) => TryParseColorCodeToByte(colorCode.AsSpan(), out a, out r, out g, out b);
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static bool TryParseColorCodeToByte(ReadOnlySpan<char> span, out byte a, out byte r, out byte g, out byte b)
         {
-            var span = colorCode.AsSpan();
             if (span[0] is '#')
             {
                 span = span[1..];
@@ -181,9 +182,10 @@ namespace LivreNoirLibrary.Media
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static bool TryParseColorCode(string colorCode, out float a, out float r, out float g, out float b)
+        public static bool TryParseColorCode(string? colorCode, out float a, out float r, out float g, out float b) => TryParseColorCode(colorCode.AsSpan(), out a, out r, out g, out b);
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static bool TryParseColorCode(ReadOnlySpan<char> span, out float a, out float r, out float g, out float b)
         {
-            var span = colorCode.AsSpan();
             if (span[0] is '#')
             {
                 span = span[1..];

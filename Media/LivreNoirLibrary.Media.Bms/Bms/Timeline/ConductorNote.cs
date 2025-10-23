@@ -1,19 +1,15 @@
 using System;
 using System.IO;
-using LivreNoirLibrary.IO;
-using LivreNoirLibrary.Numerics;
 
 namespace LivreNoirLibrary.Media.Bms
 {
-    public class ConductorNote(Channel channel, Rational value) : IConductorNote, INote<ConductorNote>
+    public class ConductorNote(Channel channel, decimal value) : IConductorNote, INote<ConductorNote>
     {
         public Channel Channel { get; set; } = channel;
-        public Rational Value { get; set; } = value;
-        public double DoubleValue { get => (double)Value; set => Value = Rational.ConvertBySBT(value); }
-        public decimal DecimalValue { get => (decimal)Value; set => Value = Rational.ConvertBySBT(value); }
+        public decimal Value { get; set; } = value;
 
         public override string ToString() => $"{{Channel={Channel}, Value={Value}}}";
-        public string GetValueText(int radix) => $"{DecimalValue}";
+        public string GetValueText(int radix) => $"{Value}";
 
         public void CopyFrom(ConductorNote source)
         {
@@ -38,7 +34,7 @@ namespace LivreNoirLibrary.Media.Bms
         public static ConductorNote Load(BinaryReader reader)
         {
             var ch = (Channel)reader.ReadInt16();
-            var value = reader.ReadRational();
+            var value = reader.ReadDecimal();
             return new(ch, value);
         }
 

@@ -14,7 +14,12 @@ namespace LivreNoirLibrary.Media.Wave.Chunks
 
         public uint SampleLength { get; set; } = sampleLength;
 
-        public static Fact LoadContents(BinaryReader reader, uint length) => new(reader.ReadUInt32());
+        public static Fact LoadContents(BinaryReader reader, ref uint length)
+        {
+            IRiffChunk.Assert(ChunkIds.Fact, sizeof(uint), length);
+            length = sizeof(uint);
+            return new(reader.ReadUInt32());
+        }
 
         public long Dump(BinaryWriter writer)
         {

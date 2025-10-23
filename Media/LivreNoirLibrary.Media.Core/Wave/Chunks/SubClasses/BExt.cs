@@ -52,7 +52,7 @@ namespace LivreNoirLibrary.Media.Wave.Chunks
             }
         }
 
-        public static BExt LoadContents(BinaryReader reader, uint length)
+        public static BExt LoadContents(BinaryReader reader, ref uint length)
         {
             BExt data = new();
             data.ProcessLoad(reader, length);

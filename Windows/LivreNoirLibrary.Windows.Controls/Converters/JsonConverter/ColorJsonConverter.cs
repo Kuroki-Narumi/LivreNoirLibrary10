@@ -2,7 +2,6 @@ using System;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Windows.Media;
-using LivreNoirLibrary.Windows.Media;
 
 namespace LivreNoirLibrary.Windows.Converters
 {

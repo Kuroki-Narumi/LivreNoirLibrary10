@@ -7,8 +7,10 @@ namespace LivreNoirLibrary.Media.Wave.Chunks
 {
     public sealed class Acid : RiffChunk, IRiffChunk<Acid>
     {
+        private const uint _bytesize = sizeof(uint) + sizeof(ushort) + sizeof(ushort) + sizeof(float) + sizeof(uint) + sizeof(ushort) + sizeof(ushort) + sizeof(float);
+
         public override string Chid => ChunkIds.Acid;
-        public override uint ByteSize => sizeof(uint) + sizeof(ushort) + sizeof(ushort) + sizeof(float) + sizeof(uint) + sizeof(ushort) + sizeof(ushort) + sizeof(float);
+        public override uint ByteSize => _bytesize;
 
         public uint FileType { get; set; }
         public ushort RootNote { get; set; }
@@ -46,17 +48,22 @@ namespace LivreNoirLibrary.Media.Wave.Chunks
             Beats = beats;
         }
 
-        public static Acid LoadContents(BinaryReader reader, uint length) => new()
+        public static Acid LoadContents(BinaryReader reader, ref uint length)
         {
-            FileType = reader.ReadUInt32(),
-            RootNote = reader.ReadUInt16(),
-            Reserved1 = reader.ReadUInt16(),
-            Reserved2 = reader.ReadSingle(),
-            Beats = reader.ReadUInt32(),
-            SignatureDen = reader.ReadUInt16(),
-            SignatureNum = reader.ReadUInt16(),
-            Tempo = reader.ReadSingle(),
-        };
+            IRiffChunk.Assert(ChunkIds.Acid, _bytesize, length);
+            length = _bytesize;
+            return new()
+            {
+                FileType = reader.ReadUInt32(),
+                RootNote = reader.ReadUInt16(),
+                Reserved1 = reader.ReadUInt16(),
+                Reserved2 = reader.ReadSingle(),
+                Beats = reader.ReadUInt32(),
+                SignatureDen = reader.ReadUInt16(),
+                SignatureNum = reader.ReadUInt16(),
+                Tempo = reader.ReadSingle(),
+            };
+        }
 
         public override void DumpContents(BinaryWriter writer)
         {

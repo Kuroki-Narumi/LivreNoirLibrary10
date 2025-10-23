@@ -118,7 +118,7 @@ namespace LNImageEditor
                     MainProcess = (p, c) =>
                     {
                         var i = 1;
-                        foreach (var item in ImageItems)
+                        foreach (var item in ImageItems.AsSpan())
                         {
                             var fullPath = item.FullPath;
 

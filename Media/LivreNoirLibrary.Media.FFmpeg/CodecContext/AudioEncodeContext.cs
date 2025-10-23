@@ -60,20 +60,19 @@ namespace LivreNoirLibrary.Media.FFmpeg
         void IFmEncoder.SetupEncoder(AVCodec* codec, AVCodecContext* codecContext)
         {
             (_in_rate, _in_channels, var rate, var ch, var bitRate) = _options;
+            void* out_configs = null;
+            int out_num_configs = 0;
+
             // サンプルレート
-            var rates = codec->supported_samplerates;
-            if (rates is not null)
+            if (ffmpeg.avcodec_get_supported_config(codecContext, codec, AVCodecConfig.AV_CODEC_CONFIG_SAMPLE_RATE, 0, &out_configs, &out_num_configs) is >= 0)
             {
                 var minDif = int.MaxValue;
                 var minIndex = -1;
-                for (var i = 0; ; i++)
+                var rateList = (int*)out_configs;
+                for (var i = 0; i < out_num_configs; i++)
                 {
-                    var rt = rates[i];
-                    if (rt is 0)
-                    {
-                        break;
-                    }
-                    var dif = rate > rt ? rate - rt : rt - rate;
+                    var rt = rateList[i];
+                    var dif = Math.Abs(rate - rt);
                     if (dif < minDif)
                     {
                         minDif = dif;
@@ -82,25 +81,21 @@ namespace LivreNoirLibrary.Media.FFmpeg
                 }
                 if (minIndex is >= 0)
                 {
-                    rate = rates[minIndex];
+                    rate = rateList[minIndex];
                 }
             }
             codecContext->sample_rate = _out_rate = rate;
             codecContext->time_base = new() { num = 1, den = rate };
+
             // チャンネルレイアウト
-            var chls = codec->ch_layouts;
             var found = false;
-            if (chls is not null)
+            if (ffmpeg.avcodec_get_supported_config(codecContext, codec, AVCodecConfig.AV_CODEC_CONFIG_CHANNEL_LAYOUT, 0, &out_configs, &out_num_configs) is >= 0)
             {
-                for (var i = 0; ; i++)
+                var chList = (AVChannelLayout*)out_configs;
+                for (var i = 0; i < out_num_configs; i++)
                 {
-                    var layout = chls[i];
-                    var chs = layout.nb_channels;
-                    if (chs is 0)
-                    {
-                        break;
-                    }
-                    if (chs == ch)
+                    var layout = chList[i];
+                    if (ch == layout.nb_channels)
                     {
                         ffmpeg.av_channel_layout_copy(&codecContext->ch_layout, &layout);
                         found = true;
@@ -113,28 +108,28 @@ namespace LivreNoirLibrary.Media.FFmpeg
                 ffmpeg.av_channel_layout_default(&codecContext->ch_layout, ch);
             }
             _out_channels = ch;
+
             // サンプルフォーマット
-            if (codec->sample_fmts is not null)
+            codecContext->sample_fmt = InternalSampleFormat;
+            if (ffmpeg.avcodec_get_supported_config(codecContext, codec, AVCodecConfig.AV_CODEC_CONFIG_SAMPLE_FORMAT, 0, &out_configs, &out_num_configs) is >= 0)
             {
-                codecContext->sample_fmt = codec->sample_fmts[0];
-                for (var i = 0; ; i++)
+                found = out_num_configs is <= 0;
+                var formatList = (AVSampleFormat*)out_configs;
+                for (var i = 0; i < out_num_configs; i++)
                 {
-                    var sampleFmt = codec->sample_fmts[i];
-                    if (sampleFmt is < 0)
+                    var fmt = formatList[i];
+                    if (fmt is InternalSampleFormat)
                     {
-                        break;
-                    }
-                    else if (sampleFmt is InternalSampleFormat)
-                    {
-                        codecContext->sample_fmt = InternalSampleFormat;
+                        found = true;
                         break;
                     }
                 }
+                if (!found)
+                {
+                    codecContext->sample_fmt = formatList[0];
+                }
             }
-            else 
-            {
-                codecContext->sample_fmt = InternalSampleFormat;
-            }
+
             if (bitRate is <= 0)
             {
                 bitRate = AudioEncodeOptions.DefaultBitrate;

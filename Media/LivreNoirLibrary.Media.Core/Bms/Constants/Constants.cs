@@ -15,7 +15,7 @@ namespace LivreNoirLibrary.Media.Bms
 
         public const int DefaultBarLength = 1;
         public static readonly Rational DefaultBarLengthR = Rational.One;
-        public const int StopResolution = 192;
+        public const decimal StopUnit = 1m / 192m;
         public const int MaxBarNumber = 999;
         public static readonly BarPosition MaxBarPosition = new(MaxBarNumber + 1, Rational.Zero);
 
@@ -26,7 +26,6 @@ namespace LivreNoirLibrary.Media.Bms
         public const string DefaultTitle = "(untitled)";
         public const PlayerType DefaultPlayer = PlayerType.Single;
         public const double DefaultBpm = 130;
-        public static readonly Rational DefaultBpmRational = new((long)DefaultBpm);
         public const Rank DefaultRank = Rank.Easy;
         public const double DefaultTotal = 999;
         public const string DefaultPlayLevel = "0";

@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Runtime.InteropServices;
+using System.Text;
 
 namespace LivreNoirLibrary.Media.Bms
 {
@@ -31,9 +32,11 @@ namespace LivreNoirLibrary.Media.Bms
             return branch;
         }
 
-        public string GetBmsHeader(FlowBranch branch) => Type is FlowType.Random
+        public string GetBranchHeader(FlowBranch branch) => Type is FlowType.Random
                 ? branch.Condition is Constants.DefaultCondition ? Tags.Else : $"{Tags.If} {branch.Condition}"
                 : branch.Condition is Constants.DefaultCondition ? Tags.Default : $"{Tags.Case} {branch.Condition}";
+
+        public string GetBranchFooter() => Type is FlowType.Random ? Tags.EndIf : Tags.Skip;
 
         public IEnumerable<BaseData> EnumerateBranches()
         {

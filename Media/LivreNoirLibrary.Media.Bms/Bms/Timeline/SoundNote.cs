@@ -10,15 +10,6 @@ namespace LivreNoirLibrary.Media.Bms
 
         public NoteType Type { get; set; } = type;
         public int Lane { get => _lane; set => _lane = (short)value; }
-        public Channel Channel
-        {
-            get => BmsUtils.GetChannel(Type, _lane); 
-            set
-            {
-                Type = BmsUtils.GetNoteType(value);
-                _lane = BmsUtils.GetLane(value);
-            }
-        }
         public int Value { get => _value; set => _value = (short)value; }
 
         public SoundNote(long lane, long value, NoteType type = NoteType.Normal) : this(type, (short)lane, (short)value) { }
@@ -27,7 +18,6 @@ namespace LivreNoirLibrary.Media.Bms
         public string GetValueText(int radix) => BmsUtils.ToBased(_value, radix);
 
         public bool Equals(SoundNote other) => Type == other.Type && _lane == other._lane && _value == other._value;
-        public bool Equals(in StructNote note) => note.Equals(Type, _lane, _value);
 
         public void CopyFrom(SoundNote source)
         {
@@ -61,6 +51,5 @@ namespace LivreNoirLibrary.Media.Bms
 
         public SoundNote Clone() => new(Type, _lane, _value);
         INote INote.Clone() => Clone();
-        public StructNote ToStruct() => new(Type, _lane, _value);
     }
 }

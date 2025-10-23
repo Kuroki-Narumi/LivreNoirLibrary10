@@ -116,12 +116,12 @@ namespace LivreNoirLibrary.Media.Bms
             }
         }
 
-        private static readonly Dictionary<BarPosition, Rational> _tempoChanges = [];
+        private static readonly Dictionary<BarPosition, decimal> _tempoChanges = [];
         public static bool StreatchBarWithTempo(this IBmsData data, SortedSet<int> numbers, Rational value, bool ratioMode)
         {
             var timeline = data.Timeline;
             var changes = _tempoChanges;
-            var actualBpm = (Rational)data.Bpm;
+            var actualBpm = (decimal)data.Bpm;
             var currentBpm = actualBpm;
             var lastPos = BarPosition.Zero;
             var modified = false;

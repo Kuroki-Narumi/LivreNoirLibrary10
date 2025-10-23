@@ -2,7 +2,7 @@ using System;
 
 namespace LivreNoirLibrary.Media.Bms
 {
-    public interface IConductorNote : IChannelNote, IRationalValueNote
+    public interface IConductorNote : IChannelNote, IDecimalValueNote
     {
     }
 }

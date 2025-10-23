@@ -10,5 +10,6 @@
         <WrapPanel Orientation="Horizontal">
             <Button Content="Color" Click="OnClick_Color"/>
         </WrapPanel>
+        <Image Source="D:\素材集\Original\ナルミ\カメ.png" RenderOptions.BitmapScalingMode="HighQuality"/>
     </Grid>
 </Window>

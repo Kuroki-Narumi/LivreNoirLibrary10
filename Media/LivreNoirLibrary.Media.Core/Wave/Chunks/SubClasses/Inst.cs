@@ -16,16 +16,21 @@ namespace LivreNoirLibrary.Media.Wave.Chunks
         public sbyte LowVelocity { get; set; }
         public sbyte HighVelocity { get; set; } = 127;
 
-        public static Inst LoadContents(BinaryReader reader, uint length)=> new()
+        public static Inst LoadContents(BinaryReader reader, ref uint length)
         {
-            UnshitedNote = reader.ReadSByte(),
-            FineTune = reader.ReadSByte(),
-            Gain = reader.ReadSByte(),
-            LowNote = reader.ReadSByte(),
-            HighNote = reader.ReadSByte(),
-            LowVelocity = reader.ReadSByte(),
-            HighVelocity = reader.ReadSByte(),
-        };
+            IRiffChunk.Assert(ChunkIds.Inst, 7, length);
+            length = 7;
+            return new()
+            {
+                UnshitedNote = reader.ReadSByte(),
+                FineTune = reader.ReadSByte(),
+                Gain = reader.ReadSByte(),
+                LowNote = reader.ReadSByte(),
+                HighNote = reader.ReadSByte(),
+                LowVelocity = reader.ReadSByte(),
+                HighVelocity = reader.ReadSByte(),
+            };
+        }
 
         public override void DumpContents(BinaryWriter writer)
         {

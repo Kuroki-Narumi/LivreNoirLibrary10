@@ -8,7 +8,7 @@ using System.Text;
 
 namespace LivreNoirLibrary.Media.Bms
 {
-    public sealed class BmsData : BaseData, IRootData
+    public sealed class BmsData : BaseData, IRootData, IStreamLoadable<BmsData>
     {
         public ChartType ChartType { get; set; } = ChartType.Beat;
         public BarLengthCache BarLengthCache { get; } = new();
@@ -28,11 +28,7 @@ namespace LivreNoirLibrary.Media.Bms
 
         public static BmsData Open(string path)
         {
-            var data = General.Open(path, s =>
-            {
-                BmsParser parser = new();
-                return parser.Parse(s);
-            });
+            var data = General.Open(path, Load);
             var ext = Path.GetExtension(path);
             if (ExtRegs.Pms.IsMatch(ext))
             {
@@ -60,6 +56,14 @@ namespace LivreNoirLibrary.Media.Bms
         {
             BmsParser parser = new();
             return parser.Parse(stream);
+        }
+
+        public void Save(string path, bool indent = false, bool ext = true) => General.Save(path, s => Dump(s, indent), ext ? ExtRegs.BeMusic : null, Exts.Bms);
+
+        public void Dump(Stream stream, bool indent)
+        {
+            BmsFormatter formatter = new(this);
+            formatter.Format(stream, this, indent);
         }
 
         public BmsData Clone()
