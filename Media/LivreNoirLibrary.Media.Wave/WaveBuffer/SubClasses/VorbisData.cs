@@ -2,14 +2,13 @@
 using System.IO;
 using System.Text.Json;
 using LivreNoirLibrary.IO;
-using LivreNoirLibrary.Files;
 using LivreNoirLibrary.Media.FFmpeg;
 using LivreNoirLibrary.Media.Ogg.Vorbis;
 using LivreNoirLibrary.Debug;
 
 namespace LivreNoirLibrary.Media.Wave
 {
-    public class VorbisData : WaveBuffer
+    public class VorbisData : WaveBuffer, IFile<VorbisData>, IStreamLoadable<VorbisData>, IStreamDumpable
     {
         private readonly VorbisCommentEditor _editor = new();
 
@@ -29,7 +28,15 @@ namespace LivreNoirLibrary.Media.Wave
             stream.SetMetaTag(StandardCommentKeys.Encoder, nameof(LivreNoirLibrary));
         }
 
-        public void Load(Stream stream)
+        public static VorbisData Open(string path) => General.Open(path, Load);
+        public static VorbisData Load(Stream stream)
+        {
+            VorbisData data = new();
+            data.LoadStream(stream);
+            return data;
+        }
+
+        public void LoadStream(Stream stream)
         {
             Clear();
             var pos = stream.Position;
@@ -40,6 +47,7 @@ namespace LivreNoirLibrary.Media.Wave
             _editor.Comments.GetLoopMarkers(_markers);
         }
 
+        public void Save(string path) => General.Save(path, Dump, ExtRegs.Vorbis, Exts.Vorbis);
         public void Save(string path, bool ext = true) => General.Save(path, Dump, ext ? ExtRegs.Vorbis : null, Exts.Vorbis);
 
         public void Dump(Stream stream)

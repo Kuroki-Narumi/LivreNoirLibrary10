@@ -8,7 +8,7 @@ using LivreNoirLibrary.ObjectModel;
 
 namespace LivreNoirLibrary.YuGiOh.Data
 {
-    public class Deck : ObservableObjectBase, IJsonWriter
+    public class Deck : ObservableObjectBase, IJsonWriter, IClear
     {
         public DeckCardList MainDeck { get; } = [];
         public DeckCardList ExtraDeck { get; } = [];

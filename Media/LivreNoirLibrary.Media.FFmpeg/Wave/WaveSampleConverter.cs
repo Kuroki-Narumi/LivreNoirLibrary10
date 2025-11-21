@@ -9,11 +9,11 @@ namespace LivreNoirLibrary.Media.Wave
 {
     internal unsafe interface IWaveSampleConverter
     {
-        public int BytesPerSample { get; }
-        public void ConvertRead(byte* source, float* target, int bytes);
-        public void ConvertWrite(float* source, byte* target, int totalSamples);
+        int BytesPerSample { get; }
+        void ConvertRead(byte* source, float* target, int bytes);
+        void ConvertWrite(float* source, byte* target, int totalSamples);
 
-        public static IWaveSampleConverter? GetConverter(SampleFormat format) => format switch
+        static IWaveSampleConverter? GetConverter(SampleFormat format) => format switch
         {
             SampleFormat.Float32 => new Float32WaveSampleConverter(),
             SampleFormat.UInt8 => new UInt8WaveSampleConverter(),

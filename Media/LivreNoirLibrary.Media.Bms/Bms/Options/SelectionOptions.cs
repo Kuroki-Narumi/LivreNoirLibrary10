@@ -9,24 +9,12 @@ namespace LivreNoirLibrary.Media.Bms
 {
     public partial class SelectionOptions : IndexesOptionsBase
     {
-        private readonly SortedSet<int> _lanes = [];
         private readonly SortedSet<Channel> _channels = [];
 
         public ConvertTarget Target { get; set => SetValue(ref field, value); } = new();
         public int BarLower { get; set => SetValue(ref field, value); }
-        public int BarUpper { get; set => SetValue(ref field, value); } = Constants.MaxBarNumber;
+        public int BarUpper { get; set => SetValue(ref field, value); } = BmsConstants.MaxBarNumber;
         public bool BarExclusive { get; set => SetValue(ref field, value); }
-
-        public SortedSet<int> Lanes
-        {
-            get => _lanes;
-            set
-            {
-                _lanes.Clear();
-                _lanes.UnionWith(value);
-                SendPropertyChanged();
-            }
-        }
 
         public SortedSet<Channel> Channels
         {
@@ -60,12 +48,12 @@ namespace LivreNoirLibrary.Media.Bms
         [JsonIgnore]
         public bool ProcessType_Quantize { get => ProcessType is SelectionProcessType.Quantize; set => SetProcessType(SelectionProcessType.Quantize, value); }
 
-        public Rational ReplaceValue { get; set => SetValue(ref field, value); }
+        public double ReplaceValue { get; set => SetValue(ref field, value); }
         public ValueOperationMode ReplaceMode { get; set => SetValue(ref field, value); }
 
-        public Rational MoveValue { get; set => SetValue(ref field, value); }
+        public double MoveValue { get; set => SetValue(ref field, value); }
         public ValueOperationMode MoveMode { get; set => SetValue(ref field, value); } = ValueOperationMode.Add;
-        public Rational QuantizeValue { get; set => SetValue(ref field, value); } = new(1, 192);
+        public int QuantizeValue { get; set => SetValue(ref field, value); } = 192;
 
         private bool _index_skip;
         private bool _lane_skip;
@@ -75,7 +63,7 @@ namespace LivreNoirLibrary.Media.Bms
         public void Prepare()
         {
             _index_skip = _indexes.Count is 0;
-            _lane_skip = (_lanes.Count + _channels.Count) is 0;
+            _lane_skip = _channels.Count is 0;
             var t = _note_types;
             t.Clear();
             if (NoteType_Normal)
@@ -97,14 +85,14 @@ namespace LivreNoirLibrary.Media.Bms
             _type_skip = t.Count is 0;
         }
 
-        public bool IsMatch(BarPosition position, INote note)
+        public bool IsMatch(BarPosition position, Note note)
         {
             var bar = position.Bar;
             return
                 !(BarExclusive ^ (bar < BarLower || bar > BarUpper)) &&
-                (_index_skip || note.IsDef(out var n) && _indexes.Contains(n.Value)) &&
-                (_lane_skip || note is IChannelNote c && _channels.Contains(c.Channel) || note is ISoundNote ss && _lanes.Contains(ss.Lane)) &&
-                (_type_skip || _note_types.Contains(note is ISoundNote s ? s.Type : NoteType.Normal));
+                (_index_skip || note.IsDefValue() && _indexes.Contains((int)note.Value)) &&
+                (_lane_skip || _channels.Contains(note.Channel)) &&
+                (_type_skip || _note_types.Contains(note.Type));
         }
 
         private void SetProcessType(SelectionProcessType type, bool value)
@@ -155,7 +143,7 @@ namespace LivreNoirLibrary.Media.Bms
 
         public bool TrySetMove(string? text)
         {
-            if (ValueOperation.TryParse(text, out var mode, out var value))
+            if (ValueOperation.TryParseToDouble(text, out var mode, out var value))
             {
                 MoveMode = mode;
                 MoveValue = value;
@@ -164,7 +152,7 @@ namespace LivreNoirLibrary.Media.Bms
             return false;
         }
 
-        public static string GetReplaceText(ValueOperationMode mode, Rational value, int radix)
+        public static string GetReplaceText(ValueOperationMode mode, double value, int radix)
         {
             if (mode is ValueOperationMode.Set)
             {
@@ -176,7 +164,7 @@ namespace LivreNoirLibrary.Media.Bms
             }
         }
 
-        public static bool TryParseReplaceText(string? text, int radix, out ValueOperationMode mode, out Rational value)
+        public static bool TryParseReplaceText(string? text, int radix, out ValueOperationMode mode, out double value)
         {
             if (!string.IsNullOrEmpty(text))
             {
@@ -186,8 +174,9 @@ namespace LivreNoirLibrary.Media.Bms
                 {
                     mode = ValueOperation.GetMode(op.Value);
                     var val = match.Groups["val"];
-                    if (Rational.TryParse(val.Value, out value))
+                    if (Rational.TryParse(val.Value, out var v))
                     {
+                        value = (double)v;
                         return true;
                     }
                 }

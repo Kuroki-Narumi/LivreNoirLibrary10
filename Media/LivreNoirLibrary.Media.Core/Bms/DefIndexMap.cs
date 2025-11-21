@@ -2,103 +2,66 @@
 using System.Collections;
 using System.Collections.Generic;
 using LivreNoirLibrary.Collections;
+using LivreNoirLibrary.ObjectModel;
 
 namespace LivreNoirLibrary.Media.Bms
 {
-    public class DefIndexMapCollection : SortedDictionary<DefType, DefIndexMap>
-    {
-        public void Merge(DefIndexMapCollection other)
-        {
-            foreach (var (type, map) in other)
-            {
-                var current = this.GetOrAdd(type);
-                current.Merge(map);
-            }
-        }
-
-        public void Product(DefIndexMapCollection other)
-        {
-            foreach (var (type, map) in other)
-            {
-                var current = this.GetOrAdd(type);
-                current.Product(map);
-            }
-        }
-    }
-
-    public class DefIndexMap : IEnumerable<(short, short)>
+    public class DefIndexMap : IEnumerable<(short, short)>, IClear
     {
         public const int RemovedIndex = -1;
-        private readonly short[] _map = CreateMap();
+        private static readonly short[] _defaultValues = CreateMap();
 
         private static unsafe short[] CreateMap()
         {
-            var map = new short[Constants.DefMax_Extended];
-            Clear(map);
-            return map;
-        }
-
-        private static unsafe void Clear(short[] map)
-        {
+            var map = new short[BmsConstants.DefMax_Extended];
             fixed (short* ptr = map)
             {
-                for (short i = 0; i < Constants.DefMax_Extended; i++)
+                for (short i = 0; i < BmsConstants.DefMax_Extended; i++)
                 {
                     map[i] = i;
                 }
             }
+            return map;
         }
 
-        public short this[int index]
+        private readonly short[] _map = [.. _defaultValues];
+
+        public short this[int index] => _map[index];
+
+        public unsafe bool IsEffective
         {
-            get => _map[index];
-            set => _map[index] = value;
-        }
-
-        public void Clear() => Clear(_map);
-
-        public int Get(int index) => _map[index];
-        public void Set(int index, short value) => _map[index] = value;
-        public void Set(int index, int value) => _map[index] = (short)value;
-
-        public void SetRemove(int index) => _map[index] = RemovedIndex;
-
-        public unsafe bool IsEffective()
-        {
-            fixed (short* ptr = _map)
+            get
             {
-                for (short i = 0; i < Constants.DefMax_Extended; i++)
+                fixed (short* ptr = _map)
                 {
-                    if (ptr[i] != i)
+                    for (short i = 0; i < BmsConstants.DefMax_Extended; i++)
                     {
-                        return true;
+                        if (ptr[i] != i)
+                        {
+                            return true;
+                        }
                     }
                 }
+                return false;
             }
-            return false;
         }
 
-        public unsafe void Merge(DefIndexMap other)
-        {
-            fixed (short* dst = _map)
-            fixed (short* src = other._map)
-            {
-                for (short i = 0; i < Constants.DefMax_Extended; i++)
-                {
-                    dst[i] = src[i];
-                }
-            }
-        }
+        public void Clear() => _map.CopyFrom(_defaultValues);
+
+        public void Set(int index, short value) => _map[index] = value;
+        public void Set(int index, int value) => _map[index] = (short)value;
+        public void SetRemove(int index) => _map[index] = RemovedIndex;
+        public bool IsRemoved(int index) => _map[index] is not RemovedIndex;
 
         public unsafe void Product(DefIndexMap other)
         {
             fixed (short* dst = _map)
             fixed (short* src = other._map)
             {
-                for (short i = 0; i < Constants.DefMax_Extended; i++)
+                for (short i = 0; i < BmsConstants.DefMax_Extended; i++)
                 {
                     var current = dst[i];
-                    if (current is > 0)
+                    if (dst[i] is > 0)
                     {
                         dst[i] = src[current];
                     }
@@ -120,7 +83,7 @@ namespace LivreNoirLibrary.Media.Bms
 
             public bool MoveNext()
             {
-                while (_index < Constants.DefMax_Extended - 1)
+                while (_index < BmsConstants.DefMax_Extended - 1)
                 {
                     _index++;
                     if (_index != _map[_index])

@@ -2,8 +2,8 @@
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Runtime.CompilerServices;
-using System.Runtime.InteropServices;
 using LivreNoirLibrary.Media.Wave.Chunks;
+using LivreNoirLibrary.Collections;
 
 namespace LivreNoirLibrary.Media.Wave
 {
@@ -62,7 +62,7 @@ namespace LivreNoirLibrary.Media.Wave
             where T : RiffChunk
         {
             List<T> result = [];
-            foreach (var chunk in CollectionsMarshal.AsSpan(meta.Chunks))
+            foreach (var chunk in meta.Chunks.AsSpan())
             {
                 if (chunk is T c && predicate(c))
                 {

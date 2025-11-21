@@ -24,7 +24,7 @@ namespace LivreNoirLibrary.Media.Wave
             {
                 VorbisData data = new();
                 using var stream = File.OpenRead(path);
-                data.Load(stream);
+                data.LoadStream(stream);
                 return data;
             }
             else

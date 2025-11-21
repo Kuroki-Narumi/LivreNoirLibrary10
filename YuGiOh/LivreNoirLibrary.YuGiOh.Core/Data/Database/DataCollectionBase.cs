@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Runtime.InteropServices;
 using System.Text.Json;
 using LivreNoirLibrary.Collections;
 using LivreNoirLibrary.Text;
@@ -47,7 +46,7 @@ namespace LivreNoirLibrary.YuGiOh.Data
         public void WriteJson(Utf8JsonWriter writer, JsonSerializerOptions options)
         {
             writer.WriteStartArray();
-            foreach (var item in CollectionsMarshal.AsSpan(_list))
+            foreach (var item in _list.AsSpan())
             {
                 JsonSerializer.Serialize(writer, item, options);
             }

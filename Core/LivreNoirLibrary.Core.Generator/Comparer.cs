@@ -1,6 +1,5 @@
 using Microsoft.CodeAnalysis;
 using System.Collections.Generic;
-using System.Net.Http.Headers;
 using System.Text;
 
 namespace LivreNoirLibrary.Core.Generator;
@@ -85,16 +84,16 @@ internal class Comparer : IIncrementalGenerator
     public const string Template_Integer = $$"""
             public readonly struct Comparer_{{PH_Type1}}_{{PH_Type2}} : IComparer<{{PH_Type1}}, {{PH_Type2}}>
             {
-                public int Compare({{PH_Type1}} x, {{PH_Type2}} y) => x.CompareTo(y);
-                public bool IsXCloserThanY({{PH_Type1}} x, {{PH_Type1}} y, {{PH_Type2}} z) => x + y - z * 2 is > 0;
+                public static int Compare({{PH_Type1}} x, {{PH_Type2}} y) => x.CompareTo(y);
+                public static bool IsXCloserThanY({{PH_Type1}} x, {{PH_Type1}} y, {{PH_Type2}} z) => x + y - z * 2 is > 0;
             }
         """;
 
     public const string Template_Cast = $$"""
             public readonly struct Comparer_{{PH_Type1}}_{{PH_Type2}} : IComparer<{{PH_Type1}}, {{PH_Type2}}>
             {
-                public int Compare({{PH_Type1}} x, {{PH_Type2}} y) => (({{PH_Type}})x).CompareTo(({{PH_Type}})y);
-                public bool IsXCloserThanY({{PH_Type1}} x, {{PH_Type1}} y, {{PH_Type2}} z) => ({{PH_Type}})x + ({{PH_Type}})y - ({{PH_Type}})z * 2 is > 0;
+                public static int Compare({{PH_Type1}} x, {{PH_Type2}} y) => (({{PH_Type}})x).CompareTo(({{PH_Type}})y);
+                public static bool IsXCloserThanY({{PH_Type1}} x, {{PH_Type1}} y, {{PH_Type2}} z) => ({{PH_Type}})x + ({{PH_Type}})y - ({{PH_Type}})z * 2 is > 0;
             }
         """;
 }

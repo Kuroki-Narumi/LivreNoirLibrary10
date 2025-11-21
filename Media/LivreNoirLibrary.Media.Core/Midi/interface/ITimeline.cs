@@ -4,6 +4,6 @@ namespace LivreNoirLibrary.Media.Midi
 {
     public interface ITimeline : IXMultiTimeline<Rational, IObject>
     {
-        public void RemoveDuplicated(ISelection? selection);
+        void RemoveDuplicated(ISelection? selection);
     }
 }

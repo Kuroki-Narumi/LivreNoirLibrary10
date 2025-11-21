@@ -5,10 +5,10 @@ namespace LivreNoirLibrary.Media.FFmpeg
 {
     public interface IHardwareEncodeOptions
     {
-        public string CodecSuffix { get; }
-        public AVHWDeviceType DeviceType { get; }
-        public AVPixelFormat HwPixelFormat { get; }
-        public bool NeedsHardwareFrame { get; }
+        string CodecSuffix { get; }
+        AVHWDeviceType DeviceType { get; }
+        AVPixelFormat HwPixelFormat { get; }
+        bool NeedsHardwareFrame { get; }
 
         void WriteOptions(Dictionary<string, string?> dic);
     }

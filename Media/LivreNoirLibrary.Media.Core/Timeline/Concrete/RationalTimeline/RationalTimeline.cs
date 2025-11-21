@@ -17,9 +17,9 @@ namespace LivreNoirLibrary.Media
 
         public IEnumerable<(Rational, TValue)> Range(Range<int> range) => RangeCore(GetPositionIndex(_pos_list, range));
 
-        public void CopyTo<T>(T destination, Range<int> srcRange) where T : IXSingleTimeline<Rational, TValue>
+        public void CopyTo(IXSingleTimeline<Rational, TValue> destination, Range<int> srcRange) 
             => CopyToCore(destination, GetPositionIndex(_pos_list, srcRange), 0);
-        public void CopyTo<T>(T destination, Range<int> srcRange, Rational destOffset) where T : IXSingleTimeline<Rational, TValue>
+        public void CopyTo(IXSingleTimeline<Rational, TValue> destination, Range<int> srcRange, Rational destOffset) 
             => CopyToCore(destination, GetPositionIndex(_pos_list, srcRange), destOffset);
 
         protected (int Start, int Length) GetPositionIndex(List<Rational> list, Range<long> range) => list.IndexRange(range);
@@ -29,9 +29,9 @@ namespace LivreNoirLibrary.Media
 
         public IEnumerable<(Rational, TValue)> Range(Range<long> range) => RangeCore(GetPositionIndex(_pos_list, range));
 
-        public void CopyTo<T>(T destination, Range<long> srcRange) where T : IXSingleTimeline<Rational, TValue>
+        public void CopyTo(IXSingleTimeline<Rational, TValue> destination, Range<long> srcRange) 
             => CopyToCore(destination, GetPositionIndex(_pos_list, srcRange), 0);
-        public void CopyTo<T>(T destination, Range<long> srcRange, Rational destOffset) where T : IXSingleTimeline<Rational, TValue>
+        public void CopyTo(IXSingleTimeline<Rational, TValue> destination, Range<long> srcRange, Rational destOffset) 
             => CopyToCore(destination, GetPositionIndex(_pos_list, srcRange), destOffset);
 
         protected (int Start, int Length) GetPositionIndex(List<Rational> list, Range<float> range) => list.IndexRange(range);
@@ -41,9 +41,9 @@ namespace LivreNoirLibrary.Media
 
         public IEnumerable<(Rational, TValue)> Range(Range<float> range) => RangeCore(GetPositionIndex(_pos_list, range));
 
-        public void CopyTo<T>(T destination, Range<float> srcRange) where T : IXSingleTimeline<Rational, TValue>
+        public void CopyTo(IXSingleTimeline<Rational, TValue> destination, Range<float> srcRange) 
             => CopyToCore(destination, GetPositionIndex(_pos_list, srcRange), 0);
-        public void CopyTo<T>(T destination, Range<float> srcRange, Rational destOffset) where T : IXSingleTimeline<Rational, TValue>
+        public void CopyTo(IXSingleTimeline<Rational, TValue> destination, Range<float> srcRange, Rational destOffset) 
             => CopyToCore(destination, GetPositionIndex(_pos_list, srcRange), destOffset);
 
         protected (int Start, int Length) GetPositionIndex(List<Rational> list, Range<double> range) => list.IndexRange(range);
@@ -53,9 +53,9 @@ namespace LivreNoirLibrary.Media
 
         public IEnumerable<(Rational, TValue)> Range(Range<double> range) => RangeCore(GetPositionIndex(_pos_list, range));
 
-        public void CopyTo<T>(T destination, Range<double> srcRange) where T : IXSingleTimeline<Rational, TValue>
+        public void CopyTo(IXSingleTimeline<Rational, TValue> destination, Range<double> srcRange) 
             => CopyToCore(destination, GetPositionIndex(_pos_list, srcRange), 0);
-        public void CopyTo<T>(T destination, Range<double> srcRange, Rational destOffset) where T : IXSingleTimeline<Rational, TValue>
+        public void CopyTo(IXSingleTimeline<Rational, TValue> destination, Range<double> srcRange, Rational destOffset) 
             => CopyToCore(destination, GetPositionIndex(_pos_list, srcRange), destOffset);
 
         protected (int Start, int Length) GetPositionIndex(List<Rational> list, Range<decimal> range) => list.IndexRange(range);
@@ -65,9 +65,9 @@ namespace LivreNoirLibrary.Media
 
         public IEnumerable<(Rational, TValue)> Range(Range<decimal> range) => RangeCore(GetPositionIndex(_pos_list, range));
 
-        public void CopyTo<T>(T destination, Range<decimal> srcRange) where T : IXSingleTimeline<Rational, TValue>
+        public void CopyTo(IXSingleTimeline<Rational, TValue> destination, Range<decimal> srcRange) 
             => CopyToCore(destination, GetPositionIndex(_pos_list, srcRange), 0);
-        public void CopyTo<T>(T destination, Range<decimal> srcRange, Rational destOffset) where T : IXSingleTimeline<Rational, TValue>
+        public void CopyTo(IXSingleTimeline<Rational, TValue> destination, Range<decimal> srcRange, Rational destOffset) 
             => CopyToCore(destination, GetPositionIndex(_pos_list, srcRange), destOffset);
 
     }

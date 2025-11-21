@@ -1,14 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Runtime.InteropServices;
 using System.Text.Json;
 using LivreNoirLibrary.IO;
 using LivreNoirLibrary.Media.FFmpeg;
+using LivreNoirLibrary.Collections;
 
 namespace LivreNoirLibrary.Media.Wave
 {
-    public class GenericWaveBuffer : WaveBuffer
+    public class GenericWaveBuffer : WaveBuffer, IFile<GenericWaveBuffer>, IStreamLoadable<GenericWaveBuffer>, IStreamDumpable
     {
         public OutputFormat OutputFormat { get; set; }
         public long Bitrate { get; set; }
@@ -37,6 +37,15 @@ namespace LivreNoirLibrary.Media.Wave
             }
         }
 
+        public static GenericWaveBuffer Open(string path) => General.Open(path, Load);
+        public static GenericWaveBuffer Load(Stream stream)
+        {
+            GenericWaveBuffer data = new();
+            using AudioDecoder decoder = new(stream, true);
+            data.Load(decoder);
+            return data;
+        }
+
         public void Save(string path) => General.Save(path, Dump, null, "");
         public void Dump(Stream stream)
         {
@@ -61,7 +70,7 @@ namespace LivreNoirLibrary.Media.Wave
 
             writer.WritePropertyName("format meta tags");
             writer.WriteStartArray();
-            foreach (var tag in CollectionsMarshal.AsSpan(FormatMetaTags))
+            foreach (var tag in FormatMetaTags.AsSpan())
             {
                 writer.WriteStringValue(tag.ToString());
             }
@@ -69,7 +78,7 @@ namespace LivreNoirLibrary.Media.Wave
 
             writer.WritePropertyName("stream meta tags");
             writer.WriteStartArray();
-            foreach (var tag in CollectionsMarshal.AsSpan(StreamMetaTags))
+            foreach (var tag in StreamMetaTags.AsSpan())
             {
                 writer.WriteStringValue(tag.ToString());
             }

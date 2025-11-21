@@ -31,27 +31,9 @@ namespace LivreNoirLibrary.Windows.Input
         public static bool operator ==(KeyInput left, KeyInput right) => left.Equals(right);
         public static bool operator !=(KeyInput left, KeyInput right) => !left.Equals(right);
 
-        public static string ToString(Key key, ModifierKeys modifier)
+        public static string ToString(Key key, ModifierKeys modifier = 0)
         {
-            StringBuilder sb = new();
-            if (ModGet(modifier, ModifierKeys.Windows))
-            {
-                sb.Append("Win+");
-            }
-            if (ModGet(modifier, ModifierKeys.Control))
-            {
-                sb.Append("Ctrl+");
-            }
-            if (ModGet(modifier, ModifierKeys.Alt))
-            {
-                sb.Append("Alt+");
-            }
-            if (ModGet(modifier, ModifierKeys.Shift))
-            {
-                sb.Append("Shift+");
-            }
-            sb.Append(GetKeyName(key));
-            return sb.ToString();
+            return $"{(ModGet(modifier, ModifierKeys.Windows) ? "Win+" : "")}{(ModGet(modifier, ModifierKeys.Control) ? "Ctrl+" : "")}{(ModGet(modifier, ModifierKeys.Alt) ? "Alt+" : "")}{(ModGet(modifier, ModifierKeys.Shift) ? "Shift+" : "")}{GetKeyName(key)}";
         }
 
         public static string GetKeyName(Key key) => _key_names.TryGetValue(key, out var name) ? name : key.ToString();

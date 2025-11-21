@@ -24,13 +24,13 @@ namespace LivreNoirLibrary.Media.Bms
 
         [JsonIgnore]
         public BarPosition PreviewStart { get; set => SetValue(ref field, value); }
-        public decimal PreviewFadeIn { get; set => SetValue(ref field, value); } = 1;
-        public decimal PreviewBody { get; set => SetValue(ref field, value); } = 19;
-        public decimal PreviewFadeOut { get; set => SetValue(ref field, value); } = 2;
+        public double PreviewFadeIn { get; set => SetValue(ref field, value); } = 1;
+        public double PreviewBody { get; set => SetValue(ref field, value); } = 19;
+        public double PreviewFadeOut { get; set => SetValue(ref field, value); } = 2;
         public bool SetPreview { get; set => SetValue(ref field, value); }
 
         public double Gain { get; set => SetValue(ref field, value); }
-        public bool Normalize { get; set => SetValue(ref field, value); }
+        public NormalizeMode NormalizeMode { get; set => SetValue(ref field, value, [nameof(NormalizeMode_None), nameof(NormalizeMode_Peak), nameof(NormalizeMode_Rms), nameof(NormalizeMode_Lufs)]); }
         public bool PlayLongEnd { get; set => SetValue(ref field, value); }
         public bool Overlap { get; set => SetValue(ref field, value); }
         public bool Marker { get; set => SetValue(ref field, value); } = true;
@@ -59,6 +59,15 @@ namespace LivreNoirLibrary.Media.Bms
         public bool ReplaceMode_Selection { get => ReplaceMode is AssembleReplaceMode.Selection; set => SetReplaceMode(AssembleReplaceMode.Selection, value); }
         [JsonIgnore]
         public bool ReplaceMode_All { get => ReplaceMode is AssembleReplaceMode.All; set => SetReplaceMode(AssembleReplaceMode.All, value); }
+
+        [JsonIgnore]
+        public bool NormalizeMode_None { get => NormalizeMode is NormalizeMode.None; set => SetNormalizeMode(NormalizeMode.None, value); }
+        [JsonIgnore]
+        public bool NormalizeMode_Peak { get => NormalizeMode is NormalizeMode.Peak; set => SetNormalizeMode(NormalizeMode.Peak, value); }
+        [JsonIgnore]
+        public bool NormalizeMode_Rms { get => NormalizeMode is NormalizeMode.Rms; set => SetNormalizeMode(NormalizeMode.Rms, value); }
+        [JsonIgnore]
+        public bool NormalizeMode_Lufs { get => NormalizeMode is NormalizeMode.Lufs; set => SetNormalizeMode(NormalizeMode.Lufs, value); }
 
         public void EnsureMode(bool isSelectionEnabled)
         {
@@ -96,6 +105,14 @@ namespace LivreNoirLibrary.Media.Bms
                 RandomMode = mode;
             }
         }
+
+        private void SetNormalizeMode(NormalizeMode mode, bool value)
+        {
+            if (value)
+            {
+                NormalizeMode = mode;
+            }
+        }
     }
 
     public enum AssembleMode
@@ -118,5 +135,13 @@ namespace LivreNoirLibrary.Media.Bms
         None,
         Selection,
         All,
+    }
+
+    public enum NormalizeMode
+    {
+        None,
+        Peak,
+        Rms,
+        Lufs,
     }
 }

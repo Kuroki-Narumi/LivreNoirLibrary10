@@ -6,7 +6,7 @@ using LivreNoirLibrary.IO;
 
 namespace LivreNoirLibrary.Media.Midi
 {
-    public sealed class SignatureTimeline : RationalTimeline<TimeSignature>, IDumpable, ILoadable<SignatureTimeline>, IBarPositionProvider
+    public sealed class SignatureTimeline : RationalTimeline<TimeSignature>, IDumpable, ILoadable<SignatureTimeline>, IBarPositionProvider<Rational>
     {
         public const string Chid = "LNMdSg";
 
@@ -22,13 +22,10 @@ namespace LivreNoirLibrary.Media.Midi
         public void ProcessLoad(BinaryReader reader) => ProcessLoad(reader, TimeSignature.Load, Chid);
         public void Dump(BinaryWriter writer) => ProcessDump(writer, IOExtensions.Dump, Chid);
 
-        public void ExtendToEvent(RawTimeline timeline, long ticksPerWholeNote)
+        public override void Clear()
         {
-            foreach (var (pos, value) in this)
-            {
-                var tick = IObject.GetTick(pos, ticksPerWholeNote);
-                timeline.Add(tick, new Events.TimeSignature(value));
-            }
+            base.Clear();
+            _number_list.Clear();
         }
 
         public TimeSignature Get(Rational position) => Get(position, TimeSignature.Default);
@@ -151,7 +148,7 @@ namespace LivreNoirLibrary.Media.Midi
 
         private static int CalcNumber(TimeSignature value, Rational length) => (int)(length.Numerator * value.Denominator / length.Denominator / value.Numerator);
 
-        public IEnumerable<BarInfo> EachBar(Rational end)
+        public IEnumerable<BarInfo<Rational>> EnumerateBars(Rational end)
         {
             int index = 0;
             int number = 0;
@@ -186,9 +183,9 @@ namespace LivreNoirLibrary.Media.Midi
             }
         }
 
-        public IEnumerable<BarLineInfo> EachLine(Rational end)
+        public IEnumerable<BarLineInfo<Rational>> EnumerateLines(Rational end)
         {
-            foreach (var info in EachBar(end))
+            foreach (var info in EnumerateBars(end))
             {
                 var number = info.Number;
                 Rational interval = new(1, info.Signature.Denominator);

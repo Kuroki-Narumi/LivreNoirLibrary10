@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
-using System.Runtime.InteropServices;
+using LivreNoirLibrary.Collections;
 
 namespace LivreNoirLibrary.YuGiOh.Data
 {
@@ -15,7 +15,7 @@ namespace LivreNoirLibrary.YuGiOh.Data
             var c = source.Count;
             _list.EnsureCapacity(c);
             _key_list.EnsureCapacity(c);
-            foreach (var item in CollectionsMarshal.AsSpan(source))
+            foreach (var item in source.AsSpan())
             {
                 Card card = new(item);
                 _list.Add(card);

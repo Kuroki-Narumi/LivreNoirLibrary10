@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
-using System.Runtime.InteropServices;
 using LivreNoirLibrary.Collections;
 using LivreNoirLibrary.Numerics;
 
@@ -24,7 +23,7 @@ namespace LivreNoirLibrary.Media.Midi
             }
             if (groups.Count is > 0)
             {
-                foreach (var (pos, ng) in CollectionsMarshal.AsSpan(groups))
+                foreach (var (pos, ng) in groups.AsSpan())
                 {
                     timeline.Remove(pos, ng);
                     ng.Dechord(pos, timeline, newSelection);
@@ -249,7 +248,7 @@ namespace LivreNoirLibrary.Media.Midi
         private static bool AddChord<T>(T track, List<Note> list, Rational pos, ListEnum func, ISelection newSelection)
             where T : ITrack
         {
-            var span = CollectionsMarshal.AsSpan(list);
+            var span = list.AsSpan();
             var flag = false;
             var timeline = track.Timeline;
             foreach (var (index, count) in func(list))
@@ -340,7 +339,7 @@ namespace LivreNoirLibrary.Media.Midi
                 }
                 if (success)
                 {
-                    foreach (var (npos, note) in CollectionsMarshal.AsSpan(list))
+                    foreach (var (npos, note) in list.AsSpan())
                     {
                         timeline.Remove(npos, note);
                     }

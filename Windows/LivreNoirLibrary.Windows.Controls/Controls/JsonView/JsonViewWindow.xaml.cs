@@ -2,7 +2,7 @@
 using System.IO;
 using System.Windows;
 using System.Windows.Input;
-using LivreNoirLibrary.Files;
+using LivreNoirLibrary.IO;
 
 namespace LivreNoirLibrary.Windows.Controls
 {

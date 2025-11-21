@@ -2,7 +2,6 @@
 
 	<PropertyGroup>
 		<TargetFramework>net10.0-windows</TargetFramework>
-		<LangVersion>preview</LangVersion>
 		<ImplicitUsings>disable</ImplicitUsings>
 		<Nullable>enable</Nullable>
 		<UseWPF>true</UseWPF>
@@ -15,6 +14,12 @@
 		<EmitCompilerGeneratedFiles>true</EmitCompilerGeneratedFiles>
 		<BaseOutputPath>..\..\bin</BaseOutputPath>
 	</PropertyGroup>
+
+	<ItemGroup>
+	  <None Remove="Resources\IndexLetters.png" />
+	  <None Remove="Resources\NoteIcons.png" />
+	  <None Remove="Resources\sample.bms" />
+	</ItemGroup>
 
 	<ItemGroup>
 	  <Page Remove="Themes\BmsSkin\Default\7keys.xaml" />
@@ -35,6 +40,12 @@
 			<ReferenceOutputAssembly>false</ReferenceOutputAssembly>
 		</ProjectReference>
   </ItemGroup>
+
+	<ItemGroup>
+	  <Resource Include="Resources\IndexLetters.png" />
+	  <Resource Include="Resources\NoteIcons.png" />
+	  <Resource Include="Resources\sample.bms" />
+	</ItemGroup>
 
 	<ItemGroup>
 	  <None Update="Themes\BmsSkin\Default\skin_bm.png">

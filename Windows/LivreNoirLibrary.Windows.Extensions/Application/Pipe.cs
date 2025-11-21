@@ -204,12 +204,12 @@ namespace LivreNoirLibrary.Windows
         }
 
         /// <summary>
-        /// Check if the window can be closed, and if not, set <see cref="CancelEventArgs.Cancel"/> to <see cref="bool">true</see>.
+        /// Check if the window can be closed, and if not, set <see cref="CancelEventArgs.Cancel"/> to <see langword="true"/>.
         /// </summary>
         /// <param name="window"></param>
         /// <param name="e">Pass through the argument of <see cref="Window.OnClosing"/></param>.
         /// <returns>
-        /// <see cref="bool">true</see> if the window can be closed; otherwise <see cref="bool">false</see>.
+        /// <see langword="true"/> if the window can be closed; otherwise <see langword="false"/>.
         /// </returns>
         public static bool CheckServerClose(this Window window, CancelEventArgs e)
         {

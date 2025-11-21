@@ -2,7 +2,7 @@
 using System.IO;
 using LivreNoirLibrary.Collections;
 using LivreNoirLibrary.Numerics;
-using LivreNoirLibrary.Files;
+using LivreNoirLibrary.IO;
 using LivreNoirLibrary.Media.FFmpeg;
 using NAudio.Wave;
 

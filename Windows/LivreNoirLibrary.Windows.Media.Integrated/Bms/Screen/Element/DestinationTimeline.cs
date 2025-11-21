@@ -13,6 +13,7 @@ namespace LivreNoirLibrary.Windows.Controls.Bms
             Set(0, defaultValue);
         }
 
+        /// <inheritdoc cref="ITimeline{TX, TValue}.Clear"/>
         public new void Clear()
         {
             base.Clear();

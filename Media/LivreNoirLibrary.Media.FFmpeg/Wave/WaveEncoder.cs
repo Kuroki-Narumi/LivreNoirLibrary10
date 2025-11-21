@@ -1,11 +1,9 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.IO;
 using System.Buffers;
-using System.Runtime.InteropServices;
 using System.Text;
 using LivreNoirLibrary.IO;
 using LivreNoirLibrary.Media.FFmpeg;
+using LivreNoirLibrary.Collections;
 
 namespace LivreNoirLibrary.Media.Wave
 {
@@ -111,7 +109,7 @@ namespace LivreNoirLibrary.Media.Wave
                 writer.Write((byte)0);
             }
             // 残りのチャンク
-            foreach (var chunk in CollectionsMarshal.AsSpan(_chunks))
+            foreach (var chunk in _chunks.AsSpan())
             {
                 if (chunk is Chunks.Fact)
                 {

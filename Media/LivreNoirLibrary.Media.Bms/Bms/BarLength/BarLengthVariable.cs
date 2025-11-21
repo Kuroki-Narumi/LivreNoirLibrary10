@@ -1,5 +1,3 @@
-using LivreNoirLibrary.Numerics;
-using System.Collections.Generic;
 
 namespace LivreNoirLibrary.Media.Bms
 {
@@ -15,29 +13,29 @@ namespace LivreNoirLibrary.Media.Bms
         public const string PreviousSymbol = "p";
         public const string PrePreviousSymbol = "q";
 
-        public Rational BarLength { get; private set; } = Rational.One;
-        public Rational FirstLength { get; private set; } = new(1, 2);
+        public double BarLength { get; private set; } = 1;
+        public double FirstLength { get; private set; } = 0.5;
         public int MaxCount { get; private set; } = 8;
         public int Index { get; set; } = 1;
-        public Rational Previous { get; private set; } = Rational.One;
-        public Rational PrePrevious { get; private set; } = Rational.One;
+        public double Previous { get; private set; } = 1;
+        public double PrePrevious { get; private set; } = 1;
 
-        public void Setup(Rational barLength, Rational firstLength, int maxCount)
+        public void Setup(double barLength, double firstLength, int maxCount)
         {
             BarLength  = barLength;
             FirstLength = firstLength;
             MaxCount = maxCount;
             Previous = firstLength;
-            PrePrevious = Rational.Zero;
+            PrePrevious = 0;
         }
 
-        public void UpdatePrevious(Rational value)
+        public void UpdatePrevious(double value)
         {
             PrePrevious = Previous;
             Previous = value;
         }
 
-        public bool TryGetValue(string symbol, out Rational value)
+        public bool TryGetValue(string symbol, out double value)
         {
             value = symbol switch
             {
@@ -47,9 +45,9 @@ namespace LivreNoirLibrary.Media.Bms
                 IndexSymbol => Index,
                 PreviousSymbol => Previous,
                 PrePreviousSymbol => PrePrevious,
-                _ => Rational.MinusOne,
+                _ => -1,
             };
-            return value.IsPositive();
+            return value is > 0;
         }
     }
 }

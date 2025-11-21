@@ -11,7 +11,7 @@ using LivreNoirLibrary.Windows.Media.Effects;
 
 namespace LivreNoirLibrary.Windows.Media.Bms
 {
-    public class BgaImageSource : ObservableObjectBase
+    public class BgaImageSource : ObservableObjectBase, IClear
     {
         private readonly MediaCacheCollection _cache = new();
         private readonly SolidColorBrush _background = new() { Color = Color.FromRgb(0, 0, 0) };

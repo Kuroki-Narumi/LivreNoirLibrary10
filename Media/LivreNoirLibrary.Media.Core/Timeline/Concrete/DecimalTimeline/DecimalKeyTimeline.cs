@@ -22,9 +22,9 @@ namespace LivreNoirLibrary.Media
         public void RemoveRange(TKey key, Range<double> range) => RemoveRangeCore(key, GetPositionIndex(key, range));
         public void Move(TKey key, Func<decimal, decimal> converter, Range<double> range) => MoveCore(key, converter, GetPositionIndex(key, range));
 
-        public void CopyTo<T>(T destination, Range<double> srcRange) where T : IXYSingleTimeline<TKey, decimal, TValue>
+        public void CopyTo(IXYSingleTimeline<TKey, decimal, TValue> destination, Range<double> srcRange) 
             => CopyToCore(destination, _value_list.Keys, p => p.IndexRange(srcRange), 0);
-        public void CopyTo<T>(T destination, Range<double> srcRange, decimal destOffset) where T : IXYSingleTimeline<TKey, decimal, TValue>
+        public void CopyTo(IXYSingleTimeline<TKey, decimal, TValue> destination, Range<double> srcRange, decimal destOffset) 
             => CopyToCore(destination, _value_list.Keys, p => p.IndexRange(srcRange), destOffset);
         public void CopyTo<T, TEnum>(T destination, TEnum keys, Range<double> srcRange) where T : IXYSingleTimeline<TKey, decimal, TValue> where TEnum : IEnumerable<TKey>
             => CopyToCore(destination, keys, p => p.IndexRange(srcRange), 0);

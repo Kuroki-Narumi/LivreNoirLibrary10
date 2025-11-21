@@ -7,18 +7,20 @@ namespace LivreNoirLibrary.Windows.Media
     public readonly unsafe struct BitmapPointer : IDisposable
     {
         private readonly WriteableBitmap _bitmap;
-        private readonly byte* Pointer;
-        private readonly int SpanLength;
-        private readonly int Width;
-        private readonly int Height;
+        private readonly byte* _pointer;
+        private readonly int _spanLength;
+        private readonly int _width;
+        private readonly int _height;
+
+        public bool IsValid => _pointer is not null;
 
         public BitmapPointer(WriteableBitmap bitmap)
         {
             _bitmap = bitmap;
-            Pointer = (byte*)bitmap.BackBuffer;
-            Width = bitmap.PixelWidth;
-            Height = bitmap.PixelHeight;
-            SpanLength = bitmap.BackBufferStride * bitmap.PixelHeight;
+            _pointer = (byte*)bitmap.BackBuffer;
+            _width = bitmap.PixelWidth;
+            _height = bitmap.PixelHeight;
+            _spanLength = bitmap.BackBufferStride * bitmap.PixelHeight;
             bitmap.Lock();
         }
 
@@ -28,8 +30,8 @@ namespace LivreNoirLibrary.Windows.Media
             _bitmap.Unlock();
         }
 
-        public Span<byte> AsSpan() => new(Pointer, SpanLength);
-        public LnBitmapData ToBitmapData() => new(Pointer, Width, Height);
+        public Span<byte> AsSpan() => new(_pointer, _spanLength);
+        public LnBitmapData ToBitmapData() => new(_pointer, _width, _height);
         public static implicit operator LnBitmapData(BitmapPointer value) => value.ToBitmapData();
     }
 }

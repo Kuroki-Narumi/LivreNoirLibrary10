@@ -10,67 +10,111 @@ namespace LivreNoirLibrary.Media
     public interface IXYMultiTimeline<TY, TX, TValue> : IXYTimeline<TY, TX, TValue>
         where TX : struct
     {
-        public void Add(TY key, TX position, TValue value);
-        public void Add(TY key, TX position, IEnumerable<TValue> values);
-        public void Add(TY key, IEnumerable<(TX, TValue)> values);
-        public void Add(IEnumerable<(TY, TX, TValue)> values);
-        public bool Remove(TY key, TX position, TValue value);
-        public int Remove(TY key, TX position, IEnumerable<TValue> values);
-        public int Remove(TY key, IEnumerable<(TX, TValue)> values);
-        public int Remove(IEnumerable<(TY, TX, TValue)> values);
+        /// <summary>
+        /// Attempts to retrieve the value list associated with the specified key and the specified position.
+        /// </summary>
+        /// <param name="key">the key to serach for.</param>
+        /// <param name="position">The position to search for.</param>
+        /// <param name="values">When this method returns, the value list associated with the specified key and the found position, if the search is successful;
+        /// otherwise, <see langword="null"/>.</param>
+        /// <returns><see langword="true"/> if an value is found; otherwise, <see langword="false"/>.</returns>
+        bool TryGetList(TY key, TX position, [MaybeNullWhen(false)] out List<TValue> values);
 
-        public void RemoveAll(Predicate<TY, TX, TValue> predicate);
-        public void RemoveAll(Predicate<TY, TX, TValue> predicate, Range<TX> range);
-        public void RemoveAll(TY key, Predicate<TX, TValue> predicate);
-        public void RemoveAll(TY key, Predicate<TX, TValue> predicate, Range<TX> range);
+        /// <summary>
+        /// Gets the list of values associated with the specified key and the specified position, or creates and adds a new list if none
+        /// exists.
+        /// </summary>
+        /// <param name="key">The key for which to retrieve the associated list of values.</param>
+        /// <param name="position">The position for which to retrieve the associated list of values.</param>
+        /// <returns>A list of values associated with the specified key and the specified position. If no list exists, a new empty list is created, added, and returned.</returns>
+        List<TValue> GetOrAddList(TY key, TX position);
 
-        public void MoveAll(Predicate<TY, TX, TValue> predicate, Func<TX, TX> converter);
-        public void MoveAll(Predicate<TY, TX, TValue> predicate, Func<TX, TX> converter, Range<TX> range);
-        public void MoveAll(TY key, Predicate<TValue> predicate, Func<TX, TX> converter);
-        public void MoveAll(TY key, Predicate<TValue> predicate, Func<TX, TX> converter, Range<TX> range);
+        /// <summary>
+        /// Returns an enumerable object that enumerates the the position and item list pairs.
+        /// </summary>
+        /// <returns>an enumerable that can be used to iterate.</returns>
+        IEnumerable<(TY, TX, List<TValue>)> EnumerateList();
 
-        public bool TryGet(TY key, TX position, SearchMode type, [MaybeNullWhen(false)] out List<TValue> values);
-        public bool TryGetNearest(TY key, TX position, out TX actualPosition, [MaybeNullWhen(false)] out List<TValue> value);
-        public bool Find(Predicate<TY, TX, TValue> predicate, [MaybeNullWhen(false)] out TValue value);
-        public bool Find(Predicate<TY, TX, TValue> predicate, Range<TX> range, [MaybeNullWhen(false)] out TValue value);
-        public bool Find(TY key, Predicate<TX, TValue> predicate, [MaybeNullWhen(false)] out TValue value);
-        public bool Find(TY key, Predicate<TX, TValue> predicate, Range<TX> range, [MaybeNullWhen(false)] out TValue value);
-        public bool Find(TY key, TX position, Predicate<TValue> predicate, [MaybeNullWhen(false)] out TValue value);
-        public List<(TY, TX, TValue)> FindAll(Predicate<TY, TX, TValue> predicate);
-        public List<(TY, TX, TValue)> FindAll(Predicate<TY, TX, TValue> predicate, Range<TX> range);
-        public List<(TX, TValue)> FindAll(TY key, Predicate<TValue> predicate);
-        public List<(TX, TValue)> FindAll(TY key, Predicate<TValue> predicate, Range<TX> range);
-        public List<TValue> FindAll(TY key, TX position, Predicate<TValue> predicate);
+        /// <summary>
+        /// Returns an enumerable object that enumerates the the position and item list pairs within the specified range.
+        /// </summary>
+        /// <param name="range">the range of positions to iterate.</param>
+        /// <returns>an enumerable that can be used to iterate within the specified range.</returns>
+        IEnumerable<(TY, TX, List<TValue>)> EnumerateList(Range<TX> range);
 
-        public void CopyTo<T>(T destination)
-            where T : IXYMultiTimeline<TY, TX, TValue>;
-        public void CopyTo<T>(T destination, TX destOffset)
-            where T : IXYMultiTimeline<TY, TX, TValue>;
-        public void CopyTo<T>(T destination, Range<TX> srcRange)
-            where T : IXYMultiTimeline<TY, TX, TValue>;
-        public void CopyTo<T>(T destination, Range<TX> srcRange, TX destOffset)
-            where T : IXYMultiTimeline<TY, TX, TValue>;
+        /// <summary>
+        /// Returns an enumerable object that enumerates the the position and item list pairs in reverse order.
+        /// </summary>
+        /// <returns>an enumerable that can be used to iterate.</returns>
+        IEnumerable<(TY, TX, List<TValue>)> ReverseEnumerateList();
 
-        public void CopyTo<T, TEnum>(T destination, TEnum keys)
-            where T : IXYMultiTimeline<TY, TX, TValue>
-            where TEnum : IEnumerable<TY>;
-        public void CopyTo<T, TEnum>(T destination, TEnum keys, TX destOffset)
-            where T : IXYMultiTimeline<TY, TX, TValue>
-            where TEnum : IEnumerable<TY>;
-        public void CopyTo<T, TEnum>(T destination, TEnum keys, Range<TX> srcRange)
-            where T : IXYMultiTimeline<TY, TX, TValue>
-            where TEnum : IEnumerable<TY>;
-        public void CopyTo<T, TEnum>(T destination, TEnum keys, Range<TX> srcRange, TX destOffset)
-            where T : IXYMultiTimeline<TY, TX, TValue>
-            where TEnum : IEnumerable<TY>;
+        /// <summary>
+        /// Returns an enumerable object that enumerates the the position and item list pairs within the specified range in reverse order.
+        /// </summary>
+        /// <param name="range">the range of positions to iterate.</param>
+        /// <returns>an enumerable that can be used to iterate within the specified range.</returns>
+        IEnumerable<(TY, TX, List<TValue>)> ReverseEnumerateList(Range<TX> range);
 
-        public void CopyTo<T>(TY key, T destination)
-            where T : IXMultiTimeline<TX, TValue>;
-        public void CopyTo<T>(TY key, T destination, TX destOffset)
-            where T : IXMultiTimeline<TX, TValue>;
-        public void CopyTo<T>(TY key, T destination, Range<TX> srcRange)
-            where T : IXMultiTimeline<TX, TValue>;
-        public void CopyTo<T>(TY key, T destination, Range<TX> srcRange, TX destOffset)
-            where T : IXMultiTimeline<TX, TValue>;
+        /// <summary>
+        /// Returns an enumerable object that enumerates the the position and item list pairs.
+        /// </summary>
+        /// <param name="key">the key to iterate.</param>
+        /// <returns>an enumerable that can be used to iterate.</returns>
+        IEnumerable<(TX, List<TValue>)> EnumerateList(TY key);
+
+        /// <summary>
+        /// Returns an enumerable object that enumerates the the position and item list pairs within the specified range.
+        /// </summary>
+        /// <param name="key">the key to iterate.</param>
+        /// <param name="range">the range of positions to iterate.</param>
+        /// <returns>an enumerable that can be used to iterate within the specified range.</returns>
+        IEnumerable<(TX, List<TValue>)> EnumerateList(TY key, Range<TX> range);
+
+        /// <summary>
+        /// Returns an enumerable object that enumerates the the position and item list pairs in reverse order.
+        /// </summary>
+        /// <param name="key">the key to iterate.</param>
+        /// <returns>an enumerable that can be used to iterate.</returns>
+        IEnumerable<(TX, List<TValue>)> ReverseEnumerateList(TY key);
+
+        /// <summary>
+        /// Returns an enumerable object that enumerates the the position and item list pairs within the specified range in reverse order.
+        /// </summary>
+        /// <param name="key">the key to iterate.</param>
+        /// <param name="range">the range of positions to iterate.</param>
+        /// <returns>an enumerable that can be used to iterate within the specified range.</returns>
+        IEnumerable<(TX, List<TValue>)> ReverseEnumerateList(TY key, Range<TX> range);
+
+        /// <summary>
+        /// Attempts to retrieve the value list associated with the specified key and the specified position, using the given search mode.
+        /// </summary>
+        /// <param name="key">the key to search for.</param>
+        /// <param name="position">The position to search for.</param>
+        /// <param name="type">The search mode that determines how the position is matched.</param>
+        /// <param name="actualPosition">When this method returns, contains the actual position that matches the search criteria, if the search is successful;
+        /// otherwise, the default value for <typeparamref name="TX"/>.</param>
+        /// <param name="values">When this method returns, the value list associated with the found position, if the search is successful;
+        /// otherwise, the default value for <typeparamref name="TValue"/>.</param>
+        /// <returns><see langword="true"/> if an value is found; otherwise, <see langword="false"/>.</returns>
+        bool TryGetValue(TY key, TX position, SearchMode type, out TX actualPosition, [MaybeNullWhen(false)] out List<TValue> values);
+
+        /// <summary>
+        /// Attempts to find the value list with the specified key and the nearest to the specified position.
+        /// </summary>
+        /// <param name="key">the key to search for.</param>
+        /// <param name="position">The position to search for the nearest value.</param>
+        /// <param name="actualPosition">When this method returns, contains the position of the nearest value found, if any;
+        /// otherwise, the default value for the type.</param>
+        /// <param name="values">When this method returns, the value list associated with the nearest value, if found; otherwise, the
+        /// default value for the type.</param>
+        /// <returns><see langword="true"/> if a nearest value is found; otherwise, <see langword="false"/>.</returns>
+        bool TryGetNearest(TY key, TX position, out TX actualPosition, [MaybeNullWhen(false)] out List<TValue> values);
+
+        void CopyTo(IXYMultiTimeline<TY, TX, TValue> destination, TX destOffset);
+        void CopyTo(IXYMultiTimeline<TY, TX, TValue> destination, Range<TX> sourceRange, TX destOffset);
+        void CopyTo<TEnum>(IXYMultiTimeline<TY, TX, TValue> destination, TEnum keys, TX destOffset) where TEnum : IEnumerable<TY>;
+        void CopyTo<TEnum>(IXYMultiTimeline<TY, TX, TValue> destination, TEnum keys, Range<TX> sourceRange, TX destOffset) where TEnum : IEnumerable<TY>;
+        void CopyTo(TY key, IXMultiTimeline<TX, TValue> destination, TX destOffset);
+        void CopyTo(TY key, IXMultiTimeline<TX, TValue> destination, Range<TX> sourceRange, TX destOffset);
     }
 }

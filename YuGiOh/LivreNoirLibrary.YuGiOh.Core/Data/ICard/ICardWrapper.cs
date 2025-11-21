@@ -6,6 +6,6 @@ namespace LivreNoirLibrary.YuGiOh.Data
 {
     public interface ICardWrapper
     {
-        public Card Card { get; }
+        Card Card { get; }
     }
 }

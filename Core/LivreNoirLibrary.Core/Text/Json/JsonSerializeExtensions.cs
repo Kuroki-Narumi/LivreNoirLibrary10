@@ -49,6 +49,15 @@ namespace LivreNoirLibrary.Text
             }
         }
 
+        public static void WriteIfNotDefault<T>(this Utf8JsonWriter writer, string propertyName, T? value, Action<T> writeAction)
+        {
+            if (!EqualityComparer<T>.Default.Equals(value, default))
+            {
+                writer.WritePropertyName(propertyName);
+                writeAction(value!);
+            }
+        }
+
         public static void WriteIfNotNull<T>(this Utf8JsonWriter writer, string propertyName, T? value, JsonSerializerOptions? options)
             where T : class
         {

@@ -24,7 +24,7 @@ namespace LivreNoirLibrary.IO
         public static void Dump(BinaryWriter writer, char value) => writer.Write(value);
         public static void Dump(BinaryWriter writer, string value) => writer.Write(value);
 
-        public static byte[] LoadBytes(BinaryReader reader) => IOExtensions.ReadWithSize(reader);
+        public static byte[] LoadBytes(BinaryReader reader) => ReadWithSize(reader);
         public static byte LoadByte(BinaryReader reader) => reader.ReadByte();
         public static sbyte LoadSByte(BinaryReader reader) => reader.ReadSByte();
         public static short LoadInt16(BinaryReader reader) => reader.ReadInt16();

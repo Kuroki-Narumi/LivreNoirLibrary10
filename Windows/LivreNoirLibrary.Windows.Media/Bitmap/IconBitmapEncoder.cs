@@ -7,7 +7,7 @@ using LivreNoirLibrary.ObjectModel;
 
 namespace LivreNoirLibrary.Windows.Media
 {
-    public class IconBitmapEncoder
+    public class IconBitmapEncoder : IClear
     {
         private readonly List<IconData> _data = [];
 

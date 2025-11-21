@@ -190,7 +190,7 @@ internal class SimdOperations : IIncrementalGenerator
         ($"ObservableCollectionBase<{PH_Type}>", "Count", $"CollectionsMarshal.AsSpan({PH_Target}._list)")
     ];
 
-    const string Code_Header = """
+    private const string Code_Header = """
 using System;
 using System.Collections.Generic;
 using System.Numerics;
@@ -203,12 +203,12 @@ namespace LivreNoirLibrary.Collections
     {
 """;
 
-    const string Code_Footer = """
+    private const string Code_Footer = """
     }
 }
 """;
 
-    const string Code_Vector_Overload = $$"""
+    private const string Code_Vector_Overload = $$"""
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static void {{PH_Method}}(this {{PH_Destination}} destination, {{PH_Source}} source)
         {
@@ -235,12 +235,12 @@ namespace LivreNoirLibrary.Collections
         }
 """;
 
-    const string Code_Vector_Ptr = $$"""
+    private const string Code_Vector_Ptr = $$"""
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static void {{PH_Method}}({{PH_Type}}* destination, {{PH_Type}}* source, int length) => {{PH_Method}}Core(destination, source, length);
 """;
 
-    const string Code_Scalar_Overload = $$"""
+    private const string Code_Scalar_Overload = $$"""
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static void {{PH_Method}}(this {{PH_Destination}} destination, {{PH_Type}} value)
         {
@@ -262,12 +262,12 @@ namespace LivreNoirLibrary.Collections
         }
 """;
 
-    const string Code_Scalar_Ptr = $$"""
+    private const string Code_Scalar_Ptr = $$"""
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static void {{PH_Method}}({{PH_Type}}* destination, {{PH_Type}} value, int length) => {{PH_Method}}Core(destination, value, length);
 """;
 
-    const string Code_2Scalar_Overload = $$"""
+    private const string Code_2Scalar_Overload = $$"""
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static void {{PH_Method}}(this {{PH_Destination}} destination, {{PH_Type}} min, {{PH_Type}} max)
         {
@@ -289,12 +289,12 @@ namespace LivreNoirLibrary.Collections
         }
 """;
 
-    const string Code_2Scalar_Ptr = $$"""
+    private const string Code_2Scalar_Ptr = $$"""
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static void {{PH_Method}}({{PH_Type}}* destination, {{PH_Type}} min, {{PH_Type}} max, int length) => {{PH_Method}}Core(destination, min, max, length);
 """;
 
-    const string Code_Unary_Overload = $$"""
+    private const string Code_Unary_Overload = $$"""
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static void {{PH_Method}}(this {{PH_Destination}} destination)
         {
@@ -316,12 +316,12 @@ namespace LivreNoirLibrary.Collections
         }
 """;
 
-    const string Code_Unary_Ptr = $$"""
+    private const string Code_Unary_Ptr = $$"""
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static void {{PH_Method}}({{PH_Type}}* destination, int length) => {{PH_Method}}Core(destination, length);
 """;
 
-    const string Code_Unary_Readonly_Overload = $$"""
+    private const string Code_Unary_Readonly_Overload = $$"""
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static {{PH_Return}} {{PH_Method}}(this {{PH_Source}} source)
         {
@@ -343,12 +343,12 @@ namespace LivreNoirLibrary.Collections
         }
 """;
 
-    const string Code_Unary_Readonly_Ptr = $$"""
+    private const string Code_Unary_Readonly_Ptr = $$"""
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static {{PH_Return}} {{PH_Method}}({{PH_Type}}* source, int length) => {{PH_Method}}Core(source, length);
 """;
 
-    const string Code_Shift_Overload = $$"""
+    private const string Code_Shift_Overload = $$"""
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static void {{PH_Method}}(this {{PH_Destination}} destination, int shiftCount)
         {
@@ -370,12 +370,12 @@ namespace LivreNoirLibrary.Collections
         }
 """;
 
-    const string Code_Shift_Ptr = $$"""
+    private const string Code_Shift_Ptr = $$"""
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static void {{PH_Method}}({{PH_Type}}* destination, int shiftCount, int length) => {{PH_Method}}Core(destination, shiftCount, length);
 """;
 
-    const string Code_EqualsAll_Overload = $$"""
+    private const string Code_EqualsAll_Overload = $$"""
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static bool EqualsAll(this {{PH_Destination}} left, {{PH_Source}} right)
         {
@@ -417,7 +417,7 @@ namespace LivreNoirLibrary.Collections
         }
 """;
 
-    const string Code_EqualsAll_Ptr = $$"""
+    private const string Code_EqualsAll_Ptr = $$"""
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static bool EqualsAll({{PH_Type}}* left, {{PH_Type}}* right, int length) => EqualsCore(left, right, length);
 """;

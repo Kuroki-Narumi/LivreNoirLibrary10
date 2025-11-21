@@ -1,184 +1,177 @@
-﻿using LivreNoirLibrary.Numerics;
+﻿using LivreNoirLibrary.Collections;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using static LivreNoirLibrary.Media.Bms.KeyLanes;
 
 namespace LivreNoirLibrary.Media.Bms
 {
-    public static partial class IBmsDataExtensions
+    public static partial class BmsExtensions
     {
-        public static int GetNoteCount(this IBmsData data, bool includeLongEnd = false)
+        extension(IListEnumerable<double, Note> timeline)
         {
-            var result = 0;
-            foreach (var (_, note) in data.Timeline)
+            public int GetNoteCount(bool includeLongEnd = false)
             {
-                if (note.IsVisibleKey(includeLongEnd, out _))
+                var count = 0;
+                foreach (var (_, list) in timeline.EnumerateList())
                 {
-                    result++;
-                }
-            }
-            return result;
-        }
-
-        public static int GetNoteCount(this IBmsData data, Predicate<INote> selector)
-        {
-            var result = 0;
-            foreach (var (_, note) in data.Timeline)
-            {
-                if (selector(note))
-                {
-                    result++;
-                }
-            }
-            return result;
-        }
-
-        public static int GetMaxBgmLane(this IBmsData data)
-        {
-            var max = 0;
-            foreach (var (_, note) in data.Timeline)
-            {
-                if (note.IsBgm(out var n) && n.Lane < max)
-                {
-                    max = n.Lane;
-                }
-            }
-            return 1 - max;
-        }
-
-        public static HashSet<int> GetUsedKeyLanes(this IRootData root, HashSet<int>? set = null)
-        {
-            set ??= [];
-            foreach (var data in root.EachData())
-            {
-                foreach (var (_, note) in data.Timeline)
-                {
-                    if (note is ISoundNote s)
+                    foreach (var note in list.AsSpan())
                     {
-                        set.Add(s.Lane);
-                    }
-                }
-            }
-            return set;
-        }
-
-        public static int GetKeyCount(this IRootData root)
-        {
-            switch (root.ChartType)
-            {
-                case ChartType.Beat:
-                    return GetKeyCount_Beat(root);
-                case ChartType.Popn:
-                    return GetKeyCount_Popn(root);
-                case ChartType.Keyboard:
-                    return GetKeyCount_Keyboard(root);
-                default:
-                    return GetUsedKeyLanes(root).Count;
-            }
-        }
-
-        private static int GetKeyCount_Beat(IRootData root)
-        {
-            var like_7 = false;
-            var like_10 = false;
-            foreach (var data in root.EachData())
-            {
-                foreach (var (_, note) in data.Timeline)
-                {
-                    if (note is ISoundNote s)
-                    {
-                        switch (s.Lane)
+                        if (note.IsVisibleKey(includeLongEnd))
                         {
-                            case >= Beat_2P_6:
-                                return 14;
-                            case >= Beat_2P_1:
-                                like_10 = true;
-                                break;
-                            case Beat_1P_6 or Beat_1P_7:
-                                like_7 = true;
-                                break;
+                            count++;
                         }
                     }
                 }
+                return count;
             }
-            return like_7 ? (like_10 ? 14 : 7) : (like_10 ? 10 : 5);
-        }
 
-        private static int GetKeyCount_Popn(IRootData root)
-        {
-            var like_3 = false;
-            var like_5 = false;
-            var like_9 = false;
-            foreach (var data in root.EachData())
+            public int GetNoteCount(Predicate<Note> selector)
             {
-                foreach (var (_, note) in data.Timeline)
+                var count = 0;
+                foreach (var (_, list) in timeline.EnumerateList())
                 {
-                    if (note is ISoundNote s)
+                    foreach (var note in list.AsSpan())
                     {
-                        switch (s.Lane)
+                        if (selector(note))
                         {
-                            case (>= Pop_1P_8 and <= Pop_1P_6) or >= Pop_2P_8:
-                                return 18;
-                            case >= Pop_6:
-                                like_9 = true;
-                                break;
-                            case >= Pop_4:
-                                like_5 = true;
-                                break;
-                            case >= Pop_1 and <= Pop_3:
-                                like_3 = true;
-                                break;
+                            count++;
                         }
                     }
                 }
+                return count;
             }
-            return like_3 ? (like_5 ? 9 : 3) : (like_9 ? 9 : 5);
-        }
 
-        private static int GetKeyCount_Keyboard(IRootData root)
-        {
-            foreach (var data in root.EachData())
+            public int GetMaxBgmLane()
             {
-                foreach (var (_, note) in data.Timeline)
+                var max = 0;
+                foreach (var (_, list) in timeline.EnumerateList())
                 {
-                    if (note is ISoundNote { Lane: >= 25 })
+                    foreach (var note in list.AsSpan())
                     {
-                        return 48;
+                        if (note.Channel.TryGetLane(out var lane) && lane < max)
+                        {
+                            max = lane;
+                        }
                     }
                 }
+                return 1 - max;
             }
-            return 24;
         }
 
-        public static int GetMaxBarResolution(this IRootData root)
+        extension (IBmsData root)
         {
-            Dictionary<int, long> localMax = [];
-            var max = 0;
-            foreach (var data in root.EachData())
+            public DefIndexCollection GetUsedDefList(DefIndexCollection? used = null)
             {
-                max = Math.Max(max, GetLocalMaxBarResolution(data, localMax));
+                used ??= [];
+                foreach (var d in root.EnumerateAllData())
+                {
+                    foreach (var (_, note) in d.Timeline)
+                    {
+                        if (note.TryGetDefType(out var type) && note.Value is not 0)
+                        {
+                            used.Add(type, (int)note.Value);
+                        }
+                    }
+                }
+                return used;
             }
-            return max;
-        }
 
-        public static int GetLocalMaxBarResolution(this IBmsData data, Dictionary<int, long>? localMax = null)
-        {
-            localMax ??= [];
-            localMax.Clear();
-            foreach (var (bar, beat) in data.Timeline.GetPositions())
+            public HashSet<Channel> GetUsedKeyLanes(HashSet<Channel>? set = null)
             {
-                var b = beat / data.GetBarLength(bar);
-                if (localMax.TryGetValue(bar, out var current))
+                set ??= [];
+                foreach (var data in root.EnumerateAllData())
                 {
-                    localMax[bar] = current.LCM(b.Denominator);
+                    foreach (var (_, note) in data.Timeline)
+                    {
+                        if (note.IsKey())
+                        {
+                            set.Add(note.Channel);
+                        }
+                    }
                 }
-                else
-                {
-                    localMax.Add(bar, b.Denominator);
-                }
+                return set;
             }
-            return localMax.Count is 0 ? 1 : (int)localMax.Values.Max();
+
+            public int GetKeyCount() => root.ChartType switch
+            {
+                ChartType.Beat => GetKeyCount_Beat(root),
+                ChartType.Popn => GetKeyCount_Popn(root),
+                ChartType.Keyboard => GetKeyCount_Keyboard(root),
+                _ => GetUsedKeyLanes(root).Count,
+            };
+
+            private int GetKeyCount_Beat()
+            {
+                var like_7 = false;
+                var like_10 = false;
+                foreach (var data in root.EnumerateAllData())
+                {
+                    foreach (var (_, note) in data.Timeline)
+                    {
+                        if (note.IsKey())
+                        {
+                            switch (note.Channel)
+                            {
+                                case >= Channel.Beat_2P_6:
+                                    return 14;
+                                case >= Channel.Beat_2P_1:
+                                    like_10 = true;
+                                    break;
+                                case Channel.Beat_1P_6 or Channel.Beat_1P_7:
+                                    like_7 = true;
+                                    break;
+                            }
+                        }
+                    }
+                }
+                return like_7 ? (like_10 ? 14 : 7) : (like_10 ? 10 : 5);
+            }
+
+            private int GetKeyCount_Popn()
+            {
+                var like_3 = false;
+                var like_5 = false;
+                var like_9 = false;
+                foreach (var data in root.EnumerateAllData())
+                {
+                    foreach (var (_, note) in data.Timeline)
+                    {
+                        if (note.IsKey())
+                        {
+                            switch (note.Channel)
+                            {
+                                case (>= Channel.Popn_1P_8 and <= Channel.Popn_1P_6) or >= Channel.Popn_2P_8:
+                                    return 18;
+                                case >= Channel.Popn_6:
+                                    like_9 = true;
+                                    break;
+                                case >= Channel.Popn_4:
+                                    like_5 = true;
+                                    break;
+                                case >= Channel.Popn_1 and <= Channel.Popn_3:
+                                    like_3 = true;
+                                    break;
+                            }
+                        }
+                    }
+                }
+                return like_3 ? (like_5 ? 9 : 3) : (like_9 ? 9 : 5);
+            }
+
+            private int GetKeyCount_Keyboard()
+            {
+                foreach (var data in root.EnumerateAllData())
+                {
+                    foreach (var (_, note) in data.Timeline)
+                    {
+                        if (note.Channel.TryGetLane(out var lane) && lane is >= 25)
+                        {
+                            return 48;
+                        }
+                    }
+                }
+                return 24;
+            }
         }
     }
 }

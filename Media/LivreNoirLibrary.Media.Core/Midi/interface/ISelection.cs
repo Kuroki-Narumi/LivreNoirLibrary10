@@ -7,10 +7,10 @@ namespace LivreNoirLibrary.Media.Midi
 {
     public interface ISelection
     {
-        public int Count { get; }
-        public void Add(Rational position, IObject obj);
-        public bool Remove(Rational position, IObject obj);
-        public IEnumerable<(Rational, IObject)> EachItem();
-        public Rational GetFirstBeat();
+        int Count { get; }
+        void Add(Rational position, IObject obj);
+        bool Remove(Rational position, IObject obj);
+        IEnumerable<(Rational, IObject)> EachItem();
+        Rational GetFirstBeat();
     }
 }

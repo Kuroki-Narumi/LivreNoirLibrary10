@@ -1,7 +1,7 @@
 ﻿using System;
 using System.IO;
 using System.Windows.Media.Imaging;
-using LivreNoirLibrary.Files;
+using LivreNoirLibrary.IO;
 using LivreNoirLibrary.Media.Bms;
 using LivreNoirLibrary.Windows.Media.Bms.SkinInfo;
 
@@ -9,7 +9,7 @@ namespace LivreNoirLibrary.Windows.Media.Bms
 {
     public class BmsTextureCache : TextureCache
     {
-        public void LoadBms(IBmsData data, string directory)
+        public void LoadBms(IBmsViewModel data, string directory)
         {
             void Set(string? relativePath, string cacheKey)
             {

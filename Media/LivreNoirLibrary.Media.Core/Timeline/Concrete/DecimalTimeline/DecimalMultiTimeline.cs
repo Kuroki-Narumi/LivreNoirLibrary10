@@ -1,11 +1,6 @@
 using System;
 using System.Collections.Generic;
-using System.IO;
-using System.Diagnostics.CodeAnalysis;
-using LivreNoirLibrary.IO;
-using LivreNoirLibrary.Numerics;
 using LivreNoirLibrary.Collections;
-using LivreNoirLibrary.ObjectModel;
 
 namespace LivreNoirLibrary.Media
 {
@@ -18,14 +13,9 @@ namespace LivreNoirLibrary.Media
 
         public IEnumerable<(decimal, TValue)> Range(Range<double> range) => RangeCore(GetPositionIndex(_pos_list, range));
 
-        public int RemoveAll(Predicate<decimal, TValue> predicate, Range<double> range) => RemoveAllCore(predicate, GetPositionIndex(_pos_list, range));
-        public void MoveAll(Predicate<decimal, TValue> predicate, Func<decimal, decimal> converter, Range<double> range) => MoveAllCore(predicate, converter, GetPositionIndex(_pos_list, range));
-        public bool Find(Predicate<decimal, TValue> predicate, Range<double> range, out decimal position, [MaybeNullWhen(false)] out TValue value) => FindCore(predicate, GetPositionIndex(_pos_list, range), out position, out value);
-        public List<(decimal, TValue)> FindAll(Predicate<decimal, TValue> predicate, Range<double> range) => FindAllCore(predicate, GetPositionIndex(_pos_list, range));
-        public void CopyTo<T>(T destination, Range<double> srcRange) where T : IXMultiTimeline<decimal, TValue>
+        public void CopyTo(IXMultiTimeline<decimal, TValue> destination, Range<double> srcRange)
             => CopyToCore(destination, GetPositionIndex(_pos_list, srcRange), 0);
-        public void CopyTo<T>(T destination, Range<double> srcRange, decimal destOffset) where T : IXMultiTimeline<decimal, TValue>
+        public void CopyTo(IXMultiTimeline<decimal, TValue> destination, Range<double> srcRange, decimal destOffset)
             => CopyToCore(destination, GetPositionIndex(_pos_list, srcRange), destOffset);
-
     }
 }

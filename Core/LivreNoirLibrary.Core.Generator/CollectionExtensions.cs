@@ -64,27 +64,27 @@ internal class CollectionExtensions : IIncrementalGenerator
     public const string Template = $$"""
                 public static bool TrySearch(this {{PH_Source}}{{PH_Target}}, {{PH_Type2}} value, SearchMode type, out int index, out {{PH_Type1}} actualValue)
                 {
-                    return TrySearch({{PH_Target}}, value, new Comparer_{{PH_Type1}}_{{PH_Type2}}(), type, out index, out actualValue);
+                    return TrySearch<{{PH_Type1}}, {{PH_Type2}}, Comparer_{{PH_Type1}}_{{PH_Type2}}>({{PH_Target}}, value, type, out index, out actualValue);
                 }
 
                 public static int FindIndex(this {{PH_Source}}{{PH_Target}}, {{PH_Type2}} value, SearchMode type)
                 {
-                    return FindIndex({{PH_Target}}, value, new Comparer_{{PH_Type1}}_{{PH_Type2}}(), type);
+                    return FindIndex<{{PH_Type1}}, {{PH_Type2}}, Comparer_{{PH_Type1}}_{{PH_Type2}}>({{PH_Target}}, value, type);
                 }
 
                 public static int FindNearestIndex(this {{PH_Source}}{{PH_Target}}, {{PH_Type2}} value)
                 {
-                    return FindNearestIndex({{PH_Target}}, value, new Comparer_{{PH_Type1}}_{{PH_Type2}}());
+                    return FindNearestIndex<{{PH_Type1}}, {{PH_Type2}}, Comparer_{{PH_Type1}}_{{PH_Type2}}>({{PH_Target}}, value);
                 }
 
                 public static {{PH_Destination}} Range(this {{PH_Source}}{{PH_Target}}, Range<{{PH_Type2}}> range)
                 {
-                    return Range({{PH_Target}}, range, new Comparer_{{PH_Type1}}_{{PH_Type2}}());
+                    return Range<{{PH_Type1}}, {{PH_Type2}}, Comparer_{{PH_Type1}}_{{PH_Type2}}>({{PH_Target}}, range);
                 }
 
                 public static (int Start, int Length) IndexRange(this {{PH_Source}}{{PH_Target}}, Range<{{PH_Type2}}> range)
                 {
-                    return IndexRange({{PH_Target}}, range, new Comparer_{{PH_Type1}}_{{PH_Type2}}());
+                    return IndexRange<{{PH_Type1}}, {{PH_Type2}}, Comparer_{{PH_Type1}}_{{PH_Type2}}>({{PH_Target}}, range);
                 }
         """;
 }

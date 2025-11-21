@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Windows.Controls;
 using System.Collections.Generic;
-using System.Runtime.InteropServices;
+using LivreNoirLibrary.Collections;
 
 namespace LivreNoirLibrary.Windows.Controls
 {
@@ -32,14 +32,14 @@ namespace LivreNoirLibrary.Windows.Controls
 
         public void ApplySelection()
         {
-            foreach (var (@ref, index) in CollectionsMarshal.AsSpan(_selected_indexes))
+            foreach (var (@ref, index) in _selected_indexes.AsSpan())
             {
                 if (@ref.TryGetTarget(out var control) && control.SelectionMode is System.Windows.Controls.SelectionMode.Single)
                 {
                     control.SelectedIndex = index;
                 }
             }
-            foreach (var (@ref, list) in CollectionsMarshal.AsSpan(_selected_items))
+            foreach (var (@ref, list) in _selected_items.AsSpan())
             {
                 if (@ref.TryGetTarget(out var control) && control.SelectionMode is not System.Windows.Controls.SelectionMode.Single)
                 {
@@ -51,7 +51,7 @@ namespace LivreNoirLibrary.Windows.Controls
                     {
                         var items = control.SelectedItems;
                         items.Clear();
-                        foreach (var item in CollectionsMarshal.AsSpan(list))
+                        foreach (var item in list.AsSpan())
                         {
                             items.Add(item);
                         }

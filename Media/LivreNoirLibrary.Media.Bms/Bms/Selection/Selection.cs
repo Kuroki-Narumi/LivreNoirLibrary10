@@ -4,17 +4,18 @@ using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Linq;
 using LivreNoirLibrary.IO;
-using LivreNoirLibrary.Numerics;
 
 namespace LivreNoirLibrary.Media.Bms
 {
-    public class Selection() : HashSet<SelectionItem>(new SelectionItem.Comparer()), IDumpable, ILoadable<Selection>
+    public class Selection() : HashSet<SelectionItem>(new SelectionItem.Comparer()), ILoadable, IDumpable
     {
         public const string Chid = "LNBSel";
 
-        public bool IsEmpty() => Count is 0;
+        public bool IsEmpty => Count is 0;
 
-        public bool Add(Rational head, Rational absolutePosition, INote note) => Add(new(head, absolutePosition, note));
+        public bool Add(BarPosition position, double head, double absolutePosition, double time, Note note) => Add(new(position, head, absolutePosition, time, note));
+        public bool Add(BarPosition position, IBmsViewModel viewModel, Note note) => Add(new(position, viewModel, note));
+        public bool Remove(Note note) => this.First(item => item.Note == note) is { } item && Remove(item);
 
         public void ReplaceToClone()
         {
@@ -24,29 +25,31 @@ namespace LivreNoirLibrary.Media.Bms
             }
         }
 
-        public void ChangeLane(Dictionary<Channel, Channel> channelMap, Dictionary<int, int> laneMap)
+        public void EnsureTime(ITimeCounter timeCounter)
+        {
+            var head = timeCounter.Beat2Time(GetFirstBarHead());
+            foreach (var item in this)
+            {
+                item.Time = timeCounter.Beat2Time(item.AbsolutePosition) - head;
+            }
+        }
+
+        public void ChangeLane(Dictionary<Channel, Channel> map)
         {
             foreach (var item in this)
             {
-                if (item is ISoundNote s)
+                if (map.TryGetValue(item.Note.Channel, out var changed))
                 {
-                    if (laneMap.TryGetValue(s.Lane, out var lane))
-                    {
-                        s.Lane = lane;
-                    }
-                }
-                else if (item is IChannelNote c && channelMap.TryGetValue(c.Channel, out var channel))
-                {
-                    c.Channel = channel;
+                    item.Note.Channel = changed;
                 }
             }
         }
 
-        public Rational GetFirstBarHead() => this.MinBy(item => item.BarHead) is { } item ? item.BarHead : Rational.Zero;
+        public double GetFirstBarHead() => this.MinBy(item => item.BarHead) is { } item ? item.BarHead : 0;
 
         public bool TryGetFirstSound([MaybeNullWhen(false)]out SelectionItem item, bool includeLongEnd)
         {
-            if (this.Where(item => item.Note.IsNormal(includeLongEnd, out var actual))
+            if (this.Where(item => item.Note.IsNormal(includeLongEnd))
                     .MinBy(item => item.AbsolutePosition)
                     is { } actual)
             {
@@ -57,7 +60,7 @@ namespace LivreNoirLibrary.Media.Bms
             return false;
         }
 
-        public IEnumerable<INote> EachNote()
+        public IEnumerable<Note> EachNote()
         {
             foreach(var item in this)
             {
@@ -65,32 +68,33 @@ namespace LivreNoirLibrary.Media.Bms
             }
         }
 
-        public HashSet<INote> GetNoteHash() => [.. this.Select(item => item.Note)];
+        public void GetNoteHash(HashSet<Note> set) => set.UnionWith(this.Select(item => item.Note));
 
         public void Dump(BinaryWriter writer)
         {
             writer.WriteChid(Chid);
             writer.Write(Count);
             var offset = GetFirstBarHead();
-            foreach (var (_, p, n) in this)
+            foreach (var (_, p, t, n) in this)
             {
                 writer.Write(p - offset);
-                INoteExtensions.Write(writer, n);
+                writer.Write(t);
+                writer.Write(n);
             }
         }
 
-        public static Selection Load(BinaryReader reader)
+        public void ProcessLoad(BinaryReader reader)
         {
+            Clear();
             reader.CheckChid(Chid);
             var count = reader.ReadInt32();
-            Selection selection = [];
             for (var i = 0; i < count; i++)
             {
-                var pos = reader.ReadRational();
-                var note = INoteExtensions.ReadINote(reader);
-                selection.Add(Rational.Zero, pos, note);
+                var pos = reader.ReadDouble();
+                var time = reader.ReadDouble();
+                var note = reader.ReadNote();
+                Add(new(default, 0, pos, time, note));
             }
-            return selection;
         }
     }
 }

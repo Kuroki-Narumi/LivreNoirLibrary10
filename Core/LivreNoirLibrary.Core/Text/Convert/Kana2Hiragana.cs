@@ -7,7 +7,7 @@ namespace LivreNoirLibrary.Text
     public static partial class TextConvert
     {
         [GeneratedRegex("[ァ-ヶ]")]
-        static partial Regex Regex_Kana { get; }
+        private static partial Regex Regex_Kana { get; }
         public static string Kana2Hiragana(this string text) => Regex_Kana.Replace(text, m => _kana2kana[m.Value]);
 
         private static readonly Dictionary<string, string> _kana2kana = new()

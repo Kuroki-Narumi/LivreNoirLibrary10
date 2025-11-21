@@ -1,10 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Runtime.InteropServices;
+using LivreNoirLibrary.Collections;
+using LivreNoirLibrary.ObjectModel;
 
 namespace LivreNoirLibrary.Media.Ogg
 {
-    public class InputStreamState(int serialNumber = -1) : StreamState(serialNumber)
+    public class InputStreamState(int serialNumber = -1) : StreamState(serialNumber), IClear
     {
         private OggPage? _current_page;
         private int _expected_page_number;
@@ -72,7 +73,7 @@ namespace LivreNoirLibrary.Media.Ogg
                 {
                     var data = new byte[bufferLength];
                     var index = 0;
-                    foreach (var buffer in CollectionsMarshal.AsSpan(buffers))
+                    foreach (var buffer in buffers.AsSpan())
                     {
                         var bLen = buffer.Length;
                         Array.Copy(buffer, 0, data, index, bLen);

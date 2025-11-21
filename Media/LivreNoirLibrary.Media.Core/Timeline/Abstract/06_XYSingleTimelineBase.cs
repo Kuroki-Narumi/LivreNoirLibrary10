@@ -1,25 +1,22 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using LivreNoirLibrary.Numerics;
 using LivreNoirLibrary.IO;
-using System.Runtime.InteropServices;
 using LivreNoirLibrary.Collections;
-using LivreNoirLibrary.ObjectModel;
 
 namespace LivreNoirLibrary.Media
 {
     public abstract class XYSingleTimelineBase<TY, TX, TValue, TOperator> : XYTimelineBase<TY, TX, TValue, TValue, TOperator>, IXYSingleTimeline<TY, TX, TValue>
         where TY : struct
         where TX : struct
-        where TOperator : IPositionOperator<TX>, new()
+        where TOperator : IPositionOperator<TX>
     {
         public sealed override int Count
         {
             get
             {
                 var count = 0;
-                foreach (var set in CollectionsMarshal.AsSpan(_key_list))
+                foreach (var set in _key_list.AsSpan())
                 {
                     count += set.Count;
                 }
@@ -89,44 +86,20 @@ namespace LivreNoirLibrary.Media
         }
 
         public void Set(TY key, TX position, TValue value) => AddItem(key, position, value);
-        public TValue Get(TY key, TX position, TValue ifnone) => Get(key, position, SearchMode.PreviousOrEqual, ifnone);
 
-        public TValue Get(TY key, TX position, SearchMode type, TValue ifnone)
-        {
-            if (TryGet(key, position, type, out _, out var value))
-            {
-                return value;
-            }
-            return ifnone;
-        }
-
-        public void CopyTo<T>(T destination) where T : IXYSingleTimeline<TY, TX, TValue>
-            => CopyToCore(destination, _value_list.Keys, p => (0, p.Count), TOperator.Zero);
-
-        public void CopyTo<T>(T destination, TX destOffset) where T : IXYSingleTimeline<TY, TX, TValue>
+        public void CopyTo(IXYSingleTimeline<TY, TX, TValue> destination, TX destOffset)
             => CopyToCore(destination, _value_list.Keys, p => (0, p.Count), destOffset);
 
-        public void CopyTo<T>(T destination, Range<TX> srcRange) where T : IXYSingleTimeline<TY, TX, TValue>
-            => CopyToCore(destination, _value_list.Keys, p => p.IndexRange(srcRange, _operator), TOperator.Zero);
+        public void CopyTo(IXYSingleTimeline<TY, TX, TValue> destination, Range<TX> srcRange, TX destOffset)
+            => CopyToCore(destination, _value_list.Keys, p => p.IndexRange<TX, TX, TOperator>(srcRange), destOffset);
 
-        public void CopyTo<T>(T destination, Range<TX> srcRange, TX destOffset) where T : IXYSingleTimeline<TY, TX, TValue>
-            => CopyToCore(destination, _value_list.Keys, p => p.IndexRange(srcRange, _operator), destOffset);
-
-        public void CopyTo<T, TEnum>(T destination, TEnum keys) where T : IXYSingleTimeline<TY, TX, TValue> where TEnum : IEnumerable<TY>
-            => CopyToCore(destination, keys, p => (0, p.Count), TOperator.Zero);
-
-        public void CopyTo<T, TEnum>(T destination, TEnum keys, TX destOffset) where T : IXYSingleTimeline<TY, TX, TValue> where TEnum : IEnumerable<TY>
+        public void CopyTo(IXYSingleTimeline<TY, TX, TValue> destination, IEnumerable<TY> keys, TX destOffset)
             => CopyToCore(destination, keys, p => (0, p.Count), destOffset);
 
-        public void CopyTo<T, TEnum>(T destination, TEnum keys, Range<TX> srcRange) where T : IXYSingleTimeline<TY, TX, TValue> where TEnum : IEnumerable<TY>
-            => CopyToCore(destination, keys, p => p.IndexRange(srcRange, _operator), TOperator.Zero);
+        public void CopyTo(IXYSingleTimeline<TY, TX, TValue> destination, IEnumerable<TY> keys, Range<TX> srcRange, TX destOffset)
+            => CopyToCore(destination, keys, p => p.IndexRange<TX, TX, TOperator>(srcRange), destOffset);
 
-        public void CopyTo<T, TEnum>(T destination, TEnum keys, Range<TX> srcRange, TX destOffset) where T : IXYSingleTimeline<TY, TX, TValue> where TEnum : IEnumerable<TY>
-            => CopyToCore(destination, keys, p => p.IndexRange(srcRange, _operator), destOffset);
-
-        protected void CopyToCore<T, TEnum>(T destination, TEnum keys, Func<List<TX>, (int, int)> rangeFunc, TX destOffset)
-            where T : IXYSingleTimeline<TY, TX, TValue>
-            where TEnum : IEnumerable<TY>
+        protected void CopyToCore(IXYSingleTimeline<TY, TX, TValue> destination, IEnumerable<TY> keys, Func<List<TX>, (int, int)> rangeFunc, TX destOffset)
         {
             foreach (var key in keys)
             {
@@ -138,26 +111,19 @@ namespace LivreNoirLibrary.Media
                     var e = s + l;
                     for (int i = s; i < e; i++)
                     {
-                        destination.Set(key, _operator.Add(p[i], destOffset), v[i]);
+                        destination.Set(key, TOperator.Add(p[i], destOffset), v[i]);
                     }
                 }
             }
         }
 
-        public void CopyTo<T>(TY key, T destination) where T : IXSingleTimeline<TX, TValue>
-            => CopyToCore(key, destination, GetPositionIndex(key), TOperator.Zero);
-
-        public void CopyTo<T>(TY key, T destination, TX destOffset) where T : IXSingleTimeline<TX, TValue>
+        public void CopyTo(TY key, IXSingleTimeline<TX, TValue> destination, TX destOffset)
             => CopyToCore(key, destination, GetPositionIndex(key), destOffset);
 
-        public void CopyTo<T>(TY key, T destination, Range<TX> srcRange) where T : IXSingleTimeline<TX, TValue>
-            => CopyToCore(key, destination, GetPositionIndex(key, srcRange), TOperator.Zero);
-
-        public void CopyTo<T>(TY key, T destination, Range<TX> srcRange, TX destOffset) where T : IXSingleTimeline<TX, TValue>
+        public void CopyTo(TY key, IXSingleTimeline<TX, TValue> destination, Range<TX> srcRange, TX destOffset)
             => CopyToCore(key, destination, GetPositionIndex(key, srcRange), destOffset);
 
-        protected void CopyToCore<T>(TY key, T destination, (int Start, int Length) range, TX destOffset)
-            where T : IXSingleTimeline<TX, TValue>
+        protected void CopyToCore(TY key, IXSingleTimeline<TX, TValue> destination, (int Start, int Length) range, TX destOffset)
         {
             var l = range.Length;
             if (l is <= 0) { return; }
@@ -166,7 +132,7 @@ namespace LivreNoirLibrary.Media
             var (p, v) = _value_list[key];
             for (int i = s; i < e; i++)
             {
-                destination.Set(_operator.Add(p[i], destOffset), v[i]);
+                destination.Set(TOperator.Add(p[i], destOffset), v[i]);
             }
         }
 
@@ -182,7 +148,7 @@ namespace LivreNoirLibrary.Media
                 writer.Write(innerCount);
                 for (var i = 0; i < innerCount; i++)
                 {
-                    _operator.Write(writer, p[i]);
+                    TOperator.Write(writer, p[i]);
                     valueWriter(writer, v[i]);
                 }
             }
@@ -198,7 +164,7 @@ namespace LivreNoirLibrary.Media
                 var innerCount = reader.ReadInt32();
                 for (var j = 0; j < innerCount; j++)
                 {
-                    var pos = _operator.Read(reader);
+                    var pos = TOperator.Read(reader);
                     var value = valueReader(reader);
                     Set(key, pos, value);
                 }
@@ -215,7 +181,7 @@ namespace LivreNoirLibrary.Media
                 var innerCount = reader.ReadInt32();
                 for (var j = 0; j < innerCount; j++)
                 {
-                    var pos = _operator.Read(reader);
+                    var pos = TOperator.Read(reader);
                     var value = valueReader(reader, key, pos);
                     Set(key, pos, value);
                 }

@@ -94,7 +94,7 @@ namespace LivreNoirLibrary.Media
         public static string GetText(ValueOperationMode mode) => _replacer.TryGetValue(mode, out var op) ? op : "";
         public static ValueOperationMode GetMode(string op) => _replacer_i.TryGetValue(op, out var m) ? m : 0;
 
-        public static string GetText(ValueOperationMode mode, Rational value) => mode is ValueOperationMode.None ? "" : $"{GetText(mode)}{value}";
+        public static string GetText<T>(ValueOperationMode mode, T value) => mode is ValueOperationMode.None ? "" : $"{GetText(mode)}{value}";
 
         [GeneratedRegex(@"(?<op>[=+\-*/%<>])?(?<val>.+)")]
         private static partial Regex GR_Replace { get; }
@@ -118,6 +118,13 @@ namespace LivreNoirLibrary.Media
             mode = default;
             value = default;
             return false;
+        }
+
+        public static bool TryParseToDouble(string? text, out ValueOperationMode mode, out double value)
+        {
+            var ret = TryParse(text, out mode, out var v);
+            value = (double)v;
+            return ret;
         }
     }
 }

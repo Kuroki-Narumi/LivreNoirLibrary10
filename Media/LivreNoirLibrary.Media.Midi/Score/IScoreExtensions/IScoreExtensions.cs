@@ -12,7 +12,7 @@ namespace LivreNoirLibrary.Media.Midi
 
             public int GetInitialTempo()
             {
-                if (score.ConductorTrack.Timeline.TryGet(Rational.Zero, Collections.SearchMode.PreviousOrEqual, out _, out var list) && list.Find(obj => obj is TempoEvent) is TempoEvent t)
+                if (score.ConductorTrack.Timeline.TryGetValue(Rational.Zero, Collections.SearchMode.PreviousOrEqual, out _, out var list) && list.Find(obj => obj is TempoEvent) is TempoEvent t)
                 {
                     return t.Value;
                 }

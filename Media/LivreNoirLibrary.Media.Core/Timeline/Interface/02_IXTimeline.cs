@@ -5,10 +5,15 @@ using LivreNoirLibrary.Collections;
 
 namespace LivreNoirLibrary.Media
 {
-    public interface IXTimeline<TX, TValue> : ITimeline<TX, TValue>, IEnumerable<(TX, TValue)>
+    public interface IXTimeline<TX, TValue> : ITimeline<TX>, IEnumerable<(TX, TValue)>
         where TX : struct
     {
-        public IEnumerable<(TX, TValue)> Range(Range<TX> range);
+        /// <summary>
+        /// Returns an enumerable object that enumerates the the position and item pairs within the specified range.
+        /// </summary>
+        /// <param name="range">the range of positions to iterate.</param>
+        /// <returns>an enumerable that can be used to iterate within the specified range.</returns>
+        IEnumerable<(TX, TValue)> Range(Range<TX> range);
 
         IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
     }

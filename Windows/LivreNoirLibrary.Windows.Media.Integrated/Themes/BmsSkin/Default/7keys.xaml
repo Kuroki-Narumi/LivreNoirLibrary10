@@ -1,4 +1,4 @@
-<PlaySkin DisplayName="7keys default" KeyCount="5, 7" Version="1.0" Author="ROKINA" BaseSize="1280, 720" Background="#777">
+<PlaySkin DisplayName="7keys default" KeyCount="5, 7" Version="1.0" Author="ROKINA" BaseSize="1280, 720" Background="#121">
 	<Skin.Options>
 		<ListOption Key="Layout">
 			<Option Value="Separate" IsDefault="true"/>
@@ -30,27 +30,28 @@
 		
 		<Texture Key="background_1p" BasedOn="skin_bm" Rect="0, 0, 320, 32"/>
 		<Texture Key="background_2p" BasedOn="skin_bm" Rect="0, 32, 320, 32"/>
-
-		<Texture Key="note_red" BasedOn="skin_bm" Rect="0, 64, 60, 8"/>
+		<Texture Key="barline" BasedOn="skin_bm" Rect="296, 66, 24, 1"/>
+		
+		<Texture Key="note_red" BasedOn="skin_bm" Rect="0, 64, 60, 6"/>
 		<Texture Key="note_red_long_head" BasedOn="skin_bm" Rect="0, 93, 60, 12"/>
 		<Texture Key="note_red_long_tail" BasedOn="skin_bm" Rect="0, 80, 60, 12"/>
 		<Texture Key="note_red_long_body" BasedOn="skin_bm" Rect="0, 110, 60, 1"/>
 		<Texture Key="note_red_long_body_active" BasedOn="skin_bm" Rect="0, 111, 60, 17" DivY="17" LoopPeriod="0.25"/>
-		<Texture Key="note_red_mine" BasedOn="skin_bm" Rect="0, 72, 60, 8"/>
+		<Texture Key="note_red_mine" BasedOn="skin_bm" Rect="0, 72, 60, 6"/>
 
-		<Texture Key="note_white" BasedOn="skin_bm" Rect="60, 64, 38, 8"/>
+		<Texture Key="note_white" BasedOn="skin_bm" Rect="60, 64, 38, 6"/>
 		<Texture Key="note_white_long_head" BasedOn="skin_bm" Rect="60, 93, 38, 12"/>
 		<Texture Key="note_white_long_tail" BasedOn="skin_bm" Rect="60, 80, 38, 12"/>
 		<Texture Key="note_white_long_body" BasedOn="skin_bm" Rect="60, 110, 38, 1"/>
 		<Texture Key="note_white_long_body_active" BasedOn="skin_bm" Rect="60, 111, 38, 17" DivY="17" LoopPeriod="0.25"/>
-		<Texture Key="note_white_mine" BasedOn="skin_bm" Rect="60, 72, 38, 8"/>
+		<Texture Key="note_white_mine" BasedOn="skin_bm" Rect="60, 72, 38, 6"/>
 
-		<Texture Key="note_blue" BasedOn="skin_bm" Rect="98, 64, 30, 8"/>
+		<Texture Key="note_blue" BasedOn="skin_bm" Rect="98, 64, 30, 6"/>
 		<Texture Key="note_blue_long_head" BasedOn="skin_bm" Rect="98, 93, 30, 12"/>
 		<Texture Key="note_blue_long_tail" BasedOn="skin_bm" Rect="98, 80, 30, 12"/>
 		<Texture Key="note_blue_long_body" BasedOn="skin_bm" Rect="98, 110, 30, 1"/>
 		<Texture Key="note_blue_long_body_active" BasedOn="skin_bm" Rect="98, 111, 30, 17" DivY="17" LoopPeriod="0.25"/>
-		<Texture Key="note_blue_mine" BasedOn="skin_bm" Rect="98, 72, 30, 8"/>
+		<Texture Key="note_blue_mine" BasedOn="skin_bm" Rect="98, 72, 30, 6"/>
 	</Skin.Textures>
 	
 	<Image Texture="background_1p" DestTimer="Scene_Start">
@@ -65,7 +66,7 @@
 	</Bga>
 
 	<!-- 1P -->
-	<NoteArea DestTimer="Scene_Start">
+	<NoteArea DestTimer="Scene_Start" BarLine="barline">
 		<Destination X="$Variables.layout_1p_frame" Y="0" Width="320" Height="512"/>
 		<!-- 1P Scratch -->
 		<NoteLane Lane="6" X="2" Width="60"
@@ -142,7 +143,7 @@
 	</NoteArea>
 	
 	<!-- 2P -->
-	<NoteArea DestTimer="Scene_Start">
+	<NoteArea DestTimer="Scene_Start" BarLine="barline">
 		<Destination X="$Variables.layout_2p_frame" Y="0" Width="320" Height="512"/>
 		<!-- 2P 1 -->
 		<NoteLane Lane="1" X="2" Width="38"

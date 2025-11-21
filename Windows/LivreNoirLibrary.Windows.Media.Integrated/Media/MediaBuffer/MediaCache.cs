@@ -1,7 +1,7 @@
 ﻿using System;
 using System.IO;
 using System.Windows.Media.Imaging;
-using LivreNoirLibrary.Files;
+using LivreNoirLibrary.IO;
 using LivreNoirLibrary.ObjectModel;
 using LivreNoirLibrary.Debug;
 

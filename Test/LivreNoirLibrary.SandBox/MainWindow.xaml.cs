@@ -1,5 +1,5 @@
 ﻿using LivreNoirLibrary.Collections;
-using LivreNoirLibrary.Files;
+using LivreNoirLibrary.IO;
 using LivreNoirLibrary.Media;
 using LivreNoirLibrary.Media.Bms;
 using LivreNoirLibrary.Media.Integrated;
@@ -83,10 +83,10 @@ namespace LivreNoirLibrary.SandBox
                 if (ExtRegs.Audio.IsMatch(path))
                 {
                     var waveData = WaveBuffer.AutoOpen(path);
-                    var peak = waveData.GetPeak()[0];
-                    var rms = waveData.GetRms()[0];
+                    var peak = waveData.GetPeak();
+                    var rms = waveData.GetRms();
                     var lufs = waveData.GetLufs();
-                    Console.WriteLine($"peak={WaveBuffer.Value2Level(peak)}dB, rms={WaveBuffer.Value2Level(rms)}dB, lufs={lufs}dB");
+                    Console.WriteLine($"peak={WaveBuffer.Value2Level(peak):0.###}dB, rms={WaveBuffer.Value2Level(rms):0.###}dB, lufs={lufs:0.###}dB");
                 }
             }
         }
@@ -115,7 +115,7 @@ namespace LivreNoirLibrary.SandBox
             if (_creator.Screen.BmsData is { } data &&
                 this.SaveFileDialog(FileDialogOptions.WithInitialPath(_creator.Screen.BmsPath), Filters.Bms_Save) is { } path)
             {
-                data.Save(path, false, true);
+                data.Root.Save(path, false, true);
             }
         }
 

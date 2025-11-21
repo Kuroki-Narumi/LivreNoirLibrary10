@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Numerics;
-using System.Reflection;
 using System.Runtime.CompilerServices;
 
 namespace LivreNoirLibrary.Numerics
@@ -12,13 +11,12 @@ namespace LivreNoirLibrary.Numerics
         where T : unmanaged, INumber<T>
     {
         private readonly List<FunctionNode> _nodes = [];
-        private LazyNode? _lazyNode;
 
         public void Clear()
         {
             _nodes.Clear();
-            _lazyNode = null;
         }
+
         public bool IsEffective() => _nodes.Count is > 0;
 
         public override string ToString() => $"{GetType()}{{{string.Join(" ", _nodes.Select(s => s.Symbol))}}}";

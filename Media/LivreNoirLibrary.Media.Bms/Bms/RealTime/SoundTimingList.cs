@@ -2,10 +2,11 @@
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
 using LivreNoirLibrary.Collections;
+using LivreNoirLibrary.ObjectModel;
 
 namespace LivreNoirLibrary.Media.Bms
 {
-    public class SoundTimingList
+    public class SoundTimingList : IClear
     {
         private readonly SortedDictionary<int, List<TimingItem>> _list = [];
         private long _first = long.MaxValue;
@@ -24,92 +25,69 @@ namespace LivreNoirLibrary.Media.Bms
 
         public SortedDictionary<int, List<TimingItem>>.Enumerator GetEnumerator() => _list.GetEnumerator();
 
-        public void Load(IBmsData data, TimeCounter counter, Predicate<ISoundNote>? selector = null, long length = 0)
+        public void Load(IBmsViewModel source, Predicate<Note>? selector = null, long length = 0)
         {
             Clear();
-            selector ??= n => n.IsPlayableSound(false, out _);
-            foreach (var (pos, notes) in data.Timeline.EachList())
+            var counter = source.TimeCounter;
+            selector ??= BmsExtensions.IsPlayableSound;
+            foreach (var (pos, notes) in source.CurrentData.Timeline.EnumerateList())
             {
-                var tick = counter.Beat2Tick(data.GetAbsolutePosition(pos));
+                var tick = counter.Beat2Tick(source.GetAbsolutePosition(pos));
                 if (length is not 0 && tick >= length)
                 {
                     break;
                 }
-                foreach (var note in CollectionsMarshal.AsSpan(notes))
+                foreach (var note in notes.AsSpan())
                 {
-                    if (note is ISoundNote s && selector(s))
+                    if (selector(note))
                     {
-                        Add(tick, s);
+                        Add(tick, note);
                     }
                 }
             }
             SetEnd(length);
         }
 
-        public void Load(Selection selection, TimeCounter counter, Predicate<ISoundNote>? selector = null, long length = 0)
+        public void Load(IBmsViewModel source, Selection selection, Predicate<Note>? selector = null, long length = 0)
         {
             Clear();
-            selector ??= n => n.IsPlayableSound(false, out _);
-            foreach (var (_, beat, note) in selection)
+            selector ??= BmsExtensions.IsPlayableSound;
+            var counter = source.TimeCounter;
+            foreach (var (pos, note) in selection)
             {
-                var tick = counter.Beat2Tick(beat);
+                var tick = counter.Beat2Tick(pos);
                 if (length is not 0 && tick >= length)
                 {
                     break;
                 }
-                if (note is ISoundNote s && selector(s))
+                if (selector(note))
                 {
-                    Add(tick, s);
+                    Add(tick, note);
                 }
             }
             SetEnd(length);
         }
 
-        public void Load(IBmsData data, Predicate<ISoundNote>? selector = null, long length = 0)
+        public static SoundTimingList Create(IBmsViewModel source, Predicate<Note>? selector = null, long length = 0)
         {
-            TimeCounter counter = new(data);
-            Load(data, counter, selector, length);
+            SoundTimingList result = new();
+            result.Load(source, selector, length);
+            return result;
         }
 
-        public void Load(IBmsData data, Selection selection, Predicate<ISoundNote>? selector = null, long length = 0)
+        public static SoundTimingList Create(IBmsViewModel source, Selection selection, Predicate<Note>? selector = null, long length = 0)
         {
-            TimeCounter counter = new(data);
-            Load(selection, counter, selector, length);
+            SoundTimingList result = new();
+            result.Load(source, selection, selector, length);
+            return result;
         }
 
-        public static SoundTimingList Create(IBmsData data, TimeCounter counter, Predicate<ISoundNote>? selector = null, long length = 0)
-        {
-            return CreateCore(list => list.Load(data, counter, selector, length));
-        }
-
-        public static SoundTimingList Create(Selection selection, TimeCounter counter, Predicate<ISoundNote>? selector = null, long length = 0)
-        {
-            return CreateCore(list => list.Load(selection, counter, selector, length));
-        }
-
-        public static SoundTimingList Create(IBmsData data, Predicate<ISoundNote>? selector = null, long length = 0)
-        {
-            return CreateCore(list => list.Load(data, selector, length));
-        }
-
-        public static SoundTimingList Create(IBmsData data, Selection selection, Predicate<ISoundNote>? selector = null, long length = 0)
-        {
-            return CreateCore(list => list.Load(data, selection, selector, length));
-        }
-
-        private static SoundTimingList CreateCore(Action<SoundTimingList> addProcess)
-        {
-            SoundTimingList list = new();
-            addProcess(list);
-            return list;
-        }
-
-        public void Add(long ticks, ISoundNote note)
+        public void Add(long ticks, Note note)
         {
             var id = note.Value;
             if (id is > 0)
             {
-                Add(id, ticks, note.Lane is > 0);
+                Add((int)id, ticks, note.IsKey());
             }
         }
 

@@ -6,8 +6,8 @@ namespace LivreNoirLibrary.Collections
         where TIn : allows ref struct
         where TSelf : IBacket<TIn, TSelf>
     {
-        public static abstract TSelf Create(in TIn input);
-        public void SetData(in TIn input);
-        public void ClearData();
+        abstract static TSelf Create(in TIn input);
+        void SetData(in TIn input);
+        void ClearData();
     }
 }

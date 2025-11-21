@@ -7,12 +7,12 @@ namespace LivreNoirLibrary.Text
     public static partial class TextConvert
     {
         [GeneratedRegex(@"[！-～“”]")]
-        static partial Regex Regex_Wide { get; }
+        private static partial Regex Regex_Wide { get; }
         public static string Wide2Half(this string text) => Regex_Wide.Replace(text, m => _wide2half[m.Value]);
 
         public static string Wide2Half_General(this string text) => _wide2half.TryGetValue(text, out var half) ? half : text;
 
-        static readonly Dictionary<string, string> _wide2half = new()
+        private static readonly Dictionary<string, string> _wide2half = new()
         {
             { "！", "!" },
             { "＂", "\"" },

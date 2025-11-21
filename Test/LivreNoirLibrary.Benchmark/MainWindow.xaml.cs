@@ -35,21 +35,6 @@ namespace LivreNoirLibrary.Benchmark
             Console.WriteLine(*(Vector128<int>*)&rect);
 
             return;
-            Console.WriteLine($"sizeof(Color) = {sizeof(Color)}");
-            var color = Color.FromArgb(1, 2, 3, 4);
-            var ptr = (byte*)&color;
-            var span = new Span<byte>(ptr, 20); // ColorContext?
-            var sc1 = *(float*)(ptr + 20);
-            var sc2 = *(float*)(ptr + 24);
-            var sc3 = *(float*)(ptr + 28);
-            var sc4 = *(float*)(ptr + 32);
-            var c1 = ptr[36];
-            var c2 = ptr[37];
-            var c3 = ptr[38];
-            var c4 = ptr[39];
-            Console.WriteLine($"Color = {color}");
-            Console.WriteLine($"Sc = {sc1}, {sc2}, {sc3}, {sc4}");
-            Console.WriteLine($"C = {c1}, {c2}, {c3}, {c4}");
         }
     }
 

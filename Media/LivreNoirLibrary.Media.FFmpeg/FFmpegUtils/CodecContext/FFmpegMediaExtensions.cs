@@ -115,7 +115,7 @@ namespace LivreNoirLibrary.Media
         /// <param name="buffer">Buffer to write.</param>
         /// <param name="pts">The timestamp(in seconds) of the decoded frame.</param>
         /// <returns>
-        /// <see cref="bool">true</see> if written to <paramref name="buffer"/>; otherwise <see cref="bool">false</see>(basically it means the end of stream).
+        /// <see langword="true"/> if written to <paramref name="buffer"/>; otherwise <see langword="false"/>(basically it means the end of stream).
         /// </returns>
         public static bool ReadOneFrame<T>(this T decoder, Span<byte> buffer, out Rational pts, out Rational duration)
             where T : IVideoDecodeContext

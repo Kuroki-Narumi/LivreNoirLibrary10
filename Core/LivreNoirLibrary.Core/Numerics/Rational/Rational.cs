@@ -91,7 +91,7 @@ namespace LivreNoirLibrary.Numerics
         public Rational((long Numerator, long Denominator) tuple) : this(tuple.Numerator, tuple.Denominator) { }
 
         /// <inheritdoc cref="Rational(long, long)"/>
-        /// <param name="check">If <see cref="bool">true</see>, throw an <see cref="OverflowException"/> 
+        /// <param name="check">If <see langword="true"/>, throw an <see cref="OverflowException"/> 
         /// if either value exceeds <see cref="long.MaxValue"/> or <see cref="long.MinValue"/>.</param>
         /// <exception cref="OverflowException"/>
         public Rational(Int128 numerator, Int128 denominator, bool check = true)

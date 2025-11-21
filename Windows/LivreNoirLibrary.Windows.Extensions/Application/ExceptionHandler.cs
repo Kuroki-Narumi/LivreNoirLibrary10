@@ -1,5 +1,4 @@
 using LivreNoirLibrary.Debug;
-using LivreNoirLibrary.Windows;
 using System;
 using System.IO;
 using System.Text;
@@ -7,7 +6,7 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Threading;
 
-namespace LivreNoirLibrary.Wpf
+namespace LivreNoirLibrary.Windows
 {
     public static class ExceptionHandler
     {

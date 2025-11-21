@@ -6,19 +6,19 @@ namespace LivreNoirLibrary.Media.Midi
 {
     public interface INote : IObject
     {
-        public Rational Length { get; }
-        public void QuantizeVelocity(int q);
-        public void QuantizeLength(Rational q);
-        public SortKey GetSortKey(SortKeyType key1, SortKeyType key2, SortKeyType key3, int index);
-        public Rational[] GetMarkersArray(Rational offset = default);
-        public string GetMarkerName(string format);
-        public IEnumerable<(Rational, Note)> EachNote(Rational position);
+        Rational Length { get; }
+        void QuantizeVelocity(int q);
+        void QuantizeLength(Rational q);
+        SortKey GetSortKey(SortKeyType key1, SortKeyType key2, SortKeyType key3, int index);
+        Rational[] GetMarkersArray(Rational offset = default);
+        string GetMarkerName(string format);
+        IEnumerable<(Rational, Note)> EachNote(Rational position);
         internal bool MatchesNumber(SortedSet<int> set);
         internal INote GetEdited(Rational lenQ, Func<Rational, Rational>? lenFunc, int velQ, Func<double, double>? velFunc, Func<double, double>? nnFunc);
 
-        public static int GetQuantized(int val, int q) => q is <= 0 ? val : (val + (q - 1)) / q * q;
+        static int GetQuantized(int val, int q) => q is <= 0 ? val : (val + (q - 1)) / q * q;
 
-        public static Rational GetQuantized(Rational val, Rational q)
+        static Rational GetQuantized(Rational val, Rational q)
         {
             if (q.IsNegativeOrZero())
             {
@@ -28,7 +28,7 @@ namespace LivreNoirLibrary.Media.Midi
             return new((long)v * q.Numerator, q.Denominator);
         }
 
-        public static double GetQuantized(double val, double q)
+        static double GetQuantized(double val, double q)
         {
             if (q is <= 0)
             {
@@ -37,7 +37,7 @@ namespace LivreNoirLibrary.Media.Midi
             return Math.Round(val / q, MidpointRounding.ToEven) * q;
         }
 
-        public static Rational GetEdit(Rational value, Rational q, Func<Rational, Rational>? func)
+        static Rational GetEdit(Rational value, Rational q, Func<Rational, Rational>? func)
         {
             var result = GetQuantized(func is not null ? func(value) : value, q);
             if (result.IsNegative())
@@ -47,9 +47,9 @@ namespace LivreNoirLibrary.Media.Midi
             return result;
         }
 
-        public static int GetIntEdit(int value, int q, Func<double, double>? func) => GetQuantized(func is not null ? func(value).RoundToInt() : value, q);
-        public static byte GetByteEdit(int value, int q, Func<double, double>? func, int min = 0) => Events.Event.GetMax127(GetIntEdit(value, q, func), min);
+        static int GetIntEdit(int value, int q, Func<double, double>? func) => GetQuantized(func is not null ? func(value).RoundToInt() : value, q);
+        static byte GetByteEdit(int value, int q, Func<double, double>? func, int min = 0) => Events.Event.GetMax127(GetIntEdit(value, q, func), min);
 
-        public static string GetLengthText(Rational length) => $"{length.Numerator}-{length.Denominator}";
+        static string GetLengthText(Rational length) => $"{length.Numerator}-{length.Denominator}";
     }
 }

@@ -1,4 +1,5 @@
 ﻿using LivreNoirLibrary.Collections;
+using LivreNoirLibrary.ObjectModel;
 using System;
 using System.Collections.Generic;
 using System.Windows;
@@ -6,7 +7,7 @@ using System.Windows.Media.Imaging;
 
 namespace LivreNoirLibrary.Windows.Media
 {
-    public class MediaCacheCollection
+    public class MediaCacheCollection : IClear
     {
         private readonly Dictionary<string, MediaCache> _data = [];
 

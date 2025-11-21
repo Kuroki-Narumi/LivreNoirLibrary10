@@ -11,7 +11,7 @@ namespace LivreNoirLibrary.Windows.Controls
             Input.InputManager.RegisterHorizontalWheelClassHandler<ScrollViewer>(HandleHorizontalWheel);
         }
 
-        static void HandleHorizontalWheel(object sender, MouseWheelEventArgs e)
+        private static void HandleHorizontalWheel(object sender, MouseWheelEventArgs e)
         {
             (sender as ScrollViewer)?.HandleHorizontalWheel(e);
         }

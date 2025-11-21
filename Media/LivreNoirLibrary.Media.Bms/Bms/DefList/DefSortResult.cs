@@ -1,3 +1,4 @@
+using LivreNoirLibrary.Collections;
 using LivreNoirLibrary.Debug;
 using LivreNoirLibrary.Text;
 using System;
@@ -16,7 +17,7 @@ namespace LivreNoirLibrary.Media.Bms
 
         private enum ContinueMode { None, Equal, Increment }
 
-        internal DefSortResult(DefIndexMapCollection maps, int radix)
+        internal DefSortResult(IDictionary<DefType, DefIndexMap> maps, int radix)
         {
             string GetHeader<T>(T value) where T : Enum => $"#{value.ToString().ToUpper()}";
 
@@ -89,7 +90,7 @@ namespace LivreNoirLibrary.Media.Bms
             {
                 StringBuilder sb = new();
                 sb.AppendLine("DefSort result:");
-                foreach (var (Before, After) in CollectionsMarshal.AsSpan(this))
+                foreach (var (Before, After) in this.AsSpan())
                 {
                     sb.AppendLine($"  {Before} → {After}");
                 }

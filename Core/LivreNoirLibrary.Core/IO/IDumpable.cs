@@ -4,6 +4,6 @@ namespace LivreNoirLibrary.IO
 {
     public interface IDumpable
     {
-        public void Dump(BinaryWriter writer);
+        void Dump(BinaryWriter writer);
     }
 }

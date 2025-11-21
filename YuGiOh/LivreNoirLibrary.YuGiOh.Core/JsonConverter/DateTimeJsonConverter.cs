@@ -23,21 +23,21 @@ namespace LivreNoirLibrary.YuGiOh.Converters
 
     public sealed class DateOnlyJsonConverter : DateTimeJsonConverterBase
     {
-        const string _format = "yyyy-MM-dd";
+        private const string _format = "yyyy-MM-dd";
         public override string Format => _format;
         public static void Write(Utf8JsonWriter writer, DateTime value) => Write(writer, value, _format);
     }
 
     public sealed class DateTimeJsonConverter : DateTimeJsonConverterBase
     {
-        const string _format = "yyyy-MM-dd HH:mm:ss";
+        private const string _format = "yyyy-MM-dd HH:mm:ss";
         public override string Format => _format;
         public static void Write(Utf8JsonWriter writer, DateTime value) => Write(writer, value, _format);
     }
 
     public sealed class NoSecondsDateJsonConverter : DateTimeJsonConverterBase
     {
-        const string _format = "yyyy-MM-dd HH:mm";
+        private const string _format = "yyyy-MM-dd HH:mm";
         public override string Format => _format;
         public static void Write(Utf8JsonWriter writer, DateTime value) => Write(writer, value, _format);
     }

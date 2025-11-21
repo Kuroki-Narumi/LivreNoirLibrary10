@@ -1,9 +1,10 @@
 ﻿using System;
 using LivreNoirLibrary.Collections;
+using LivreNoirLibrary.ObjectModel;
 
 namespace LivreNoirLibrary.Media.Wave
 {
-    public partial class BiQuadFilter
+    public partial class BiQuadFilter : IClear
     {
         private double _a1;
         private double _a2;

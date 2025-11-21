@@ -11,12 +11,11 @@ namespace LivreNoirLibrary.Media.Wave
 
         public int Channels => _source.Channels;
         public int SampleRate => _source.SampleRate;
+        public int WindowWidth { get; }
         public double MaxLevel { get; set; } = 0.0;
         public double MinLevel { get; set; } = -90.0;
-        public double Factor { get => _factor; set => _factor = Math.Clamp(value, 0, 1); }
-        private double _factor = 1.0;
+        public double Factor { get; set => field = Math.Clamp(value, 0, 1); }
 
-        private readonly int _ww;
         private readonly double[][] _fft_result;
 
         public ReadOnlySpan<double> Channel(int channel) => _fft_result[channel];
@@ -25,7 +24,7 @@ namespace LivreNoirLibrary.Media.Wave
         public Spectrum(IWaveBuffer source, int ww = FFT.DefaultWindowWidth)
         {
             _source = source;
-            _ww = ww;
+            WindowWidth = ww;
             var ch = source.Channels;
             _fft_result = new double[ch][];
             var w2 = ww / 2;
@@ -51,9 +50,9 @@ namespace LivreNoirLibrary.Media.Wave
                 range = 1;
             }
             var ch = Channels;
-            var ww = _ww;
+            var ww = WindowWidth;
             var w2 = ww / 2;
-            var factor = _factor;
+            var factor = Factor;
             var hamming = FFT.GetHammingComplex32(ww);
             var src = _source;
             var levelFactor = factor / range;
@@ -62,7 +61,7 @@ namespace LivreNoirLibrary.Media.Wave
             try
             {
                 var buffer = ary.AsSpan(0, ww * 2);
-                for (int c = 0; c < ch; c++)
+                for (var c = 0; c < ch; c++)
                 {
                     src.GetChannelComplex(buffer, c, (int)position);
                     buffer.Multiply(hamming);

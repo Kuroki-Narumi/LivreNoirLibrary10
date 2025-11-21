@@ -44,13 +44,10 @@ namespace LivreNoirLibrary.Media.Midi
         public void ProcessLoad(BinaryReader reader) => ProcessLoad(reader, IOExtensions.LoadInt32, Chid);
         public void Dump(BinaryWriter writer) => ProcessDump(writer, IOExtensions.Dump, Chid);
 
-        public void ExtendToEvent(RawTimeline timeline, long ticksPerWholeNote)
+        public override void Clear()
         {
-            foreach (var (pos, value) in this)
-            {
-                var tick = IObject.GetTick(pos, ticksPerWholeNote);
-                timeline.Add(tick, new Events.Tempo(value));
-            }
+            base.Clear();
+            _seconds_list.Clear();
         }
 
         public void CopyTo(TempoTimeline target, Range<Rational> range, Rational offset)

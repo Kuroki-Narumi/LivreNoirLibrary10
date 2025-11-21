@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Runtime.InteropServices;
 using LivreNoirLibrary.IO;
 using LivreNoirLibrary.Numerics;
+using LivreNoirLibrary.Collections;
 
 namespace LivreNoirLibrary.Media.Midi
 {
@@ -20,10 +20,10 @@ namespace LivreNoirLibrary.Media.Midi
             writer.Write(c);
             for (var i = 0; i < c; i++)
             {
-                _operator.Write(writer, _pos_list[i] - offset);
+                Operator_Rational.Write(writer, _pos_list[i] - offset);
                 var v = _value_list[i];
                 writer.Write(v.Count);
-                foreach (var item in CollectionsMarshal.AsSpan(v))
+                foreach (var item in v.AsSpan())
                 {
                     w.Write(writer, item.Object);
                 }
@@ -38,9 +38,9 @@ namespace LivreNoirLibrary.Media.Midi
             return selection;
         }
 
-        public void Add(SelectionItem item) => Add(item.Position, item);
-        public void Add(Rational position, IObject obj) => Add(position, new SelectionItem(position, obj));
-        public bool Remove(Rational position, IObject obj) => RemoveAll(position, item => ReferenceEquals(item.Object, obj)) is > 0;
+        public void Add(SelectionItem item) => this.Add(item.Position, item);
+        public void Add(Rational position, IObject obj) => this.Add(position, new SelectionItem(position, obj));
+        public bool Remove(Rational position, IObject obj) => this.RemoveAll(position, item => ReferenceEquals(item.Object, obj)) is > 0;
 
         public IEnumerable<(Rational, IObject)> EachItem()
         {
@@ -58,9 +58,9 @@ namespace LivreNoirLibrary.Media.Midi
 
         public void ForEachItem(Action<SelectionItem> action)
         {
-            foreach (var list in CollectionsMarshal.AsSpan(_value_list))
+            foreach (var list in _value_list.AsSpan())
             {
-                foreach (var item in CollectionsMarshal.AsSpan(list))
+                foreach (var item in list.AsSpan())
                 {
                     action(item);
                 }
@@ -71,7 +71,7 @@ namespace LivreNoirLibrary.Media.Midi
 
         public Rational GetFirstBeat()
         {
-            if (IsEmpty())
+            if (IsEmpty)
             {
                 return Rational.Zero;
             }

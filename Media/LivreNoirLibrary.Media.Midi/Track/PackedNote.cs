@@ -1,12 +1,12 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Runtime.InteropServices;
 using System.Buffers;
 using System.Text;
 using LivreNoirLibrary.Media.Midi;
 using LivreNoirLibrary.Numerics;
 using LivreNoirLibrary.IO;
+using LivreNoirLibrary.Collections;
 
 namespace LivreNoirLibrary.Media.BM3
 {
@@ -62,7 +62,7 @@ namespace LivreNoirLibrary.Media.BM3
             {
                 writer.Write(pos);
                 writer.Write(bytes, 1, 1);
-                foreach (var value in CollectionsMarshal.AsSpan(list))
+                foreach (var value in list.AsSpan())
                 {
                     writer.Write(value);
                     writer.Write(bytes, 2, 1);
@@ -75,7 +75,7 @@ namespace LivreNoirLibrary.Media.BM3
 
             // Controls
             writer.Write(bytes, 4, 5);
-            foreach (var (pos, list) in _controls.EachList())
+            foreach (var (pos, list) in _controls.EnumerateList())
             {
                 WriteList(pos, list);
             }
@@ -87,7 +87,7 @@ namespace LivreNoirLibrary.Media.BM3
                 writer.Write(bytes, 8, 1);
                 writer.Write(tid);
                 writer.Write(bytes, 1, 1);
-                foreach (var (pos, list) in timeline.EachList())
+                foreach (var (pos, list) in timeline.EnumerateList())
                 {
                     WriteList(pos, list);
                 }

@@ -2,13 +2,13 @@
 using System.Buffers;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
-using System.Runtime.InteropServices;
 using System.Text;
 using System.Text.Json;
 using LivreNoirLibrary.UnsafeOperations;
 using LivreNoirLibrary.Text;
 using LivreNoirLibrary.Media.Wave;
 using LivreNoirLibrary.Media.FFmpeg;
+using LivreNoirLibrary.Collections;
 
 namespace LivreNoirLibrary.Media.Ogg.Vorbis
 {
@@ -40,7 +40,7 @@ namespace LivreNoirLibrary.Media.Ogg.Vorbis
 
         public bool TryGetValue(string key, [MaybeNullWhen(false)]out string value)
         {
-            foreach (var c in CollectionsMarshal.AsSpan(this))
+            foreach (var c in this.AsSpan())
             {
                 if (c.Key == key)
                 {
@@ -98,7 +98,7 @@ namespace LivreNoirLibrary.Media.Ogg.Vorbis
         public List<VorbisComment> FindAll(string key)
         {
             List<VorbisComment> result = [];
-            foreach (var c in CollectionsMarshal.AsSpan(this))
+            foreach (var c in this.AsSpan())
             {
                 if (c.Key == key)
                 {
@@ -139,7 +139,7 @@ namespace LivreNoirLibrary.Media.Ogg.Vorbis
         public PacketInfo ToPacket()
         {
             var encoding = Encoding.UTF8;
-            var span = CollectionsMarshal.AsSpan(this);
+            var span = this.AsSpan();
             var vendor = Vendor;
             var venLen = vendor.Length;
             // calc required buffer length
@@ -189,7 +189,7 @@ namespace LivreNoirLibrary.Media.Ogg.Vorbis
             writer.WriteStartObject();
             writer.WriteString("vendor", Vendor);
             var i = 0;
-            foreach (var (key, value) in CollectionsMarshal.AsSpan(this))
+            foreach (var (key, value) in this.AsSpan())
             {
                 writer.WriteString($"{++i}", $"{key}={value}");
             }

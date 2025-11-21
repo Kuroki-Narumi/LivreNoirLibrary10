@@ -1,6 +1,6 @@
 using System;
 using System.Collections.Generic;
-using System.Runtime.InteropServices;
+using LivreNoirLibrary.Collections;
 
 namespace LivreNoirLibrary.YuGiOh.Data
 {
@@ -58,7 +58,7 @@ namespace LivreNoirLibrary.YuGiOh.Data
         public List<Card> GetCheckedList()
         {
             List<Card> result = [];
-            foreach (var item in CollectionsMarshal.AsSpan(_list))
+            foreach (var item in _list.AsSpan())
             {
                 if (item.IsChecked)
                 {
@@ -71,7 +71,7 @@ namespace LivreNoirLibrary.YuGiOh.Data
         public HashSet<int> GetCheckedIdList()
         {
             HashSet<int> result = [];
-            foreach (var item in CollectionsMarshal.AsSpan(_list))
+            foreach (var item in _list.AsSpan())
             {
                 if (item.IsChecked)
                 {

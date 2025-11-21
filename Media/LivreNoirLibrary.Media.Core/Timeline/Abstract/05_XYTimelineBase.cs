@@ -2,25 +2,23 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
-using System.Runtime.InteropServices;
 using LivreNoirLibrary.Collections;
-using LivreNoirLibrary.ObjectModel;
 
 namespace LivreNoirLibrary.Media
 {
     public abstract class XYTimelineBase<TY, TX, TValue, TInnerData, TOperator> : TimelineBase<TX, TValue, TOperator>, IXYTimeline<TY, TX, TValue>
         where TY : struct
         where TX : struct
-        where TOperator : IPositionOperator<TX>, new()
+        where TOperator : IPositionOperator<TX>
     {
         protected readonly List<SortedSet<TY>> _key_list = [];
         protected readonly SortedList<TY, (List<TX> Positions, List<TInnerData> Values)> _value_list = [];
 
-        public ReadOnlySpan<TX> GetPositions(TY key) => _value_list.TryGetValue(key, out var pv) ? CollectionsMarshal.AsSpan(pv.Positions) : [];
-        public ReadOnlySpan<TX> GetPositions(TY key, Range<TX> range) => _value_list.TryGetValue(key, out var pv) ? pv.Positions.Range(range, _operator) : [];
+        public ReadOnlySpan<TX> GetPositions(TY key) => _value_list.TryGetValue(key, out var pv) ? pv.Positions.AsSpan() : [];
+        public ReadOnlySpan<TX> GetPositions(TY key, Range<TX> range) => _value_list.TryGetValue(key, out var pv) ? pv.Positions.Range<TX, TX, TOperator>(range) : [];
         public ReadOnlySpan<TY> GetKeyList() => _value_list.Keys.ToArray();
         protected (int Start, int Length) GetPositionIndex(TY key) => _value_list.TryGetValue(key, out var pv) ? (0, pv.Positions.Count) : (0, 0);
-        protected (int Start, int Length) GetPositionIndex(TY key, Range<TX> range) => _value_list.TryGetValue(key, out var pv) ? pv.Positions.IndexRange(range, _operator) : (0, 0);
+        protected (int Start, int Length) GetPositionIndex(TY key, Range<TX> range) => _value_list.TryGetValue(key, out var pv) ? pv.Positions.IndexRange<TX, TX, TOperator>(range) : (0, 0);
 
         public abstract IEnumerator<(TY, TX, TValue)> GetEnumerator();
         public IEnumerable<(TY, TX, TValue)> Range(Range<TX> range) => RangeCore(GetPositionIndex(range));
@@ -77,13 +75,16 @@ namespace LivreNoirLibrary.Media
             }
         }
 
+        protected int FindPreviousOrEqual(List<TX> list, TX position) => list.TrySearch<TX, TX, TOperator>(position, SearchMode.PreviousOrEqual, out var index, out _) ? index : 0;
+        protected int FindNextOrEqual(List<TX> list, TX position) => list.TrySearch<TX, TX, TOperator>(position, SearchMode.NextOrEqual, out var index, out _) ? index : 0;
+
         protected void RemoveRangeUnsafe(TY key, List<TX> p, int s, int e)
         {
             var index = FindPreviousOrEqual(_pos_list, p[s]);
             for (int i = s; i < e; i++)
             {
                 var pos = p[i];
-                while (_operator.Compare(_pos_list[index], pos) is not 0) { index++; }
+                while (TOperator.Compare(_pos_list[index], pos) is not 0) { index++; }
                 RemovePosKey(key, index);
             }
         }
@@ -117,7 +118,7 @@ namespace LivreNoirLibrary.Media
             foreach (var key in keys)
             {
                 var (p, v) = _value_list[key];
-                RemoveKeyPos(key, p, v, p.IndexRange(RangeUtils.Get(posStart, posEnd, true), _operator));
+                RemoveKeyPos(key, p, v, p.IndexRange<TX, TX, TOperator>(RangeUtils.Get(posStart, posEnd, true)));
             }
         }
 
@@ -224,37 +225,6 @@ namespace LivreNoirLibrary.Media
             }
         }
 
-        public sealed override void Move(TX from, TX to)
-        {
-            if (_operator.Compare(from, to) is 0)
-            {
-                return;
-            }
-            if (TryGetIndex(from, out var index))
-            {
-                var keys = _key_list[index];
-                RemoveAt(_pos_list, _key_list, index);
-                foreach (var key in keys)
-                {
-                    var (p, v) = _value_list[key];
-                    if (TryGetIndex(p, from, out index))
-                    {
-                        var value = v[index];
-                        RemoveAt(p, v, index);
-                        if (TryGetIndex(p, to, out index))
-                        {
-                            ReplaceItem(v, index, value);
-                        }
-                        else
-                        {
-                            InsertKeyPos(p, v, ~index, to, value);
-                        }
-                    }
-                }
-                InsertPosKey(keys, to);
-            }
-        }
-
         protected sealed override void MoveCore(Func<TX, TX> converter, (int Start, int Length) range)
         {
             var l = range.Length;
@@ -283,36 +253,9 @@ namespace LivreNoirLibrary.Media
             RemoveRange(_pos_list, _key_list, s, l);
             foreach (var (key, list) in moveList)
             {
-                foreach (var (pos, val) in CollectionsMarshal.AsSpan(list))
+                foreach (var (pos, val) in list.AsSpan())
                 {
                     AddItem(key, pos, val);
-                }
-            }
-        }
-
-        public void Move(TY key, TX from, TX to)
-        {
-            if (_operator.Compare(from, to) is 0)
-            {
-                return;
-            }
-            if (_value_list.TryGetValue(key, out var pv))
-            {
-                var (p, v) = pv;
-                if (TryGetIndex(p, from, out var index))
-                {
-                    var value = v[index];
-                    RemoveAt(p, v, index);
-                    if (TryGetIndex(p, to, out index))
-                    {
-                        ReplaceItem(v, index, value);
-                    }
-                    else
-                    {
-                        InsertKeyPos(p, v, ~index, to, value);
-                    }
-                    RemovePosKey(key, _pos_list.BinarySearch(from));
-                    InsertPosKey(key, to);
                 }
             }
         }
@@ -334,82 +277,17 @@ namespace LivreNoirLibrary.Media
             }
             RemoveRange(p, v, s, l);
             RemoveRangeUnsafe(key, p, s, e);
-            foreach (var (pos, val) in CollectionsMarshal.AsSpan(moveList))
+            foreach (var (pos, val) in moveList.AsSpan())
             {
                 AddItem(key, p, v, pos, val);
             }
         }
 
-        protected sealed override void SlideCore(int start, TX amount, bool add)
-        {
-            var pos = _pos_list[start];
-            var c = _pos_list.Count;
-            for (int i = start; i < c; i++)
-            {
-                var p = _pos_list[i];
-                _pos_list[i] = add ? _operator.Add(p, amount) : _operator.Subtract(p, amount);
-            }
-            foreach (var (_, (p, _)) in _value_list)
-            {
-                var index = FindNextOrEqual(p, pos);
-                c = p.Count;
-                for (int i = index; i < c; i++)
-                {
-                    var pp = p[i];
-                    p[i] = add ? _operator.Add(pp, amount) : _operator.Subtract(pp, amount);
-                }
-            }
-        }
-
-        public void InsertSpace(TY key, TX offset, TX length)
-        {
-            if (_value_list.TryGetValue(key, out var pv))
-            {
-                var p = pv.Positions;
-                var index = FindNextOrEqual(p, offset);
-                SlideCore(key, p, index, length, true);
-            }
-        }
-
-        public void DeleteSpace(TY key, TX offset, TX length)
-        {
-            if (_value_list.TryGetValue(key, out var pv))
-            {
-                var end = _operator.Add(offset, length);
-                RemoveRange(key, RangeUtils.Get(offset, end));
-                var p = pv.Positions;
-                var index = FindNextOrEqual(p, end);
-                SlideCore(key, p, index, length, false);
-            }
-        }
-
-        protected void SlideCore(TY key, List<TX> p, int start, TX amount, bool add)
-        {
-            var c = p.Count;
-            var index = FindPreviousOrEqual(_pos_list, p[start]);
-            List<TX> moveList = [];
-            for (int i = start; i < c; i++)
-            {
-                var pos = p[i];
-                var newPos = add ? _operator.Add(pos, amount) : _operator.Subtract(pos, amount);
-                p[i] = newPos;
-                while (_operator.Compare(_pos_list[index], pos) is not 0) { index++; }
-                RemovePosKey(key, index);
-                moveList.Add(pos);
-            }
-            foreach (var item in CollectionsMarshal.AsSpan(moveList))
-            {
-                InsertPosKey(key, item);
-            }
-        }
-
-        public bool TryGet(TY key, TX position, [MaybeNullWhen(false)] out TInnerData value) => TryGet(key, position, SearchMode.Equal, out _, out value);
-
-        public bool TryGet(TY key, TX position, SearchMode type, out TX actualPosition, [MaybeNullWhen(false)] out TInnerData value)
-            => TryGetCore(key, p => p.FindIndex(position, _operator, type), out actualPosition, out value);
+        public bool TryGetValue(TY key, TX position, SearchMode type, out TX actualPosition, [MaybeNullWhen(false)] out TInnerData value)
+            => TryGetCore(key, p => p.FindIndex<TX, TX, TOperator>(position, type), out actualPosition, out value);
 
         public bool TryGetNearest(TY key, TX position, out TX actualPosition, [MaybeNullWhen(false)] out TInnerData value)
-            => TryGetCore(key, p => p.FindNearestIndex(position, _operator), out actualPosition, out value);
+            => TryGetCore(key, p => p.FindNearestIndex<TX, TX, TOperator>(position), out actualPosition, out value);
 
         protected bool TryGetCore(TY key, Func<List<TX>, int> func, out TX actualPosition, [MaybeNullWhen(false)] out TInnerData value)
         {

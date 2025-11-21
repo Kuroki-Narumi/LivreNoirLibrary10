@@ -88,12 +88,10 @@ namespace LivreNoirLibrary.Windows.Media.Bms.SkinInfo
             var reflected = ObjectPool.Rent<HashSet<string>>();
             try
             {
-                reflected.Clear();
                 return TryResolveReflection(expr, provider, reflected, out value);
             }
             finally
             {
-                reflected.Clear();
                 ObjectPool.Return(reflected);
             }
         }

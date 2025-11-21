@@ -5,6 +5,7 @@ using System.Buffers.Binary;
 using System.Numerics;
 using System.Runtime.CompilerServices;
 using System.Text;
+using LivreNoirLibrary.Text;
 
 namespace LivreNoirLibrary.IO
 {
@@ -27,6 +28,12 @@ namespace LivreNoirLibrary.IO
         }
 
         public static string ReadASCII(this BinaryReader reader, int length) => ReadASCII(reader.BaseStream, length);
+
+        public static string? ReadStringOrNull(this BinaryReader reader)
+        {
+            var value = reader.ReadString();
+            return StringExtensions.GetNullIfEmpty(value);
+        }
 
         public static string ReadChid(this Stream stream) => ReadASCII(stream, ChidLength);
         public static string ReadChid(this BinaryReader reader) => ReadASCII(reader.BaseStream, ChidLength);

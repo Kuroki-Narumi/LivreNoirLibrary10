@@ -5,7 +5,7 @@ namespace LivreNoirLibrary.Media
 {
     public interface IBinaryColorOperation
     {
-        public unsafe void Apply(byte* source, byte* target);
+        unsafe void Apply(byte* source, byte* target);
     }
 
     public readonly unsafe struct ColorOperation_AlphaBlend : IBinaryColorOperation

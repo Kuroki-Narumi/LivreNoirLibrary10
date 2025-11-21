@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Runtime.InteropServices;
+using LivreNoirLibrary.Collections;
 
 namespace LivreNoirLibrary.YuGiOh.Data
 {
@@ -22,7 +22,7 @@ namespace LivreNoirLibrary.YuGiOh.Data
         {
             if (source is not null)
             {
-                foreach (var info in CollectionsMarshal.AsSpan(source))
+                foreach (var info in source.AsSpan())
                 {
                     PackInfo item = new(info);
                     _list.TryAdd(item.ProductId, item);

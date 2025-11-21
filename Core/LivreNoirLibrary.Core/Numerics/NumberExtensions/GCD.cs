@@ -109,7 +109,7 @@ namespace LivreNoirLibrary.Numerics
 
         public interface ITrailingZeroCount<T>
         {
-            public int Tzc(T value);
+            int Tzc(T value);
         }
 
         public readonly struct Tzc_Int128 : ITrailingZeroCount<Int128>

@@ -19,18 +19,18 @@ namespace LivreNoirLibrary.Media.Bms
             var pos = stream.Position;
             try
             {
-                using StreamReader reader = new(stream, Constants.Utf8Encoding, true, -1, true);
+                using StreamReader reader = new(stream, BmsConstants.Utf8Encoding, true, -1, true);
                 text = reader.ReadToEnd();
             }
             catch (DecoderFallbackException)
             {
                 stream.Position = pos;
-                using StreamReader reader = new(stream, Constants.DefaultEncoding, false, -1, true);
+                using StreamReader reader = new(stream, BmsConstants.DefaultEncoding, false, -1, true);
                 text = reader.ReadToEnd();
             }
             RawText = text;
             // #BASE と #LNOBJ は一度だけ適用する
-            var radix = Constants.Base_Default;
+            var radix = BmsConstants.Base_Default;
             ReadOnlySpan<char> span_lnobj = [];
             foreach (var line in text.EnumerateLines())
             {
@@ -129,7 +129,7 @@ namespace LivreNoirLibrary.Media.Bms
                                 {
                                     if (type is >= DefType.Bpm and <= DefType.Speed)
                                     {
-                                        parser.AddConductorDef(type, key, decimal.Parse(value));
+                                        parser.AddConductorDef(type, key, double.Parse(value));
                                     }
                                     else
                                     {
@@ -268,7 +268,7 @@ namespace LivreNoirLibrary.Media.Bms
                 // この時点で長さ7以上が保証される('#' + 小節番号3桁 + チャンネル2桁 + 値1桁以上)
                 // 正規表現から使われる文字種も限定されているので、以下の2行では例外は発生しない。
                 number = int.Parse(line.Slice(1, 3));
-                channel = (Channel)BasedNumber.ParseToInt(line.Slice(4, 2), Constants.Base_Default);
+                channel = BmsUtils.ToChannel(line.Slice(4, 2));
                 // 1文字の区切り文字を挟んだ残りが内容(空文字列になる可能性もある)
                 // フォールバックのため、チャンネルの直後が区切り文字でない(例:'a')場合、それは値に含める。
                 valueSpan = line[(IsDelimiter(line[6]) ? 7 : 6)..];

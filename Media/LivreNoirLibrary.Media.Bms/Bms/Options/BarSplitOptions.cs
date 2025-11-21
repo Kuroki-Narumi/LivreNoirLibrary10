@@ -11,10 +11,11 @@ namespace LivreNoirLibrary.Media.Bms
         private static readonly BarLengthVariable _dummy_vals = new();
 
         internal readonly SortedSet<int> _numbers = [];
-        internal readonly ReversePolishNotation<Rational> _rpn = new();
+        internal readonly ReversePolishNotation<double> _rpn = new();
+        internal readonly BarLengthVariable _rpn_vals = new();
 
         public BarSplitMode Mode { get; set => SetValue(ref field, value, [nameof(Mode_Once), nameof(Mode_Division), nameof(Mode_Interval), nameof(Mode_Expression)]); }
-        public Rational FirstLength { get; set => SetValue(ref field, value); }
+        public double FirstLength { get; set => SetValue(ref field, value); }
         public int MaxCount { get; set => SetValue(ref field, value); } = 4;
         public string? Expression { get; set => SetValue(ref field, value); }
 
@@ -63,7 +64,7 @@ namespace LivreNoirLibrary.Media.Bms
         {
             return
                 _numbers.Count is > 0 &&
-                (FirstLength.IsPositiveThanZero() || _rpn.IsEffective()) &&
+                (FirstLength is > 0 || _rpn.IsEffective()) &&
                 MaxCount is > 1;
         }
 

@@ -1,7 +1,8 @@
+using LivreNoirLibrary.Collections;
+using LivreNoirLibrary.ObjectModel;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
-using System.Runtime.InteropServices;
 
 namespace LivreNoirLibrary.Numerics
 {
@@ -16,18 +17,16 @@ namespace LivreNoirLibrary.Numerics
         private static readonly Exception ExpressionEmptyException = new("the expression is empty.");
         private static ArgumentException ArgumentTooFewException(int actual, int expected) => new($"too few arguments ({actual}, expected:{expected}).");
 
-        public bool TryEvaluate(TryGetFunc<T> variables, out T result, [MaybeNullWhen(true)]out Exception exception)
+        public bool TryGetLazyNode(List<LazyNode<T>> output, [MaybeNullWhen(true)]out Exception exception)
         {
-            result = default;
             if (_nodes.Count is 0)
             {
                 exception = ExpressionEmptyException;
                 return false;
             }
-            List<T> stack = [];
-            foreach (var token in CollectionsMarshal.AsSpan(_nodes))
+            foreach (var token in _nodes.AsSpan())
             {
-                var currentCount = stack.Count;
+                var currentCount = output.Count;
                 var opCount = token.OperandCount;
                 if (currentCount < opCount)
                 {
@@ -35,84 +34,66 @@ namespace LivreNoirLibrary.Numerics
                     return false;
                 }
                 var index = currentCount - opCount;
-                var operands = CollectionsMarshal.AsSpan(stack)[index..];
-                try
-                {
-                    var r = token.Func(operands, variables);
-                    if (r.Exception is { } ex)
-                    {
-                        exception = ex;
-                        return false;
-                    }
-                    stack.RemoveRange(index, opCount);
-                    stack.Add(r.Value);
-                }
-                catch (Exception ex)
-                {
-                    exception = ex;
-                    return false;
-                }
+                var operands = output.AsSpan()[index..];
+                var node = CreateLazyNode(token, operands);
+                output.RemoveRange(index, opCount);
+                output.Add(node);
             }
-            result = stack[^1];
-            return CheckResult(result, out exception);
-        }
-
-        public bool TryGetLazyNode([MaybeNullWhen(false)] out LazyNode node, [MaybeNullWhen(true)]out Exception exception)
-        {
-            node = default;
-            if (_lazyNode is null)
-            {
-                if (_nodes.Count is 0)
-                {
-                    exception = ExpressionEmptyException;
-                    return false;
-                }
-                List<LazyNode> stack = [];
-                foreach (var token in CollectionsMarshal.AsSpan(_nodes))
-                {
-                    var currentCount = stack.Count;
-                    var opCount = token.OperandCount;
-                    if (currentCount < opCount)
-                    {
-                        exception = ArgumentTooFewException(currentCount, opCount);
-                        return false;
-                    }
-                    var index = currentCount - opCount;
-                    var operands = CollectionsMarshal.AsSpan(stack)[index..];
-                    node = CreateLazyNode(token, operands);
-                    stack.RemoveRange(index, opCount);
-                    stack.Add(node);
-                }
-                _lazyNode = stack[^1];
-            }
-            node = _lazyNode;
             exception = null;
             return true;
         }
 
-        public bool TryLazyEvaluate(TryGetFunc<T> variables, out T result, [MaybeNullWhen(true)] out Exception exception)
+        public bool TryEvaluate(TryGetFunc<T> variables, out T result, [MaybeNullWhen(true)] out Exception exception)
         {
             result = default;
-            if (TryGetLazyNode(out var node, out exception))
+            var nodes = ObjectPool.Rent<List<LazyNode<T>>>();
+            try
             {
-                try
+                if (!TryGetLazyNode(nodes, out exception))
                 {
-                    var r = node.Execute(variables);
-                    if (r.Exception is { } ex)
-                    {
-                        exception = ex;
-                        return false;
-                    }
-                    result = r.Value;
+                    return false;
                 }
-                catch (Exception ex)
+                var r = nodes[^1].Execute(variables);
+                if (r.Exception is { } ex)
                 {
                     exception = ex;
                     return false;
                 }
+                result = r.Value;
                 return CheckResult(result, out exception);
             }
-            return false;
+            catch (Exception ex)
+            {
+                exception = ex;
+                return false;
+            }
+            finally
+            {
+                ObjectPool.Return(nodes);
+            }
+        }
+
+        public IEnumerable<T> EvaluateAll(TryGetFunc<T> variables)
+        {
+            var nodes = ObjectPool.Rent<List<LazyNode<T>>>();
+            try
+            {
+                if (TryGetLazyNode(nodes, out _))
+                {
+                    foreach (var node in nodes)
+                    {
+                        var r = node.Execute(variables);
+                        if (r.IsSuccessful && CheckResult(r.Value, out _))
+                        {
+                            yield return r.Value;
+                        }
+                    }
+                }
+            }
+            finally
+            {
+                ObjectPool.Return(nodes);
+            }
         }
     }
 }

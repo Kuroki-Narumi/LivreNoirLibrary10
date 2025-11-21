@@ -1,9 +1,10 @@
-﻿using System;
+﻿using LivreNoirLibrary.ObjectModel;
+using System;
 using System.Collections.Generic;
 
 namespace LivreNoirLibrary.Media.Bms
 {
-    public class BmsTimer
+    public class BmsTimer : IClear
     {
         private readonly Dictionary<TimerId, long> _timers = [];
 

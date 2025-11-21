@@ -1,5 +1,5 @@
 ﻿using LivreNoirLibrary.Collections;
-using LivreNoirLibrary.Files;
+using LivreNoirLibrary.IO;
 using LivreNoirLibrary.Media.BM3;
 using LivreNoirLibrary.Media.Bms;
 using LivreNoirLibrary.Media.Midi;
@@ -11,6 +11,8 @@ using System.Text.RegularExpressions;
 
 namespace LivreNoirLibrary.Media.Integrated
 {
+    using Note = Midi.Note;
+
     public static partial class MediaExtensions
     {
 
@@ -130,25 +132,26 @@ namespace LivreNoirLibrary.Media.Integrated
             }
             // end of track
             var pos = state.Offset;
-            timeline.Add(pos, new MetaText(MetaType.Marker, Media.Constants.IgnoreMarkerName));
+            timeline.Add(pos, new MetaText(MetaType.Marker, Constants.IgnoreMarkerName));
             timeline.Add(pos, new Note() { Number = 0, Velocity = 1, Length = new(1, 64) });
             return (data, filename);
         }
 
-        public static void ExtendConductor(this IScore score, IBmsData target, Rational length)
+        public static void ExtendConductor(this IScore score, IBmsDataUnit target, Rational length)
         {
-            target.ClearBarLength();
-            target.Timeline.RemoveAll((_, item) => item is IConductorNote);
+            var bars = target.BarDefs;
+            bars.Clear();
+            target.Timeline.RemoveAll((_, item) => item.IsConductor());
             TempoTimeline conductor = new(score);
-            target.Bpm = conductor.GetBpm(Rational.Zero);
+            target.MainHeaders.Set(HeaderType.Bpm, conductor.GetBpm(Rational.Zero));
             var enumer = conductor.GetEnumerator();
             var exists = enumer.MoveNext();
-            foreach (var info in score.EachBar(length))
+            foreach (var info in score.EnumerateBars(length))
             {
                 var head = info.Head;
                 var len = info.Length;
                 var number = info.Number;
-                target.SetBarLength(number, len);
+                bars.Set(number, (double)len);
                 var limit = head + len;
                 while (exists)
                 {
@@ -157,19 +160,19 @@ namespace LivreNoirLibrary.Media.Integrated
                     var bpm = TimeUtils.MicroSeconds2Bpm(tempo);
                     if (pos.IsZero())
                     {
-                        target.Bpm = bpm;
+                        target.MainHeaders.Set(HeaderType.Bpm, bpm);
                     }
                     else
                     {
                         BarPosition p = new(number, (pos - head) / len);
-                        target.Timeline.Add(p, new ConductorNote(Channel.Bpm, (decimal)bpm));
+                        target.Timeline.Add(p, new(Channel.Bpm, bpm));
                     }
                     exists = enumer.MoveNext();
                 }
             }
         }
 
-        public static void CreateBmsData(this PackedTrack packed, IBmsData target, string baseName, bool oneOrigin, ref int defId, ref int lane)
+        public static void CreateBmsData(this PackedTrack packed, IBmsDataUnit target, BarLengthCache<double> barCache, string baseName, bool oneOrigin, ref int defId, ref int lane)
         {
             var defSource = packed.Defs;
             var defCount = defSource.Length;
@@ -181,17 +184,18 @@ namespace LivreNoirLibrary.Media.Integrated
                 {
                     name += $".{Exts.Wav}";
                 }
-                defId = target.FindFreeDefIndex(DefType.Wav, defId);
-                target.SetDef(DefType.Wav, defId, $"{baseName}{name}");
+                defId = target.DefLists.FindFreeDefIndex(DefType.Wav, defId);
+                target.DefLists.Set(DefType.Wav, defId, $"{baseName}{name}");
                 defMap.Add(i, defId);
             }
 
             var maxLane = packed.MaxLane;
             var alignToRight = packed.AlignToRight;
+            var timeline = target.Timeline;
             foreach (var (pos, list) in packed.DefTimeline)
             {
                 list.Sort();
-                var bPos = oneOrigin ? target.GetBarPosition(pos + 1) : target.GetBarPosition(pos);
+                var bPos = oneOrigin ? barCache.GetBarPosition((double)pos + 1, target) : barCache.GetBarPosition((double)pos, target);
                 var c = list.Count;
                 for (var l = 0; l < c; l++)
                 {
@@ -201,8 +205,7 @@ namespace LivreNoirLibrary.Media.Integrated
                     {
                         actualLane += maxLane - c;
                     }
-                    SoundNote note = new(-actualLane, id);
-                    target.Timeline.Add(bPos, note);
+                    timeline.Add(bPos, new(Channel.Bgm_Start + (short)actualLane, id));
                 }
             }
             lane += maxLane;

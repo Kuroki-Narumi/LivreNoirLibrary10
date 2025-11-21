@@ -2,14 +2,13 @@
 
 	<PropertyGroup>
 		<TargetFramework>net10.0</TargetFramework>
-		<LangVersion>preview</LangVersion>
 		<ImplicitUsings>disable</ImplicitUsings>
 		<Nullable>enable</Nullable>
 		<AllowUnsafeBlocks>True</AllowUnsafeBlocks>
 		<Authors>Kuroki-Narumi</Authors>
 		<Company>LivreNoir</Company>
 		<RepositoryUrl>https://github.com/Kuroki-Narumi/LivreNoirLibrary10</RepositoryUrl>
-		<RootNamespace>LivreNoirLibrary.Media.Bms</RootNamespace>
+		<RootNamespace>LivreNoirLibrary.Media</RootNamespace>
 		<EmitCompilerGeneratedFiles>true</EmitCompilerGeneratedFiles>
 		<BaseOutputPath>..\..\bin</BaseOutputPath>
 	</PropertyGroup>

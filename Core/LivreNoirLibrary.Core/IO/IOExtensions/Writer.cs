@@ -47,6 +47,18 @@ namespace LivreNoirLibrary.IO
             }
         }
 
+        public static void WriteNullable(this BinaryWriter writer, string? value)
+        {
+            if (string.IsNullOrEmpty(value))
+            {
+                writer.Write7BitEncodedInt(0);
+            }
+            else
+            {
+                writer.Write(value);
+            }
+        }
+
         public static void WriteChid(this BinaryWriter writer, string? value) => WriteChid(writer.BaseStream, value);
 
         public static void WriteWithSize(this BinaryWriter writer, byte[] buffer)

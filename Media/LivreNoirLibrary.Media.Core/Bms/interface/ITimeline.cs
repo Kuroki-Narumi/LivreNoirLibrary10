@@ -1,12 +1,10 @@
-﻿using LivreNoirLibrary.Numerics;
-using System;
-using System.Collections.Generic;
+﻿using LivreNoirLibrary.IO;
 
 namespace LivreNoirLibrary.Media.Bms
 {
-    public interface ITimeline : IXMultiTimeline<BarPosition, INote>
+    public interface ITimeline : IXMultiTimeline<BarPosition, Note>, IDumpable, ILoadable
     {
-        public void InsertBar(int number);
-        public void DeleteBar(int number, int count);
+        void InsertBar(int number, int count);
+        void DeleteBar(int number, int count);
     }
 }

@@ -6,13 +6,12 @@ namespace LivreNoirLibrary.Media.Bms
 {
     public partial class BmsParser
     {
-        public class ParseState(ParseState? parent, BaseData data)
+        public class ParseState(IBmsDataUnit data)
         {
-            public BaseData Data { get; } = data;
-            public ParseState? Parent { get; } = parent;
+            public IBmsDataUnit Data { get; } = data;
 
             public Dictionary<int, int> BgmLaneCounts { get; } = [];
-            public HashSet<int> LastLongNotes { get; } = [];
+            public HashSet<Channel> LastLongNotes { get; } = [];
             public SortedDictionary<Channel, List<(int, string)>> UnProcessedLines { get; } = [];
             public List<string> Comments { get; } = [];
 
@@ -21,14 +20,14 @@ namespace LivreNoirLibrary.Media.Bms
                 UnProcessedLines.GetOrAdd(channel).Add((number, line));
             }
 
-            public int UpdateBgmLane(int number)
+            public Channel UpdateBgmLane(int number)
             {
                 if (!BgmLaneCounts.TryGetValue(number, out var count))
                 {
                     count = 0;
                 }
                 BgmLaneCounts[number] = count + 1;
-                return -count;
+                return Channel.Bgm_Start + (short)count;
             }
         }
     }

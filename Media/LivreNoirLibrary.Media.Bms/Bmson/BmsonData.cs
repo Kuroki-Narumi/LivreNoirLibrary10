@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Text.Json.Serialization;
 using System.IO;
 using LivreNoirLibrary.IO;
-using LivreNoirLibrary.Files;
 using LivreNoirLibrary.Text;
 
 namespace LivreNoirLibrary.Media.Bmson

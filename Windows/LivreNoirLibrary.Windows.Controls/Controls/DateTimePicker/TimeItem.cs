@@ -16,7 +16,7 @@ namespace LivreNoirLibrary.Windows.Controls
             Column = column;
         }
 
-        static TimeItem Create(TimeItemType type, int value) => type switch
+        private static TimeItem Create(TimeItemType type, int value) => type switch
         {
             TimeItemType.Hour => Hour(value),
             _ => Minute(value),
@@ -25,7 +25,7 @@ namespace LivreNoirLibrary.Windows.Controls
         public static TimeItem Hour(int value) => new(value, value % 6, value / 6);
         public static TimeItem Minute(int value) => new(value, value % 10, value / 10);
 
-        static TimeItem[] GetArray(TimeItemType type, int start, int end)
+        private static TimeItem[] GetArray(TimeItemType type, int start, int end)
         {
             var length = end - start + 1;
             if (length <= 0) return [];

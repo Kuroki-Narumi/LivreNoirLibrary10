@@ -1,6 +1,6 @@
 ﻿using System.Diagnostics.CodeAnalysis;
 using NAudio.Wave;
-using LivreNoirLibrary.Files;
+using LivreNoirLibrary.IO;
 
 namespace LivreNoirLibrary.Media
 {

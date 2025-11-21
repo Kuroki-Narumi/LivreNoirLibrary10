@@ -17,9 +17,9 @@ namespace LivreNoirLibrary.Media
 
         public IEnumerable<(long, TValue)> Range(Range<double> range) => RangeCore(GetPositionIndex(_pos_list, range));
 
-        public void CopyTo<T>(T destination, Range<double> srcRange) where T : IXSingleTimeline<long, TValue>
+        public void CopyTo(IXSingleTimeline<long, TValue> destination, Range<double> srcRange) 
             => CopyToCore(destination, GetPositionIndex(_pos_list, srcRange), 0);
-        public void CopyTo<T>(T destination, Range<double> srcRange, long destOffset) where T : IXSingleTimeline<long, TValue>
+        public void CopyTo(IXSingleTimeline<long, TValue> destination, Range<double> srcRange, long destOffset) 
             => CopyToCore(destination, GetPositionIndex(_pos_list, srcRange), destOffset);
 
         protected (int Start, int Length) GetPositionIndex(List<long> list, Range<decimal> range) => list.IndexRange(range);
@@ -29,9 +29,9 @@ namespace LivreNoirLibrary.Media
 
         public IEnumerable<(long, TValue)> Range(Range<decimal> range) => RangeCore(GetPositionIndex(_pos_list, range));
 
-        public void CopyTo<T>(T destination, Range<decimal> srcRange) where T : IXSingleTimeline<long, TValue>
+        public void CopyTo(IXSingleTimeline<long, TValue> destination, Range<decimal> srcRange) 
             => CopyToCore(destination, GetPositionIndex(_pos_list, srcRange), 0);
-        public void CopyTo<T>(T destination, Range<decimal> srcRange, long destOffset) where T : IXSingleTimeline<long, TValue>
+        public void CopyTo(IXSingleTimeline<long, TValue> destination, Range<decimal> srcRange, long destOffset) 
             => CopyToCore(destination, GetPositionIndex(_pos_list, srcRange), destOffset);
 
     }

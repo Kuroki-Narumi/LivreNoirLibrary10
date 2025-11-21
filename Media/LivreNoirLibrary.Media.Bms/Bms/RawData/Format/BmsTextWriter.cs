@@ -3,19 +3,16 @@ using System.Text;
 using System.IO;
 using LivreNoirLibrary.ObjectModel;
 using System.Collections.Concurrent;
-using LivreNoirLibrary.Debug;
 
 namespace LivreNoirLibrary.Media.Bms
 {
-    public class BmsTextWriter(Stream stream, bool indent, int radix, Encoding encoding) : DisposableBase
+    public class BmsTextWriter(Stream stream, bool indent, Encoding encoding) : DisposableBase
     {
         private static readonly ConcurrentDictionary<int, string> _indentPadding = [];
 
         private readonly StreamWriter _writer = new(stream, encoding, -1, true);
         private int _indent = indent ? 0 : -1;
         private bool _beginning_of_line = true;
-
-        public int Radix { get; } = radix;
 
         protected override void DisposeManaged()
         {

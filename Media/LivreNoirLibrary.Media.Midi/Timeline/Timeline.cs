@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Runtime.InteropServices;
 using LivreNoirLibrary.Collections;
 using LivreNoirLibrary.IO;
 using LivreNoirLibrary.Numerics;
@@ -52,7 +51,7 @@ namespace LivreNoirLibrary.Media.Midi
                 var list = lists[i];
                 dups.Clear();
                 remove.Clear();
-                foreach (var obj in CollectionsMarshal.AsSpan(list))
+                foreach (var obj in list.AsSpan())
                 {
                     if (obj is Note n)
                     {

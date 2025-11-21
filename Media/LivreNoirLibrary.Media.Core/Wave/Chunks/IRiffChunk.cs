@@ -11,15 +11,15 @@ namespace LivreNoirLibrary.Media.Wave
         /// <summary>
         /// Riff chunk type represented by four letters.
         /// </summary>
-        public string Chid { get; }
+        string Chid { get; }
         /// <summary>
         /// If the chunk byte size is fixed: return it. If it is indefinite: return 0.
         /// </summary>
-        public uint ByteSize { get; }
-        public void DumpContents(BinaryWriter writer);
-        public void WriteJsonContents(Utf8JsonWriter writer, JsonSerializerOptions options);
+        uint ByteSize { get; }
+        void DumpContents(BinaryWriter writer);
+        void WriteJsonContents(Utf8JsonWriter writer, JsonSerializerOptions options);
 
-        public static void Assert(string chid, uint expectedSize, uint givenSize)
+        static void Assert(string chid, uint expectedSize, uint givenSize)
         {
             if (expectedSize != givenSize)
             {
@@ -30,18 +30,18 @@ namespace LivreNoirLibrary.Media.Wave
 
     public interface IDataChunk : IRiffChunk
     {
-        public byte[] Data { get; set; }
+        byte[] Data { get; set; }
     }
 
     public interface IIdChunk : IRiffChunk
     {
-        public int Id { get; set; }
+        int Id { get; set; }
     }
 
     public interface IRiffChunk<TSelf> : IRiffChunk
         where TSelf : IRiffChunk<TSelf>
     {
-        public static abstract TSelf LoadContents(BinaryReader reader, ref uint length);
+        abstract static TSelf LoadContents(BinaryReader reader, ref uint length);
     }
 
     public static class IRiffChunkExtensions

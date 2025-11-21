@@ -6,7 +6,7 @@ namespace LivreNoirLibrary.Media
 {
     public interface IPositionOperator<T> : IComparer<T, T>
     {
-        public static abstract T Zero { get; }
+        abstract static T Zero { get; }
 
         /// <summary>
         /// 
@@ -16,7 +16,7 @@ namespace LivreNoirLibrary.Media
         /// <returns>
         /// a <typeparamref name="T"/> value of addition <paramref name="x"/> and <paramref name="y"/>.
         /// </returns>
-        public T Add(T x, T y);
+        abstract static T Add(T x, T y);
 
         /// <summary>
         /// 
@@ -26,9 +26,10 @@ namespace LivreNoirLibrary.Media
         /// <returns>
         /// a <typeparamref name="T"/> value of subtraction <paramref name="y"/> from <paramref name="x"/>.
         /// </returns>
-        public T Subtract(T x, T y);
+        abstract static T Subtract(T x, T y);
 
-        public void Write(BinaryWriter writer, T value);
-        public T Read(BinaryReader reader);
+        abstract static void Write(BinaryWriter writer, T value);
+
+        abstract static T Read(BinaryReader reader);
     }
 }

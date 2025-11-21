@@ -1,13 +1,10 @@
 using LivreNoirLibrary.Collections;
-using LivreNoirLibrary.Files;
 using LivreNoirLibrary.Media.Midi;
-using LivreNoirLibrary.Media.Wave;
 using LivreNoirLibrary.Numerics;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Runtime.InteropServices;
 using System.Text;
 
 namespace LivreNoirLibrary.Media.BM3
@@ -27,12 +24,12 @@ namespace LivreNoirLibrary.Media.BM3
         private readonly RationalMultiTimeline<int> _defTimeline = [];
 
         public int TrackId { get; }
-        public ReadOnlySpan<IObject> Objects => CollectionsMarshal.AsSpan(_objects);
-        public ReadOnlySpan<PackedNote> PackedNotes => CollectionsMarshal.AsSpan(_packed);
+        public ReadOnlySpan<IObject> Objects => _objects.AsSpan();
+        public ReadOnlySpan<PackedNote> PackedNotes => _packed.AsSpan();
         public int Id2Channel(int id) => _id2channel[id];
         public int DefCount => _defs.Count;
-        public ReadOnlySpan<string> Defs => CollectionsMarshal.AsSpan(_defs);
-        public IEnumerable<(Rational, List<int>)> DefTimeline => _defTimeline.EachList();
+        public ReadOnlySpan<string> Defs => _defs.AsSpan();
+        public IEnumerable<(Rational, List<int>)> DefTimeline => _defTimeline.EnumerateList();
         public int MaxLane { get; }
         public bool AlignToRight { get; }
 
@@ -161,7 +158,7 @@ namespace LivreNoirLibrary.Media.BM3
             }
 
             // path 1 : register
-            foreach (var (pos, list) in track.Timeline.EachList())
+            foreach (var (pos, list) in track.Timeline.EnumerateList())
             {
                 foreach (var obj in list.Order())
                 {
@@ -261,7 +258,7 @@ namespace LivreNoirLibrary.Media.BM3
             Dictionary<byte[], int> packed2id = new(new ByteArrayEqualityComparer());
             Dictionary<int, List<Rational>> packedPosList = [];
             var ksKeys = ksTimeline.GetKeyList();
-            foreach (var packed in CollectionsMarshal.AsSpan(notes))
+            foreach (var packed in notes.AsSpan())
             {
                 var pos = packed._position;
                 var endPos = packed._endPosition;
@@ -294,7 +291,7 @@ namespace LivreNoirLibrary.Media.BM3
                 {
                     foreach (var ksKey in ksKeys)
                     {
-                        if (ksTimeline.TryGet(ksKey, pPos + pos, SearchMode.PreviousOrEqual, out var acPos, out var kId))
+                        if (ksTimeline.TryGetValue(ksKey, pPos + pos, SearchMode.PreviousOrEqual, out var acPos, out var kId))
                         {
                             var flagKey = (acPos, kId);
                             if (ksFlags.TryGetValue(flagKey, out var flag))
@@ -365,7 +362,7 @@ namespace LivreNoirLibrary.Media.BM3
                     markerNames.Add(name);
 
                     var markerPosition = markers[j];
-                    foreach (var packedPosition in CollectionsMarshal.AsSpan(posList))
+                    foreach (var packedPosition in posList.AsSpan())
                     {
                         markerTimeline.Add(packedPosition + markerPosition, markerId);
                     }
@@ -378,9 +375,9 @@ namespace LivreNoirLibrary.Media.BM3
             var maxLane = 0;
             var defList = _defs;
             var defTimeline = _defTimeline;
-            foreach (var (pos, list) in markerTimeline.EachList())
+            foreach (var (pos, list) in markerTimeline.EnumerateList())
             {
-                foreach (var markerId in CollectionsMarshal.AsSpan(list))
+                foreach (var markerId in list.AsSpan())
                 {
                     var name = markerInfos[markerId];
                     var defId = defList.Count;

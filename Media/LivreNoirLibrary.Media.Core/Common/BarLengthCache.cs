@@ -1,15 +1,20 @@
 using System;
 using System.Collections.Generic;
+using System.Numerics;
 using LivreNoirLibrary.Numerics;
 
 namespace LivreNoirLibrary.Media
 {
-    public class BarLengthCache(int capacity = 999)
+    public abstract class BarLengthCache<T>(int capacity = 999)
+        where T : INumber<T>
     {
         /// <summary>
         /// index: 小節番号 - 1, value: その小節先頭の絶対時刻
         /// </summary>
-        private readonly List<Rational> _cache = new(capacity);
+        private readonly List<T> _cache = new(capacity);
+
+        protected abstract T Convert(Rational value);
+        protected abstract Rational ConvertBack(T value);
 
         /// <summary>
         /// 指定された小節番号以降の時刻キャッシュを削除します。小節長が変更された場合に呼び出す必要があります。
@@ -21,7 +26,7 @@ namespace LivreNoirLibrary.Media
             {
                 _cache.Clear();
             }
-            else
+            else if (number <= _cache.Count)
             {
                 // cacheのインデックスは「実際の小節番号 - 1」
                 number--;
@@ -29,16 +34,16 @@ namespace LivreNoirLibrary.Media
             }
         }
 
-        public Rational GetHead(int number, IBarPositionProvider provider)
+        public T GetHead(int number, IBarLengthProvider<T> provider)
         {
             if (number is <= 0)
             {
-                return Rational.Zero;
+                return T.Zero;
             }
             else
             {
                 var cache = _cache;
-                var pos = cache.Count is 0 ? Rational.Zero : cache[^1];
+                var pos = cache.Count is 0 ? T.Zero : cache[^1];
                 // cache.Count = キャッシュ済みの小節番号
                 for (var num = cache.Count; num < number; num++)
                 {
@@ -50,15 +55,15 @@ namespace LivreNoirLibrary.Media
             }
         }
 
-        public Rational GetAbsolutePosition(BarPosition pos, IBarPositionProvider provider)
+        public T GetAbsolutePosition(BarPosition pos, IBarLengthProvider<T> provider)
         {
-            var head = GetHead(pos.Bar, provider);
-            return head + pos.Offset * provider.GetBarLength(pos.Bar);
+            var (number, offset) = pos;
+            return offset.IsZero() ? GetHead(number, provider) : GetHead(number, provider) + Convert(offset) * provider.GetBarLength(number);
         }
 
-        public BarPosition GetBarPosition(Rational absolutePosition, IBarPositionProvider provider)
+        public BarPosition GetBarPosition(T absolutePosition, IBarLengthProvider<T> provider)
         {
-            if (absolutePosition.IsNegativeOrZero())
+            if (absolutePosition <= T.Zero)
             {
                 return BarPosition.Zero;
             }
@@ -76,7 +81,7 @@ namespace LivreNoirLibrary.Media
             // 実際の小節番号
             var number = index - 1;
             // 指定値の直前の小節線の絶対時刻
-            var total = index is 0 ? Rational.Zero : cache[number];
+            var total = index is 0 ? T.Zero : cache[number];
             absolutePosition -= total;
             var length = provider.GetBarLength(number);
             // 指定値の残り部分が小節長以上である限り
@@ -90,18 +95,19 @@ namespace LivreNoirLibrary.Media
                 length = provider.GetBarLength(number);
                 absolutePosition -= length;
             }
-            return new(number, absolutePosition / length);
+            return new(number, ConvertBack(absolutePosition / length));
         }
+    }
 
-        public IEnumerable<BarInfo> EnumerateBars(int first, int last, IBarPositionProvider provider)
-        {
-            var pos = GetHead(first, provider);
-            for (var i = first; i <= last; i++)
-            {
-                var len = provider.GetBarLength(i);
-                yield return new(i, new(len), pos, len);
-                pos += len;
-            }
-        }
+    public sealed class RationalBarLengthCache : BarLengthCache<Rational>
+    {
+        protected override Rational Convert(Rational value) => value;
+        protected override Rational ConvertBack(Rational value) => value;
+    }
+
+    public sealed class DoubleBarLengthCache : BarLengthCache<double>
+    {
+        protected override double Convert(Rational value) => (double)value;
+        protected override Rational ConvertBack(double value) => Rational.ConvertBySBT(value);
     }
 }

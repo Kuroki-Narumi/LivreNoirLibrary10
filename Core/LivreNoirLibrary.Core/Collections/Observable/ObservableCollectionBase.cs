@@ -26,11 +26,11 @@ namespace LivreNoirLibrary.Collections
         public bool Contains(T item) => _list.Contains(item);
 
         /// <inheritdoc cref="CollectionsMarshal.AsSpan"/>
-        public ReadOnlySpan<T> AsSpan() => CollectionsMarshal.AsSpan(_list);
+        public ReadOnlySpan<T> AsSpan() => _list.AsSpan();
         /// <inheritdoc cref="CollectionsMarshal.AsSpan"/>
-        public ReadOnlySpan<T> AsSpan(int index) => CollectionsMarshal.AsSpan(_list)[index..];
+        public ReadOnlySpan<T> AsSpan(int index) => _list.AsSpan()[index..];
         /// <inheritdoc cref="CollectionsMarshal.AsSpan"/>
-        public ReadOnlySpan<T> AsSpan(int index, int count) => CollectionsMarshal.AsSpan(_list).Slice(index, count);
+        public ReadOnlySpan<T> AsSpan(int index, int count) => _list.AsSpan(index, count);
 
         public void Clear()
         {

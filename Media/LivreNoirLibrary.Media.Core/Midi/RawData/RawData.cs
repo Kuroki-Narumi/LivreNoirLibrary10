@@ -1,11 +1,12 @@
-﻿using System;
+﻿using LivreNoirLibrary.Collections;
+using LivreNoirLibrary.IO;
+using LivreNoirLibrary.Media.Midi.Events;
+using LivreNoirLibrary.Text;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Runtime.InteropServices;
 using System.Text.Json;
-using LivreNoirLibrary.IO;
-using LivreNoirLibrary.Media.Midi.Events;
-using LivreNoirLibrary.Text;
 
 namespace LivreNoirLibrary.Media.Midi
 {
@@ -32,7 +33,7 @@ namespace LivreNoirLibrary.Media.Midi
                 var den = _resolution;
                 if (den != v)
                 {
-                    foreach (var track in CollectionsMarshal.AsSpan(_tracks))
+                    foreach (var track in _tracks.AsSpan())
                     {
                         track.ChangeResolution(v, den);
                     }
@@ -43,7 +44,7 @@ namespace LivreNoirLibrary.Media.Midi
 
         public short TrackCount => _format is 0 ? (short)1 : (short)_tracks.Count;
 
-        public ReadOnlySpan<RawTimeline> Tracks => CollectionsMarshal.AsSpan(_tracks);
+        public ReadOnlySpan<RawTimeline> Tracks => _tracks.AsSpan();
 
         public void EnsureTrackCount(int count)
         {
@@ -62,7 +63,7 @@ namespace LivreNoirLibrary.Media.Midi
             writer.WriteNumber("track_count", _tracks.Count);
             writer.WritePropertyName("tracks");
             writer.WriteStartArray();
-            foreach (var track in CollectionsMarshal.AsSpan(_tracks))
+            foreach (var track in _tracks.AsSpan())
             {
                 writer.WriteStartArray();
                 foreach (var (pos, ev) in track)
@@ -184,7 +185,7 @@ namespace LivreNoirLibrary.Media.Midi
             if (_format is 0)
             {
                 RawTimeline timeline = [];
-                foreach (var track in CollectionsMarshal.AsSpan(_tracks))
+                foreach (var track in _tracks.AsSpan())
                 {
                     track.CopyTo(timeline);
                 }
@@ -192,7 +193,7 @@ namespace LivreNoirLibrary.Media.Midi
             }
             else
             {
-                foreach (var track in CollectionsMarshal.AsSpan(_tracks))
+                foreach (var track in _tracks.AsSpan())
                 {
                     WriteTrack(track, writer);
                 }

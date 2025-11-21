@@ -2,9 +2,14 @@
 
 namespace LivreNoirLibrary.IO
 {
+    public interface ILoadable
+    {
+        void ProcessLoad(BinaryReader reader);
+    }
+
     public interface ILoadable<TSelf>
         where TSelf : ILoadable<TSelf>
     {
-        public static abstract TSelf Load(BinaryReader reader);
+        abstract static TSelf Load(BinaryReader reader);
     }
 }

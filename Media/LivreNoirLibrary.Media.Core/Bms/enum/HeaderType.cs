@@ -7,6 +7,6 @@ namespace LivreNoirLibrary.Media.Bms
         Player, Genre, Title, SubTitle, Artist, SubArtist,
         Bpm, PlayLevel, Difficulty, Rank, Total,
         StageFile, Banner, BackBmp, 
-        Preview, LnObj, LnMode, DefExRank, Comment, Base,
+        Preview, LnObj, LnMode, DefExRank, Comment, VolWav, Base,
     }
 }

@@ -4,12 +4,11 @@ using System.Diagnostics.CodeAnalysis;
 
 namespace LivreNoirLibrary.Media.Bms
 {
-    public interface IDefListCollection
+    public interface IDefListCollection : ICount
     {
-        public bool Contains(DefType type);
-        public bool TryGetList(DefType type, [MaybeNullWhen(false)] out IDefList defList);
-        public IDefList GetOrAddList(DefType type);
-        public bool RemoveList(DefType type);
-        public IEnumerable<(DefType, IDefList)> EnumerateList();
+        bool TryGetList(DefType type, [MaybeNullWhen(false)] out IDefList defList);
+        IDefList GetOrAddList(DefType type);
+        bool RemoveList(DefType type);
+        IEnumerable<(DefType, IDefList)> EnumerateList();
     }
 }

@@ -5,13 +5,13 @@ namespace LivreNoirLibrary.Windows.Controls
 {
     public interface ICanvas
     {
-        public const double DefaultPosition = 0;
-        public const double DefaultSize = 1;
+        const double DefaultPosition = 0;
+        const double DefaultSize = 1;
 
-        public static readonly DependencyProperty ViewportLeftProperty = PropertyUtils.RegisterAttachedTwoWay(typeof(CanvasBase), DefaultPosition, OnViewportLeftChanged);
-        public static readonly DependencyProperty ViewportTopProperty = PropertyUtils.RegisterAttachedTwoWay(typeof(CanvasBase), DefaultPosition, OnViewportTopChanged);
-        public static readonly DependencyProperty ViewportWidthProperty = PropertyUtils.RegisterAttachedTwoWay(typeof(CanvasBase), DefaultSize, OnViewportWidthChanged);
-        public static readonly DependencyProperty ViewportHeightProperty = PropertyUtils.RegisterAttachedTwoWay(typeof(CanvasBase), DefaultSize, OnViewportHeightChanged);
+        static readonly DependencyProperty ViewportLeftProperty = PropertyUtils.RegisterAttachedTwoWay(typeof(CanvasBase), DefaultPosition, OnViewportLeftChanged);
+        static readonly DependencyProperty ViewportTopProperty = PropertyUtils.RegisterAttachedTwoWay(typeof(CanvasBase), DefaultPosition, OnViewportTopChanged);
+        static readonly DependencyProperty ViewportWidthProperty = PropertyUtils.RegisterAttachedTwoWay(typeof(CanvasBase), DefaultSize, OnViewportWidthChanged);
+        static readonly DependencyProperty ViewportHeightProperty = PropertyUtils.RegisterAttachedTwoWay(typeof(CanvasBase), DefaultSize, OnViewportHeightChanged);
         
         private static void OnViewportLeftChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
@@ -49,14 +49,14 @@ namespace LivreNoirLibrary.Windows.Controls
             }
         }
 
-        public double ViewportLeft { get; set; }
-        public double ViewportTop { get; set; }
-        public double ViewportWidth { get; set; }
-        public double ViewportHeight { get; set; }
+        double ViewportLeft { get; set; }
+        double ViewportTop { get; set; }
+        double ViewportWidth { get; set; }
+        double ViewportHeight { get; set; }
 
-        public void ReserveViewportRefresh();
+        void ReserveViewportRefresh();
 
-        public void SetViewport(double x, double y, double width, double height)
+        void SetViewport(double x, double y, double width, double height)
         {
             ViewportLeft = x;
             ViewportTop = y;
@@ -64,7 +64,7 @@ namespace LivreNoirLibrary.Windows.Controls
             ViewportHeight = height;
         }
 
-        public void SetViewport(in Rect rect) => SetViewport(rect.X, rect.Y, rect.Width, rect.Height);
+        void SetViewport(in Rect rect) => SetViewport(rect.X, rect.Y, rect.Width, rect.Height);
 
         void OnViewportLeftChanged(double value) { }
         void OnViewportTopChanged(double value) { }

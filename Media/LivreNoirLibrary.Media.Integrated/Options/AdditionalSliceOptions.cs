@@ -13,7 +13,7 @@ namespace LivreNoirLibrary.Media.Integrated
         public int Detect_Interval { get; set => SetValue(ref field, value); } = 20;
         public bool Detect_ShowGuide { get; set => SetValue(ref field, value); }
 
-        public ISoundNote? Note { get; set => SetValue(ref field, value, [nameof(IsReplaceEnabled), nameof(IsReplaceAllEnabled)]); }
+        public Note? Note { get; set => SetValue(ref field, value, [nameof(IsReplaceEnabled), nameof(IsReplaceAllEnabled)]); }
         public BarPosition NotePosition { get; set => SetValue(ref field, value); }
         public int ReferenceIndex { get; set => SetValue(ref field, value, [nameof(IsReplaceAllEnabled)]); }
         public int DefStart { get; set => SetValue(ref field, value); }
@@ -52,11 +52,11 @@ namespace LivreNoirLibrary.Media.Integrated
             ReplaceMode = SliceReplaceMode.Add;
         }
 
-        public void SetNote(BarPosition position, ISoundNote note)
+        public void SetNote(BarPosition position, Note note)
         {
             Note = note;
             NotePosition = position;
-            ReferenceIndex = note.Value;
+            ReferenceIndex = (int)note.Value;
             if (ReplaceMode is SliceReplaceMode.Add)
             {
                 ReplaceMode = SliceReplaceMode.Selection;

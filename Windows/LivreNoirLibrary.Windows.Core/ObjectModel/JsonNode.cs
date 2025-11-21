@@ -171,7 +171,7 @@ namespace LivreNoirLibrary.ObjectModel
         }
     }
 
-    public class JsonCollectionNode : JsonNode
+    public class JsonCollectionNode : JsonNode, IClear
     {
         public ObservableCollection<JsonNode> Children { get; } = [];
 

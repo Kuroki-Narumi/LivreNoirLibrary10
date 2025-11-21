@@ -10,12 +10,12 @@ namespace LivreNoirLibrary.YuGiOh.Data
 {
     public interface ICardList
     {
-        public bool Contains(Card card);
-        public void Add(Card card);
-        public bool Remove(Card card);
+        bool Contains(Card card);
+        void Add(Card card);
+        bool Remove(Card card);
 
-        public IEnumerable<Card> EnumCards();
-        public void Load(IEnumerable<Card> source);
+        IEnumerable<Card> EnumCards();
+        void Load(IEnumerable<Card> source);
     }
 
     public static class ICardListExtensions

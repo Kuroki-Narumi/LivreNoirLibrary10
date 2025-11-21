@@ -1,9 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.IO;
-using System.Diagnostics.CodeAnalysis;
-using LivreNoirLibrary.IO;
-using LivreNoirLibrary.Numerics;
 using LivreNoirLibrary.Collections;
 
 namespace LivreNoirLibrary.Media
@@ -17,10 +13,9 @@ namespace LivreNoirLibrary.Media
 
         public IEnumerable<(double, TValue)> Range(Range<decimal> range) => RangeCore(GetPositionIndex(_pos_list, range));
 
-        public void CopyTo<T>(T destination, Range<decimal> srcRange) where T : IXSingleTimeline<double, TValue>
+        public void CopyTo(IXSingleTimeline<double, TValue> destination, Range<decimal> srcRange)
             => CopyToCore(destination, GetPositionIndex(_pos_list, srcRange), 0);
-        public void CopyTo<T>(T destination, Range<decimal> srcRange, double destOffset) where T : IXSingleTimeline<double, TValue>
+        public void CopyTo(IXSingleTimeline<double, TValue> destination, Range<decimal> srcRange, double destOffset)
             => CopyToCore(destination, GetPositionIndex(_pos_list, srcRange), destOffset);
-
     }
 }

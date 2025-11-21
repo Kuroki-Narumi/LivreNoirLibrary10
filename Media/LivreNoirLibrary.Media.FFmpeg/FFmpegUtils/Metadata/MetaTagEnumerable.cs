@@ -14,7 +14,7 @@ namespace LivreNoirLibrary.Media.FFmpeg
             _dic = metaTag.GetDictPointer();
         }
 
-        Enumerator GetEnumerator() => new(_dic);
+        private Enumerator GetEnumerator() => new(_dic);
         IEnumerator<MetaTag> IEnumerable<MetaTag>.GetEnumerator() => GetEnumerator();
         IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 

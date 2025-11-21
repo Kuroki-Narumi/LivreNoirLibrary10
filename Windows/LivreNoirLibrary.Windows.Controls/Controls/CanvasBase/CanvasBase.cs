@@ -11,10 +11,10 @@ namespace LivreNoirLibrary.Windows.Controls
         public static readonly DependencyProperty ViewportWidthProperty = ICanvas.ViewportWidthProperty;
         public static readonly DependencyProperty ViewportHeightProperty = ICanvas.ViewportHeightProperty;
 
-        protected double _vx = ICanvas.DefaultPosition;
-        protected double _vy = ICanvas.DefaultPosition;
-        protected double _vw = ICanvas.DefaultSize;
-        protected double _vh = ICanvas.DefaultSize;
+        private double _vx = ICanvas.DefaultPosition;
+        private double _vy = ICanvas.DefaultPosition;
+        private double _vw = ICanvas.DefaultSize;
+        private double _vh = ICanvas.DefaultSize;
         public double ViewportLeft { get => _vx; set => SetValue(ViewportHeightProperty, value); }
         public double ViewportTop { get => _vy; set => SetValue(ViewportWidthProperty, value); }
         public double ViewportWidth { get => _vw; set => SetValue(ViewportWidthProperty, value); }

@@ -49,12 +49,25 @@ namespace LivreNoirLibrary.ObjectModel
             return true;
         }
 
+        public void ClearValues()
+        {
+            _values.Clear();
+        }
+
         public void Load<TDic>(TDic source)
             where TDic : IDictionary<string, T>
         {
             foreach (var (key, value) in source)
             {
                 SetValue(value, key);
+            }
+        }
+
+        public IEnumerable<(string, T)> EnumerateValues()
+        {
+            foreach (var (k, v) in _values)
+            {
+                yield return (k, v);
             }
         }
     }

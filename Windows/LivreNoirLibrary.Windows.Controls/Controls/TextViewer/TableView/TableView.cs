@@ -6,7 +6,6 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
 using System.Windows.Data;
-using System.Runtime.InteropServices;
 using LivreNoirLibrary.Collections;
 
 namespace LivreNoirLibrary.Windows.Controls
@@ -224,7 +223,7 @@ namespace LivreNoirLibrary.Windows.Controls
 
         protected virtual void UpdateDataCells()
         {
-            foreach (var cell in CollectionsMarshal.AsSpan(_cells))
+            foreach (var cell in _cells.AsSpan())
             {
                 cell.Update(_cellStyle, _ratioFixed, _ratioDigits);
             }
@@ -433,7 +432,7 @@ namespace LivreNoirLibrary.Windows.Controls
                 }
             }
             StringBuilder sb = new();
-            foreach (var row in CollectionsMarshal.AsSpan(result))
+            foreach (var row in result.AsSpan())
             {
                 sb.AppendJoin('\t', row);
                 sb.Append('\n');

@@ -4,6 +4,6 @@ namespace LivreNoirLibrary.Windows.Controls
 {
     public interface ICenteringPanelChild
     {
-        public void ReserveFocus();
+        void ReserveFocus();
     }
 }

@@ -3,13 +3,12 @@ using System.Collections.Generic;
 using System.IO;
 using LivreNoirLibrary.IO;
 using LivreNoirLibrary.Collections;
-using LivreNoirLibrary.ObjectModel;
 
 namespace LivreNoirLibrary.Media
 {
     public abstract class XSingleTimelineBase<TX, TValue, TOperator> : XTimelineBase<TX, TValue, TValue, TOperator>, IXSingleTimeline<TX, TValue>
         where TX : struct
-        where TOperator : IPositionOperator<TX>, new()
+        where TOperator : IPositionOperator<TX>
     {
         public sealed override int Count => _value_list.Count;
 
@@ -42,26 +41,23 @@ namespace LivreNoirLibrary.Media
 
         public TValue Get(TX position, SearchMode type, TValue ifnone)
         {
-            if (TryGet(position, type, out _, out var value))
+            if (TryGetValue(position, type, out _, out var value))
             {
                 return value;
             }
             return ifnone;
         }
 
-        public void CopyTo<T>(T destination) where T : IXSingleTimeline<TX, TValue> => CopyToCore(destination, GetPositionIndex(), TOperator.Zero);
-        public void CopyTo<T>(T destination, TX destOffset) where T : IXSingleTimeline<TX, TValue> => CopyToCore(destination, GetPositionIndex(), destOffset);
-        public void CopyTo<T>(T destination, Range<TX> srcRange) where T : IXSingleTimeline<TX, TValue> => CopyToCore(destination, GetPositionIndex(srcRange), TOperator.Zero);
-        public void CopyTo<T>(T destination, Range<TX> srcRange, TX destOffset) where T : IXSingleTimeline<TX, TValue> => CopyToCore(destination, GetPositionIndex(srcRange), destOffset);
+        public void CopyTo(IXSingleTimeline<TX, TValue> destination, TX destOffset) => CopyToCore(destination, GetPositionIndex(), destOffset);
+        public void CopyTo(IXSingleTimeline<TX, TValue> destination, Range<TX> srcRange, TX destOffset) => CopyToCore(destination, GetPositionIndex(srcRange), destOffset);
 
-        protected void CopyToCore<T>(T destination, (int Start, int Length) range, TX destOffset)
-             where T : IXSingleTimeline<TX, TValue>
+        protected void CopyToCore(IXSingleTimeline<TX, TValue> destination, (int Start, int Length) range, TX destOffset)
         {
             var s = range.Start;
             var e = s + range.Length;
-            for (int i = s; i < e; i++)
+            for (var i = s; i < e; i++)
             {
-                destination.Set(_operator.Add(_pos_list[i], destOffset), _value_list[i]);
+                destination.Set(TOperator.Add(_pos_list[i], destOffset), _value_list[i]);
             }
         }
 
@@ -70,9 +66,9 @@ namespace LivreNoirLibrary.Media
             writer.WriteChid(chid);
             var c = _pos_list.Count;
             writer.Write(c);
-            for (int i = 0; i < c; i++)
+            for (var i = 0; i < c; i++)
             {
-                _operator.Write(writer, _pos_list[i]);
+                TOperator.Write(writer, _pos_list[i]);
                 valueWriter(writer, _value_list[i]);
             }
         }
@@ -81,22 +77,10 @@ namespace LivreNoirLibrary.Media
         {
             reader.CheckChid(chid);
             var count = reader.ReadInt32();
-            for (int i = 0; i < count; i++)
+            for (var i = 0; i < count; i++)
             {
-                var pos = _operator.Read(reader);
+                var pos = TOperator.Read(reader);
                 var value = valueReader(reader);
-                Set(pos, value);
-            }
-        }
-
-        public void ProcessLoad(BinaryReader reader, ValueReader<TX, TValue> valueReader, string? chid = null)
-        {
-            reader.CheckChid(chid);
-            var count = reader.ReadInt32();
-            for (int i = 0; i < count; i++)
-            {
-                var pos = _operator.Read(reader);
-                var value = valueReader(reader, pos);
                 Set(pos, value);
             }
         }

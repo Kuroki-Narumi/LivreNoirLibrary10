@@ -5,10 +5,10 @@ namespace LivreNoirLibrary.Media
 {
     public interface IVideoContext
     {
-        public int InputWidth { get; }
-        public int InputHeight { get; }
-        public int OutputWidth { get; }
-        public int OutputHeight { get; }
-        public Rational FrameRate { get; }
+        int InputWidth { get; }
+        int InputHeight { get; }
+        int OutputWidth { get; }
+        int OutputHeight { get; }
+        Rational FrameRate { get; }
     }
 }

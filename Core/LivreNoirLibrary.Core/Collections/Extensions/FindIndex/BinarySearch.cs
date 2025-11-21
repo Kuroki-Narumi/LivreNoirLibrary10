@@ -28,7 +28,7 @@ namespace LivreNoirLibrary.Collections
             return ~min;
         }
 
-        public static int BinarySearch<T1, T2, TComparer>(this IList<T1> list, T2 item, TComparer comparer)
+        public static int BinarySearch<T1, T2, TComparer>(this IList<T1> list, T2 item)
             where TComparer : IComparer<T1, T2>
         {
             var min = 0;
@@ -37,7 +37,7 @@ namespace LivreNoirLibrary.Collections
             {
                 var i = min + (max - min) / 2;
                 var p = list[i];
-                switch (comparer.Compare(list[i], item))
+                switch (TComparer.Compare(list[i], item))
                 {
                     case 0:
                         return i;
@@ -52,10 +52,10 @@ namespace LivreNoirLibrary.Collections
             return ~min;
         }
 
-        public static int BinarySearch<T1, T2, TComparer>(this Span<T1> span, T2 item, TComparer comparer)
-            where TComparer : IComparer<T1, T2> => BinarySearch((ReadOnlySpan<T1>)span, item, comparer);
+        public static int BinarySearch<T1, T2, TComparer>(this Span<T1> span, T2 item)
+            where TComparer : IComparer<T1, T2> => BinarySearch<T1, T2, TComparer>((ReadOnlySpan<T1>)span, item);
 
-        public static int BinarySearch<T1, T2, TComparer>(this ReadOnlySpan<T1> span, T2 item, TComparer comparer)
+        public static int BinarySearch<T1, T2, TComparer>(this ReadOnlySpan<T1> span, T2 item)
             where TComparer : IComparer<T1, T2>
         {
             var min = 0;
@@ -63,7 +63,7 @@ namespace LivreNoirLibrary.Collections
             while (max >= min)
             {
                 var i = min + (max - min) / 2;
-                switch (comparer.Compare(span[i], item))
+                switch (TComparer.Compare(span[i], item))
                 {
                     case 0:
                         return i;

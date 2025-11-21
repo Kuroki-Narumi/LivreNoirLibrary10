@@ -8,7 +8,7 @@ namespace LivreNoirLibrary.Text
 {
     public interface IJsonWriter
     {
-        public void WriteJson(Utf8JsonWriter writer, JsonSerializerOptions options);
+        void WriteJson(Utf8JsonWriter writer, JsonSerializerOptions options);
     }
 
     public static class IJsonWriterExtension

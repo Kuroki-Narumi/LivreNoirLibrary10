@@ -1,30 +1,173 @@
-﻿using LivreNoirLibrary.Files;
+﻿using LivreNoirLibrary.Collections;
 using LivreNoirLibrary.IO;
-using LivreNoirLibrary.Numerics;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Text;
 
 namespace LivreNoirLibrary.Media.Bms
 {
-    public sealed class BmsData : BaseData, IRootData, IStreamLoadable<BmsData>
+    public class BmsData : IBmsData, IFile<BmsData>
     {
-        public ChartType ChartType { get; set; } = ChartType.Beat;
-        public BarLengthCache BarLengthCache { get; } = new();
-
         public static BmsData Create()
         {
             BmsData data = new();
-            data.Headers.SetDefault();
+            data.Root.MainHeaders.SetDefault();
             return data;
         }
 
-        internal override void ClearBarLengthCache(int number) => BarLengthCache.Clear(number);
-        internal override Rational GetHead(int number, IBarPositionProvider provider) => BarLengthCache.GetHead(number, provider);
-        internal override Rational GetAbsolutePosition(BarPosition position, IBarPositionProvider provider) => BarLengthCache.GetAbsolutePosition(position, provider);
-        internal override BarPosition GetBarPosition(Rational absolutePosition, IBarPositionProvider provider) => BarLengthCache.GetBarPosition(absolutePosition, provider);
-        internal override IEnumerable<BarInfo> EnumerateBars(int first, int last, IBarPositionProvider provider) => BarLengthCache.EnumerateBars(first, last, provider);
+        private readonly List<BaseData> _dataList = [new()];
+        private readonly SortedSet<int> _freeDataIndex = [];
+
+        public ChartType ChartType { get; set; }
+        public int LnObj { get; set; }
+
+        public IBmsDataUnit Root => _dataList[0];
+
+        public void Clear()
+        {
+            var list = _dataList;
+            var free = _freeDataIndex;
+            var c = list.Count;
+            list[0].Clear();
+            for (var i = 1; i < c; i++)
+            {
+                list[i].Clear();
+                free.Add(i);
+            }
+            LnObj = 0;
+        }
+
+        public IBmsDataUnit GetBranchData(FlowBranch branch)
+        {
+            var list = _dataList;
+            if (branch == FlowBranch.Root)
+            {
+                return list[0];
+            }
+            var index = branch.DataIndex;
+            if ((uint)(index - 1) <= (uint)(list.Count - 1))
+            {
+                return list[index];
+            }
+            var free = _freeDataIndex;
+            if (free.Count is > 0)
+            {
+                index = free.Min;
+                free.Remove(index);
+            }
+            else
+            {
+                index = list.Count;
+                list.Add(new());
+            }
+            branch.DataIndex = index;
+            return list[index];
+        }
+
+        public bool TryGetBranch(FlowAddress address, [MaybeNullWhen(false)]out IFlowContainer flow, [MaybeNullWhen(false)]out IBmsDataUnit data)
+        {
+            var span = address.AsSpan();
+            data = Root;
+            var max = (span.Length / 2) * 2;
+            flow = null;
+            for (var i = 0; i < max; i++)
+            {
+                var flows = data.Flows;
+                var flowIndex = span[i];
+                if (flowIndex >= flows.Count)
+                {
+                    return false;
+                }
+                flow = flows[flowIndex];
+                i++;
+                if (flow.GetBranch(span[i]) is { } branch)
+                {
+                    data = GetBranchData(branch);
+                }
+                else
+                {
+                    return false;
+                }
+            }
+            return data is not null;
+        }
+
+        public bool InsulateBranch(FlowBranch branch)
+        {
+            var list = _dataList;
+            var index = branch.DataIndex;
+            if ((uint)(index - 1) <= (uint)(list.Count - 1))
+            {
+                list[index].Clear();
+                branch.DataIndex = -1;
+                _freeDataIndex.Add(index);
+                return true;
+            }
+            return false;
+        }
+
+        public void WriteHistoryData(Stream stream)
+        {
+            using BinaryWriter writer = new(stream, Encoding.UTF8, true);
+
+            writer.Write((byte)ChartType);
+            writer.Write((short)LnObj);
+
+            var free = _freeDataIndex;
+            writer.Write(free.Count);
+            foreach (var i in free)
+            {
+                writer.Write(i);
+            }
+
+            var list = _dataList;
+            writer.Write(list.Count);
+            foreach (var data in list.AsSpan())
+            {
+                data.DumpMain(writer);
+            }
+        }
+
+        public void ReadHistoryData(Stream stream)
+        {
+            using BinaryReader reader = new(stream, Encoding.UTF8, true);
+
+            ChartType = (ChartType)reader.ReadByte();
+            LnObj = reader.ReadInt16();
+
+            var free = _freeDataIndex;
+            free.Clear();
+            var count = reader.ReadInt32();
+            for (var i = 0; i < count; i++)
+            {
+                free.Add(reader.ReadInt32());
+            }
+
+            var list = _dataList;
+            count = reader.ReadInt32();
+            for (var i = 0; i < count; i++)
+            {
+                BaseData data;
+                if (i >= list.Count)
+                {
+                    data = new();
+                    list.Add(data);
+                }
+                else
+                {
+                    data = list[i];
+                }
+                data.LoadMain(reader, this);
+            }
+            var c = list.Count;
+            for (var i = count; i < c; i++)
+            {
+                list[i].Clear();
+                free.Add(i);
+            }
+        }
 
         public static BmsData Open(string path)
         {
@@ -36,7 +179,7 @@ namespace LivreNoirLibrary.Media.Bms
             }
             else if (ExtRegs.Bmg.IsMatch(ext))
             {
-                data.ChartType = ChartType.Generic;
+                data.ChartType = ChartType.Keyboard;
             }
             else
             {
@@ -45,52 +188,21 @@ namespace LivreNoirLibrary.Media.Bms
             return data;
         }
 
-        public string GetExtension() => ChartType switch
-        {
-            ChartType.Popn => Filters.Pms_Save,
-            ChartType.Generic => Filters.Bmg_Save,
-            _ => Filters.Bms_Save,
-        };
-
         public static BmsData Load(Stream stream)
         {
-            BmsParser parser = new();
-            return parser.Parse(stream);
+            BmsData result = new();
+            BmsParser parser = new(result);
+            parser.Parse(stream);
+            return result;
         }
 
+        public void Save(string path) => Save(path, false, true);
         public void Save(string path, bool indent = false, bool ext = true) => General.Save(path, s => Dump(s, indent), ext ? ExtRegs.BeMusic : null, Exts.Bms);
 
         public void Dump(Stream stream, bool indent)
         {
             BmsFormatter formatter = new(this);
-            formatter.Format(stream, this, indent);
-        }
-
-        public BmsData Clone()
-        {
-            using MemoryStream ms = new();
-            WriteHistoryBuffer(ms);
-            BmsData data = new() { ChartType = ChartType };
-            data.LoadHistoryBuffer(ms);
-            return data;
-        }
-
-        public void WriteHistoryBuffer(Stream stream)
-        {
-            using (BinaryWriter writer = new(stream, Encoding.UTF8, true))
-            {
-                stream.SetLength(0);
-                DumpMain(writer);
-            }
-            stream.Position = 0;
-        }
-
-        public void LoadHistoryBuffer(Stream stream)
-        {
-            BarLengthCache.Clear();
-            stream.Position = 0;
-            using BinaryReader reader = new(stream, Encoding.UTF8, true);
-            LoadMain(reader);
+            formatter.Format(stream, null, indent);
         }
     }
 }

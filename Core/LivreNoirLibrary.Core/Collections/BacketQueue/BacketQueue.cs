@@ -1,19 +1,19 @@
 using System;
-using System.Collections.Generic;
 using System.Threading;
-using System.Buffers;
 using System.Diagnostics.CodeAnalysis;
 using LivreNoirLibrary.ObjectModel;
 
 namespace LivreNoirLibrary.Collections
 {
-    public class BacketQueue<TIn, TOut>(int capacity, bool autoResize = false) : DisposableBase
+    public class BacketQueue<TIn, TOut>(int capacity, bool autoResize = false) : DisposableBase, IClear
         where TIn : allows ref struct
         where TOut : IBacket<TIn, TOut>
     {
+        private static readonly bool _isDisposable = typeof(TOut).IsAssignableTo(typeof(IDisposable));
+
         protected override void DisposeUnmanaged()
         {
-            if (typeof(TOut).IsAssignableTo(typeof(IDisposable)))
+            if (_isDisposable)
             {
                 foreach (var item in _array)
                 {
@@ -34,8 +34,8 @@ namespace LivreNoirLibrary.Collections
         public bool AutoResize { get; set; } = autoResize;
 
         public int Count => _size;
-        public bool IsEmpty() => _size is <= 0;
-        public bool IsFull() => _size >= _array.Length;
+        public bool IsEmpty => _size is <= 0;
+        public bool IsFull => _size >= _array.Length;
 
         public void Clear()
         {
@@ -100,7 +100,7 @@ namespace LivreNoirLibrary.Collections
         protected virtual void OnCapacityChanged(TOut[] newArray) { }
 
         /// <returns>
-        /// <see cref="bool">true</see> if item discarded.
+        /// <see langword="true"/> if item discarded.
         /// </returns>
         public bool Enqueue(in TIn item)
         {

@@ -1,23 +1,21 @@
 ﻿using System;
-using System.Collections.Generic;
-using LivreNoirLibrary.Numerics;
+using System.Diagnostics.CodeAnalysis;
+using System.IO;
+using LivreNoirLibrary.ObjectModel;
 
 namespace LivreNoirLibrary.Media.Bms
 {
-    public interface IBmsData : IBarPositionProvider
+    public interface IBmsData : IClear
     {
-        public IBmsData? Parent { get; }
-        public IHeaderCollection Headers { get; }
-        public IDefListCollection DefLists { get; }
-        public ITimeline Timeline { get; }
+        ChartType ChartType { get; set; }
+        int LnObj { get; set; }
+        IBmsDataUnit Root { get; }
 
-        public IEnumerable<IBmsData> EachData();
+        IBmsDataUnit GetBranchData(FlowBranch branch);
+        bool TryGetBranch(FlowAddress address, [MaybeNullWhen(false)] out IFlowContainer flow, [MaybeNullWhen(false)] out IBmsDataUnit data);
+        bool InsulateBranch(FlowBranch branch);
 
-        public Rational GetHead(int number);
-        public IEnumerable<BarInfo> EnumerateBars(int first, int last);
-        public void ClearBarLength();
-        public void SetBarLength(int number, Rational value);
-        public void InsertBar(int number, Rational value);
-        public void DeleteBar(int number, int count);
+        void WriteHistoryData(Stream stream);
+        void ReadHistoryData(Stream stream);
     }
 }

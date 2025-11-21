@@ -123,17 +123,16 @@ namespace LivreNoirLibrary.Numerics
             where T : INumber<T>
             where TConv : ISbtConverter<T>
         {
-            var negative = false;
-            if (T.IsNegative(value))
+            var sign = T.Sign(value);
+            if (sign is < 0)
             {
-                negative = true;
                 value = -value;
             }
             var intPart = conv.Convert2Int128(value);
             var decPart = value - conv.Convert2T(intPart);
             if (T.IsZero(decPart))
             {
-                return new((long)(negative ? -intPart : intPart));
+                return new((long)(intPart * sign));
             }
 
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -156,7 +155,7 @@ namespace LivreNoirLibrary.Numerics
             Rational Return((Int128 num, Int128 den) tuple)
             {
                 var n = (long)(intPart * tuple.den + tuple.num);
-                return new(true, negative ? -n : n, (long)tuple.den);
+                return new(true, n * sign, (long)tuple.den);
             }
 
             /*

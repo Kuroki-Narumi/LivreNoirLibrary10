@@ -7,7 +7,7 @@ namespace LivreNoirLibrary.ObjectModel
         /// <summary>
         /// Gets the history of operations or events associated with the current instance.
         /// </summary>
-        public IHistory History { get; }
+        IHistory History { get; }
     }
 
     /// <summary>
@@ -20,20 +20,20 @@ namespace LivreNoirLibrary.ObjectModel
         /// Gets current state as <typeparamref name="T"/> for the undo history.
         /// </summary>
         /// <returns>A history data that stored to the undo stack.</returns>
-        public T GetHistoryData();
+        T GetHistoryData();
 
         /// <summary>
         /// Determine if the history needs to be updated.
         /// </summary>
         /// <param name="historyData">A history data that stored to the undo stack.</param>
-        /// <returns><see cref="bool">true</see> if the current state changed from given <paramref name="historyData"/>.</returns>
-        public bool NeedsUpdateHistory(T historyData);
+        /// <returns><see langword="true"/> if the current state changed from given <paramref name="historyData"/>.</returns>
+        bool NeedsUpdateHistory(T historyData);
 
         /// <summary>
         /// Apply the operations from history.
         /// </summary>
         /// <param name="historyData">A history data that stored to the undo stack.</param>
-        public void ApplyHistory(T historyData);
+        void ApplyHistory(T historyData);
     }
 
     public static class IHistoryOwnerExtensions

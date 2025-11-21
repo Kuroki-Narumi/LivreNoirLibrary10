@@ -9,7 +9,7 @@ using LivreNoirLibrary.ObjectModel;
 
 namespace LivreNoirLibrary.Collections
 {
-    public unsafe class UnmanagedArray<T> : DisposableBase, IEnumerable<T>
+    public unsafe class UnmanagedArray<T> : DisposableBase, IEnumerable<T>, IClear
         where T : unmanaged
     {
         public static readonly bool IsHardwareAccelerated = Vector<T>.IsSupported;
@@ -33,6 +33,7 @@ namespace LivreNoirLibrary.Collections
         }
 
         public ref T this[Index index] => ref this[index.GetOffset(_size)];
+        public Span<T> this[Range range] => Slice(range);
 
         public UnmanagedArray(int size = 0) => Realloc(size);
         public UnmanagedArray(ReadOnlySpan<T> source)
@@ -84,22 +85,24 @@ namespace LivreNoirLibrary.Collections
             throw new ArgumentOutOfRangeException(nameof(requiredSize), $"size must be > 0. (given:{requiredSize})");
         }
 
-        public void EnsureSize(int size, bool clear = true)
+        public bool EnsureSize(int size, bool clear = true)
         {
             if (size > _size)
             {
                 ReallocToPowerOf2(size, clear);
+                return true;
             }
+            return false;
         }
 
         public Span<T> AsSpan() => _ptr is null ? [] : new(_ptr, _size);
         public Span<T> AsSpan(int index) => Slice(index);
         public Span<T> AsSpan(Index index) => Slice(index);
         public Span<T> AsSpan(int index, int count) => Slice(index, count);
-        public Span<T> AsSpan(Index index, int count) => Slice(index, count);
+        public Span<T> AsSpan(Range range) => Slice(range);
 
         public static implicit operator Span<T>(UnmanagedArray<T> obj) => obj.AsSpan();
-        public static implicit operator ReadOnlySpan<T>(UnmanagedArray<T> obj) => (ReadOnlySpan<T>)obj.AsSpan();
+        public static implicit operator ReadOnlySpan<T>(UnmanagedArray<T> obj) => obj.AsSpan();
 
         private Span<T> ThrowOutOfRange(int index)
         {
@@ -141,7 +144,11 @@ namespace LivreNoirLibrary.Collections
             }
         }
 
-        public Span<T> Slice(Index index, int count) => Slice(index.GetOffset(_size), count);
+        public Span<T> Slice(Range range)
+        {
+            var (offset, length) = range.GetOffsetAndLength(_size);
+            return Slice(offset, length);
+        }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private static void ClearCore(T* ptr, int count)
@@ -184,7 +191,11 @@ namespace LivreNoirLibrary.Collections
             }
         }
 
-        public void Clear(Index index, int count) => Clear(index.GetOffset(_size), count);
+        public void Clear(Range range)
+        {
+            var (offset, length) = range.GetOffsetAndLength(_size);
+            Clear(offset, length);
+        }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private static void FillCore(T value, T* ptr, int count)
@@ -240,7 +251,7 @@ namespace LivreNoirLibrary.Collections
 
         public void CopyFrom(List<T> source)
         {
-            var span = CollectionsMarshal.AsSpan(source);
+            var span = source.AsSpan();
             fixed (T* src = span)
             {
                 CopyFromCore(_ptr, src, Math.Min(_size, source.Count));
@@ -267,7 +278,7 @@ namespace LivreNoirLibrary.Collections
         {
             if ((uint)index < (uint)_size)
             {
-                var span = CollectionsMarshal.AsSpan(source);
+                var span = source.AsSpan();
                 fixed (T* src = span)
                 {
                     CopyFromCore(_ptr + index, src, Math.Min(_size - index, source.Count));

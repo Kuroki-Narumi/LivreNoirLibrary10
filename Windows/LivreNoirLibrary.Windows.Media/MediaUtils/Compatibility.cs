@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Diagnostics.CodeAnalysis;
 using System.Windows.Media.Imaging;
-using LivreNoirLibrary.Files;
+using LivreNoirLibrary.IO;
 
 namespace LivreNoirLibrary.Windows.Media
 {

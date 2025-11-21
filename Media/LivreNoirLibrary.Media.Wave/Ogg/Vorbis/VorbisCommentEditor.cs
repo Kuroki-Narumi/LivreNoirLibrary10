@@ -5,7 +5,7 @@ using LivreNoirLibrary.ObjectModel;
 
 namespace LivreNoirLibrary.Media.Ogg.Vorbis
 {
-    public class VorbisCommentEditor : DisposableBase
+    public class VorbisCommentEditor : DisposableBase, IClear
     {
         private IdHeader _id_header;
         private readonly VorbisCommentList _comments = [];

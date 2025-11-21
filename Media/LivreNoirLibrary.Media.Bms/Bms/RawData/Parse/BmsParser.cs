@@ -1,59 +1,42 @@
 ﻿using LivreNoirLibrary.Collections;
-using LivreNoirLibrary.Numerics;
 using LivreNoirLibrary.Text;
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Runtime.InteropServices;
 using System.Text;
 
 namespace LivreNoirLibrary.Media.Bms
 {
-    public partial class BmsParser : IBmsParser
+    public partial class BmsParser(IBmsData root) : IBmsParser
     {
-        public ulong DenominatorLimit { get; set; } = Rational.DefaultConvertDenLimit;
-
         private int _radix;
         private long _lnObj;
 
-        private readonly ParseState _root;
+        private readonly IBmsData _root = root;
         private readonly StringBuilder _comments = new();
-        private ParseState _current;
+        private ParseState _current = null!;
 
         private readonly List<ParseState> _states = [];
-        private readonly Dictionary<DefType, Dictionary<long, decimal>> _conductor_defs = [];
+        private readonly Dictionary<DefType, Dictionary<long, double>> _conductorDefs = [];
 
-        private readonly Stack<(ParseState, FlowContainer?)> _stack = [];
-        private FlowContainer? _currentFlow;
-
-        public BmsParser()
-        {
-            BmsData rootData = new();
-            _current = _root = new(null, rootData);
-        }
-
-        public BmsData Parse(Stream stream)
-        {
-            IBmsParserExtensions.Parse(this, stream);
-            return (_root.Data as BmsData)!;
-        }
+        private readonly Stack<(ParseState, IFlowContainer?)> _stack = [];
+        private IFlowContainer? _currentFlow;
+        private bool _insideBranch;
 
         void IBmsParser.InitializeParse(int radix, long lnObj)
         {
             _radix = radix;
             _lnObj = lnObj;
 
-            _root.Data.Clear();
+            _root.Clear();
+            _root.LnObj = (int)lnObj;
             _comments.Clear();
             _stack.Clear();
             _states.Clear();
-            _current = _root;
+            _current = new(_root.Root);
+            _states.Add(_current);
             _currentFlow = null;
-
-            if (lnObj is not 0)
-            {
-                _root.Data.LnObj = (int)lnObj;
-            }
+            _insideBranch = false;
         }
 
         void IBmsParser.OnLineProcessed(int lineNumber)
@@ -68,11 +51,10 @@ namespace LivreNoirLibrary.Media.Bms
 
         void IBmsParser.FinalizeParse()
         {
-            foreach (var state in CollectionsMarshal.AsSpan(_states))
+            foreach (var state in _states.AsSpan())
             {
                 ResolveConductor(state);
             }
-            ResolveConductor(_root);
         }
 
         void IBmsParser.AddComment(ReadOnlySpan<char> line)
@@ -86,33 +68,23 @@ namespace LivreNoirLibrary.Media.Bms
 
         void IBmsParser.AddHeader(ReadOnlySpan<char> key, ReadOnlySpan<char> value)
         {
-            var headers = _current.Data.Headers;
+            var data = _current.Data;
             if (Enum.TryParse<HeaderType>(key, true, out var type))
             {
                 if (type is HeaderType.Base or HeaderType.LnObj)
                 {
                     return;
                 }
-                if (BmsUtils.IsNumberHeader(type))
-                {
-                    if (double.TryParse(value, out var result))
-                    {
-                        headers.Set(type, result);
-                    }
-                }
-                else
-                {
-                    headers.Set(type, value.ToString());
-                }
+                data.MainHeaders[type] = value.ToString();
             }
             else
             {
-                headers.SubHeaders.Add((key.ToString(), value.ToString()));
+                data.SubHeaders.Add(new(key.ToString(), value.ToString()));
             }
         }
 
         void IBmsParser.AddDef(DefType type, long key, string value) => _current.Data.DefLists.Set(type, (int)key, value);
-        void IBmsParser.AddConductorDef(DefType type, long key, decimal value) => _conductor_defs.GetOrAdd(type)[key] = value;
+        void IBmsParser.AddConductorDef(DefType type, long key, double value) => _conductorDefs.GetOrAdd(type)[key] = value;
 
         void IBmsParser.AddBar(int number, Channel channel, ReadOnlySpan<char> value)
         {
@@ -121,7 +93,7 @@ namespace LivreNoirLibrary.Media.Bms
             {
                 if (double.TryParse(value, out var v))
                 {
-                    current.Data.Bars.Set(number, Rational.ConvertBySBT(v, DenominatorLimit));
+                    current.Data.BarDefs.Set(number, v);
                 }
             }
             else if (channel.IsConductor())
@@ -131,49 +103,42 @@ namespace LivreNoirLibrary.Media.Bms
             else
             {
                 var tl = current.Data.Timeline;
-                Func<long, INote> noteCreator;
+                Func<long, Note> noteCreator;
                 if (channel is Channel.Bpm_Base)
                 {
-                    noteCreator = v => new ConductorNote(Channel.Bpm, v);
+                    noteCreator = v => new(Channel.Bpm, v);
                 }
                 else if (channel is Channel.Bgm)
                 {
-                    var lane = current.UpdateBgmLane(number);
-                    noteCreator = v => new SoundNote(lane, v, NoteType.Normal);
+                    channel = current.UpdateBgmLane(number);
+                    noteCreator = v => new(channel, v);
                 }
-                else if (BmsUtils.IsSoundChannel(channel))
+                else if (channel.IsWavDef())
                 {
-                    var type = channel.GetNoteType();
-                    var lane = channel.GetLane();
-                    if (channel.IsLong())
+                    var (lane, type) = channel.Split();
+                    noteCreator = type switch
                     {
-                        noteCreator = v =>
+                        NoteType.LongEnd => v =>
                         {
                             if (_current.LastLongNotes.Remove(lane))
                             {
-                                return new SoundNote(lane, v, NoteType.LongEnd);
+                                return new(lane, NoteType.LongEnd, v);
                             }
                             else
                             {
                                 _current.LastLongNotes.Add(lane);
-                                return new SoundNote(lane, v);
+                                return new(lane, v);
                             }
-                        };
-                    }
-                    else if (channel.IsVisible())
-                    {
-                        noteCreator = v => v == _lnObj ? new SoundNote(lane, 0, NoteType.LongEnd) : new SoundNote(lane, v);
-                    }
-                    else
-                    {
-                        noteCreator = v => new SoundNote(lane, v, type);
-                    }
+                        },
+                        NoteType.Normal => v => v == _lnObj ? new(lane, NoteType.LongEnd, 0) : new(lane, v),
+                        _ => v => new(lane, type, v),
+                    };
                 }
                 else
                 {
-                    noteCreator = v => new MetaNote(channel, v);
+                    noteCreator = v => new(channel, v);
                 }
-                var radix = channel.IsHex() ? 16 : _radix;
+                var radix = channel.IsHexValue() ? 16 : _radix;
                 var den = value.Length / 2;
                 for (var i = 0; i < den; i++)
                 {
@@ -191,7 +156,7 @@ namespace LivreNoirLibrary.Media.Bms
             state.Data.Note = string.Join(Environment.NewLine, state.Comments);
             var radix = _radix;
             var tl = state.Data.Timeline;
-            var defs = _conductor_defs;
+            var defs = _conductorDefs;
             foreach (var (channel, list) in state.UnProcessedLines)
             {
                 var defType = channel switch
@@ -206,7 +171,7 @@ namespace LivreNoirLibrary.Media.Bms
                 {
                     continue;
                 }
-                foreach (var (number, line) in CollectionsMarshal.AsSpan(list))
+                foreach (var (number, line) in list.AsSpan())
                 {
                     var span = line.AsSpan();
                     var den = span.Length / 2;
@@ -214,7 +179,7 @@ namespace LivreNoirLibrary.Media.Bms
                     {
                         if (BasedNumber.TryParseToLong(span[..2], radix, out var key) && def.TryGetValue(key, out var value))
                         {
-                            tl.Add(new(number, i, den), new ConductorNote(channel, value));
+                            tl.Add(new(number, i, den), new Note(channel, value));
                         }
                         span = span[2..];
                     }
@@ -222,46 +187,92 @@ namespace LivreNoirLibrary.Media.Bms
             }
         }
 
-        private void StartFlow(FlowType type, int max, bool isFixed)
+        private void ApplyComment(INoteObject obj)
         {
-            FlowContainer flow = new(type, max, isFixed, _current.Data);
             if (_comments.Length is > 0)
             {
-                flow.Note = _comments.ToString();
+                obj.Note = _comments.ToString();
                 _comments.Clear();
             }
-            _current.Data.Flows.Add(flow);
+        }
+
+        private void StartFlow(FlowType type, int max, bool isFixed)
+        {
+            // 想定される構造
+            // 01 #RANDOM 3
+            // 02   #IF 1
+            // 03     (contents)
+            // 04   #ENDIF
+            // 06 #RANDOM 3
+            // - 05 #ENDRANDOMが省略されている
+            //   - 現在のフローを終了する
+            if (_currentFlow is not null)
+            {
+                EndFlow();
+            }
+            var data = _current.Data;
+            var flow = new FlowContainer
+            {
+                Type = type,
+                Max = max,
+                IsFixed = isFixed
+            };
+            ApplyComment(flow);
+            data.Flows.Add(flow);
             _currentFlow = flow;
+            _insideBranch = false;
         }
 
         private void EndFlow()
         {
-            EndBranch();
+            // 想定される構造
+            // 06 #RANDOM 3
+            // 07  #IF 2
+            // 08    (contents)
+            // 10 #ENDRANDOM
+            // - 09 #ENDIFが省略されている
+            //   - 現在のブランチでフローが開始していないにも関わらず、フローを終了しようとしている
+            if (_currentFlow is null)
+            {
+                EndBranch();
+            }
             _currentFlow = null;
         }
 
         private void StartBranch(int value)
         {
-            if (_currentFlow is null)
+            // 想定される構造
+            // 01 #RANDOM 3
+            // 02   #IF 1
+            // 03     (contents)
+            // 04   #IF 2
+            // 05     (contents)
+            // 07   #ENDIF
+            // 08 #ENDRANDOM
+            // - 04 フローの外でブランチが開始している
+            //   - ブランチの終了タグが省略されているとみなして、現在のブランチを終了
+            if (_insideBranch)
             {
                 EndBranch();
             }
-            _stack.Push((_current, _currentFlow));
-            var branch = _currentFlow?.GetOrCreateBranch(value) ?? new(_current.Data, value);
-            _current = new(_current, branch);
-            if (_currentFlow is not null)
+            if (_currentFlow is { } flow)
             {
+                _stack.Push((_current, flow));
+                var branch = flow.GetOrAddBranch(value);
+                var data = _root.GetBranchData(branch);
+                ApplyComment(branch);
+                _current = new(data);
                 _states.Add(_current);
+                _currentFlow = null;
+                _insideBranch = true;
             }
-            _currentFlow = null;
         }
 
         private void EndBranch()
         {
-            if (_current.Data is FlowBranch && _stack.TryPop(out var item))
+            if (_insideBranch && _stack.TryPop(out var item))
             {
-                _current = item.Item1;
-                _currentFlow = item.Item2;
+                (_current, _currentFlow) = item;
             }
         }
 
@@ -269,14 +280,14 @@ namespace LivreNoirLibrary.Media.Bms
         void IBmsParser.StartSetRandom(int value) => StartFlow(FlowType.Random, value, true);
         void IBmsParser.StartIf(int value) => StartBranch(value);
         void IBmsParser.StartElseIf(int value) => StartBranch(value);
-        void IBmsParser.StartElse() => StartBranch(Constants.DefaultCondition);
+        void IBmsParser.StartElse() => StartBranch(BmsConstants.DefaultCondition);
         void IBmsParser.EndIf() => EndBranch();
         void IBmsParser.EndRandom() => EndFlow();
 
         void IBmsParser.StartSwitch(int value) => StartFlow(FlowType.Switch, value, false);
         void IBmsParser.StartSetSwitch(int value) => StartFlow(FlowType.Switch, value, true);
         void IBmsParser.StartCase(int value) => StartBranch(value);
-        void IBmsParser.StartDefault() => StartBranch(Constants.DefaultCondition);
+        void IBmsParser.StartDefault() => StartBranch(BmsConstants.DefaultCondition);
         void IBmsParser.Skip() => EndBranch();
         void IBmsParser.EndSwitch() => EndFlow();
     }

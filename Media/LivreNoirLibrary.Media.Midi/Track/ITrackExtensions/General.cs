@@ -1,7 +1,7 @@
 using LivreNoirLibrary.Numerics;
 using System;
 using System.Collections.Generic;
-using System.Runtime.InteropServices;
+using LivreNoirLibrary.Collections;
 
 namespace LivreNoirLibrary.Media.Midi
 {
@@ -56,7 +56,7 @@ namespace LivreNoirLibrary.Media.Midi
             source.Timeline.CopyTo(timeline);
             foreach (var (_, list) in groups)
             {
-                foreach (var ng in CollectionsMarshal.AsSpan(list))
+                foreach (var ng in list.AsSpan())
                 {
                     track.AutoGroup(ng);
                 }

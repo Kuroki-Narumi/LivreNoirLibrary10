@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
-using System.Runtime.InteropServices;
 using LivreNoirLibrary.Collections;
 
 namespace LivreNoirLibrary.YuGiOh.Data
@@ -28,6 +27,7 @@ namespace LivreNoirLibrary.YuGiOh.Data
             base.NotifyCollectionReset();
         }
 
+        /// <inheritdoc cref="ICollection{T}.Clear"/>
         public new void Clear()
         {
             ClearWithoutNotify();
@@ -88,7 +88,7 @@ namespace LivreNoirLibrary.YuGiOh.Data
         private void UpdateCount()
         {
             _sum_count = 0;
-            foreach (var item in CollectionsMarshal.AsSpan(_list))
+            foreach (var item in _list.AsSpan())
             {
                 _sum_count += item.Count;
             }

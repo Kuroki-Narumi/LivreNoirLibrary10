@@ -179,14 +179,14 @@ namespace LivreNoirLibrary.Collections
         public void Shuffle() => Shuffle(Random.Shared);
         public void Shuffle(Random random)
         {
-            random.Shuffle(CollectionsMarshal.AsSpan(_list));
+            random.Shuffle(_list.AsSpan());
             NotifyCollectionReset();
         }
 
         public void Shuffle(int index, int count) => Shuffle(index, count, Random.Shared);
         public void Shuffle(int index, int count, Random random)
         {
-            random.Shuffle(CollectionsMarshal.AsSpan(_list).Slice(index, count));
+            random.Shuffle(_list.AsSpan(index, count));
             NotifyCollectionReset();
         }
 

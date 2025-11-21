@@ -2,10 +2,9 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
-using System.Text;
 using System.Text.Json;
-using System.Runtime.InteropServices;
 using System.Diagnostics.CodeAnalysis;
+using LivreNoirLibrary.Collections;
 
 namespace LivreNoirLibrary.Media.Wave.Chunks
 {
@@ -51,7 +50,7 @@ namespace LivreNoirLibrary.Media.Wave.Chunks
         public override void DumpContents(BinaryWriter writer)
         {
             FourLetterHeader.Write(writer, Type);
-            foreach (var chunk in CollectionsMarshal.AsSpan(SubChunks))
+            foreach (var chunk in SubChunks.AsSpan())
             {
                 writer.WriteRiffChunk(chunk);
             }
@@ -62,7 +61,7 @@ namespace LivreNoirLibrary.Media.Wave.Chunks
             writer.WriteString("type", Type);
             writer.WritePropertyName("chunks");
             writer.WriteStartArray();
-            foreach (var chunk in CollectionsMarshal.AsSpan(SubChunks))
+            foreach (var chunk in SubChunks.AsSpan())
             {
                 chunk.WriteJson(writer, options);
             }
@@ -83,7 +82,7 @@ namespace LivreNoirLibrary.Media.Wave.Chunks
             where T : DataChunk
         {
             var nocheck = string.IsNullOrEmpty(chid);
-            foreach (var c in CollectionsMarshal.AsSpan(SubChunks))
+            foreach (var c in SubChunks.AsSpan())
             {
                 if (c is T ch && (nocheck || c.Chid == chid))
                 {
@@ -99,7 +98,7 @@ namespace LivreNoirLibrary.Media.Wave.Chunks
             where T : DataChunk, IIdChunk
         {
             var nocheck = string.IsNullOrEmpty(chid);
-            foreach (var c in CollectionsMarshal.AsSpan(SubChunks))
+            foreach (var c in SubChunks.AsSpan())
             {
                 if (c is T ch && ch.Id == id && (nocheck || c.Chid == chid))
                 {
@@ -116,7 +115,7 @@ namespace LivreNoirLibrary.Media.Wave.Chunks
         {
             var nocheck = string.IsNullOrEmpty(chid);
             List<T> result = [];
-            foreach (var c in CollectionsMarshal.AsSpan(SubChunks))
+            foreach (var c in SubChunks.AsSpan())
             {
                 if (c is T ch && (nocheck || c.Chid == chid))
                 {
@@ -131,7 +130,7 @@ namespace LivreNoirLibrary.Media.Wave.Chunks
         {
             var nocheck = string.IsNullOrEmpty(chid);
             List<T> result = [];
-            foreach (var c in CollectionsMarshal.AsSpan(SubChunks))
+            foreach (var c in SubChunks.AsSpan())
             {
                 if (c is T ch && ch.Id == id && (nocheck || c.Chid == chid))
                 {

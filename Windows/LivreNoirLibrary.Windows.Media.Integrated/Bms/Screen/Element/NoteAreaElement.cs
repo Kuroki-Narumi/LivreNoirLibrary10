@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Runtime.InteropServices;
 using System.Windows;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
@@ -9,6 +8,7 @@ using LivreNoirLibrary.Media.Bms;
 using LivreNoirLibrary.Windows.Media;
 using LivreNoirLibrary.Windows.Media.Bms;
 using LivreNoirLibrary.Windows.Media.Bms.SkinInfo;
+using LivreNoirLibrary.Collections;
 
 namespace LivreNoirLibrary.Windows.Controls.Bms
 {
@@ -84,11 +84,17 @@ namespace LivreNoirLibrary.Windows.Controls.Bms
                 var lanes = _lanes;
                 ViewModel.Update(timer, absoluteTick);
                 var areaHeight = ViewModel.DestHeight;
-                foreach (var child in CollectionsMarshal.AsSpan(source._visible))
+                var barTexture = _barLine;
+                var width = Width;
+                foreach (var bar in source.BarLines)
+                {
+                    AddChild(barTexture, 0, width, bar.RelativePosition);
+                }
+                foreach (var child in source.VisibleChildren)
                 {
                     if (lanes.TryGetValue(child.Lane, out var laneInfo))
                     {
-                        var textureName =
+                        var textureData =
                             child.IsMine ? laneInfo.Mine :
                             (child.VisualLength is > 0) ? laneInfo.LongHead :
                             laneInfo.Note;
@@ -96,7 +102,7 @@ namespace LivreNoirLibrary.Windows.Controls.Bms
                         {
                             AddChild(child.IsActive ? laneInfo.ActiveLongBody : laneInfo.LongBody, laneInfo.X, laneInfo.Width, child.CurrentOffset, child.VisualLength);
                         }
-                        AddChild(textureName, laneInfo.X, laneInfo.Width, child.CurrentOffset);
+                        AddChild(textureData, laneInfo.X, laneInfo.Width, child.CurrentOffset);
                         if (child.VisualLength is > 0)
                         {
                             AddChild(laneInfo.LongTail, laneInfo.X, laneInfo.Width, child.CurrentOffset + child.VisualLength);
@@ -125,7 +131,7 @@ namespace LivreNoirLibrary.Windows.Controls.Bms
         protected override void OnRender(DrawingContext drawingContext)
         {
             base.OnRender(drawingContext);
-            foreach (var (bitmap, rect) in CollectionsMarshal.AsSpan(_children))
+            foreach (var (bitmap, rect) in _children.AsSpan())
             {
                 drawingContext.DrawImage(bitmap, rect);
             }

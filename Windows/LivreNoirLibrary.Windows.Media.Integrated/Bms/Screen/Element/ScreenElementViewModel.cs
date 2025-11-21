@@ -10,7 +10,7 @@ using LivreNoirLibrary.Windows.Media.Bms.SkinInfo;
 
 namespace LivreNoirLibrary.Windows.Controls.Bms
 {
-    public class ScreenElementViewModel : ObservableObjectBase
+    public class ScreenElementViewModel : ObservableObjectBase, IClear
     {
         public double DestX { get; set => SetValue(ref field, value); }
         public double DestY { get; set => SetValue(ref field, value); }
@@ -138,7 +138,7 @@ namespace LivreNoirLibrary.Windows.Controls.Bms
                     }
                     relativeTick = (loopEnd - loopStart) % interval + loopStart;
                 }
-                if (_slopes.TryGet(relativeTick, SearchMode.PreviousOrEqual, out _, out var slope))
+                if (_slopes.TryGetValue(relativeTick, SearchMode.PreviousOrEqual, out _, out var slope))
                 {
                     var x = _dest_x.Get(relativeTick, slope);
                     var y = _dest_y.Get(relativeTick, slope);

@@ -1,7 +1,5 @@
 ﻿using LivreNoirLibrary.Collections;
 using LivreNoirLibrary.Debug;
-using LivreNoirLibrary.Files;
-using LivreNoirLibrary.Media.BM3;
 using LivreNoirLibrary.Media.Bms;
 using LivreNoirLibrary.Media.Midi;
 using LivreNoirLibrary.Media.Wave;
@@ -9,11 +7,11 @@ using LivreNoirLibrary.Numerics;
 using LivreNoirLibrary.ObjectModel;
 using LivreNoirLibrary.Text;
 using System;
+using System.Buffers;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
-using System.Runtime.InteropServices;
 using System.Threading;
 
 namespace LivreNoirLibrary.Media.Integrated
@@ -54,7 +52,7 @@ namespace LivreNoirLibrary.Media.Integrated
                     }
                 }
             }
-            foreach (var (pos, obj) in CollectionsMarshal.AsSpan(remove))
+            foreach (var (pos, obj) in remove.AsSpan())
             {
                 timeline.Remove(pos, obj);
             }
@@ -91,7 +89,7 @@ namespace LivreNoirLibrary.Media.Integrated
         }
 
         public static bool MarkByTrack<T>(this T wave, IScore source, int trackIndex, SliceOptions options)
-            where T : IWaveBuffer, IMarker
+            where T : IWaveBuffer, IMarkerContainer
         {
             ExConsole.Write($"Mark By Track: {options.GetJsonText(false)}");
             var track = source.GetTrack(trackIndex);
@@ -149,7 +147,7 @@ namespace LivreNoirLibrary.Media.Integrated
         }
 
         public static void SaveSliced_General<T>(T source, string directory, string baseName, SliceOptions options, ProgressReporter? p, CancellationToken c)
-            where T : IWaveBuffer, IMarker
+            where T : IWaveBuffer, IMarkerContainer
         {
             var cLeft = WaveBuffer.Level2Value(options.CutoffLeft);
             var mLeft = (int)options.MarginLeft;
@@ -168,9 +166,9 @@ namespace LivreNoirLibrary.Media.Integrated
             }
             var rate = source.SampleRate;
             var ch = source.Channels;
-            double i = 0;
-            double max = source.GetSliceCount();
-            using UnmanagedSharedBuffer<float> buffer = new(rate * ch);
+            var i = 0d;
+            var max = (double)source.GetSliceCount();
+            using UnmanagedArray<float> buffer = new();
             foreach (var slice in source.EachSlice())
             {
                 c.ThrowIfCancellationRequested();
@@ -180,7 +178,9 @@ namespace LivreNoirLibrary.Media.Integrated
                 {
                     var t0 = Stopwatch.GetTimestamp();
                     var (srcSlice, ro, rl, ao, al) = source.SliceWithCutSilence((int)slice.Offset, (int)slice.Length, cLeft, cRight, mLeft, mRight);
-                    buffer.SetData(srcSlice);
+                    var bufferSize = srcSlice.Length;
+                    buffer.EnsureSize(bufferSize + crossfade * ch, false);
+                    buffer.CopyFrom(srcSlice);
                     if (needCrossfade)
                     {
                         WaveBuffer.FadeIn(buffer, 0, crossfade, fiFactor, ch);
@@ -192,7 +192,9 @@ namespace LivreNoirLibrary.Media.Integrated
                     }
                     if (crossfade is > 0 && ao + al >= ro + rl)
                     {
-                        buffer.Append(source.Slice(ao + al, crossfade));
+                        var crossSpan = source.Slice(ao + al, crossfade);
+                        buffer.CopyFrom(crossSpan, bufferSize);
+                        bufferSize += crossfade * ch;
                         WaveBuffer.FadeOut(buffer, -crossfade, crossfade, foFactor, ch);
                         needCrossfade = true;
                     }
@@ -203,7 +205,7 @@ namespace LivreNoirLibrary.Media.Integrated
                     using (WaveEncoder encoder = new($"{fullPath}.wav", new(rate, ch, format)))
                     {
                         encoder.Software = nameof(LivreNoirLibrary);
-                        encoder.Write(buffer);
+                        encoder.Write(buffer.Slice(0, bufferSize));
                     }
                     ExConsole.Write($"Saved slice: {fullPath} in {Stopwatch.GetElapsedTime(t0).TotalMilliseconds:F3}ms");
                 }
@@ -217,14 +219,14 @@ namespace LivreNoirLibrary.Media.Integrated
         }
 
         public static void SaveSliced<T>(this T wave, string directory, string baseFilename, SliceOptions options, ProgressReporter? p = null, CancellationToken c = default)
-            where T : IWaveBuffer, IMarker
+            where T : IWaveBuffer, IMarkerContainer
         {
             var baseName = PackUtils.Format(options.BasenameWithDefault, baseFilename);
             SaveSliced_General(wave, directory, baseName, options, p, c);
         }
 
         public static void SaveSliced<T>(this T wave, string directory, string baseFilename, IScore score, int trackId, SliceOptions options, ProgressReporter? p = null, CancellationToken c = default)
-            where T : IWaveBuffer, IMarker
+            where T : IWaveBuffer, IMarkerContainer
         {
             var baseName = PackFormat(options.BasenameWithDefault, baseFilename, score, trackId);
             SaveSliced_General(wave, directory, baseName, options, p, c);

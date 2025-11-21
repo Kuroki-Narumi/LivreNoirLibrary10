@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Runtime.InteropServices;
 using System.Threading;
 using System.Windows.Data;
+using LivreNoirLibrary.Collections;
 
 namespace LivreNoirLibrary.Windows.Controls
 {
@@ -16,7 +16,7 @@ namespace LivreNoirLibrary.Windows.Controls
         {
             lock (_lock)
             {
-                foreach (var selector in CollectionsMarshal.AsSpan(_list))
+                foreach (var selector in _list.AsSpan())
                 {
                     if (_used.Add(selector))
                     {

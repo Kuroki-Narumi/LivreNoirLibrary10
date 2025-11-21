@@ -15,7 +15,7 @@ namespace LivreNoirLibrary.Media.FFmpeg
             _type = type;
         }
 
-        Enumerator GetEnumerator() => new(_context, _type);
+        private Enumerator GetEnumerator() => new(_context, _type);
         IEnumerator<StreamInfo> IEnumerable<StreamInfo>.GetEnumerator() => GetEnumerator();
         IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 

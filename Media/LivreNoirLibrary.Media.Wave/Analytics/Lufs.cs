@@ -1,14 +1,14 @@
-﻿using LivreNoirLibrary.Collections;
-using LivreNoirLibrary.ObjectModel;
-using System;
+﻿using System;
 using System.Collections.Generic;
-using System.Reflection.Metadata;
-using System.Runtime.InteropServices;
+using LivreNoirLibrary.Collections;
+using LivreNoirLibrary.ObjectModel;
 
 namespace LivreNoirLibrary.Media.Wave
 {
     public partial class Analysis
     {
+        private static readonly float[] _ms_factors = [1, 1, 1, 1.41421356f, 1.41421356f, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
+
         public static float CalculateLufs(IWaveBuffer waveBuffer) => CalculateLufs(waveBuffer.Data, waveBuffer.SampleRate, waveBuffer.Channels);
         public static unsafe float CalculateLufs(ReadOnlySpan<float> buffer, int sampleRate, int channels)
         {
@@ -62,12 +62,13 @@ namespace LivreNoirLibrary.Media.Wave
             }
             Notify("apply High Pass filter");
 
+            var msFactor = _ms_factors;
             var msList = ObjectPool.Rent<List<float>>();
             var gatedList = ObjectPool.Rent<List<float>>();
+            fixed (float* msFactorPtr = msFactor)
             try
             {
                 // 2. RMSの計算
-                msList.Clear();
                 var blockSize = (int)(sampleRate * 0.4);
                 var capacity = 1 + length / blockSize;
                 msList.EnsureCapacity(capacity);
@@ -77,7 +78,7 @@ namespace LivreNoirLibrary.Media.Wave
                     var ms = 0f;
                     for (var c = 0; c < channels; c++)
                     {
-                        ms += SimdOperations.MeanSquare(dataPointers[c], length);
+                        ms += SimdOperations.MeanSquare(dataPointers[c], length) * msFactorPtr[c];
                     }
                     if (ms is 0)
                     {
@@ -92,7 +93,7 @@ namespace LivreNoirLibrary.Media.Wave
                         var ms = 0f;
                         for (var c = 0; c < channels; c++)
                         {
-                            ms += SimdOperations.MeanSquare(dataPointers[c] + index, blockSize);
+                            ms += SimdOperations.MeanSquare(dataPointers[c] + index, blockSize) * msFactorPtr[c];
                         }
                         msList.Add(ms);
                     }
@@ -109,13 +110,12 @@ namespace LivreNoirLibrary.Media.Wave
 
                 // 3. ゲーティング
                 // ステップ1: 絶対閾値
-                gatedList.Clear();
                 gatedList.EnsureCapacity(capacity);
                 // LKFS値が -70dB を超えるxのみを考慮する:
                 // -0.691 + 10 * log10(x) > -70
                 // x > 10 ^ {(-70 + 0.691) / 10} ≒ 1.1724653045822963959543852795004e-7
                 const double th1 = 1.1724653045822963959543852795004e-7;
-                foreach (var ms in CollectionsMarshal.AsSpan(msList))
+                foreach (var ms in msList.AsSpan())
                 {
                     if (ms > th1)
                     {
@@ -135,7 +135,7 @@ namespace LivreNoirLibrary.Media.Wave
                 // absL = -0.691 + 10 * log10(avgJ)
                 // -0.691 + 10 * log10(x) > absL - 10
                 // x > avgJ * 0.1
-                foreach (var ms in CollectionsMarshal.AsSpan(msList))
+                foreach (var ms in msList.AsSpan())
                 {
                     if (ms > th2)
                     {

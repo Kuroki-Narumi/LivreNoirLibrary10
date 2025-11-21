@@ -2,8 +2,8 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using System.Runtime.InteropServices;
 using LivreNoirLibrary.Text;
+using LivreNoirLibrary.Collections;
 
 namespace LivreNoirLibrary.YuGiOh.Data
 {
@@ -212,7 +212,7 @@ namespace LivreNoirLibrary.YuGiOh.Data
 
         public void Remove(List<Card> cards)
         {
-            foreach (var card in CollectionsMarshal.AsSpan(cards))
+            foreach (var card in cards.AsSpan())
             {
                 Forbidden.RemoveWithoutNotify(card);
                 Limit1.RemoveWithoutNotify(card);

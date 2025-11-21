@@ -123,7 +123,7 @@ namespace LivreNoirLibrary.Collections
             }
             else
             {
-                return FindNearestCore(CollectionsMarshal.AsSpan(list), value, ref index, out actualValue);
+                return FindNearestCore(list.AsSpan(), value, ref index, out actualValue);
             }
         }
 
@@ -161,10 +161,10 @@ namespace LivreNoirLibrary.Collections
             }
         }
 
-        public static bool FindNearest<T1, T2, TComparer>(this IList<T1> list, T2 value, TComparer comparer, out int index, [MaybeNullWhen(false)] out T1 actualValue)
+        public static bool FindNearest<T1, T2, TComparer>(this IList<T1> list, T2 value, out int index, [MaybeNullWhen(false)] out T1 actualValue)
             where TComparer : IComparer<T1, T2>
         {
-            index = BinarySearch(list, value, comparer);
+            index = BinarySearch<T1, T2, TComparer>(list, value);
             if (index is >= 0)
             {
                 actualValue = list[index];
@@ -180,7 +180,7 @@ namespace LivreNoirLibrary.Collections
                     {
                         var v1 = list[lower];
                         var v2 = list[upper];
-                        if (comparer.IsXCloserThanY(v1, v2, value))
+                        if (TComparer.IsXCloserThanY(v1, v2, value))
                         {
                             actualValue = v1;
                             index = lower;
@@ -217,23 +217,23 @@ namespace LivreNoirLibrary.Collections
             }
         }
 
-        public static bool FindNearest<T1, T2, TComparer>(this List<T1> list, T2 value, TComparer comparer, out int index, [MaybeNullWhen(false)] out T1 actualValue)
-            where TComparer : IComparer<T1, T2> => FindNearestCore(CollectionsMarshal.AsSpan(list), value, comparer, out index, out actualValue);
+        public static bool FindNearest<T1, T2, TComparer>(this List<T1> list, T2 value, out int index, [MaybeNullWhen(false)] out T1 actualValue)
+            where TComparer : IComparer<T1, T2> => FindNearestCore<T1, T2, TComparer>(list.AsSpan(), value, out index, out actualValue);
 
-        public static bool FindNearest<T1, T2, TComparer>(this T1[] ary, T2 value, TComparer comparer, out int index, [MaybeNullWhen(false)] out T1 actualValue)
-            where TComparer : IComparer<T1, T2> => FindNearestCore(ary, value, comparer, out index, out actualValue);
+        public static bool FindNearest<T1, T2, TComparer>(this T1[] ary, T2 value, out int index, [MaybeNullWhen(false)] out T1 actualValue)
+            where TComparer : IComparer<T1, T2> => FindNearestCore<T1, T2, TComparer>(ary, value, out index, out actualValue);
 
-        public static bool FindNearest<T1, T2, TComparer>(this Span<T1> span, T2 value, TComparer comparer, out int index, [MaybeNullWhen(false)] out T1 actualValue)
-            where TComparer : IComparer<T1, T2> => FindNearestCore(span, value, comparer, out index, out actualValue);
+        public static bool FindNearest<T1, T2, TComparer>(this Span<T1> span, T2 value, out int index, [MaybeNullWhen(false)] out T1 actualValue)
+            where TComparer : IComparer<T1, T2> => FindNearestCore<T1, T2, TComparer>(span, value, out index, out actualValue);
 
-        public static bool FindNearest<T1, T2, TComparer>(this ReadOnlySpan<T1> span, T2 value, TComparer comparer, out int index, [MaybeNullWhen(false)] out T1 actualValue)
-            where TComparer : IComparer<T1, T2> => FindNearestCore(span, value, comparer, out index, out actualValue);
+        public static bool FindNearest<T1, T2, TComparer>(this ReadOnlySpan<T1> span, T2 value, out int index, [MaybeNullWhen(false)] out T1 actualValue)
+            where TComparer : IComparer<T1, T2> => FindNearestCore<T1, T2, TComparer>(span, value, out index, out actualValue);
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private static bool FindNearestCore<T1, T2, TComparer>(this ReadOnlySpan<T1> span, T2 value, TComparer comparer, out int index, [MaybeNullWhen(false)] out T1 actualValue)
+        private static bool FindNearestCore<T1, T2, TComparer>(this ReadOnlySpan<T1> span, T2 value, out int index, [MaybeNullWhen(false)] out T1 actualValue)
             where TComparer : IComparer<T1, T2>
         {
-            index = BinarySearch(span, value, comparer);
+            index = BinarySearch<T1, T2, TComparer>(span, value);
             if (index is >= 0)
             {
                 actualValue = span[index];
@@ -249,7 +249,7 @@ namespace LivreNoirLibrary.Collections
                     {
                         var v1 = span[lower];
                         var v2 = span[upper];
-                        if (comparer.IsXCloserThanY(v1, v2, value))
+                        if (TComparer.IsXCloserThanY(v1, v2, value))
                         {
                             actualValue = v1;
                             index = lower;

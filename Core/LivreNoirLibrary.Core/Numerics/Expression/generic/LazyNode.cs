@@ -1,26 +1,13 @@
 using System;
-using System.Collections.Generic;
-using System.Linq;
 
 namespace LivreNoirLibrary.Numerics
 {
     public partial class ReversePolishNotation<T>
     {
-        public abstract class LazyNode(string symbol, ReadOnlySpan<LazyNode> operands)
-        {
-            private readonly LazyNode[] _operands = operands.ToArray();
-
-            public string Symbol { get; } = symbol;
-            public ReadOnlySpan<LazyNode> Operands => _operands;
-            public abstract FuncResult Execute(TryGetFunc<T> variables);
-
-            public override string ToString() => _operands.Length is 0 ? Symbol : $"{Symbol}({string.Join(", ", _operands.Select(o => o.ToString()))})";
-        }
-
-        public sealed class LazyFunctionNode(string symbol, Func func, ReadOnlySpan<LazyNode> operands) : LazyNode(symbol, operands)
+        public sealed class LazyFunctionNode(string symbol, Func func, ReadOnlySpan<LazyNode<T>> operands) : LazyNode<T>(symbol, operands)
         {
             private readonly Func _func = func;
-            public override FuncResult Execute(TryGetFunc<T> variables)
+            public override FuncResult<T> Execute(TryGetFunc<T> variables)
             {
                 var operands = Operands;
                 var span = (stackalloc T[operands.Length]);
@@ -37,9 +24,9 @@ namespace LivreNoirLibrary.Numerics
             }
         }
 
-        public sealed class LazyAndNode(ReadOnlySpan<LazyNode> operands) : LazyNode(AndSymbol, operands)
+        public sealed class LazyAndNode(ReadOnlySpan<LazyNode<T>> operands) : LazyNode<T>(AndSymbol, operands)
         {
-            public override FuncResult Execute(TryGetFunc<T> variables)
+            public override FuncResult<T> Execute(TryGetFunc<T> variables)
             {
                 var operands = Operands;
                 var left = operands[0].Execute(variables);
@@ -47,9 +34,9 @@ namespace LivreNoirLibrary.Numerics
             }
         }
 
-        public sealed class LazyOrNode(ReadOnlySpan<LazyNode> operands) : LazyNode(OrSymbol, operands)
+        public sealed class LazyOrNode(ReadOnlySpan<LazyNode<T>> operands) : LazyNode<T>(OrSymbol, operands)
         {
-            public override FuncResult Execute(TryGetFunc<T> variables)
+            public override FuncResult<T> Execute(TryGetFunc<T> variables)
             {
                 var operands = Operands;
                 var left = operands[0].Execute(variables);
@@ -57,9 +44,9 @@ namespace LivreNoirLibrary.Numerics
             }
         }
 
-        public sealed class LazyConditionalNode(ReadOnlySpan<LazyNode> operands) : LazyNode(ConditionalSymbol, operands)
+        public sealed class LazyConditionalNode(ReadOnlySpan<LazyNode<T>> operands) : LazyNode<T>(ConditionalSymbol, operands)
         {
-            public override FuncResult Execute(TryGetFunc<T> variables)
+            public override FuncResult<T> Execute(TryGetFunc<T> variables)
             {
                 var operands = Operands;
                 var condition = operands[0].Execute(variables);
@@ -71,7 +58,7 @@ namespace LivreNoirLibrary.Numerics
             }
         }
 
-        protected virtual LazyNode CreateLazyNode(FunctionNode token, ReadOnlySpan<LazyNode> operands) => token.Symbol switch
+        protected virtual LazyNode<T> CreateLazyNode(FunctionNode token, ReadOnlySpan<LazyNode<T>> operands) => token.Symbol switch
         {
             AndSymbol => new LazyAndNode(operands),
             OrSymbol => new LazyOrNode(operands),

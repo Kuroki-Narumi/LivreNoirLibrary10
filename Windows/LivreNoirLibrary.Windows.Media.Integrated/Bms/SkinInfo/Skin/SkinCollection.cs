@@ -7,7 +7,7 @@ using LivreNoirLibrary.ObjectModel;
 
 namespace LivreNoirLibrary.Windows.Media.Bms.SkinInfo
 {
-    public class SkinCollection : ObservableObjectBase
+    public class SkinCollection : ObservableObjectBase, IClear
     {
         private static readonly ParserContext _ctx;
 

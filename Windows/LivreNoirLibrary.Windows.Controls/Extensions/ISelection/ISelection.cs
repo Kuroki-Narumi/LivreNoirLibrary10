@@ -8,16 +8,16 @@ namespace LivreNoirLibrary.Windows.Controls
 {
     public interface ISelection
     {
-        public SelectionType SelectionType { get; }
-        public ISelectionRect SelectionRect { get; }
-        public bool IsSelectionEmpty { get; }
+        SelectionType SelectionType { get; }
+        ISelectionRect SelectionRect { get; }
+        bool IsSelectionEmpty { get; }
 
-        public void OnSelectionStart(double x, double y) { }
-        public void OnHorizontalSelection(ref double x1, ref double x2) { }
-        public void OnVerticalSelection(ref double y1, ref double y2) { }
-        public void OnSelectionFinished(bool selected) { }
+        void OnSelectionStart(double x, double y) { }
+        void OnHorizontalSelection(ref double x1, ref double x2) { }
+        void OnVerticalSelection(ref double y1, ref double y2) { }
+        void OnSelectionFinished(bool selected) { }
 
-        public double GetDeadZone() => 0.0;
+        double GetDeadZone() => 0.0;
     }
 
     public static class ISelectionExtension

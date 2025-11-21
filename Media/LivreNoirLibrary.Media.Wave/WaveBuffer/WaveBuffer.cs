@@ -7,7 +7,7 @@ using LivreNoirLibrary.ObjectModel;
 
 namespace LivreNoirLibrary.Media.Wave
 {
-    public partial class WaveBuffer() : DisposableBase, IWaveBuffer, IMarker, IJsonWriter
+    public partial class WaveBuffer() : DisposableBase, IWaveBuffer, IMarkerContainer, IJsonWriter, IClear
     {
         public const int DefaultSampleRate = 44100;
         public const int DefaultChannels = 2;
@@ -25,7 +25,7 @@ namespace LivreNoirLibrary.Media.Wave
         public int Channels => _channels;
         public int TotalSample => _data_length;
 
-        int IMarker.Length => this.SampleLength;
+        int IMarkerContainer.Length => this.SampleLength;
 
         public MarkerCollection Markers => _markers;
 
@@ -142,7 +142,7 @@ namespace LivreNoirLibrary.Media.Wave
 
         protected virtual void LoadMetaData(object source)
         {
-            if (source is IMarker m)
+            if (source is IMarkerContainer m)
             {
                 m.Markers.CopyTo(_markers);
             }

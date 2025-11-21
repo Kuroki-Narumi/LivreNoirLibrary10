@@ -1,6 +1,6 @@
-﻿using System;
+﻿using LivreNoirLibrary.Collections;
+using System;
 using System.Collections.Generic;
-using System.Runtime.InteropServices;
 
 namespace LivreNoirLibrary.Media.Bms
 {
@@ -13,13 +13,13 @@ namespace LivreNoirLibrary.Media.Bms
         public int DefStart { get; set => SetValue(ref field, value); } = 1;
     }
 
-    public class MultiDefInfo(int maxIndex, Dictionary<int, string> additionalDefs, List<(ISoundNote, int)> replace, DefIndexMap? map)
+    public class MultiDefInfo(int maxIndex, Dictionary<int, string> additionalDefs, List<(Note, int)> replace, DefIndexMap? map)
     {
-        private readonly List<(ISoundNote, int)> _replace = replace;
+        private readonly List<(Note, int)> _replace = replace;
 
         public int MaxIndex { get; } = maxIndex;
         public Dictionary<int, string> AdditionalDefs { get; } = additionalDefs;
-        public ReadOnlySpan<(ISoundNote, int)> ReplaceList => CollectionsMarshal.AsSpan(_replace);
+        public ReadOnlySpan<(Note, int)> ReplaceList => _replace.AsSpan();
         public DefIndexMap? DefMap { get; } = map;
     }
 }

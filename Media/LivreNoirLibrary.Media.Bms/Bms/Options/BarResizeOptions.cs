@@ -10,7 +10,7 @@ namespace LivreNoirLibrary.Media.Bms
     {
         internal readonly SortedSet<int> _numbers = [];
 
-        public Rational Length { get; set => SetValue(ref field, value); }
+        public double Length { get; set => SetValue(ref field, value); }
         public bool RatioMode { get; set => SetValue(ref field, value); }
         public BarResizeMode Mode
         {

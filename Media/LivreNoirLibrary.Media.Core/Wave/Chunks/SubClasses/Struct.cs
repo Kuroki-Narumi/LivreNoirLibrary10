@@ -2,7 +2,7 @@
 using System.Text.Json;
 using System.Collections.Generic;
 using System.IO;
-using System.Runtime.InteropServices;
+using LivreNoirLibrary.Collections;
 
 namespace LivreNoirLibrary.Media.Wave.Chunks
 {
@@ -50,7 +50,7 @@ namespace LivreNoirLibrary.Media.Wave.Chunks
             writer.Write(Unknown4);
             writer.Write(Unknown5);
             writer.Write(Unknown6);
-            foreach (var data in CollectionsMarshal.AsSpan(DataList))
+            foreach (var data in DataList.AsSpan())
             {
                 data.Dump(writer);
             }
@@ -66,7 +66,7 @@ namespace LivreNoirLibrary.Media.Wave.Chunks
             writer.WriteNumber("unknown 6", Unknown6);
             writer.WritePropertyName("data");
             writer.WriteStartArray();
-            foreach (var data in CollectionsMarshal.AsSpan(DataList))
+            foreach (var data in DataList.AsSpan())
             {
                 data.WriteJsonContent(writer, options);
             }

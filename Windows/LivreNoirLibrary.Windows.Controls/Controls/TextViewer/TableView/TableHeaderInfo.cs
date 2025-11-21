@@ -23,6 +23,6 @@ namespace LivreNoirLibrary.Windows.Controls
             VerticalHeader = vName;
         }
 
-        static string ToVertical(string text) => string.Join('\n', text as IEnumerable<char>);
+        private static string ToVertical(string text) => string.Join('\n', text as IEnumerable<char>);
     }
 }

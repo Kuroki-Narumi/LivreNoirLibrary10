@@ -1,9 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Runtime.InteropServices;
 using LivreNoirLibrary.Numerics;
 using LivreNoirLibrary.IO;
+using LivreNoirLibrary.Collections;
 
 namespace LivreNoirLibrary.Media.FFmpeg
 {
@@ -74,14 +72,14 @@ namespace LivreNoirLibrary.Media.FFmpeg
 
         protected override void BeforeFlush()
         {
-            foreach (var context in CollectionsMarshal.AsSpan(_video_streams))
+            foreach (var context in _video_streams.AsSpan())
             {
                 context.Flush();
                 context.Dispose();
             }
             _video_streams.Clear();
 
-            foreach (var context in CollectionsMarshal.AsSpan(_audio_streams))
+            foreach (var context in _audio_streams.AsSpan())
             {
                 context.Flush();
                 context.Dispose();

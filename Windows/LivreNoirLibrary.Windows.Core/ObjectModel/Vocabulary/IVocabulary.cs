@@ -5,8 +5,8 @@ namespace LivreNoirLibrary.Windows
     public interface IVocabulary<TSelf>
         where TSelf : IVocabulary<TSelf>
     {
-        public static abstract TSelf Current { get; set; }
-        public static abstract TSelf Default { get; set; }
-        public LanguageData? CurrentLanguage { get; set; }
+        abstract static TSelf Current { get; set; }
+        abstract static TSelf Default { get; set; }
+        LanguageData? CurrentLanguage { get; set; }
     }
 }

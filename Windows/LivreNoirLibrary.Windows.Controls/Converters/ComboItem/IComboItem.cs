@@ -5,8 +5,8 @@ namespace LivreNoirLibrary.Windows
 {
     public interface IComboItem : INamedObject
     {
-        public static abstract Type KeyType { get; }
-        public static abstract object GetItem(object value);
-        public object Value { get; }
+        abstract static Type KeyType { get; }
+        abstract static object GetItem(object value);
+        object Value { get; }
     }
 }

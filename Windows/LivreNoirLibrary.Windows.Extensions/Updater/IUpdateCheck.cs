@@ -4,11 +4,11 @@ namespace LivreNoirLibrary.Windows
 {
     public interface IUpdateCheck
     {
-        public bool CheckUpdate { get; set; }
-        public string VersionUrl { get; }
-        public string SettingName { get; }
+        bool CheckUpdate { get; set; }
+        string VersionUrl { get; }
+        string SettingName { get; }
 
-        public string GetMessage_NewVersion() => "新しいバージョン({0})が公開されています。\n更新しますか？";
-        public string GetMessage_NoUpdate() => "更新はありません。";
+        string GetMessage_NewVersion() => "新しいバージョン({0})が公開されています。\n更新しますか？";
+        string GetMessage_NoUpdate() => "更新はありません。";
     }
 }

@@ -2,10 +2,8 @@
 using System.Collections.Generic;
 using System.IO;
 using System.IO.Compression;
-using System.Runtime.InteropServices;
 using System.Text;
 using LivreNoirLibrary.Collections;
-using LivreNoirLibrary.Files;
 using LivreNoirLibrary.IO;
 using LivreNoirLibrary.Media.BM3;
 using LivreNoirLibrary.Media.Midi;
@@ -14,7 +12,7 @@ using LivreNoirLibrary.Text;
 
 namespace LivreNoirLibrary.Media.Integrated
 {
-    public partial class BM3Score : MidiData<BM3Track>, IStreamDumpable, IStreamLoadable<BM3Score>
+    public partial class BM3Score : MidiData<BM3Track>, IFile<BM3Score>, IStreamDumpable, IStreamLoadable<BM3Score>
     {
         public const string DumpHeader = "BM3Scr";
 
@@ -77,7 +75,7 @@ namespace LivreNoirLibrary.Media.Integrated
             writer.Write(Options.GetJsonText(false));
             _signatures.Dump(writer);
             writer.Write(_tracks.Count);
-            foreach (var track in CollectionsMarshal.AsSpan(_tracks))
+            foreach (var track in _tracks.AsSpan())
             {
                 track.Dump(writer);
             }
@@ -106,7 +104,7 @@ namespace LivreNoirLibrary.Media.Integrated
         {
             if (index is > 1 && _tracks.MoveUp(index))
             {
-                foreach (var track in CollectionsMarshal.AsSpan(_tracks))
+                foreach (var track in _tracks.AsSpan())
                 {
                     track.Options.SwapSideChain(index, index - 1);
                 }
@@ -119,7 +117,7 @@ namespace LivreNoirLibrary.Media.Integrated
         {
             if (index is >= 1 && _tracks.MoveDown(index))
             {
-                foreach (var track in CollectionsMarshal.AsSpan(_tracks))
+                foreach (var track in _tracks.AsSpan())
                 {
                     track.Options.SwapSideChain(index, index + 1);
                 }
@@ -133,7 +131,7 @@ namespace LivreNoirLibrary.Media.Integrated
             if (index is >= 1 && index < _tracks.Count)
             {
                 _tracks.RemoveAt(index);
-                foreach (var track in CollectionsMarshal.AsSpan(_tracks))
+                foreach (var track in _tracks.AsSpan())
                 {
                     track.Options.RemoveSideChain(index);
                 }

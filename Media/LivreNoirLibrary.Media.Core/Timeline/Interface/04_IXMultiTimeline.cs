@@ -1,46 +1,81 @@
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using LivreNoirLibrary.Collections;
-using LivreNoirLibrary.ObjectModel;
 
 namespace LivreNoirLibrary.Media
 {
-    public interface IXMultiTimeline<TX, TValue> : IXTimeline<TX, TValue>
+    public interface IXMultiTimeline<TX, TValue> : IXTimeline<TX, TValue>, IListEnumerable<TX, TValue>
         where TX : struct
     {
-        public IEnumerable<(TX, List<TValue>)> EachList();
-        public IEnumerable<(TX, List<TValue>)> EachList(Range<TX> range);
+        /// <summary>
+        /// Attempts to retrieve the value list associated with the specified position.
+        /// </summary>
+        /// <param name="position">The position to search for.</param>
+        /// <param name="values">When this method returns, the value list associated with the found position, if the search is successful;
+        /// otherwise, <see langword="null"/>.</param>
+        /// <returns><see langword="true"/> if an value is found; otherwise, <see langword="false"/>.</returns>
+        bool TryGetList(TX position, [MaybeNullWhen(false)] out List<TValue> values);
 
-        public void Add(TX position, TValue value);
-        public void AddToFront(TX position, TValue value);
-        public void Add<TEnumerable>(TX position, TEnumerable values) where TEnumerable : IEnumerable<TValue>;
-        public void Add<TEnumerable>(TEnumerable values) where TEnumerable : IEnumerable<(TX, TValue)>;
-        public bool Remove(TX position, TValue value);
-        public int Remove<TEnumerable>(TX position, TEnumerable values) where TEnumerable : IEnumerable<TValue>;
-        public int Remove<TEnumerable>(TEnumerable values) where TEnumerable : IEnumerable<(TX, TValue)>;
+        /// <summary>
+        /// Gets the list of values associated with the specified position, or creates and adds a new list if none
+        /// exists.
+        /// </summary>
+        /// <param name="position">The position for which to retrieve the associated list of values.</param>
+        /// <returns>A list of values associated with the specified position. If no list exists for the position, a new empty
+        /// list is created, added, and returned.</returns>
+        List<TValue> GetOrAddList(TX position);
 
-        public int RemoveAll(Predicate<TX, TValue> predicate);
-        public int RemoveAll(Predicate<TX, TValue> predicate, Range<TX> range);
-        public int RemoveAll(TX position, Predicate<TValue> predicate);
+        /// <summary>
+        /// Returns an enumerable object that enumerates the the position and item list pairs within the specified range.
+        /// </summary>
+        /// <param name="range">the range of positions to iterate.</param>
+        /// <returns>an enumerable that can be used to iterate within the specified range.</returns>
+        IEnumerable<(TX, List<TValue>)> EnumerateList(Range<TX> range);
 
-        public void MoveAll(Predicate<TX, TValue> predicate, Func<TX, TX> converter);
-        public void MoveAll(Predicate<TX, TValue> predicate, Func<TX, TX> converter, Range<TX> range);
-        public void MoveAll(TX from, TX to, Predicate<TValue> predicate);
+        /// <summary>
+        /// Returns an enumerable object that enumerates the the position and item list pairs within the specified range in reverse order.
+        /// </summary>
+        /// <param name="range">the range of positions to iterate.</param>
+        /// <returns>an enumerable that can be used to iterate within the specified range.</returns>
+        IEnumerable<(TX, List<TValue>)> ReverseEnumerateList(Range<TX> range);
 
-        public bool TryGet(TX position, SearchMode type, out TX actualPosition, [MaybeNullWhen(false)] out List<TValue> values);
-        public bool TryGetNearest(TX position, out TX actualPosition, [MaybeNullWhen(false)] out List<TValue> values);
-        public bool Find(Predicate<TX, TValue> predicate, out TX position, [MaybeNullWhen(false)] out TValue value);
-        public bool Find(Predicate<TX, TValue> predicate, Range<TX> range, out TX position, [MaybeNullWhen(false)] out TValue value);
-        public bool Find(TX position, Predicate<TValue> predicate, [MaybeNullWhen(false)] out TValue value);
-        public List<(TX, TValue)> FindAll(Predicate<TX, TValue> predicate);
-        public List<(TX, TValue)> FindAll(Predicate<TX, TValue> predicate, Range<TX> range);
-        public List<TValue> FindAll(TX position, Predicate<TValue> predicate);
+        /// <summary>
+        /// Attempts to retrieve the value list associated with the specified position, using the given search mode.
+        /// </summary>
+        /// <param name="position">The position to search for.</param>
+        /// <param name="type">The search mode that determines how the position is matched.</param>
+        /// <param name="actualPosition">When this method returns, contains the actual position that matches the search criteria, if the search is successful;
+        /// otherwise, the default value for <typeparamref name="TX"/>.</param>
+        /// <param name="values">When this method returns, the value list associated with the found position, if the search is successful;
+        /// otherwise, the default value for <typeparamref name="TValue"/>.</param>
+        /// <returns><see langword="true"/> if an value is found; otherwise, <see langword="false"/>.</returns>
+        bool TryGetValue(TX position, SearchMode type, out TX actualPosition, [MaybeNullWhen(false)] out List<TValue> values);
 
-        public void CopyTo<T>(T destination) where T : IXMultiTimeline<TX, TValue>;
-        public void CopyTo<T>(T destination, TX destOffset) where T : IXMultiTimeline<TX, TValue>;
-        public void CopyTo<T>(T destination, Range<TX> srcRange) where T : IXMultiTimeline<TX, TValue>;
-        public void CopyTo<T>(T destination, Range<TX> srcRange, TX destOffset) where T : IXMultiTimeline<TX, TValue>;
+        /// <summary>
+        /// Attempts to find the value list with the nearest to the specified position.
+        /// </summary>
+        /// <param name="position">The position to search for the nearest value.</param>
+        /// <param name="actualPosition">When this method returns, contains the position of the nearest value found, if any;
+        /// otherwise, the default value for the type.</param>
+        /// <param name="values">When this method returns, the value list associated with the nearest value, if found; otherwise, the
+        /// default value for the type.</param>
+        /// <returns><see langword="true"/> if a nearest value is found; otherwise, <see langword="false"/>.</returns>
+        bool TryGetNearest(TX position, out TX actualPosition, [MaybeNullWhen(false)] out List<TValue> values);
+
+        /// <summary>
+        /// Copies timeline values to the specified destination timeline, starting at the given destination offset.
+        /// </summary>
+        /// <param name="destination">The timeline to which the values will be copied.</param>
+        /// <param name="destOffset">The offset in the destination timeline at which to begin copying the values.</param>
+        void CopyTo(IXMultiTimeline<TX, TValue> destination, TX destOffset);
+
+        /// <summary>
+        /// Copies a range of timeline values to the specified destination timeline, starting at the given destination offset.
+        /// </summary>
+        /// <param name="destination">The timeline to which the values will be copied.</param>
+        /// <param name="sourceRange">The range of values to copy from the source timeline. Only values within this range will be copied.</param>
+        /// <param name="destOffset">The offset in the destination timeline at which to begin copying the values.</param>
+        void CopyTo(IXMultiTimeline<TX, TValue> destination, Range<TX> sourceRange, TX destOffset);
     }
 }

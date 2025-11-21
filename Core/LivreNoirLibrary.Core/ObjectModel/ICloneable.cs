@@ -6,6 +6,6 @@ namespace LivreNoirLibrary.ObjectModel
     public interface ICloneable<TSelf>
         where TSelf : ICloneable<TSelf>
     {
-        public TSelf Clone();
+        TSelf Clone();
     }
 }

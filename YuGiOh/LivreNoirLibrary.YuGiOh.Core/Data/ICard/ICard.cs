@@ -5,23 +5,23 @@ namespace LivreNoirLibrary.YuGiOh.Data
 {
     public interface ICard
     {
-        public int Id { get; }
-        public string Name { get; }
-        public string Ruby { get; }
-        public string EnName { get; }
-        public CardType CardType { get; }
-        public string Text { get; }
-        public bool Unusable { get; }
+        int Id { get; }
+        string Name { get; }
+        string Ruby { get; }
+        string EnName { get; }
+        CardType CardType { get; }
+        string Text { get; }
+        bool Unusable { get; }
 
-        public Attribute Attribute { get; }
-        public MonsterType MonsterType { get; }
-        public bool HasEffect { get; }
-        public Ability Ability { get; }
-        public int Level { get; }
-        public int Atk { get; }
-        public int Def { get; }
-        public int PendulumScale { get; }
-        public string PendulumText { get; }
+        Attribute Attribute { get; }
+        MonsterType MonsterType { get; }
+        bool HasEffect { get; }
+        Ability Ability { get; }
+        int Level { get; }
+        int Atk { get; }
+        int Def { get; }
+        int PendulumScale { get; }
+        string PendulumText { get; }
     }
 
     public static partial class ICardExtensions

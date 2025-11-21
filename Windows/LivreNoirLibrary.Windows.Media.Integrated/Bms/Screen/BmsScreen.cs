@@ -6,10 +6,11 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
-using System.Runtime.InteropServices;
 using System.Windows;
 using System.Windows.Controls;
 using LivreNoirLibrary.Windows.Controls.Bms;
+using LivreNoirLibrary.Collections;
+using LivreNoirLibrary.Media.Bms.ViewModels;
 
 namespace LivreNoirLibrary.Windows.Media.Bms
 {
@@ -17,7 +18,7 @@ namespace LivreNoirLibrary.Windows.Media.Bms
     {
         public SkinInfo.Skin? Skin { get; private set => SetValue(ref field, value); }
         public string? BmsPath { get; private set => SetValue(ref field, value); }
-        public BmsData? BmsData { get; private set => SetValue(ref field, value); }
+        public BmsViewModel BmsData { get; } = new();
         public string? Directory => Path.GetDirectoryName(BmsPath);
 
         public double HighSpeed { get; set => SetValue(ref field, value); } = 1;
@@ -113,19 +114,19 @@ namespace LivreNoirLibrary.Windows.Media.Bms
         {
             if (Skin is { } skin)
             {
-                foreach (var element in CollectionsMarshal.AsSpan(_groupElements))
+                foreach (var element in _groupElements.AsSpan())
                 {
                     element.LoadDestination(skin, this);
                 }
-                foreach (var element in CollectionsMarshal.AsSpan(_imageElements))
+                foreach (var element in _imageElements.AsSpan())
                 {
                     element.LoadDestination(skin, this);
                 }
-                foreach (var element in CollectionsMarshal.AsSpan(_bgaElements))
+                foreach (var element in _bgaElements.AsSpan())
                 {
                     element.LoadDestination(skin, this);
                 }
-                foreach (var element in CollectionsMarshal.AsSpan(_noteElements))
+                foreach (var element in _noteElements.AsSpan())
                 {
                     element.LoadDestination(skin, this);
                 }
@@ -134,19 +135,19 @@ namespace LivreNoirLibrary.Windows.Media.Bms
 
         public bool OpenBms(string path)
         {
+            _bgaSource.Clear();
             try
             {
-                var data = BmsData.Open(path);
+                var root = LivreNoirLibrary.Media.Bms.BmsData.Open(path);
                 BmsPath = path;
-                BmsData = data;
-                _bgaSource.Clear();
-                _textureCache.LoadBms(data, Directory!);
+                BmsData.Root = root;
+                _textureCache.LoadBms(BmsData, Directory!);
                 return true;
             }
             catch (Exception ex)
             {
                 ExConsole.Write(ex);
-                BmsData = null;
+                BmsData.Root = null!;
                 return false;
             }
         }
@@ -170,25 +171,25 @@ namespace LivreNoirLibrary.Windows.Media.Bms
         public void Update(long absoluteTick)
         {
             var timer = _timer;
-            foreach (var element in CollectionsMarshal.AsSpan(_groupElements))
+            foreach (var element in _groupElements.AsSpan())
             {
                 element.Update(timer, absoluteTick);
             }
             var tc = _textureCache;
-            foreach (var element in CollectionsMarshal.AsSpan(_imageElements))
+            foreach (var element in _imageElements.AsSpan())
             {
                 element.Update(timer, absoluteTick, tc);
             }
             if (Skin is SkinInfo.PlaySkin)
             {
                 _bgaSource.Update(_timingList, timer, absoluteTick);
-                foreach (var element in CollectionsMarshal.AsSpan(_bgaElements))
+                foreach (var element in _bgaElements.AsSpan())
                 {
                     element.Update(timer, absoluteTick);
                 }
                 var hs = HighSpeed;
                 _notes.Update(_timingList, timer, absoluteTick, hs);
-                foreach (var element in CollectionsMarshal.AsSpan(_noteElements))
+                foreach (var element in _noteElements.AsSpan())
                 {
                     element.Update(_notes, timer, absoluteTick, tc, hs);
                 }

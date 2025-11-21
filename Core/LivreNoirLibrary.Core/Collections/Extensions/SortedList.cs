@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
+using System.IO;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 
@@ -90,7 +91,7 @@ namespace LivreNoirLibrary.Collections
             var index = keys.BinarySearch(key, comparer);
             if (index is >= 0)
             {
-                var span = CollectionsMarshal.AsSpan(values);
+                var span = values.AsSpan();
                 return updateFunc(ref span[index]);
             }
             else
@@ -159,8 +160,8 @@ namespace LivreNoirLibrary.Collections
         public static void CopyTo<TKey, TValue>(List<TKey> sourceKeys, List<TValue> sourceValues, List<TKey> targetKeys, List<TValue> targetValues)
             where TKey : IComparable<TKey>
         {
-            var sk = CollectionsMarshal.AsSpan(sourceKeys);
-            var sv = CollectionsMarshal.AsSpan(sourceValues);
+            var sk = sourceKeys.AsSpan();
+            var sv = sourceValues.AsSpan();
             var sourceLength = sk.Length;
             var sourceIndex = 0;
             for (var targetIndex = 0; sourceIndex < sourceLength && targetIndex < targetKeys.Count; targetIndex++)
@@ -190,14 +191,14 @@ namespace LivreNoirLibrary.Collections
 
         public static Enumerator<TKey, TValue> GetEnumerator<TKey, TValue>(List<TKey> keys, List<TValue> values) => new(keys, values);
 
-        public struct Enumerator<TKey, TValue>(List<TKey> keys, List<TValue> values) : IEnumerator<KeyValuePair<TKey, TValue>>
+        public struct Enumerator<TKey, TValue>(List<TKey> keys, List<TValue> values) : IEnumerator<(TKey, TValue)>
         {
             private readonly List<TKey> _keys = keys;
             private readonly List<TValue> _values = values;
             private int _index = 0;
-            private KeyValuePair<TKey, TValue> _current;
+            private (TKey, TValue) _current;
 
-            public readonly KeyValuePair<TKey, TValue> Current => _current;
+            public readonly (TKey, TValue) Current => _current;
             readonly object System.Collections.IEnumerator.Current => Current;
 
             public bool MoveNext()

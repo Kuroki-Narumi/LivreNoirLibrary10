@@ -16,7 +16,7 @@ using System.Windows.Navigation;
 using System.Windows.Threading;
 using LivreNoirLibrary.Collections;
 using LivreNoirLibrary.Debug;
-using LivreNoirLibrary.Files;
+using LivreNoirLibrary.IO;
 using LivreNoirLibrary.Media;
 using LivreNoirLibrary.Numerics;
 using LivreNoirLibrary.ObjectModel;

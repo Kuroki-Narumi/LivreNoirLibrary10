@@ -1,7 +1,9 @@
 using System;
+using System.Collections.Generic;
 using System.Globalization;
 using System.Text;
 using LivreNoirLibrary.Collections;
+using LivreNoirLibrary.ObjectModel;
 
 namespace LivreNoirLibrary.Text
 {
@@ -9,12 +11,19 @@ namespace LivreNoirLibrary.Text
     {
         public static string[] SplitLines(this string? text, bool trim = false)
         {
-            using SharedBuffer<string> buffer = new(256);
-            foreach (var span in text.AsSpan().EnumerateLines())
+            var buffer = ObjectPool.Rent<List<string>>();
+            try
             {
-                buffer.Add(new(trim ? span.Trim() : span));
+                foreach (var span in text.AsSpan().EnumerateLines())
+                {
+                    buffer.Add(new(trim ? span.Trim() : span));
+                }
+                return [.. buffer];
             }
-            return [.. buffer];
+            finally
+            {
+                ObjectPool.Return(buffer);
+            }
         }
 
         public static int CountLine(this string? text, bool countEmptyLine = true)

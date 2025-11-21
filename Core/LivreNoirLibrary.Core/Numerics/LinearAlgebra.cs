@@ -22,23 +22,14 @@ namespace LivreNoirLibrary.Numerics
 {
     public static class LinearAlgebra
     {
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private static ReadOnlySpan<T> CastToReadOnlySpan<T>(Span<T> span) => span;
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private static ReadOnlySpan<T> CastToReadOnlySpan<T>(T[] array) => array.AsSpan();
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private static ReadOnlySpan<T> CastToReadOnlySpan<T>(List<T> list) => CollectionsMarshal.AsSpan(list);
-
-        public static double SquareComplex(this List<double> list) => SquareComplexCore(CastToReadOnlySpan(list));
-        public static double SquareComplex(this double[] array) => SquareComplexCore(CastToReadOnlySpan(array));
-        public static double SquareComplex(this Span<double> span) => SquareComplexCore(CastToReadOnlySpan(span));
+        public static double SquareComplex(this List<double> list) => SquareComplexCore(list.AsSpan());
+        public static double SquareComplex(this double[] array) => SquareComplexCore(array);
+        public static double SquareComplex(this Span<double> span) => SquareComplexCore(span);
         public static double SquareComplex(this ReadOnlySpan<double> span) => SquareComplexCore(span);
 
-        public static float SquareComplex(this List<float> list) => SquareComplexCore(CastToReadOnlySpan(list));
-        public static float SquareComplex(this float[] array) => SquareComplexCore(CastToReadOnlySpan(array));
-        public static float SquareComplex(this Span<float> span) => SquareComplexCore(CastToReadOnlySpan(span));
+        public static float SquareComplex(this List<float> list) => SquareComplexCore(list.AsSpan());
+        public static float SquareComplex(this float[] array) => SquareComplexCore(array);
+        public static float SquareComplex(this Span<float> span) => SquareComplexCore(span);
         public static float SquareComplex(this ReadOnlySpan<float> span) => SquareComplexCore(span);
 
         private static unsafe double SquareComplexCore(this ReadOnlySpan<double> span)
@@ -71,14 +62,14 @@ namespace LivreNoirLibrary.Numerics
             return sum;
         }
 
-        public static double MeanSquareComplex(this List<double> list) => MeanSquareComplex(CastToReadOnlySpan(list));
-        public static double MeanSquareComplex(this double[] array) => MeanSquareComplex(CastToReadOnlySpan(array));
-        public static double MeanSquareComplex(this Span<double> span) => MeanSquareComplex(CastToReadOnlySpan(span));
+        public static double MeanSquareComplex(this List<double> list) => MeanSquareComplex(list.AsSpan());
+        public static double MeanSquareComplex(this double[] array) => MeanSquareComplex(array);
+        public static double MeanSquareComplex(this Span<double> span) => MeanSquareComplex(span);
         public static double MeanSquareComplex(this ReadOnlySpan<double> span) => SquareComplexCore(span) * 2 / span.Length;
 
-        public static float MeanSquareComplex(this List<float> list) => MeanSquareComplex(CastToReadOnlySpan(list));
-        public static float MeanSquareComplex(this float[] array) => MeanSquareComplex(CastToReadOnlySpan(array));
-        public static float MeanSquareComplex(this Span<float> span) => MeanSquareComplex(CastToReadOnlySpan(span));
+        public static float MeanSquareComplex(this List<float> list) => MeanSquareComplex(list);
+        public static float MeanSquareComplex(this float[] array) => MeanSquareComplex(array);
+        public static float MeanSquareComplex(this Span<float> span) => MeanSquareComplex(span);
         public static float MeanSquareComplex(this ReadOnlySpan<float> span) => SquareComplexCore(span) * 2 / span.Length;
 
         public static unsafe float Variance(this ReadOnlySpan<float> span)

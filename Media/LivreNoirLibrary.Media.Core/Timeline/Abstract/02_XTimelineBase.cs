@@ -1,23 +1,20 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
-using System.Runtime.InteropServices;
 using LivreNoirLibrary.Collections;
-using LivreNoirLibrary.ObjectModel;
 
 namespace LivreNoirLibrary.Media
 {
     public abstract class XTimelineBase<TX, TValue, TInnerData, TOperator> : TimelineBase<TX, TValue, TOperator>, IXTimeline<TX, TValue>
         where TX : struct
-        where TOperator : IPositionOperator<TX>, new()
+        where TOperator : IPositionOperator<TX>
     {
         protected readonly List<TInnerData> _value_list = [];
 
         public abstract IEnumerator<(TX, TValue)> GetEnumerator();
         public IEnumerable<(TX, TValue)> Range(Range<TX> range) => RangeCore(GetPositionIndex(range));
-        protected abstract IEnumerable<(TX, TValue)> RangeCore((int Start, int Length) range);
 
-        public sealed override void Clear()
+        public override void Clear()
         {
             _pos_list.Clear();
             _value_list.Clear();
@@ -32,6 +29,14 @@ namespace LivreNoirLibrary.Media
             }
             return false;
         }
+
+        public bool TryGetValue(TX position, SearchMode type, out TX actualPosition, [MaybeNullWhen(false)] out TInnerData value)
+            => TryGetCore(_pos_list.FindIndex<TX, TX, TOperator>(position, type), out actualPosition, out value);
+
+        public bool TryGetNearest(TX position, out TX actualPosition, [MaybeNullWhen(false)] out TInnerData value)
+            => TryGetCore(_pos_list.FindNearestIndex<TX, TX, TOperator>(position), out actualPosition, out value);
+
+        protected abstract IEnumerable<(TX, TValue)> RangeCore((int Start, int Length) range);
 
         protected void RemoveItem(int index)
         {
@@ -104,26 +109,12 @@ namespace LivreNoirLibrary.Media
         }
 
         protected abstract void ReplaceItem(int index, TInnerData value);
+
         protected void InsertItem(int index, TX position, TInnerData value)
         {
             _pos_list.Insert(index, position);
             _value_list.Insert(index, value);
             OnItemChanged(index);
-        }
-
-
-        public sealed override void Move(TX from, TX to)
-        {
-            if (_operator.Compare(from, to) is 0)
-            {
-                return;
-            }
-            if (TryGetIndex(from, out var index))
-            {
-                var current = _value_list[index];
-                RemoveItem(index);
-                AddItem(to, current);
-            }
         }
 
         protected sealed override void MoveCore(Func<TX, TX> converter, (int Start, int Length) range)
@@ -140,29 +131,11 @@ namespace LivreNoirLibrary.Media
                 moveList.Add((converter(pos), val));
             }
             RemoveRangeCore(range);
-            foreach (var (pos, val) in CollectionsMarshal.AsSpan(moveList))
+            foreach (var (pos, val) in moveList.AsSpan())
             {
                 AddItem(pos, val);
             }
         }
-
-        protected sealed override void SlideCore(int start, TX amount, bool add)
-        {
-            var c = _pos_list.Count;
-            for (int i = start; i < c; i++)
-            {
-                var pos = _pos_list[i];
-                _pos_list[i] = add ? _operator.Add(pos, amount) : _operator.Subtract(pos, amount);
-            }
-        }
-
-        public bool TryGet(TX position, [MaybeNullWhen(false)] out TInnerData value) => TryGet(position, SearchMode.Equal, out _, out value);
-
-        public bool TryGet(TX position, SearchMode type, out TX actualPosition, [MaybeNullWhen(false)] out TInnerData value)
-            => TryGetCore(_pos_list.FindIndex(position, _operator, type), out actualPosition, out value);
-
-        public bool TryGetNearest(TX position, out TX actualPosition, [MaybeNullWhen(false)] out TInnerData value)
-            => TryGetCore(_pos_list.FindNearestIndex(position, _operator), out actualPosition, out value);
 
         protected bool TryGetCore(int index, out TX actualPosition, [MaybeNullWhen(false)] out TInnerData value)
         {

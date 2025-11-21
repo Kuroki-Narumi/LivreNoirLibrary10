@@ -32,7 +32,7 @@ namespace LivreNoirLibrary.SandBox
 
         [JsonIgnore]
         public BmsScreen Screen { get; } = new();
-        public AssembleOptions AssembleOptions { get; set => SetValue(ref field, value); } = new() { Marker = false, Gain = -6 };
+        public AssembleOptions AssembleOptions { get; set => SetValue(ref field, value); } = new() { Marker = false, Gain = -3 };
 
         public Rational FrameRate { get; set => SetValue(ref field, value); } = FrameRates.Fps60;
         public bool IsHevc { get; set => SetValue(ref field, value); } = true;
@@ -55,7 +55,7 @@ namespace LivreNoirLibrary.SandBox
                 try
                 {
                     p.Report("Assembling...", null);
-                    _assembledData = data.Assemble(AssembleOptions, Screen.Directory!, p, c);
+                    (_assembledData, _) = data.Assemble(AssembleOptions, Screen.Directory!, p, c);
                 }
                 catch (OperationCanceledException)
                 {

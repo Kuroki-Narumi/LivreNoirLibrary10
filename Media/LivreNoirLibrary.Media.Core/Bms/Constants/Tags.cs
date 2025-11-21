@@ -1,18 +1,67 @@
-using LivreNoirLibrary.Collections;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace LivreNoirLibrary.Media.Bms
 {
     public static class Tags
     {
+        public const string Player = "#PLAYER";
+        public const string Genre = "#GENRE";
+        public const string Title = "#TITLE";
+        public const string SubTitle = "#SUBTITLE";
+        public const string Artist = "#ARTIST";
+        public const string SubArtist = "#SUBARTIST";
+        public const string Bpm = "#BPM";
+        public const string PlayLevel = "#PLAYLEVEL";
+        public const string Difficulty = "#DIFFICULTY";
+        public const string Rank = "#RANK";
+        public const string Total = "#TOTAL";
+        public const string StageFile = "#STAGEFILE";
+        public const string Banner = "#BANNER";
+        public const string BackBmp = "#BACKBMP";
+        public const string Preview = "#PREVIEW";
+        public const string LnObj = "#LNOBJ";
+        public const string LnMode = "#LNMODE";
+        public const string DefExRank = "#DEFEXRANK";
+        public const string Comment = "#COMMENT";
+        public const string VolWav = "#VOLWAV";
+        public const string Base = "#BASE";
+
+        private static readonly Dictionary<HeaderType, string> _header2string = new()
+        {
+            [HeaderType.Player] = Player,
+            [HeaderType.Genre] = Genre,
+            [HeaderType.Title] = Title,
+            [HeaderType.SubTitle] = SubTitle,
+            [HeaderType.Artist] = Artist,
+            [HeaderType.SubArtist] = SubArtist,
+            [HeaderType.Bpm] = Bpm,
+            [HeaderType.PlayLevel] = PlayLevel,
+            [HeaderType.Difficulty] = Difficulty,
+            [HeaderType.Rank] = Rank,
+            [HeaderType.StageFile] = StageFile,
+            [HeaderType.Banner] = Banner,
+            [HeaderType.BackBmp] = BackBmp,
+            [HeaderType.Preview] = Preview,
+            [HeaderType.LnMode] = LnMode,
+            [HeaderType.DefExRank] = DefExRank,
+            [HeaderType.Comment] = Comment,
+            [HeaderType.VolWav] = VolWav,
+        };
+
+        public static string ToString(HeaderType type)
+        {
+            if (!_header2string.TryGetValue(type, out var value))
+            {
+                value = type.ToString().ToUpperInvariant();
+                _header2string[type] = value;
+            }
+            return value;
+        }
+
         public const string Wav = "#WAV";
         public const string Bmp = "#BMP";
         public const string Bga = "#BGA";
-        public const string Bpm = "#BPM";
         public const string ExBpm = "#EXBPM";
         public const string Stop = "#STOP";
         public const string Text = "#TEXT";
@@ -25,26 +74,6 @@ namespace LivreNoirLibrary.Media.Bms
         public const string ChangeOption = "#CHANGEOPTION";
         public const string Scroll = "#SCROLL";
         public const string Speed = "#SPEED";
-
-        public static string ToTag(this DefType type) => _defType2Tag.TryGetValue(type, out var value) ? value : type.ToString().ToUpper();
-        private static readonly Dictionary<DefType, string> _defType2Tag = new()
-        {
-            [DefType.Wav] = Wav,
-            [DefType.Bmp] = Bmp,
-            [DefType.Bga] = Bga,
-            [DefType.Bpm] = Bpm,
-            [DefType.Stop] = Stop,
-            [DefType.Text] = Text,
-            [DefType.ExWav] = ExWav,
-            [DefType.ExBmp] = ExBmp,
-            [DefType.AtBga] = AtBga,
-            [DefType.Argb] = Argb,
-            [DefType.SwBga] = SwBga,
-            [DefType.ExRank] = ExRank,
-            [DefType.ChangeOption] = ChangeOption,
-            [DefType.Scroll] = Scroll,
-            [DefType.Speed] = Speed,
-        };
 
         public const string Random = "#RANDOM";
         public const string SetRandom = "#SETRANDOM";

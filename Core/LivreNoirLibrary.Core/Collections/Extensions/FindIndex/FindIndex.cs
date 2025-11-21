@@ -69,9 +69,9 @@ namespace LivreNoirLibrary.Collections
         /// <param name="comparer">The TComparer to use when comparing.</param>
         /// <param name="type">Specifies how to search for the element.</param>
         /// <returns>The zero-based index of the element that matches the given condition, if found; otherwise, -1.</returns>
-        public static int FindIndex<T1, T2, TComparer>(this ReadOnlySpan<T1> span, T2 value, TComparer comparer, SearchMode type)
+        public static int FindIndex<T1, T2, TComparer>(this ReadOnlySpan<T1> span, T2 value, SearchMode type)
             where TComparer : IComparer<T1, T2>
-            => TrySearch(span, value, comparer, type, out var index, out _) ? index : -1;
+            => TrySearch<T1, T2, TComparer>(span, value, type, out var index, out _) ? index : -1;
 
         /// <summary>
         /// Searches for an element that matches the given condition, and return the zero-based index of the <see cref="Span{T}"/>.
@@ -81,9 +81,9 @@ namespace LivreNoirLibrary.Collections
         /// <param name="comparer">The TComparer to use when comparing.</param>
         /// <param name="type">Specifies how to search for the element.</param>
         /// <returns>The zero-based index of the element that matches the given condition, if found; otherwise, -1.</returns>
-        public static int FindIndex<T1, T2, TComparer>(this Span<T1> span, T2 value, TComparer comparer, SearchMode type)
+        public static int FindIndex<T1, T2, TComparer>(this Span<T1> span, T2 value, SearchMode type)
             where TComparer : IComparer<T1, T2>
-            => TrySearch(span, value, comparer, type, out var index, out _) ? index : -1;
+            => TrySearch<T1, T2, TComparer>(span, value, type, out var index, out _) ? index : -1;
 
         /// <summary>
         /// Searches for an element that matches the given condition, and return the zero-based index of the <see cref="Array"/>.
@@ -93,9 +93,9 @@ namespace LivreNoirLibrary.Collections
         /// <param name="comparer">The TComparer to use when comparing.</param>
         /// <param name="type">Specifies how to search for the element.</param>
         /// <returns>The zero-based index of the element that matches the given condition, if found; otherwise, -1.</returns>
-        public static int FindIndex<T1, T2, TComparer>(this T1[] array, T2 value, TComparer comparer, SearchMode type)
+        public static int FindIndex<T1, T2, TComparer>(this T1[] array, T2 value, SearchMode type)
             where TComparer : IComparer<T1, T2>
-            => TrySearch(array, value, comparer, type, out var index, out _) ? index : -1;
+            => TrySearch<T1, T2, TComparer>(array, value, type, out var index, out _) ? index : -1;
 
         /// <summary>
         /// Searches for an element that matches the given condition, and return the zero-based index of the <see cref="List{T}"/>.
@@ -105,9 +105,9 @@ namespace LivreNoirLibrary.Collections
         /// <param name="comparer">The TComparer to use when comparing.</param>
         /// <param name="type">Specifies how to search for the element.</param>
         /// <returns>The zero-based index of the element that matches the given condition, if found; otherwise, -1.</returns>
-        public static int FindIndex<T1, T2, TComparer>(this List<T1> list, T2 value, TComparer comparer, SearchMode type)
+        public static int FindIndex<T1, T2, TComparer>(this List<T1> list, T2 value, SearchMode type)
             where TComparer : IComparer<T1, T2>
-            => TrySearch(list, value, comparer, type, out var index, out _) ? index : -1;
+            => TrySearch<T1, T2, TComparer>(list, value, type, out var index, out _) ? index : -1;
 
         /// <summary>
         /// Searches for an element that matches the given condition, and return the zero-based index of the <see cref="IList{T}"/>.
@@ -117,8 +117,8 @@ namespace LivreNoirLibrary.Collections
         /// <param name="comparer">The TComparer to use when comparing.</param>
         /// <param name="type">Specifies how to search for the element.</param>
         /// <returns>The zero-based index of the element that matches the given condition, if found; otherwise, -1.</returns>
-        public static int FindIndex<T1, T2, TComparer>(this IList<T1> list, T2 value, TComparer comparer, SearchMode type)
+        public static int FindIndex<T1, T2, TComparer>(this IList<T1> list, T2 value, SearchMode type)
             where TComparer : IComparer<T1, T2>
-            => TrySearch(list, value, comparer, type, out var index, out _) ? index : -1;
+            => TrySearch<T1, T2, TComparer>(list, value, type, out var index, out _) ? index : -1;
     }
 }

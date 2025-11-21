@@ -245,12 +245,6 @@ namespace LivreNoirLibrary.Media.Wave
             WaveBuffer.SetValue(buffer.Data, func, sampleOffset, sampleCount, buffer.Channels);
         }
 
-        public static float GetMaxMagnitude<T>(this T buffer, int sampleOffset = 0, int sampleCount = 0)
-            where T : IWaveBuffer
-        {
-            return WaveBuffer.GetMaxMagnitude(buffer.Data, sampleOffset, sampleCount, buffer.Channels);
-        }
-
         public static void Clamp<T>(this T buffer, float value = 1, int sampleOffset = 0, int sampleCount = 0)
             where T : IWaveBuffer
         {
@@ -305,13 +299,13 @@ namespace LivreNoirLibrary.Media.Wave
             Splice(buffer, left, right - left + 1);
         }
 
-        public static float[] GetPeak<T>(this T buffer, int sampleOffset = 0, int sampleCount = 0)
+        public static float GetPeak<T>(this T buffer, int sampleOffset = 0, int sampleCount = 0)
             where T : IWaveBuffer
         {
             return WaveBuffer.GetPeak(buffer.Data, sampleOffset, sampleCount, buffer.Channels);
         }
 
-        public static float[] GetRms<T>(this T buffer, int sampleOffset = 0, int sampleCount = 0)
+        public static float GetRms<T>(this T buffer, int sampleOffset = 0, int sampleCount = 0)
             where T : IWaveBuffer
         {
             return WaveBuffer.GetRms(buffer.Data, sampleOffset, sampleCount, buffer.Channels);
@@ -321,6 +315,24 @@ namespace LivreNoirLibrary.Media.Wave
             where T : IWaveBuffer
         {
             return WaveBuffer.GetLufs(buffer.Data, sampleOffset, sampleCount, buffer.SampleRate, buffer.Channels);
+        }
+
+        public static float[] GetPeakPerChannel<T>(this T buffer, int sampleOffset = 0, int sampleCount = 0)
+            where T : IWaveBuffer
+        {
+            return WaveBuffer.GetPeakPerChannel(buffer.Data, sampleOffset, sampleCount, buffer.Channels);
+        }
+
+        public static float[] GetRmsPerChannel<T>(this T buffer, int sampleOffset = 0, int sampleCount = 0)
+            where T : IWaveBuffer
+        {
+            return WaveBuffer.GetRmsPerChannel(buffer.Data, sampleOffset, sampleCount, buffer.Channels);
+        }
+
+        public static float[][] SplitChannels<T>(this T buffer, int sampleOffset = 0, int sampleCount = 0)
+            where T : IWaveBuffer
+        {
+            return WaveBuffer.SplitChannels(buffer.Data, sampleOffset, sampleCount, buffer.Channels);
         }
     }
 }

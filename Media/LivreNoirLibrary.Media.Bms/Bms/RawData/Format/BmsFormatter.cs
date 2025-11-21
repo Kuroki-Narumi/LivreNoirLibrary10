@@ -1,52 +1,49 @@
-﻿using LivreNoirLibrary.Numerics;
-using System;
+﻿using System;
 using System.Collections.Generic;
-using System.Data;
 using System.IO;
-using System.Runtime.InteropServices;
+using System.Runtime.CompilerServices;
 using System.Text;
+using LivreNoirLibrary.Collections;
 
 namespace LivreNoirLibrary.Media.Bms
 {
-    using ConductorDefCollection = Dictionary<DefType, OrderedDictionary<decimal, int>>;
+    using ConductorDefCollection = Dictionary<DefType, OrderedDictionary<double, int>>;
 
-    public partial class BmsFormatter
+    public partial class BmsFormatter(IBmsData data)
     {
-        private readonly ConductorDefCollection _conductor_defs = [];
-        private readonly Dictionary<BaseData, SaveState> _states = [];
-        private readonly Encoding _encoding;
-        private readonly int _radix;
+        private readonly IBmsData _data = data;
+        private readonly ConductorDefCollection _conductorDefs = [];
+        private readonly Dictionary<IBmsDataUnit, SaveState> _states = [];
+        private Encoding? _encoding = null;
+        private int _radix;
 
-        public long MaxDenominator { get; private set; }
-
-        public BmsFormatter(BmsData data)
+        public long Prepare(IBmsDataUnit? root = null)
         {
-            var conductorDefs = _conductor_defs;
+            var data = _data;
+            var conductorDefs = _conductorDefs;
             var states = _states;
-            conductorDefs.Clear();
-            states.Clear();
-
-            var encoding = Constants.DefaultEncoding;
+            var encoding = BmsConstants.DefaultEncoding;
             try
             {
                 TryEncode(data, encoding);
             }
             catch
             {
-                encoding = Constants.Utf8Encoding;
+                encoding = BmsConstants.Utf8Encoding;
             }
             _encoding = encoding;
 
             var lnObj = data.LnObj;
-            var radix = Constants.Base_Legacy;
+            var radix = BmsConstants.Base_Legacy;
             var maxDen = 0L;
-            foreach (var d in data.EachData())
+            foreach (var unit in _data.EnumerateChildren(root))
             {
-                SaveState state = new(d, lnObj, conductorDefs, ref radix);
-                states.Add(d, state);
+                SaveState state = new(unit, lnObj, conductorDefs, ref radix);
+                states.Add(unit, state);
                 maxDen = Math.Max(maxDen, state.MaxDenominator);
             }
             _radix = radix;
+            return maxDen;
         }
 
         public void ReductDenominator(long limit)
@@ -55,67 +52,93 @@ namespace LivreNoirLibrary.Media.Bms
             {
                 state.ReductDenominator(limit);
             }
-            MaxDenominator = limit;
         }
 
-        public void Format(Stream stream, BmsData data, bool indent)
+        private static void TryEncode(IBmsData data, Encoding encoding)
         {
-            using BmsTextWriter writer = new(stream, indent, _radix, _encoding);
-            DumpHeader(data, writer, true);
-            DumpMain(data, writer, true);
-            DumpFlow(data, writer, true);
-        }
-
-        private static void TryEncode(BaseData data, Encoding encoding)
-        {
-            if (data.Note is { } str)
+            foreach (var unit in data.EnumerateAllData())
             {
-                encoding.GetByteCount(str);
-            }
-            data.Headers.TryEncode(encoding);
-            data.DefLists.TryEncode(encoding);
-            foreach (var flow in CollectionsMarshal.AsSpan(data.Flows))
-            {
-                if (flow.Note is { } s)
+                CheckNote(unit);
+                unit.MainHeaders.TryEncode(encoding);
+                unit.SubHeaders.TryEncode(encoding);
+                unit.DefLists.TryEncode(encoding);
+                foreach (var flow in unit.Flows.AsSpan())
                 {
-                    encoding.GetByteCount(s);
+                    CheckNote(flow);
+                    foreach (var branch in flow.EnumerateBranches())
+                    {
+                        CheckNote(branch);
+                    }
                 }
-                foreach (var branch in CollectionsMarshal.AsSpan(flow.Branches))
+            }
+
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
+            void CheckNote(INoteObject obj)
+            {
+                if (obj.Note is { } note)
                 {
-                    TryEncode(branch, encoding);
+                    encoding.GetByteCount(note);
                 }
             }
         }
 
-        private void DumpHeader(BaseData data, BmsTextWriter writer, bool isRoot)
+        public void Format(Stream stream, IBmsDataUnit? root = null, bool indent = false)
+        {
+            ArgumentNullException.ThrowIfNull(_encoding);
+            using BmsTextWriter writer = new(stream, indent, _encoding);
+            root ??= _data.Root;
+            DumpHeader(root, writer, true);
+            DumpMain(root, writer, true);
+            DumpFlow(root, writer, true);
+        }
+
+        private void DumpHeader(IBmsDataUnit data, BmsTextWriter writer, bool isRoot)
         {
             writer.WriteLine(data.Note);
-            if (data.Headers.HasValue || (isRoot && writer.Radix is > Constants.Base_Default))
+            var radix = _radix;
+            var lnObj = _data.LnObj;
+            var main = data.MainHeaders;
+            var sub = data.SubHeaders;
+            var writeBase = isRoot && radix is > BmsConstants.Base_Default;
+            var writeLnObj = isRoot && lnObj is not 0;
+            if (main.Count + sub.Count is > 0 || writeBase || writeLnObj)
             {
                 if (isRoot)
                 {
                     writer.WriteLine(FieldSeparators.Header);
                     writer.WriteLine();
                 }
-                data.Headers.Dump(writer, isRoot);
+                main.Dump(writer);
+                if (writeLnObj)
+                {
+                    writer.WriteLine($"#LNOBJ {BmsUtils.ToBased(lnObj, radix)}");
+                }
+                sub.Dump(writer);
+                if (writeBase)
+                {
+                    writer.WriteLine($"#BASE {radix}");
+                }
+                if (isRoot)
+                {
+                    writer.WriteLine();
+                }
             }
-            if (data.DefLists.HasValue || (isRoot && _conductor_defs.Count is > 0))
+            if (data.DefLists.HasValue || (isRoot && _conductorDefs.Count is > 0))
             {
                 if (isRoot)
                 {
                     writer.WriteLine(FieldSeparators.Def);
                     writer.WriteLine();
                 }
-                data.DefLists.Dump(writer, isRoot);
+                data.DefLists.Dump(writer, radix, isRoot);
                 if (isRoot)
                 {
-                    var radix = writer.Radix;
-                    foreach (var (type, dic) in _conductor_defs)
+                    foreach (var (type, dic) in _conductorDefs)
                     {
                         var key = type.ToString().ToUpper();
                         foreach (var (value, index) in dic)
                         {
-                            writer.WriteLine($"#{key}{BmsUtils.ToBased(index, radix)} {value}");
+                            writer.WriteLine($"#{key}{BmsUtils.ToBased(index, radix)} {value:0.############}");
                         }
                     }
                     writer.WriteLine();
@@ -123,7 +146,7 @@ namespace LivreNoirLibrary.Media.Bms
             }
         }
 
-        private void DumpMain(BaseData data, BmsTextWriter writer, bool isRoot)
+        private void DumpMain(IBmsDataUnit data, BmsTextWriter writer, bool isRoot)
         {
             if (isRoot)
             {
@@ -131,7 +154,7 @@ namespace LivreNoirLibrary.Media.Bms
                 writer.WriteLine();
             }
             var state = _states[data];
-            var radix = writer.Radix;
+            var radix = _radix;
             foreach (var (number, bar) in state._bars)
             {
                 var numberHead = BmsUtils.GetBarText(number);
@@ -141,15 +164,15 @@ namespace LivreNoirLibrary.Media.Bms
                     writer.Write(head);
                     line.WriteText(writer, radix);
                 }
-                if (data.Bars.TryGetValue(number, out var length) && length != Rational.One)
+                if (bar.Length is not 1)
                 {
-                    writer.WriteLine($"{numberHead}{BmsUtils.ToBased(Channel.Bar)}:{(decimal)length}");
+                    writer.WriteLine($"{numberHead}{BmsUtils.ToBased(Channel.Bar)}:{bar.Length:0.############}");
                 }
                 foreach (var (ch, lines) in bar._channels)
                 {
                     head = $"{numberHead}{BmsUtils.ToBased(ch)}:";
-                    var r = BmsUtils.IsHex(ch) ? 16 : radix;
-                    foreach (var line in CollectionsMarshal.AsSpan(lines))
+                    var r = BmsUtils.IsHexValue(ch) ? 16 : radix;
+                    foreach (var line in lines.AsSpan())
                     {
                         writer.Write(head);
                         line.WriteText(writer, r);
@@ -163,28 +186,29 @@ namespace LivreNoirLibrary.Media.Bms
             }
         }
 
-        private void DumpFlow(BaseData data, BmsTextWriter writer, bool isRoot)
+        private void DumpFlow(IBmsDataUnit data, BmsTextWriter writer, bool isRoot)
         {
-            if (data.Flows.Count is > 0)
+            if (data.ContainsFlow)
             {
                 if (isRoot)
                 {
                     writer.WriteLine(FieldSeparators.Flows);
                     writer.WriteLine();
                 }
-                foreach (var flow in CollectionsMarshal.AsSpan(data.Flows))
+                foreach (var flow in data.Flows.AsSpan())
                 {
                     writer.WriteLine(flow.Note);
                     writer.WriteLine(flow.BmsHeader);
                     writer.IndentRight();
-                    foreach (var branch in CollectionsMarshal.AsSpan(flow.Branches))
+                    foreach (var branch in flow.EnumerateBranches())
                     {
+                        var branchData = _data.GetBranchData(branch);
                         writer.WriteLine(branch.Note);
-                        writer.WriteLine(flow.GetBranchHeader(branch));
+                        writer.WriteLine(flow.GetBranchHeader(branch.Condition));
                         writer.IndentRight();
-                        DumpHeader(branch, writer, false);
-                        DumpMain(branch, writer, false);
-                        DumpFlow(branch, writer, false);
+                        DumpHeader(branchData, writer, false);
+                        DumpMain(branchData, writer, false);
+                        DumpFlow(branchData, writer, false);
                         writer.IndentLeft();
                         writer.WriteLine(flow.GetBranchFooter());
                     }

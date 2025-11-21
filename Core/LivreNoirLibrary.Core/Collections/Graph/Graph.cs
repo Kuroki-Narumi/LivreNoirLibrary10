@@ -8,6 +8,7 @@ namespace LivreNoirLibrary.Collections
         public event NotifyGraphNodeChangedEventHandler? NodeChanged;
         public event NotifyGraphEdgeChangedEventHandler? EdgeChanged;
 
+        /// <inheritdoc cref="HashSet{T}.Clear"/>
         public new void Clear()
         {
             if (Count > 0)

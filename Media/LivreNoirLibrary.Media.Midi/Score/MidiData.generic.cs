@@ -115,7 +115,7 @@ namespace LivreNoirLibrary.Media.Midi
         public TimeSignature GetTimeSignatureByNumber(int number) => _signatures.GetByNumber(number);
         public void SetTimeSignature(Rational position, TimeSignature value) => _signatures.Set(position, value);
         public void SetTimeSignatureByNumber(int number, TimeSignature value) => _signatures.SetByNumber(number, value);
-        public IEnumerable<BarInfo> EachBar(Rational end) => _signatures.EachBar(end);
-        public IEnumerable<BarLineInfo> EachLine(Rational end) => _signatures.EachLine(end);
+        public IEnumerable<BarInfo<Rational>> EnumerateBars(Rational end) => _signatures.EnumerateBars(end);
+        public IEnumerable<BarLineInfo<Rational>> EnumerateLines(Rational end) => _signatures.EnumerateLines(end);
     }
 }

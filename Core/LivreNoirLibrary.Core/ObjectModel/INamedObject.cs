@@ -4,6 +4,6 @@ namespace LivreNoirLibrary.ObjectModel
 {
     public interface INamedObject
     {
-        public string? Name { get; }
+        string? Name { get; }
     }
 }

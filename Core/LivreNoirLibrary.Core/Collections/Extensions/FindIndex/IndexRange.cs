@@ -48,44 +48,44 @@ namespace LivreNoirLibrary.Collections
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private static (int Start, int Length) IndexRangeCore<T1, T2, TComparer>(ReadOnlySpan<T1> span, Range<T2> range, TComparer comparer)
+        private static (int Start, int Length) IndexRangeCore<T1, T2, TComparer>(ReadOnlySpan<T1> span, Range<T2> range)
             where T2 : struct
             where TComparer : IComparer<T1, T2>
         {
-            var (s, e) = GetRangeCore(span, range, comparer);
+            var (s, e) = GetRangeCore<T1, T2, TComparer>(span, range);
             return (s, e - s);
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static (int Start, int Length) IndexRange<T1, T2, TComparer>(this ReadOnlySpan<T1> span, Range<T2> range, TComparer comparer)
+        public static (int Start, int Length) IndexRange<T1, T2, TComparer>(this ReadOnlySpan<T1> span, Range<T2> range)
             where T2 : struct
             where TComparer : IComparer<T1, T2>
-            => IndexRangeCore(span, range, comparer);
+            => IndexRangeCore<T1, T2, TComparer>(span, range);
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static (int Start, int Length) IndexRange<T1, T2, TComparer>(this Span<T1> span, Range<T2> range, TComparer comparer)
+        public static (int Start, int Length) IndexRange<T1, T2, TComparer>(this Span<T1> span, Range<T2> range)
             where T2 : struct
             where TComparer : IComparer<T1, T2>
-            => IndexRangeCore<T1, T2, TComparer>(span, range, comparer);
+            => IndexRangeCore<T1, T2, TComparer>(span, range);
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static (int Start, int Length) IndexRange<T1, T2, TComparer>(this T1[] array, Range<T2> range, TComparer comparer)
+        public static (int Start, int Length) IndexRange<T1, T2, TComparer>(this T1[] array, Range<T2> range)
             where T2 : struct
             where TComparer : IComparer<T1, T2>
-            => IndexRangeCore<T1, T2, TComparer>(array, range, comparer);
+            => IndexRangeCore<T1, T2, TComparer>(array, range);
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static (int Start, int Length) IndexRange<T1, T2, TComparer>(this List<T1> list, Range<T2> range, TComparer comparer)
+        public static (int Start, int Length) IndexRange<T1, T2, TComparer>(this List<T1> list, Range<T2> range)
             where T2 : struct
             where TComparer : IComparer<T1, T2>
-            => IndexRangeCore((ReadOnlySpan<T1>)CollectionsMarshal.AsSpan(list), range, comparer);
+            => IndexRangeCore<T1, T2, TComparer>((ReadOnlySpan<T1>)list.AsSpan(), range);
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static (int Start, int Length) IndexRange<T1, T2, TComparer>(this IList<T1> list, Range<T2> range, TComparer comparer)
+        public static (int Start, int Length) IndexRange<T1, T2, TComparer>(this IList<T1> list, Range<T2> range)
             where T2 : struct
             where TComparer : IComparer<T1, T2>
         {
-            var (s, e) = GetRangeCore(list, range, comparer);
+            var (s, e) = GetRangeCore<T1, T2, TComparer>(list, range);
             return (s, e - s);
         }
     }

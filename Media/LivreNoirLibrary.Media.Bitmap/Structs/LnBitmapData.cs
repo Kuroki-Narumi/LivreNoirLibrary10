@@ -12,6 +12,7 @@ namespace LivreNoirLibrary.Media
         public readonly int Height = height;
 
         public int PixelSize => Width * Height;
+        public int Stride => Width * 4;
         public bool IsValid => Pointer is not null && Width is > 0 && Height > 0;
 
         public uint* Offset(int y) => Pointer + y * Width;

@@ -2,10 +2,11 @@
 using System.Collections.Generic;
 using System.Windows.Media.Imaging;
 using LivreNoirLibrary.Media;
+using LivreNoirLibrary.ObjectModel;
 
 namespace LivreNoirLibrary.Windows.Media
 {
-    public class TextureCache
+    public class TextureCache : IClear
     {
         protected readonly Dictionary<string, BitmapImage?> _sourceCache = [];
         protected readonly Dictionary<TextureCacheKey, CroppedBitmap?> _croppedCache = [];

@@ -1,43 +1,49 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Threading;
+using System.Collections.Concurrent;
+using System.Runtime.CompilerServices;
+using System.Reflection;
 
 namespace LivreNoirLibrary.ObjectModel
 {
     public static class ObjectPool
     {
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static T Rent<T>() where T : new() => Pool<T>.Rent();
-        public static void Return<T>(T value) where T : new() => Pool<T>.Return(value);
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static void Return<T>(T obj) where T : new() => Pool<T>.Return(obj);
 
         private static class Pool<T>
             where T : new()
         {
-            private static readonly Lock _lock = new();
-            private static readonly List<T> _stored = [];
+            private static readonly Stack<T> _stored = [];
+            private static readonly Action<T>? _clearMethod;
 
-            public static T Rent()
+            static Pool()
             {
-                lock (_lock)
+                if (typeof(T).GetMethod("Clear", BindingFlags.Instance | BindingFlags.Public, Type.EmptyTypes) is { } info && info.ReturnType == typeof(void))
                 {
-                    if (_stored.Count is > 0)
-                    {
-                        var value = _stored[^1];
-                        _stored.RemoveAt(_stored.Count - 1);
-                        return value;
-                    }
-                    else
-                    {
-                        return new();
-                    }
+                    _clearMethod = info.CreateDelegate<Action<T>>();
                 }
             }
 
-            public static void Return(T value)
+            public static T Rent()
             {
-                lock (_lock)
+                if (_stored.TryPop(out var obj))
                 {
-                    _stored.Add(value);
+                    return obj;
                 }
+                else
+                {
+                    return new();
+                }
+            }
+
+            public static void Return(T obj)
+            {
+                _clearMethod?.Invoke(obj);
+                _stored.Push(obj);
             }
         }
     }

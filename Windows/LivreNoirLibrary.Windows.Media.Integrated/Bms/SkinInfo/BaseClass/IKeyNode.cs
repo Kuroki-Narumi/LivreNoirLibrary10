@@ -4,6 +4,6 @@ namespace LivreNoirLibrary.Windows.Media.Bms.SkinInfo
 {
     public interface IKeyNode
     {
-        public string Key { get; }
+        string Key { get; }
     }
 }

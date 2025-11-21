@@ -1,16 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Runtime.InteropServices;
 using System.Text.Json;
 using LivreNoirLibrary.IO;
-using LivreNoirLibrary.Files;
 using LivreNoirLibrary.Media.FFmpeg;
 using LivreNoirLibrary.Debug;
+using LivreNoirLibrary.Collections;
 
 namespace LivreNoirLibrary.Media.Wave
 {
-    public partial class WaveData : WaveBuffer, IWaveMetaData
+    public partial class WaveData : WaveBuffer, IWaveMetaData, IFile<WaveData>, IStreamLoadable<WaveData>, IStreamDumpable
     {
         private SampleFormat _sample_format = WaveEncodeOptions.DefaultFormat;
         private FormatChunk _format;
@@ -65,6 +64,16 @@ namespace LivreNoirLibrary.Media.Wave
             _format = FormatChunk.Create(SampleRate, Channels, SampleFormat);
         }
 
+        public static WaveData Open(string path) => General.Open(path, Load);
+        public static WaveData Load(Stream stream)
+        {
+            WaveData data = new();
+            using WaveDecoder decoder = new(stream, true, 0, 0);
+            data.Load(decoder);
+            return data;
+        }
+
+        public void Save(string path) => General.Save(path, Dump, ExtRegs.Wav, Exts.Wav);
         public void Save(string path, bool ext = true) => General.Save(path, Dump, ext ? ExtRegs.Wav : null, Exts.Wav);
         public void Save(string path, SampleFormat sampleFormat, bool ext = true)
         {
@@ -135,7 +144,7 @@ namespace LivreNoirLibrary.Media.Wave
             Format.WriteJson(writer, options);
             writer.WritePropertyName("chunks");
             writer.WriteStartArray();
-            foreach (var chunk in CollectionsMarshal.AsSpan(_chunks))
+            foreach (var chunk in _chunks.AsSpan())
             {
                 chunk.WriteJson(writer, options);
             }

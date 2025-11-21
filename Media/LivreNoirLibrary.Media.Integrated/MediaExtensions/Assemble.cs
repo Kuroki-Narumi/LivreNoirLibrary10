@@ -1,54 +1,62 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Runtime.InteropServices;
-using System.Threading;
-using LivreNoirLibrary.Collections;
+﻿using LivreNoirLibrary.Collections;
 using LivreNoirLibrary.Debug;
 using LivreNoirLibrary.Media.Bms;
 using LivreNoirLibrary.Media.Wave;
-using LivreNoirLibrary.Numerics;
 using LivreNoirLibrary.ObjectModel;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading;
 
 namespace LivreNoirLibrary.Media.Integrated
 {
+    public readonly record struct AssembleResult(WaveData WaveData, float ActualGain)
+    {
+        public static implicit operator AssembleResult((WaveData, float) tuple) => new(tuple.Item1, tuple.Item2);
+    }
+
     public static partial class MediaExtensions
     {
-        public static WaveData Assemble(this IBmsData data, AssembleOptions option, string directory) => Assemble(data, option, directory, null, CancellationToken.None);
-        public static WaveData Assemble(this IBmsData data, AssembleOptions options, string directory, ProgressReporter? reporter, CancellationToken c)
+        public static AssembleResult Assemble(this IBmsViewModel data, AssembleOptions option, string directory) => Assemble(data, option, directory, null, CancellationToken.None);
+        public static AssembleResult Assemble(this IBmsViewModel data, AssembleOptions options, string directory, ProgressReporter? reporter, CancellationToken c)
         {
             reporter?.Report("Creating Timeline ...", 0, 100);
-            var selector = options.Target.GetSelector([], options.PlayLongEnd && data.LnObj is 0);
+            var includeLongEnd = options.PlayLongEnd && data.LnObj is 0;
+            Predicate<Note> selector = options.Target.Type switch
+            {
+                ConvertTargetType.Key => n => n.IsVisibleKey(includeLongEnd),
+                ConvertTargetType.Bgm => n => n.IsBgm(),
+                _ => n => n.IsMainSound(includeLongEnd),
+            };
             var list = SoundTimingList.Create(data, selector);
             return AssembleCore(data, options, directory, list, options.Adjust ? list.FirstTick : 0, 0, reporter, c);
         }
 
-        public static WaveData AssembleSelection(this IBmsData data, AssembleOptions option, Selection selection, string directory) => AssembleSelection(data, option, selection, directory, null, CancellationToken.None);
-        public static WaveData AssembleSelection(this IBmsData data, AssembleOptions options, Selection selection, string directory, ProgressReporter? reporter, CancellationToken c)
+        public static AssembleResult AssembleSelection(this IBmsViewModel data, AssembleOptions option, Selection selection, string directory) => AssembleSelection(data, option, selection, directory, null, CancellationToken.None);
+        public static AssembleResult AssembleSelection(this IBmsViewModel data, AssembleOptions options, Selection selection, string directory, ProgressReporter? reporter, CancellationToken c)
         {
             reporter?.Report("Creating Timeline ...", 0, 100);
-            var lnEnd = options.PlayLongEnd && data.LnObj is 0;
-            var list = SoundTimingList.Create(data, selection, n => n.IsPlayableSound(lnEnd, out _));
+            var includeLongEnd = options.PlayLongEnd && data.LnObj is 0;
+            var list = SoundTimingList.Create(data, selection, n => n.IsMainSound(includeLongEnd));
             return AssembleCore(data, options, directory, list, list.FirstTick, 0, reporter, c);
         }
 
-        public static WaveData AssembleForPreview(this IBmsData data, AssembleOptions options, string directory) => AssembleForPreview(data, options, directory, null, CancellationToken.None);
-        public static WaveData AssembleForPreview(this IBmsData data, AssembleOptions options, string directory, ProgressReporter? reporter, CancellationToken c)
+        public static AssembleResult AssembleForPreview(this IBmsViewModel data, AssembleOptions options, string directory) => AssembleForPreview(data, options, directory, null, CancellationToken.None);
+        public static AssembleResult AssembleForPreview(this IBmsViewModel data, AssembleOptions options, string directory, ProgressReporter? reporter, CancellationToken c)
         {
             reporter?.Report("Creating Timeline ...", 0, 100);
-            TimeCounter counter = new(data);
-            var start = counter.Beat2Tick(data.GetAbsolutePosition(options.PreviewStart));
+            var start = data.TimeCounter.Beat2Tick(data.GetAbsolutePosition(options.PreviewStart));
             var b = TimeUtils.Seconds2Ticks(options.PreviewBody);
             var fo = TimeUtils.Seconds2Ticks(options.PreviewFadeOut);
 
-            var list = SoundTimingList.Create(data, counter, null, start + b + fo);
+            var list = SoundTimingList.Create(data, null, start + b + fo);
 
             var fi = TimeUtils.Seconds2Ticks(options.PreviewFadeIn);
             if (fi > start)
             {
                 fi = start;
             }
-            var result = AssembleCore(data, options, directory, list, start - fi, fi + b + fo, reporter, c);
+            var (result, gain) = AssembleCore(data, options, directory, list, start - fi, fi + b + fo, reporter, c);
             reporter?.Report("Apply fade ...", 100, 100);
             var rate = result.SampleRate;
             if (fi is > 0)
@@ -62,16 +70,16 @@ namespace LivreNoirLibrary.Media.Integrated
                 result.FadeOut(-fadeout, fadeout, 2);
             }
 
-            return result;
+            return (result, gain);
         }
 
-        private static WaveData AssembleCore(IBmsData data, AssembleOptions options, string directory, SoundTimingList timings, long headroom, long lengthLimit, ProgressReporter? reporter, CancellationToken c)
+        private static AssembleResult AssembleCore(IBmsViewModel data, AssembleOptions options, string directory, SoundTimingList timings, long headroom, long lengthLimit, ProgressReporter? reporter, CancellationToken c)
         {
             c.ThrowIfCancellationRequested();
             var ogain = options.Gain;
             var gain = WaveBuffer.Level2Value(ogain);
-            var normalize = options.Normalize;
-            var needGain = ogain is not 0 || normalize;
+            var normalize = options.NormalizeMode;
+            var needGain = ogain is not 0 || normalize is not 0;
             var overlap = options.Overlap;
 
             var marker = options.Marker;
@@ -160,7 +168,7 @@ namespace LivreNoirLibrary.Media.Integrated
                     result.EnsureSampleLength(Math.Min(sampleLimit, ToOffset(timings.LastTick)));
                     needInitialize = false;
                 }
-                foreach (var item in CollectionsMarshal.AsSpan(list))
+                foreach (var item in list.AsSpan())
                 {
                     Append(name!, item.Position, overlap ? 0 : item.Length);
                 }
@@ -170,9 +178,18 @@ namespace LivreNoirLibrary.Media.Integrated
             if (needGain)
             {
                 reporter?.Report("Normalizing ...", 99, 100);
-                if (normalize)
+                Console.WriteLine($"gain={gain}, mode={normalize}");
+                switch (normalize)
                 {
-                    gain /= result.GetMaxMagnitude();
+                    case NormalizeMode.Peak:
+                        gain /= result.GetPeak();
+                        break;
+                    case NormalizeMode.Rms:
+                        gain /= result.GetRms();
+                        break;
+                    case NormalizeMode.Lufs:
+                        gain *= WaveBuffer.Level2Value(-result.GetLufs());
+                        break;
                 }
                 result.Multiply(gain);
             }
@@ -181,33 +198,28 @@ namespace LivreNoirLibrary.Media.Integrated
                 result.Markers.Set(pos, string.Join(" + ", names));
             }
             result.Software = "LivreNoirLibrary";
-            return result;
+            return (result, gain);
         }
 
-        public static bool ReplaceToAssembled(this IBmsData data, AssembleOptions options, Selection selection, string defName, out Selection newSelection, out int defId)
+        public static void ReplaceToAssembled(this IBmsViewModel data, AssembleOptions options, Selection selection, string defName, out Selection newSelection, out int defId)
         {
-            if (!data.TryGetDefIndex(DefType.Wav, defName, out defId))
+            if (!data.TryGetDefKey(DefType.Wav, defName, out defId))
             {
                 defId = data.FindFreeDefIndex(DefType.Wav);
+                data.CurrentData.DefLists.Set(DefType.Wav, defId, defName);
             }
-            bool flag;
             switch (options.ReplaceMode)
             {
                 case AssembleReplaceMode.Selection:
-                    flag = data.ReplaceSelection(selection, defId, out newSelection);
+                    newSelection = data.CombineSequence(selection, defId);
                     break;
                 case AssembleReplaceMode.All:
-                    flag = data.ReplaceSelectionAll(selection, defId, options.ReplaceMargin, out newSelection);
+                    newSelection = data.CombineSequenceAll(selection, defId, options.ReplaceMargin);
                     break;
                 default:
                     newSelection = selection;
-                    return false;
+                    return;
             }
-            if (flag)
-            {
-                data.DefLists.Set(DefType.Wav, defId, defName);
-            }
-            return flag;
         }
     }
 }

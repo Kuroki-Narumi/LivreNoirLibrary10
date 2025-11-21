@@ -1,4 +1,5 @@
-﻿using System;
+﻿using LivreNoirLibrary.ObjectModel;
+using System;
 using System.Buffers;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
@@ -6,7 +7,7 @@ using static LivreNoirLibrary.Media.Ogg.OggPage;
 
 namespace LivreNoirLibrary.Media.Ogg
 {
-    public class OutputStreamState(int serialNumber = -1) : StreamState(serialNumber)
+    public class OutputStreamState(int serialNumber = -1) : StreamState(serialNumber), IClear
     {
         public int FlushBufferLength { get; set; } = 4096;
         public int FlushPacketCount { get; set; } = 4;

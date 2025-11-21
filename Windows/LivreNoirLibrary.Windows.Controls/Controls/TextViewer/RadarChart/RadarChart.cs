@@ -20,9 +20,9 @@ namespace LivreNoirLibrary.Windows.Controls
             ReserveRefresh();
         }
 
-        static readonly Dictionary<double, (double, double)> _angle_cache = [];
+        private static readonly Dictionary<double, (double, double)> _angle_cache = [];
 
-        (double, double) GetSinCos(double angle)
+        private (double, double) GetSinCos(double angle)
         {
             if (!_angle_cache.TryGetValue(angle, out var value))
             {

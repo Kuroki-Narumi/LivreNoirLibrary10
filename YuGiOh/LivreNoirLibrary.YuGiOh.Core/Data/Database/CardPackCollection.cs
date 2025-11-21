@@ -1,9 +1,6 @@
 using LivreNoirLibrary.Collections;
-using LivreNoirLibrary.Text;
 using System;
 using System.Collections.Generic;
-using System.Runtime.InteropServices;
-using System.Text.Json;
 
 namespace LivreNoirLibrary.YuGiOh.Data
 {
@@ -17,7 +14,7 @@ namespace LivreNoirLibrary.YuGiOh.Data
             var c = source.Count;
             _list.EnsureCapacity(c);
             _key_list.EnsureCapacity(c);
-            foreach (var item in CollectionsMarshal.AsSpan(source))
+            foreach (var item in source.AsSpan())
             {
                 CardPack pack = new(item);
                 _list.Add(pack);

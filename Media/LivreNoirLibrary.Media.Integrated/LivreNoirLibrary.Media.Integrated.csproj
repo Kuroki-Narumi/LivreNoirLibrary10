@@ -2,7 +2,6 @@
 
 	<PropertyGroup>
 		<TargetFramework>net10.0</TargetFramework>
-		<LangVersion>preview</LangVersion>
 		<ImplicitUsings>disable</ImplicitUsings>
 		<Nullable>enable</Nullable>
 		<AllowUnsafeBlocks>True</AllowUnsafeBlocks>
@@ -16,6 +15,7 @@
 
 	<ItemGroup>
 	  <ProjectReference Include="..\LivreNoirLibrary.Media.Bms\LivreNoirLibrary.Media.Bms.csproj" />
+	  <ProjectReference Include="..\LivreNoirLibrary.Media.FFmpeg\LivreNoirLibrary.Media.FFmpeg.csproj" />
 	  <ProjectReference Include="..\LivreNoirLibrary.Media.Midi\LivreNoirLibrary.Media.Midi.csproj" />
 	  <ProjectReference Include="..\LivreNoirLibrary.Media.Wave\LivreNoirLibrary.Media.Wave.csproj" />
 	</ItemGroup>

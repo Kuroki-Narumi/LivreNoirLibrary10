@@ -10,7 +10,7 @@ namespace LivreNoirLibrary.YuGiOh
     public static partial class Vocab
     {
         [GeneratedRegex(@"[\s""-'*-/:->[-`{-~・“”‘’＝－―★☆×『』【】《》]")]
-        static partial Regex Regex_Symbol { get; }
+        private static partial Regex Regex_Symbol { get; }
 
         public static string RemoveSymbol(string text)
         {

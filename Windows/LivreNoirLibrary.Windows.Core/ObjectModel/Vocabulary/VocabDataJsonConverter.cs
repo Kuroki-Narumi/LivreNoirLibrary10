@@ -18,35 +18,28 @@ namespace LivreNoirLibrary.Windows
             }
             else if (reader.TokenType is JsonTokenType.StartObject)
             {
-                string header = "", desc = "", key = "";
-                ref string target = ref header;
-                reader.Read();
-                while (reader.TokenType is not JsonTokenType.EndObject)
+                string? header = null, desc = null, key = null;
+                using (var doc = JsonDocument.ParseValue(ref reader))
                 {
-                    if (reader.TokenType is JsonTokenType.PropertyName)
+                    foreach (var prop in doc.RootElement.EnumerateObject())
                     {
-                        switch (reader.GetString())
+                        switch (prop.Name)
                         {
                             case PropertyName_Header:
-                                target = ref header;
+                                header = prop.Value.GetString();
                                 break;
                             case PropertyName_Description:
-                                target = ref desc;
+                                desc = prop.Value.GetString();
                                 break;
                             case PropertyName_KeyTip:
-                                target = ref key;
+                                key = prop.Value.GetString();
                                 break;
                         }
                     }
-                    else if (reader.TokenType is JsonTokenType.String)
-                    {
-                        target = reader.GetString()!;
-                    }
-                    reader.Read();
                 }
                 VocabData data = new()
                 {
-                    Header = header,
+                    Header = header ?? "",
                     Description = desc,
                     KeyTip = key,
                 };

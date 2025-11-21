@@ -41,6 +41,8 @@ namespace LivreNoirLibrary.Windows
         public string MenuHeader => string.IsNullOrEmpty(KeyTip) ? Header : $"{Header}(_{KeyTip})";
         public string MenuHeaderWithLeader => string.IsNullOrEmpty(KeyTip) ? HeaderWithLeader : $"{HeaderWithLeader}(_{KeyTip})";
 
+        public override string ToString() => Header;
+
         public static implicit operator string(VocabData value) => value.Header;
         public static implicit operator VocabData(string value) => new() { Header = value };
         public static implicit operator VocabData((string, string) tuple) => new() { Header = tuple.Item1, Description = tuple.Item2 };

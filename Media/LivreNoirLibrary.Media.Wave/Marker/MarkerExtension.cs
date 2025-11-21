@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using LivreNoirLibrary.Debug;
 using LivreNoirLibrary.Media.Wave.Chunks;
 using LivreNoirLibrary.Text;
 
@@ -17,7 +16,7 @@ namespace LivreNoirLibrary.Media.Wave
             return result;
         }
 
-        public static void GetCueMarkers<T>(this T meta, MarkerCollection target)
+        public static void GetCueMarkers<T>(this T meta, IMarkerCollection target)
             where T : IWaveMetaData
         {
             target.Clear();
@@ -34,7 +33,7 @@ namespace LivreNoirLibrary.Media.Wave
             }
         }
 
-        public static void SetCueMarkers<T>(this T meta, MarkerCollection source, long totalSamples)
+        public static void SetCueMarkers<T>(this T meta, IMarkerCollection source, long totalSamples)
             where T : IWaveMetaData
         {
             var cues = meta.GetOrCreateChunk<Cue>(() => []);
@@ -58,7 +57,7 @@ namespace LivreNoirLibrary.Media.Wave
             }
             // apply
             var purpose = "beat".Shared();
-            foreach (var (i, name, pos, length) in source.EachMarkerWithLength(totalSamples, false))
+            foreach (var (i, name, pos, length) in source.EnumerateWithLength(totalSamples, false))
             {
                 CueData data = new(pos) { Id = i };
                 cues.Add(data);

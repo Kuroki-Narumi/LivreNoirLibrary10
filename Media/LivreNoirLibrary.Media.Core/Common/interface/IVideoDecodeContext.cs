@@ -18,7 +18,7 @@ namespace LivreNoirLibrary.Media
         /// <param name="requiredTime">Minimum timestamp required (in seconds)<br/>
         /// If hardware decoding is enabled, the decoder ignores this.</param>
         /// <returns>
-        /// <see cref="bool">true</see> if a frame decoded; otherwise <see cref="bool">false</see>(basically it means the end of stream).
+        /// <see langword="true"/> if a frame decoded; otherwise <see langword="false"/>(basically it means the end of stream).
         /// </returns>
         bool DecodeFrame(Rational requiredTime);
 
@@ -29,7 +29,7 @@ namespace LivreNoirLibrary.Media
         /// <param name="pts">The frame timestamp(in seconds).</param>
         /// <param name="duration">The frame duration(in seconds).</param>
         /// <returns>
-        /// <see cref="bool">true</see> if written to <paramref name="buffer"/>; otherwise <see cref="bool">false</see>(meaning the decoder has no decoded frames).
+        /// <see langword="true"/> if written to <paramref name="buffer"/>; otherwise <see langword="false"/>(meaning the decoder has no decoded frames).
         /// </returns>
         /// <exception cref="IndexOutOfRangeException"/>
         /// <exception cref="OutOfMemoryException"/>

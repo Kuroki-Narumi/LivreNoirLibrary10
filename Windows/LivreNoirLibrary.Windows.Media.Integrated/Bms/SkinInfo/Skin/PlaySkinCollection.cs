@@ -1,10 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using LivreNoirLibrary.Collections;
+using LivreNoirLibrary.ObjectModel;
 
 namespace LivreNoirLibrary.Windows.Media.Bms.SkinInfo
 {
-    public class PlaySkinCollection
+    public class PlaySkinCollection : IClear
     {
         private readonly Dictionary<int, ObservableList<PlaySkin>> _skins = [];
         public IEnumerable<PlaySkin>? this[int keyCount] => _skins.GetValueOrDefault(keyCount);

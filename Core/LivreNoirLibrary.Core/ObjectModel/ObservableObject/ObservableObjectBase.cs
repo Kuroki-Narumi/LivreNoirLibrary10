@@ -15,6 +15,7 @@ namespace LivreNoirLibrary.ObjectModel
 
         public event PropertyChangedEventHandler? PropertyChanged;
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         protected bool SetValue<T>(ref T field, T value, [CallerMemberName] string propertyName = "")
         {
             if (EqualityComparer<T>.Default.Equals(field, value))
@@ -39,28 +40,52 @@ namespace LivreNoirLibrary.ObjectModel
             return result;
         }
 
-        protected bool SetValue<T>(ref T field, T value, Action<T, T> changed, [CallerMemberName] string propertyName = "")
+        protected bool SetValue<T>(ref T field, T value, Action<T, T> changedHandler, [CallerMemberName] string propertyName = "")
         {
             var oldValue = field;
             var result = SetValue(ref field, value, propertyName);
             if (result)
             {
-                changed(oldValue, value);
+                changedHandler(oldValue, value);
             }
             return result;
         }
 
-        protected bool SetValue<T>(ref T field, T value, ReadOnlySpan<string> relatedProperties, Action<T, T> changed, [CallerMemberName] string propertyName = "")
+        protected bool SetValue<T>(ref T field, T value, ReadOnlySpan<string> relatedProperties, Action<T, T> changedHandler, [CallerMemberName] string propertyName = "")
         {
             var oldValue = field;
             var result = SetValue(ref field, value, propertyName);
             if (result)
             {
+                changedHandler(oldValue, value);
                 foreach (var prop in relatedProperties)
                 {
                     SendPropertyChanged(prop);
                 }
-                changed(oldValue, value);
+            }
+            return result;
+        }
+
+        protected bool SetValue<T>(ref T field, T value, Action changedHandler, [CallerMemberName] string propertyName = "")
+        {
+            var result = SetValue(ref field, value, propertyName);
+            if (result)
+            {
+                changedHandler();
+            }
+            return result;
+        }
+
+        protected bool SetValue<T>(ref T field, T value, ReadOnlySpan<string> relatedProperties, Action changedHandler, [CallerMemberName] string propertyName = "")
+        {
+            var result = SetValue(ref field, value, propertyName);
+            if (result)
+            {
+                changedHandler();
+                foreach (var prop in relatedProperties)
+                {
+                    SendPropertyChanged(prop);
+                }
             }
             return result;
         }

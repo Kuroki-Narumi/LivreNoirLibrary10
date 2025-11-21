@@ -8,16 +8,16 @@ namespace LivreNoirLibrary.Windows.Controls
 {
     public partial class AlignSelector : Control
     {
-        const string PART_Vertical = nameof(PART_Vertical);
-        const string PART_Horizontal = nameof(PART_Horizontal);
-        const string Button_V1 = nameof(Button_V1);
-        const string Button_V2 = nameof(Button_V2);
-        const string Button_V3 = nameof(Button_V3);
-        const string Button_V4 = nameof(Button_V4);
-        const string Button_H1 = nameof(Button_H1);
-        const string Button_H2 = nameof(Button_H2);
-        const string Button_H3 = nameof(Button_H3);
-        const string Button_H4 = nameof(Button_H4);
+        private const string PART_Vertical = nameof(PART_Vertical);
+        private const string PART_Horizontal = nameof(PART_Horizontal);
+        private const string Button_V1 = nameof(Button_V1);
+        private const string Button_V2 = nameof(Button_V2);
+        private const string Button_V3 = nameof(Button_V3);
+        private const string Button_V4 = nameof(Button_V4);
+        private const string Button_H1 = nameof(Button_H1);
+        private const string Button_H2 = nameof(Button_H2);
+        private const string Button_H3 = nameof(Button_H3);
+        private const string Button_H4 = nameof(Button_H4);
 
         static AlignSelector()
         {

@@ -6,17 +6,17 @@ namespace LivreNoirLibrary.Media.FFmpeg
 {
     public unsafe interface ICodecOptions
     {
-        public AVCodecID Codec { get; }
-        public AVPixelFormat PixelFormat { get; }
-        public AVFieldOrder FieldOrder { get; }
-        public AVColorRange ColorRange { get; }
-        public AVColorSpace ColorSpace { get; }
-        public AVColorPrimaries ColorPrimaries { get; }
-        public AVColorTransferCharacteristic ColorTransferCharacteristic { get; }
-        public AVChromaLocation ChromaLocation { get; }
-        public Rational GopSize { get; }
-        public int MaxBFrames => 0;
-        public Rational AspectRatio => Rational.One;
+        AVCodecID Codec { get; }
+        AVPixelFormat PixelFormat { get; }
+        AVFieldOrder FieldOrder { get; }
+        AVColorRange ColorRange { get; }
+        AVColorSpace ColorSpace { get; }
+        AVColorPrimaries ColorPrimaries { get; }
+        AVColorTransferCharacteristic ColorTransferCharacteristic { get; }
+        AVChromaLocation ChromaLocation { get; }
+        Rational GopSize { get; }
+        int MaxBFrames => 0;
+        Rational AspectRatio => Rational.One;
 
         Dictionary<string, string?> GetDictionary();
     }

@@ -6,18 +6,7 @@ namespace LivreNoirLibrary.Numerics
 {
     public partial class ReversePolishNotation<T>
     {
-        public readonly struct FuncResult(T value, Exception? exception)
-        {
-            public readonly T Value = value;
-            public readonly Exception? Exception = exception;
-
-            public bool HasException => Exception is not null;
-
-            public static implicit operator FuncResult(T value) => new(value, null);
-            public static implicit operator FuncResult(Exception exception) => new(default, exception);
-        }
-
-        public delegate FuncResult Func(ReadOnlySpan<T> operands, TryGetFunc<T> variables);
+        public delegate FuncResult<T> Func(ReadOnlySpan<T> operands, TryGetFunc<T> variables);
 
         protected readonly struct FunctionNode(string symbol, int operandCount, Func func)
         {

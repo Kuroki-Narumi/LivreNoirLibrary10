@@ -134,39 +134,39 @@ namespace LivreNoirLibrary.Collections
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static bool TrySearch<T1, T2, TComparer>(this IList<T1> list, T2 value, TComparer comparer, SearchMode mode, out int index, [MaybeNullWhen(false)] out T1 actualValue)
+        public static bool TrySearch<T1, T2, TComparer>(this IList<T1> list, T2 value, SearchMode mode, out int index, [MaybeNullWhen(false)] out T1 actualValue)
             where TComparer : IComparer<T1, T2>
         {
-            index = TrySearchCore_GetIndex(BinarySearch(list, value, comparer), list.Count, mode);
+            index = TrySearchCore_GetIndex(BinarySearch<T1, T2, TComparer>(list, value), list.Count, mode);
             return ReturnCore(list, index, out actualValue);
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static bool TrySearch<T1, T2, TComparer>(this List<T1> list, T2 value, TComparer comparer, SearchMode mode, out int index, [MaybeNullWhen(false)] out T1 actualValue)
+        public static bool TrySearch<T1, T2, TComparer>(this List<T1> list, T2 value, SearchMode mode, out int index, [MaybeNullWhen(false)] out T1 actualValue)
             where TComparer : IComparer<T1, T2>
         {
-            index = TrySearchCore_GetIndex(BinarySearch(CollectionsMarshal.AsSpan(list), value, comparer), list.Count, mode);
+            index = TrySearchCore_GetIndex(BinarySearch<T1, T2, TComparer>(list.AsSpan(), value), list.Count, mode);
             return ReturnCore(list, index, out actualValue);
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static bool TrySearch<T1, T2, TComparer>(this T1[] array, T2 value, TComparer comparer, SearchMode mode, out int index, [MaybeNullWhen(false)] out T1 actualValue)
+        public static bool TrySearch<T1, T2, TComparer>(this T1[] array, T2 value, SearchMode mode, out int index, [MaybeNullWhen(false)] out T1 actualValue)
             where TComparer : IComparer<T1, T2>
         {
-            index = TrySearchCore_GetIndex(BinarySearch((ReadOnlySpan<T1>)array, value, comparer), array.Length, mode);
+            index = TrySearchCore_GetIndex(BinarySearch<T1, T2, TComparer>((ReadOnlySpan<T1>)array, value), array.Length, mode);
             return ReturnCore(array, index, out actualValue);
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static bool TrySearch<T1, T2, TComparer>(this Span<T1> span, T2 value, TComparer comparer, SearchMode mode, out int index, [MaybeNullWhen(false)] out T1 actualValue)
+        public static bool TrySearch<T1, T2, TComparer>(this Span<T1> span, T2 value, SearchMode mode, out int index, [MaybeNullWhen(false)] out T1 actualValue)
             where TComparer : IComparer<T1, T2>
-            => TrySearch((ReadOnlySpan<T1>)span, value, comparer, mode, out index, out actualValue);
+            => TrySearch<T1, T2, TComparer>((ReadOnlySpan<T1>)span, value, mode, out index, out actualValue);
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static bool TrySearch<T1, T2, TComparer>(this ReadOnlySpan<T1> span, T2 value, TComparer comparer, SearchMode mode, out int index, [MaybeNullWhen(false)] out T1 actualValue)
+        public static bool TrySearch<T1, T2, TComparer>(this ReadOnlySpan<T1> span, T2 value, SearchMode mode, out int index, [MaybeNullWhen(false)] out T1 actualValue)
             where TComparer : IComparer<T1, T2>
         {
-            index = TrySearchCore_GetIndex(BinarySearch(span, value, comparer), span.Length, mode);
+            index = TrySearchCore_GetIndex(BinarySearch<T1, T2, TComparer>(span, value), span.Length, mode);
             return ReturnCore(span, index, out actualValue);
         }
     }

@@ -66,17 +66,17 @@ namespace LivreNoirLibrary.Media.Bms
             }
         }
 
-        public Predicate<INote> GetSelector(HashSet<INote> selection, bool includeLongEnd)
+        public Predicate<Note> GetSelector(HashSet<Note> selection, bool includeLongEnd)
         {
             return Type switch
             {
-                ConvertTargetType.Key => n => n.IsVisibleKey(includeLongEnd, out _),
-                ConvertTargetType.Bgm => n => n.IsBgm(out _),
-                ConvertTargetType.Selected => n => n.IsPlayableSound(includeLongEnd, out _) && selection.Contains(n),
-                ConvertTargetType.BgmAndSelected => n => n.IsSound(n => n.IsBgm() || (n.IsNormal(includeLongEnd) && selection.Contains(n))),
-                ConvertTargetType.Lane => n => n.IsSound(n => n.IsPlayableSound(includeLongEnd) && _targets.Contains(n.Lane)),
-                ConvertTargetType.Id => n => n.IsSound(n => n.IsPlayableSound(includeLongEnd) && _targets.Contains(n.Value)),
-                _ => n => n.IsPlayableSound(includeLongEnd, out _)
+                ConvertTargetType.Key => n => n.IsVisibleKey(includeLongEnd),
+                ConvertTargetType.Bgm => n => n.IsBgm(),
+                ConvertTargetType.Selected => n => n.IsSound() && selection.Contains(n),
+                ConvertTargetType.BgmAndSelected => n => n.IsBgm() || (n.IsSound() && selection.Contains(n)),
+                ConvertTargetType.Lane => n => BmsUtils.TryGetLane(n.Channel, out var lane) && _targets.Contains(lane),
+                ConvertTargetType.Id => n => _targets.Contains((int)n.Value),
+                _ => n => n.IsVisibleKey(includeLongEnd) || n.IsBgm(),
             };
         }
     }

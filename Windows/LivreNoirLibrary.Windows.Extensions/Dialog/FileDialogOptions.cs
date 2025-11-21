@@ -35,7 +35,7 @@ namespace LivreNoirLibrary.Windows
         /// Gets or sets a value indicating whether the dialog box displays a warning if the user specifies a path that does not exist.
         /// </summary>
         /// <returns>
-        /// <see cref="bool">true</see> if the dialog box displays a warning when the user specifies a path that does not exist; otherwise, <see cref="bool">false</see>. The default value is <see cref="bool">true</see>.
+        /// <see langword="true"/> if the dialog box displays a warning when the user specifies a path that does not exist; otherwise, <see langword="false"/>. The default value is <see langword="true"/>.
         /// </returns>
         public bool CheckPathExesits { get; set; } = true;
 
@@ -43,7 +43,7 @@ namespace LivreNoirLibrary.Windows
         /// Gets or sets a value indicating whether the dialog box allows multiple files to be selected.
         /// </summary>
         /// <returns>
-        /// <see cref="bool">true</see> if the dialog box allows multiple files to be selected together or concurrently; otherwise, <see cref="bool">false</see>. The default value is <see cref="bool">false</see>.
+        /// <see langword="true"/> if the dialog box allows multiple files to be selected together or concurrently; otherwise, <see langword="false"/>. The default value is <see langword="false"/>.
         /// </returns>
         public bool Multiselect { get; set; } = false;
 
@@ -51,7 +51,7 @@ namespace LivreNoirLibrary.Windows
         /// Gets or sets a value indicating whether the dialog box displays a warning if the user specifies a file name that does not exist.
         /// </summary>
         /// <returns>
-        /// <see cref="bool">true</see> if the dialog box displays a warning when the user specifies a file name that does not exist; otherwise, <see cref="bool">false</see>. The default value is <see cref="bool">true</see>.
+        /// <see langword="true"/> if the dialog box displays a warning when the user specifies a file name that does not exist; otherwise, <see langword="false"/>. The default value is <see langword="true"/>.
         /// </returns>
         public bool CheckFileExists { get; set; } = true;
 
@@ -59,7 +59,7 @@ namespace LivreNoirLibrary.Windows
         /// Gets or sets a value indicating whether the Save As dialog box displays a warning if the user specifies a file name that already exists.
         /// </summary>
         /// <returns>
-        /// <see cref="bool">true</see> if the dialog box prompts the user before overwriting an existing file if the user specifies a file name that already exists; <see cref="bool">false</see> if the dialog box automatically overwrites the existing file without prompting the user for permission. The default value is <see cref="bool">true</see>.
+        /// <see langword="true"/> if the dialog box prompts the user before overwriting an existing file if the user specifies a file name that already exists; <see langword="false"/> if the dialog box automatically overwrites the existing file without prompting the user for permission. The default value is <see langword="true"/>.
         /// </returns>
         public bool OverwritePrompt { get; set; } = true;
 

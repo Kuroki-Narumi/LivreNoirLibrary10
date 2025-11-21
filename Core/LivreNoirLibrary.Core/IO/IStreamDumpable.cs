@@ -4,6 +4,6 @@ namespace LivreNoirLibrary.IO
 {
     public interface IStreamDumpable
     {
-        public void Dump(Stream stream);
+        void Dump(Stream stream);
     }
 }

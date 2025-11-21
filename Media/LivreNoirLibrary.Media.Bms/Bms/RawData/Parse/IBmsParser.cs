@@ -30,7 +30,7 @@ namespace LivreNoirLibrary.Media.Bms
         void AddHeader(ReadOnlySpan<char> key, ReadOnlySpan<char> value);
 
         void AddDef(DefType type, long key, string value);
-        void AddConductorDef(DefType type, long key, decimal value);
+        void AddConductorDef(DefType type, long key, double value);
 
         void AddBar(int number, Channel channel, ReadOnlySpan<char> value);
     }

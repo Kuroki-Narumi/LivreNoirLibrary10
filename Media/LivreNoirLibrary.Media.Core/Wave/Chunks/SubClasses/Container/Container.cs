@@ -3,7 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Text.Json;
-using System.Runtime.InteropServices;
+using LivreNoirLibrary.Collections;
 
 namespace LivreNoirLibrary.Media.Wave.Chunks
 {
@@ -29,7 +29,7 @@ namespace LivreNoirLibrary.Media.Wave.Chunks
         public override void DumpContents(BinaryWriter writer)
         {
             writer.Write((uint)DataList.Count);
-            foreach (var data in CollectionsMarshal.AsSpan(DataList))
+            foreach (var data in DataList.AsSpan())
             {
                 data.Dump(writer);
             }
@@ -39,7 +39,7 @@ namespace LivreNoirLibrary.Media.Wave.Chunks
         {
             writer.WritePropertyName("data");
             writer.WriteStartArray();
-            foreach (var data in CollectionsMarshal.AsSpan(DataList))
+            foreach (var data in DataList.AsSpan())
             {
                 data.WriteJson(writer, options);
             }

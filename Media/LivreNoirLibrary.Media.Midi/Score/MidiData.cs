@@ -1,6 +1,5 @@
 ﻿using System;
 using System.IO;
-using LivreNoirLibrary.Files;
 using LivreNoirLibrary.IO;
 
 namespace LivreNoirLibrary.Media.Midi

@@ -6,9 +6,9 @@ namespace LivreNoirLibrary.Windows.Controls
 
     public interface IVerifyText
     {
-        public event VerifyTextEventHandler? Verify;
+        event VerifyTextEventHandler? Verify;
 
-        public string? Text { get; set; }
-        public bool IsTextValid { get; }
+        string? Text { get; set; }
+        bool IsTextValid { get; }
     }
 }

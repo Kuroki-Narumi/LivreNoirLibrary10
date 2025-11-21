@@ -3,26 +3,27 @@ using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Text;
 using LivreNoirLibrary.Numerics;
+using LivreNoirLibrary.ObjectModel;
 
 namespace LivreNoirLibrary.Media.Midi
 {
-    public interface IScore : IBarPositionProvider
+    public interface IScore : IBarPositionProvider<Rational>, IClear
     {
-        public string? Title { get; set; }
-        public string? Copyright { get; set; }
+        string? Title { get; set; }
+        string? Copyright { get; set; }
 
-        public void InitializeTracks(int count);
-        public int TrackCount { get; }
-        public ITrack GetTrack(int index);
-        public bool TryGetTrack(int index, [MaybeNullWhen(false)] out ITrack track);
-        public bool TryGetTrackByTitle(string? title, out int index, [MaybeNullWhen(false)] out ITrack track);
-        public IEnumerable<(int Index, ITrack Track)> EachTrack();
+        void InitializeTracks(int count);
+        int TrackCount { get; }
+        ITrack GetTrack(int index);
+        bool TryGetTrack(int index, [MaybeNullWhen(false)] out ITrack track);
+        bool TryGetTrackByTitle(string? title, out int index, [MaybeNullWhen(false)] out ITrack track);
+        IEnumerable<(int Index, ITrack Track)> EachTrack();
 
-        public TimeSignature GetTimeSignature(Rational position);
-        public TimeSignature GetTimeSignatureByNumber(int number);
-        public void SetTimeSignature(Rational position, TimeSignature value);
-        public void SetTimeSignatureByNumber(int number, TimeSignature value);
-        public IEnumerable<BarInfo> EachBar(Rational end);
-        public IEnumerable<BarLineInfo> EachLine(Rational end);
+        TimeSignature GetTimeSignature(Rational position);
+        TimeSignature GetTimeSignatureByNumber(int number);
+        void SetTimeSignature(Rational position, TimeSignature value);
+        void SetTimeSignatureByNumber(int number, TimeSignature value);
+        IEnumerable<BarInfo<Rational>> EnumerateBars(Rational end);
+        IEnumerable<BarLineInfo<Rational>> EnumerateLines(Rational end);
     }
 }

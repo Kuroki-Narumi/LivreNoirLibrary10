@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Runtime.InteropServices;
 using System.Text;
 using System.Text.Json;
+using LivreNoirLibrary.Collections;
 
 namespace LivreNoirLibrary.Media.Wave.Chunks
 {
@@ -87,7 +87,7 @@ namespace LivreNoirLibrary.Media.Wave.Chunks
             writer.Write(SMPTEOffset);
             writer.Write((uint)DataList.Count);
             writer.Write((uint)SamplerData.Length);
-            foreach (var data in CollectionsMarshal.AsSpan(DataList))
+            foreach (var data in DataList.AsSpan())
             {
                 data.Dump(writer);
             }
@@ -123,7 +123,7 @@ namespace LivreNoirLibrary.Media.Wave.Chunks
             if (SamplerData.Length > 0)
             {
                 writer.WriteString("sampler data", BitConverter.ToString(SamplerData));
-                writer.WriteString("(sampler data string)", System.Text.Encoding.UTF8.GetString(SamplerData));
+                writer.WriteString("(sampler data string)", Encoding.UTF8.GetString(SamplerData));
             }
         }
     }

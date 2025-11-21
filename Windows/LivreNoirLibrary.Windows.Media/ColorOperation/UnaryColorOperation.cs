@@ -7,7 +7,7 @@ namespace LivreNoirLibrary.Media
 {
     public interface IUnaryColorOperation
     {
-        public unsafe void Apply(byte* source);
+        unsafe void Apply(byte* source);
     }
 
     public readonly struct ColorOperation_Set(int index, byte value) : IUnaryColorOperation

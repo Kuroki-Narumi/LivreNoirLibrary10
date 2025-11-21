@@ -8,10 +8,10 @@ namespace LivreNoirLibrary.Windows.Controls
 {
     public partial class DateTimePicker : Control
     {
-        const string PART_Date = nameof(PART_Date);
-        const string PART_Hour = nameof(PART_Hour);
-        const string PART_Minute = nameof(PART_Minute);
-        const string PART_Now = nameof(PART_Now);
+        private const string PART_Date = nameof(PART_Date);
+        private const string PART_Hour = nameof(PART_Hour);
+        private const string PART_Minute = nameof(PART_Minute);
+        private const string PART_Now = nameof(PART_Now);
 
         public static readonly DateTime DefaultDateTime = DateTime.MinValue;
         public static readonly DateTime DefaultStart = DefaultDateTime;

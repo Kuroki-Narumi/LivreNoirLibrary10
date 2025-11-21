@@ -5,8 +5,8 @@ namespace LivreNoirLibrary.Windows.Controls
 {
     public interface IDefaultText
     {
-        public static readonly DependencyProperty DefaultTextProperty = PropertyUtils.RegisterAttached<string>(typeof(PropertyHolder));
+        static readonly DependencyProperty DefaultTextProperty = PropertyUtils.RegisterAttached<string>(typeof(PropertyHolder));
 
-        public string? DefaultText { get; set; }
+        string? DefaultText { get; set; }
     }
 }

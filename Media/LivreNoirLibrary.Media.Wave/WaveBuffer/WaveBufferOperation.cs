@@ -227,12 +227,13 @@ namespace LivreNoirLibrary.Media.Wave
         public static unsafe void FadeIn(Span<float> buffer, int sampleOffset, int sampleCount, float power, int channels)
         {
             AdjustArgs(buffer, ref sampleOffset, ref sampleCount, channels);
+            var invSC = 1f / sampleCount;
             fixed (float* ptrBegin = buffer)
             {
                 var ptr = ptrBegin + sampleOffset * channels;
                 for (var i = 0; i < sampleCount; i++)
                 {
-                    var ratio = MathF.Pow((float)i / sampleCount, power);
+                    var ratio = MathF.Pow(i * invSC, power);
                     for (var c = 0; c < channels; c++, ptr++)
                     {
                         *ptr *= ratio;
@@ -244,13 +245,13 @@ namespace LivreNoirLibrary.Media.Wave
         public static unsafe void FadeOut(Span<float> buffer, int sampleOffset, int sampleCount, float power, int channels)
         {
             AdjustArgs(buffer, ref sampleOffset, ref sampleCount, channels);
-            power = 1f / power;
+            var invSC = 1f / sampleCount;
             fixed (float* ptrBegin = buffer)
             {
                 var ptr = ptrBegin + sampleOffset * channels;
-                for (var i = 0; i < sampleCount; i++)
+                for (var i = 1; i <= sampleCount; i++)
                 {
-                    var ratio = 1f - MathF.Pow((i + 1f) / sampleCount, power);
+                    var ratio = MathF.Pow((sampleCount - i) * invSC, power);
                     for (var c = 0; c < channels; c++, ptr++)
                     {
                         *ptr *= ratio;
@@ -273,13 +274,6 @@ namespace LivreNoirLibrary.Media.Wave
                     }
                 }
             }
-        }
-
-        public static float GetMaxMagnitude(Span<float> span, int sampleOffset, int sampleCount, int channels)
-        {
-            AdjustArgs(span, ref sampleOffset, ref sampleCount, channels);
-            var (min, max) = span.Slice(sampleOffset * channels, sampleCount * channels).MinMax();
-            return Math.Max(max, -min);
         }
 
         public static void Clamp(Span<float> span, float value, int sampleOffset, int sampleCount, int channels)
@@ -381,7 +375,27 @@ namespace LivreNoirLibrary.Media.Wave
             return (left, right);
         }
 
-        public static unsafe float[] GetPeak(ReadOnlySpan<float> span, int sampleOffset, int sampleCount, int channels)
+        public static float GetPeak(Span<float> span, int sampleOffset, int sampleCount, int channels)
+        {
+            AdjustArgs(span, ref sampleOffset, ref sampleCount, channels);
+            var (min, max) = span.Slice(sampleOffset * channels, sampleCount * channels).MinMax();
+            return Math.Max(max, -min);
+        }
+
+        public static float GetRms(ReadOnlySpan<float> span, int sampleOffset, int sampleCount, int channels)
+        {
+            AdjustArgs(span, ref sampleOffset, ref sampleCount, channels);
+            var ms = span.Slice(sampleOffset * channels, sampleCount * channels).MeanSquare();
+            return MathF.Sqrt(ms);
+        }
+
+        public static float GetLufs(ReadOnlySpan<float> span, int sampleOffset, int sampleCount, int sampleRate, int channels)
+        {
+            AdjustArgs(span, ref sampleOffset, ref sampleCount, channels);
+            return Analysis.CalculateLufs(span.Slice(sampleOffset * channels, sampleCount * channels), sampleRate, channels);
+        }
+
+        public static unsafe float[] GetPeakPerChannel(ReadOnlySpan<float> span, int sampleOffset, int sampleCount, int channels)
         {
             AdjustArgs(span, ref sampleOffset, ref sampleCount, channels);
             var max = new float[channels];
@@ -404,7 +418,7 @@ namespace LivreNoirLibrary.Media.Wave
             return max;
         }
 
-        public static unsafe float[] GetRms(ReadOnlySpan<float> span, int sampleOffset, int sampleCount, int channels)
+        public static unsafe float[] GetRmsPerChannel(ReadOnlySpan<float> span, int sampleOffset, int sampleCount, int channels)
         {
             AdjustArgs(span, ref sampleOffset, ref sampleCount, channels);
             var sum = new float[channels];
@@ -424,13 +438,7 @@ namespace LivreNoirLibrary.Media.Wave
             return sum;
         }
 
-        public static float GetLufs(ReadOnlySpan<float> span, int sampleOffset, int sampleCount, int sampleRate, int channels)
-        {
-            AdjustArgs(span, ref sampleOffset, ref sampleCount, channels);
-            return Analysis.CalculateLufs(span.Slice(sampleOffset * channels, sampleCount * channels), sampleRate, channels);
-        }
-
-        public static unsafe float[][] SplitChannels(ReadOnlySpan<float> span, int channels, int sampleOffset = 0, int sampleCount = 0)
+        public static unsafe float[][] SplitChannels(ReadOnlySpan<float> span, int sampleOffset, int sampleCount, int channels)
         {
             AdjustArgs(span, ref sampleOffset, ref sampleCount, channels);
             var result = new float[channels][];

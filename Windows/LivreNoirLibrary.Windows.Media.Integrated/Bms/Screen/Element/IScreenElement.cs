@@ -7,8 +7,8 @@ namespace LivreNoirLibrary.Windows.Controls.Bms
 {
     public interface IScreenElement
     {
-        public SkinElement SkinElement { get; }
-        public ScreenElementViewModel ViewModel { get; }
+        SkinElement SkinElement { get; }
+        ScreenElementViewModel ViewModel { get; }
     }
 
     public static class IScreenElementExtension

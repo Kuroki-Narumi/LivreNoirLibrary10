@@ -5,17 +5,17 @@ namespace LivreNoirLibrary.Windows.Controls
 {
     public interface INumberText<T>
     {
-        public static void OnDefaultValueChanged(DependencyObject d, DependencyPropertyChangedEventArgs e) => (d as INumberText<T>)?.OnDefaultValueChanged((T)e.NewValue);
-        public static void OnValueChanged(DependencyObject d, DependencyPropertyChangedEventArgs e) => (d as INumberText<T>)?.OnValueChanged((T)e.NewValue);
-        public static void OnMinimumChanged(DependencyObject d, DependencyPropertyChangedEventArgs e) => (d as INumberText<T>)?.OnMinimumChanged((T)e.NewValue);
-        public static void OnMaximumChanged(DependencyObject d, DependencyPropertyChangedEventArgs e) => (d as INumberText<T>)?.OnMaximumChanged((T)e.NewValue);
-        public static void OnWheelStepChanged(DependencyObject d, DependencyPropertyChangedEventArgs e) => (d as INumberText<T>)?.OnWheelStepChanged((T)e.NewValue);
+        static void OnDefaultValueChanged(DependencyObject d, DependencyPropertyChangedEventArgs e) => (d as INumberText<T>)?.OnDefaultValueChanged((T)e.NewValue);
+        static void OnValueChanged(DependencyObject d, DependencyPropertyChangedEventArgs e) => (d as INumberText<T>)?.OnValueChanged((T)e.NewValue);
+        static void OnMinimumChanged(DependencyObject d, DependencyPropertyChangedEventArgs e) => (d as INumberText<T>)?.OnMinimumChanged((T)e.NewValue);
+        static void OnMaximumChanged(DependencyObject d, DependencyPropertyChangedEventArgs e) => (d as INumberText<T>)?.OnMaximumChanged((T)e.NewValue);
+        static void OnWheelStepChanged(DependencyObject d, DependencyPropertyChangedEventArgs e) => (d as INumberText<T>)?.OnWheelStepChanged((T)e.NewValue);
 
-        public T DefaultValue { get; set; }
-        public T Value { get; set; }
-        public T Minimum { get; set; }
-        public T Maximum { get; set; }
-        public T WheelStep { get; set; }
+        T DefaultValue { get; set; }
+        T Value { get; set; }
+        T Minimum { get; set; }
+        T Maximum { get; set; }
+        T WheelStep { get; set; }
 
         void OnDefaultValueChanged(T value) { }
         void OnValueChanged(T value) { }

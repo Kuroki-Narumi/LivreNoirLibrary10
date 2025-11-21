@@ -7,18 +7,18 @@ namespace LivreNoirLibrary.Windows.Controls
 {
     public interface IBasedIntText
     {
-        public const int DefaultRadix = 16;
-        public const int DefaultDigits = 0;
+        const int DefaultRadix = 16;
+        const int DefaultDigits = 0;
 
-        public static readonly object MinRadixObject = BasedNumber.MinimumRadix;
-        public static readonly object MaxRadixObject = BasedNumber.MaximumRadix;
+        static readonly object MinRadixObject = BasedNumber.MinimumRadix;
+        static readonly object MaxRadixObject = BasedNumber.MaximumRadix;
 
-        public static void OnRadixChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        static void OnRadixChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
             (d as IBasedIntText)?.OnRadixChanged((int)e.NewValue);
         }
 
-        public static object OnRadixCoerce(DependencyObject d, object baseValue)
+        static object OnRadixCoerce(DependencyObject d, object baseValue)
         {
             var value = (int)baseValue;
             return value is < BasedNumber.MinimumRadix ? MinRadixObject
@@ -26,13 +26,13 @@ namespace LivreNoirLibrary.Windows.Controls
                  : baseValue;
         }
 
-        public static void OnDigitsChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        static void OnDigitsChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
             (d as IBasedIntText)?.OnDigitsChanged((int)e.NewValue);
         }
 
-        public int Radix { get; set; }
-        public int Digits { get; set; }
+        int Radix { get; set; }
+        int Digits { get; set; }
 
         void OnRadixChanged(int value) { }
         void OnDigitsChanged(int value) { }

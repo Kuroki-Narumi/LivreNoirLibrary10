@@ -8,7 +8,7 @@ namespace LivreNoirLibrary.Media
 {
     public interface IColorBlend
     {
-        public Vector<float> Blend(Vector<float> back, Vector<float> front);
+        Vector<float> Blend(Vector<float> back, Vector<float> front);
     }
 
     public static unsafe partial class ColorBlend
