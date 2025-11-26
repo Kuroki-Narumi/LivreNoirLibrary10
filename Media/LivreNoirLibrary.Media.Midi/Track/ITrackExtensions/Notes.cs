@@ -88,11 +88,11 @@ namespace LivreNoirLibrary.Media.Midi
             return ReturnPosition(ary, ary.FindNearestIndex(position));
         }
 
-        public static Rational GetNotePosition<T>(this T track, Rational position, SearchMode type)
+        public static Rational GetNotePosition<T>(this T track, Rational position, SearchMode mode)
             where T : ITrack
         {
             var ary = CreateNoteBorders(track);
-            return ReturnPosition(ary, ary.FindIndex(position, type));
+            return ReturnPosition(ary, ary.FindIndex(position, mode));
         }
 
         public static Rational NextNotePosition<T>(this T track, Rational position) where T : ITrack => GetNotePosition(track, position, SearchMode.Next);
@@ -105,11 +105,11 @@ namespace LivreNoirLibrary.Media.Midi
             return ReturnPosition(ary, ary.FindNearestIndex(position));
         }
 
-        public static Rational GetNotePosition<T>(this T track, double position, SearchMode type)
+        public static Rational GetNotePosition<T>(this T track, double position, SearchMode mode)
             where T : ITrack
         {
             var ary = CreateNoteBorders(track);
-            return ReturnPosition(ary, ary.FindIndex(position, type));
+            return ReturnPosition(ary, ary.FindIndex(position, mode));
         }
 
         public static Rational NextNotePosition<T>(this T track, double position) where T : ITrack => GetNotePosition(track, position, SearchMode.Next);

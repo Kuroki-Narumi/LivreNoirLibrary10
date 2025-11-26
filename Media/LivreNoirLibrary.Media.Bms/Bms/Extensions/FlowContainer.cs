@@ -146,6 +146,7 @@ namespace LivreNoirLibrary.Media.Bms
                 obj.IsFixed = reader.ReadBoolean();
                 var branches = obj.Branches;
                 branches.Clear();
+                obj.DefaultBranch = null;
                 var count = reader.ReadInt32();
                 for (var i = 0; i < count; i++)
                 {

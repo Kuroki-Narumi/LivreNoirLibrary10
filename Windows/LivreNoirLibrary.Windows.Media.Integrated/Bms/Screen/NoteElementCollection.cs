@@ -5,7 +5,7 @@ using LivreNoirLibrary.ObjectModel;
 using System;
 using System.Collections.Generic;
 
-namespace LivreNoirLibrary.Windows.Media.Bms
+namespace LivreNoirLibrary.Windows.Controls.Bms
 {
     public class NoteElementCollection : ObservableObjectBase
     {
@@ -24,12 +24,12 @@ namespace LivreNoirLibrary.Windows.Media.Bms
             var children = _children;
             bars.Clear();
             children.Clear();
-            foreach (var (channel, tick, info) in timings.KeyInfos)
+            foreach (var (channel, time, info) in timings.KeyInfos)
             {
                 var startPos = (double)timings.Time2Position(info.Time);
                 if (channel is Channel.Bar)
                 {
-                    bars.Add(new(tick, startPos));
+                    bars.Add(new(time, startPos));
                 }
                 else
                 {
@@ -37,30 +37,30 @@ namespace LivreNoirLibrary.Windows.Media.Bms
                     if (info.Length is > 0)
                     {
                         var end = info.Time + info.Length;
-                        var endTick = TimeUtils.Seconds2Ticks(end);
                         var endPos = (double)timings.Time2Position(end);
-                        children.Add(new(lane, tick, endTick, startPos, endPos - startPos, info.IsMine));
+                        children.Add(new(lane, time, end, startPos, endPos - startPos, info.IsMine));
                     }
                     else
                     {
-                        children.Add(new(lane, tick, tick, startPos, 0, info.IsMine));
+                        children.Add(new(lane, time, time, startPos, 0, info.IsMine));
                     }
                 }
             }
             bars.Sort(new BarLineInfoComparer());
         }
 
-        public void Update(TimingList timings, BmsTimer timer, long absoluteTick, double highSpeed)
+        public void Update(in UpdateArgs args)
         {
+            var timings = args.Timings;
             var visible = _visible;
             visible.Clear();
-            if (timer.TryGet(TimerId.Play_MusicStart, absoluteTick, out var currentTick))
+            if (args.Timer.TryGet(TimerId.Play_MusicStart, args.AbsoluteTime, out var currentTime))
             {
-                var start = timings.Time2Position(TimeUtils.Ticks2Seconds(currentTick));
-                var end = start + 1 / highSpeed;
+                var start = timings.Time2Position(currentTime);
+                var end = start + 1 / args.HighSpeed;
                 foreach (var child in _children.AsSpan())
                 {
-                    if (child.EndTick >= currentTick && child.VisualStart <= end && (child.VisualStart + child.VisualLength) >= start)
+                    if (child.EndTime >= currentTime && child.VisualStart <= end && (child.VisualStart + child.VisualLength) >= start)
                     {
                         var offset = child.VisualStart - start;
                         child.CurrentOffset = offset;
@@ -77,21 +77,21 @@ namespace LivreNoirLibrary.Windows.Media.Bms
             }
         }
 
-        public record NoteInfo(int Lane, long Tick, long EndTick, double VisualStart, double VisualLength, bool IsMine)
+        public record NoteInfo(int Lane, double Time, double EndTime, double VisualStart, double VisualLength, bool IsMine)
         {
             public double CurrentOffset { get; set; }
             public bool IsVisible { get; set; }
             public bool IsActive { get; set; }
         }
 
-        public record BarLineInfo(long Tick, double Position)
+        public record BarLineInfo(double Time, double Position)
         {
             public double RelativePosition { get; set; }
         }
 
         private readonly struct BarLineInfoComparer : IComparer<BarLineInfo>, IComparer<BarLineInfo, double>
         {
-            public int Compare(BarLineInfo? x, BarLineInfo? y) => x!.Tick.CompareTo(y!.Tick);
+            public int Compare(BarLineInfo? x, BarLineInfo? y) => x!.Time.CompareTo(y!.Time);
             public static int Compare(BarLineInfo x, double y) => x.Position.CompareTo(y);
             public static bool IsXCloserThanY(BarLineInfo x, BarLineInfo y, double z) => x.Position + y.Position < z * 2;
         }

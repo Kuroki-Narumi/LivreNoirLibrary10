@@ -5,6 +5,6 @@ namespace LivreNoirLibrary.Media.Bms.ViewModels
 {
     public interface IFlowViewModel
     {
-        public IEnumerable<FlowContainerViewModel> Children { get; }
+        IEnumerable<FlowContainerViewModel> Children { get; }
     }
 }

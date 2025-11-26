@@ -62,72 +62,66 @@ namespace LivreNoirLibrary.Windows.Controls.Wave
 
         protected override unsafe void Refresh()
         {
-            if (_source is not { } source || !TryGetBitmapPointer(out var b))
+            if (_source is not { } source || Bitmap is not { } b)
             {
                 return;
             }
             var offset = _pixelOffset;
+            using var bitmap = b.BeginWrite();
+            var stride = bitmap.Width;
+            var h = (int)RequiredHeight;
+            AdjustRefreshArea((int)_lastHeight, h, offset, _lastPixelOffset, bitmap, out var top, out var bottom);
+
+            // 新規描画
+            var channels = Math.Min(source.Channels, 2);
+            var levelScale = _levelScale;
+            var timeScale = _samplesPerPixel;
+            var intTimeScale = (int)timeScale;
+            var limitX = (int)RequiredWidth;
+            var centerX = limitX / 2;
+            // 描画用のピクセルデータ
+            var colors = stackalloc uint[2];
+            colors[0] = ColorUtils.GetMask(ColorFlags.R | ColorFlags.A);
+            colors[1] = ColorUtils.GetMask(ColorFlags.B | ColorFlags.A);
+
+            int GetX(float value) => (int)(value * levelScale) + centerX;
+
+            var buffer = ArrayPool<float>.Shared.Rent(intTimeScale);
             try
             {
-                var bitmap = b.ToBitmapData();
-                var stride = bitmap.Width;
-                var h = (int)RequiredHeight;
-                AdjustRefreshArea((int)_lastHeight, h, offset, _lastPixelOffset, bitmap, out var top, out var bottom);
-
-                // 新規描画
-                var channels = Math.Min(source.Channels, 2);
-                var levelScale = _levelScale;
-                var timeScale = _samplesPerPixel;
-                var intTimeScale = (int)timeScale;
-                var limitX = (int)RequiredWidth;
-                var centerX = limitX / 2;
-                // 描画用のピクセルデータ
-                var colors = stackalloc uint[2];
-                colors[0] = ColorUtils.Mask_R | ColorUtils.Mask_A;
-                colors[1] = ColorUtils.Mask_B | ColorUtils.Mask_A;
-
-                int GetX(float value) => (int)(value * levelScale) + centerX;
-
-                var buffer = ArrayPool<float>.Shared.Rent(intTimeScale);
                 var bufferSpan = buffer.AsSpan(0, intTimeScale);
-                try
+                var ptr = (uint*)bitmap.Offset(top);
+                for (var y = top; y < bottom; y++, ptr += stride)
                 {
-                    var ptr = bitmap.Offset(top);
-                    for (var y = top; y < bottom; y++, ptr += stride)
+                    // この一列の内容をクリア
+                    SimdOperations.Clear(ptr, stride);
+                    // 参照するサンプル位置
+                    var pos = ((offset + y) * timeScale).RoundToInt();
+                    for (var c = 0; c < channels; c++)
                     {
-                        // この一列の内容をクリア
-                        SimdOperations.Clear(ptr, stride);
-                        // 参照するサンプル位置
-                        var pos = ((offset + y) * timeScale).RoundToInt();
-                        for (var c = 0; c < channels; c++)
-                        {
-                            // チャンネルごとのこの区間のサンプルを取得
-                            source.GetChannel(bufferSpan, c, pos);
-                            var (min, max) = bufferSpan.MinMax();
-                            var left = Math.Clamp(GetX(min), 0, centerX);
-                            var right = Math.Clamp(GetX(max), centerX, limitX);
-                            SimdOperations.Or(ptr + left, colors[c], right - left);
-                        }
+                        // チャンネルごとのこの区間のサンプルを取得
+                        source.GetChannel(bufferSpan, c, pos);
+                        var (min, max) = bufferSpan.MinMax();
+                        var left = Math.Clamp(GetX(min), 0, centerX);
+                        var right = Math.Clamp(GetX(max), centerX, limitX);
+                        SimdOperations.Or(ptr + left, colors[c], right - left);
                     }
-                }
-                finally
-                {
-                    ArrayPool<float>.Shared.Return(buffer);
                 }
             }
             finally
             {
-                b.Dispose();
-                _lastHeight = RequiredHeight;
-                _lastPixelOffset = offset;
+                ArrayPool<float>.Shared.Return(buffer);
             }
+            _lastHeight = RequiredHeight;
+            _lastPixelOffset = offset;
         }
 
         /// <summary>
         /// 前回描画した部分と重複する領域の除外
         /// </summary>
-        public static unsafe void AdjustRefreshArea(int lastBottom, int requiredHeight, double offset, double lastOffset, LnBitmapData bitmap, out int top, out int bottom)
+        public static unsafe void AdjustRefreshArea(int lastBottom, int requiredHeight, double offset, double lastOffset, BitmapPointer bitmap, out int top, out int bottom)
         {
+            var pointer = (uint*)bitmap.Pointer;
             top = 0;
             bottom = requiredHeight;
             if (lastOffset is >= 0)
@@ -141,7 +135,7 @@ namespace LivreNoirLibrary.Windows.Controls.Wave
                     {
                         top = remain;
                         remain *= w * 4;
-                        Buffer.MemoryCopy(bitmap.Pointer, bitmap.Pointer + dif * w, remain, remain);
+                        Buffer.MemoryCopy(pointer, pointer + dif * w, remain, remain);
                     }
                 }
                 else if (dif is < 0) // 左に移動した
@@ -151,7 +145,7 @@ namespace LivreNoirLibrary.Windows.Controls.Wave
                     {
                         bottom = -dif;
                         remain *= w;
-                        Buffer.MemoryCopy(bitmap.Pointer - dif * w, bitmap.Pointer, remain, remain);
+                        Buffer.MemoryCopy(pointer - dif * w, pointer, remain, remain);
                     }
                 }
                 else // 移動していない

@@ -140,28 +140,61 @@ namespace LivreNoirLibrary.Media.Wave
             {
                 buffer.SetTotalSample(offset + count, true);
             }
-            var span = buffer.Data;
-            span.Slice(offset, count).Add(source);
+            buffer.Data.Slice(offset, count).Add(source);
         }
 
-        public static void Append<T>(this T buffer, ReadOnlySpan<float> source)
+        private static void AppendCore<T>(this T buffer, ReadOnlySpan<float> source, int sampleOffset, float factor)
             where T : IWaveBuffer
         {
-            AppendCore(buffer, source, buffer.SampleLength);
+            var ch = buffer.Channels;
+            var offset = sampleOffset * ch;
+            var count = source.Length;
+            if (buffer.TotalSample < offset + count)
+            {
+                buffer.SetTotalSample(offset + count, true);
+            }
+            buffer.Data.Slice(offset, count).Add(source, factor);
         }
 
-        public static void AppendAt<T>(this T buffer, ReadOnlySpan<float> source, int sampleOffset)
+        public static void Append<T>(this T buffer, ReadOnlySpan<float> source, float factor = 1)
+            where T : IWaveBuffer
+        {
+            if (factor is 1)
+            {
+                AppendCore(buffer, source, buffer.SampleLength);
+            }
+            else
+            {
+                AppendCore(buffer, source, buffer.SampleLength, factor);
+            }
+        }
+
+        public static void AppendAt<T>(this T buffer, ReadOnlySpan<float> source, int sampleOffset, float factor = 1)
             where T : IWaveBuffer
         {
             WaveBuffer.AdjustArgs(buffer.Data, ref sampleOffset, buffer.Channels);
-            AppendCore(buffer, source, sampleOffset);
+            if (factor is 1)
+            {
+                AppendCore(buffer, source, sampleOffset);
+            }
+            else
+            {
+                AppendCore(buffer, source, sampleOffset, factor);
+            }
         }
 
-        public static void Append<T1, T2>(this T1 dst, T2 src, int dstOffset = 0, int srcOffset = 0, int srcSamples = 0)
+        public static void Append<T1, T2>(this T1 dst, T2 src, int dstOffset = 0, int srcOffset = 0, int srcSamples = 0, float factor = 1)
             where T1 : IWaveBuffer
             where T2 : IWaveBuffer
         {
-            ConvertProcess(dst, src, dstOffset, srcOffset, srcSamples, AppendCore);
+            if (factor is 1)
+            {
+                ConvertProcess(dst, src, dstOffset, srcOffset, srcSamples, AppendCore);
+            }
+            else
+            {
+                ConvertProcess(dst, src, dstOffset, srcOffset, srcSamples, (dst, src, dstOffset) => AppendCore(dst, src, dstOffset, factor));
+            }
         }
 
         public static void SetValue<T>(this T buffer, float value, int sampleOffset = 0, int sampleCount = 0)

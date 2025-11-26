@@ -1,39 +1,47 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Runtime.InteropServices;
+using System.Linq;
 using LivreNoirLibrary.Collections;
+using LivreNoirLibrary.Debug;
 using LivreNoirLibrary.ObjectModel;
 
 namespace LivreNoirLibrary.Media.Bms
 {
-    public class SoundTimingList : IClear
+    public class SoundTimingList : IClear, ISoundList
     {
-        private readonly SortedDictionary<int, List<TimingItem>> _list = [];
-        private long _first = long.MaxValue;
-        private long _last = 0;
+        private readonly SortedDictionary<int, List<SoundTimingInfo>> _list = [];
+        private double _first = long.MaxValue;
+        private double _last = 0;
 
         public int Count => _list.Count;
-        public long FirstTick => _last is 0 ? 0 : _first;
-        public long LastTick => _last;
+        public double FirstTime => _last is 0 ? 0 : _first;
+        public double LastTime => _last;
 
         public void Clear()
         {
             _list.Clear();
-            _first = long.MaxValue;
-            _last = long.MaxValue;
+            _first = double.MaxValue;
+            _last = 0;
         }
 
-        public SortedDictionary<int, List<TimingItem>>.Enumerator GetEnumerator() => _list.GetEnumerator();
+        public SortedDictionary<int, List<SoundTimingInfo>>.Enumerator GetEnumerator() => _list.GetEnumerator();
 
-        public void Load(IBmsViewModel source, Predicate<Note>? selector = null, long length = 0)
+        IEnumerable<(int WavId, List<SoundTimingInfo>)> ISoundList.EnumerateSoundList()
+        {
+            foreach (var (id, list) in _list)
+            {
+                yield return (id, list);
+            }
+        }
+
+        public void Load(IBmsViewModel source, Predicate<Note>? selector = null, double length = 0)
         {
             Clear();
-            var counter = source.TimeCounter;
             selector ??= BmsExtensions.IsPlayableSound;
-            foreach (var (pos, notes) in source.CurrentData.Timeline.EnumerateList())
+            foreach (var (pos, notes) in source.CurrentTimeline.EnumerateList())
             {
-                var tick = counter.Beat2Tick(source.GetAbsolutePosition(pos));
-                if (length is not 0 && tick >= length)
+                var time = source.Position2Time(pos);
+                if (length is not 0 && time >= length)
                 {
                     break;
                 }
@@ -41,28 +49,27 @@ namespace LivreNoirLibrary.Media.Bms
                 {
                     if (selector(note))
                     {
-                        Add(tick, note);
+                        Add(time, note);
                     }
                 }
             }
             SetEnd(length);
         }
 
-        public void Load(IBmsViewModel source, Selection selection, Predicate<Note>? selector = null, long length = 0)
+        public void Load(IBmsViewModel source, Selection selection, Predicate<Note>? selector = null, double length = 0)
         {
             Clear();
             selector ??= BmsExtensions.IsPlayableSound;
-            var counter = source.TimeCounter;
             foreach (var (pos, note) in selection)
             {
-                var tick = counter.Beat2Tick(pos);
-                if (length is not 0 && tick >= length)
+                var time = source.Beat2Time(pos);
+                if (length is not 0 && time >= length)
                 {
                     break;
                 }
                 if (selector(note))
                 {
-                    Add(tick, note);
+                    Add(time, note);
                 }
             }
             SetEnd(length);
@@ -82,67 +89,43 @@ namespace LivreNoirLibrary.Media.Bms
             return result;
         }
 
-        public void Add(long ticks, Note note)
+        private void Add(double time, Note note)
         {
             var id = note.Value;
             if (id is > 0)
             {
-                Add((int)id, ticks, note.IsKey());
+                Add((int)id, time, note.IsBgm());
             }
         }
 
-        public void Add(int id, long ticks, bool autoKey = false)
+        private void Add(int id, double time, bool isBgm)
         {
-            if (ticks < _first)
+            if (time < _first)
             {
-                _first = ticks;
+                _first = time;
             }
-            if (ticks > _last)
+            if (time > _last)
             {
-                _last = ticks;
+                _last = time;
             }
             var list = _list.GetOrAdd(id);
             if (list.Count is > 0)
             {
-                list[^1] = list[^1].SetLength(ticks, false);
+                list[^1] = list[^1].SetLength(time);
             }
-            list.Add(new(ticks, id, autoKey));
+            list.Add(new(time, isBgm));
         }
 
-        public void SetEnd(long ticks)
+        private void SetEnd(double time)
         {
-            if (ticks > _last)
+            if (time > _last)
             {
                 foreach (var (_, list) in _list)
                 {
-                    list[^1] = list[^1].SetLength(ticks, true);
+                    list[^1] = list[^1].SetLength(time);
                 }
-                _last = ticks;
+                _last = time;
             }
-        }
-
-        public readonly struct TimingItem : IComparable, IComparable<TimingItem>
-        {
-            public readonly long Position;
-            public readonly long Length;
-            public readonly int Id;
-            public readonly bool AutoKey;
-            public readonly bool IsLast;
-
-            private TimingItem(long position, long length, int id, bool autoKey, bool isLast)
-            {
-                Position = position;
-                Length = length;
-                Id = id;
-                AutoKey = autoKey;
-                IsLast = isLast;
-            }
-
-            public TimingItem(long position, int id, bool autoKey) : this(position, -1, id, autoKey, false) { }
-            public TimingItem SetLength(long endPosition, bool isLast) => new(Position, endPosition - Position, Id, AutoKey, isLast);
-
-            public int CompareTo(TimingItem other) => Position.CompareTo(other.Position);
-            public int CompareTo(object? obj) => obj is TimingItem other ? CompareTo(other) : 1;
         }
     }
 }

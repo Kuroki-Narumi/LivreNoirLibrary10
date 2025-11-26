@@ -283,8 +283,8 @@ namespace LivreNoirLibrary.Media
             }
         }
 
-        public bool TryGetValue(TY key, TX position, SearchMode type, out TX actualPosition, [MaybeNullWhen(false)] out TInnerData value)
-            => TryGetCore(key, p => p.FindIndex<TX, TX, TOperator>(position, type), out actualPosition, out value);
+        public bool TryGetValue(TY key, TX position, SearchMode mode, out TX actualPosition, [MaybeNullWhen(false)] out TInnerData value)
+            => TryGetCore(key, p => p.FindIndex<TX, TX, TOperator>(position, mode), out actualPosition, out value);
 
         public bool TryGetNearest(TY key, TX position, out TX actualPosition, [MaybeNullWhen(false)] out TInnerData value)
             => TryGetCore(key, p => p.FindNearestIndex<TX, TX, TOperator>(position), out actualPosition, out value);

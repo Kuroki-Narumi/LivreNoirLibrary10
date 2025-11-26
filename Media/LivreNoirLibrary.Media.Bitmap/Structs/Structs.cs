@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Drawing;
 using System.Runtime.CompilerServices;
-using System.Text;
 
 namespace LivreNoirLibrary.Media
 {
@@ -36,46 +35,63 @@ namespace LivreNoirLibrary.Media
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static bool Adjust(ref int x, ref int y, ref int w, ref int h, int width, int height)
         {
-            if (x is < 0)
-            {
-                w += x;
-                x = 0;
-            }
-            if (y is < 0)
-            {
-                h += y;
-                y = 0;
-            }
-            w = Math.Min(w, width - x);
-            h = Math.Min(h, height - y);
+            var x1 = Math.Max(x, 0);
+            var y1 = Math.Max(y, 0);
+            w = Math.Min(x + w, width) - x1;
+            h = Math.Min(y + h, height) - y1;
             if (w is > 0 && h is > 0)
             {
+                x = x1;
+                y = y1;
                 return true;
             }
             else
             {
                 return false;
             }
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static bool Adjust(
+            ref int sx, ref int sy, ref int sw, ref int sh, 
+            ref int dx, ref int dy,
+            int sourceWidth, int sourceHeight, int destWidth, int destHeight)
+        {
+            // コピー先の実際の範囲
+            var x1 = Math.Max(dx, 0);
+            var y1 = Math.Max(dy, 0);
+            sw = Math.Min(dx + sw, destWidth) - x1;
+            sh = Math.Min(dy + sh, destHeight) - y1;
+            if (sw is <= 0 || sh is <= 0)
+            {
+                return false;
+            }
+            // コピーする座標を実際の範囲に合わせてシフト
+            sx += x1 - dx;
+            sy += y1 - dy;
+            dx = x1;
+            dy = y1;
+            return Adjust(ref sx, ref sy, ref sw, ref sh, sourceWidth, sourceHeight);
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static bool Adjust(ref Rectangle rect, int width, int height)
         {
             var (x, y, w, h) = rect;
-            if (Adjust(ref x, ref y, ref w, ref h, width, height))
-            {
-                rect = new(x, y, w, h);
-                return true;
-            }
-            else
-            {
-                return false;
-            }
+            var result = Adjust(ref x, ref y, ref w, ref h, width, height);
+            rect = new(x, y, w, h);
+            return result;
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static bool Adjust(ref int x, ref int y, ref int width, ref int height, LnBitmapData bitmap) => Adjust(ref x, ref y, ref width, ref height, bitmap.Width, bitmap.Height);
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static bool Adjust(ref Rectangle rect, LnBitmapData bitmap) => Adjust(ref rect, bitmap.Width, bitmap.Height);
+        public static bool Adjust(ref Rectangle sourceRect, ref Point destLocation, int sourceWidth, int sourceHeight, int destWidth, int destHeight)
+        {
+            var (sx, sy, sw, sh) = sourceRect;
+            var (dx, dy) = destLocation;
+            var result = Adjust(ref sx, ref sy, ref sw, ref sh, ref dx, ref dy, sourceWidth, sourceHeight, destWidth, destHeight);
+            sourceRect = new(sx, sy, sw, sh);
+            destLocation = new(dx, dy);
+            return result;
+        }
     }
 }

@@ -1,15 +1,15 @@
-﻿using System;
+﻿using LivreNoirLibrary.Media.Wave;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
 namespace LivreNoirLibrary.Media.Bms
 {
-    public interface IBmsViewModel : IBarPositionProvider<double>
+    public interface IBmsViewModel : IBarPositionProvider<double>, ITimeCounter
     {
         IBmsData Root { get; }
         IBmsDataUnit CurrentData { get; }
         IListEnumerable<BarPosition, Note> CurrentTimeline => CurrentData.Timeline;
-        ITimeCounter TimeCounter { get; }
         DoubleBarLengthCache BarLengthCache { get; }
 
         /// <summary>

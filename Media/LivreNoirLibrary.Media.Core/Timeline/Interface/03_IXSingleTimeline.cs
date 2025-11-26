@@ -18,13 +18,13 @@ namespace LivreNoirLibrary.Media
         /// Attempts to retrieve the value associated with the specified position, using the given search mode.
         /// </summary>
         /// <param name="position">The position to search for.</param>
-        /// <param name="type">The search mode that determines how the position is matched.</param>
+        /// <param name="mode">The search mode that determines how the position is matched.</param>
         /// <param name="actualPosition">When this method returns, contains the actual position that matches the search criteria, if the search is successful;
         /// otherwise, the default value for <typeparamref name="TX"/>.</param>
         /// <param name="value">When this method returns, contains the value associated with the found position, if the search is successful;
         /// otherwise, the default value for <typeparamref name="TValue"/>.</param>
         /// <returns><see langword="true"/> if an value is found; otherwise, <see langword="false"/>.</returns>
-        bool TryGetValue(TX position, SearchMode type, out TX actualPosition, [MaybeNullWhen(false)] out TValue value);
+        bool TryGetValue(TX position, SearchMode mode, out TX actualPosition, [MaybeNullWhen(false)] out TValue value);
 
         /// <summary>
         /// Attempts to find the value with the nearest to the specified position.

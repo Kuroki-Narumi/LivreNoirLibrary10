@@ -52,7 +52,7 @@ namespace LivreNoirLibrary.Media.Bms
             info.JudgeRank = source.ExRank;
 
             var total = source.Total;
-            info.Total = total is <= 0 ? 100 : total / BmsUtils.CalcTotal(GetNoteCount(current));
+            info.Total = total is <= 0 ? 100 : total / BmsUtils.CalcTotal(source.CurrentTimeline.GetNoteCount());
             info.LnType = source.LnMode;
             info.BannerImage = source.Banner;
             info.EyecatchImage = source.StageFile;
@@ -106,7 +106,7 @@ namespace LivreNoirLibrary.Media.Bms
                 return null;
             }
             var lastBar = 0;
-            foreach (var (pos, list) in current.Timeline.EnumerateList())
+            foreach (var (pos, list) in source.CurrentTimeline.EnumerateList())
             {
                 lastBar = pos.Bar;
                 var time = Convert(source.GetAbsolutePosition(pos));

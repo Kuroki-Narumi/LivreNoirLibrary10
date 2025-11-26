@@ -6,11 +6,6 @@ namespace LivreNoirLibrary.Media
     public interface IVideoDecodeContext : IVideoContext, IMediaDecodeContext
     {
         /// <summary>
-        /// Approximate output frame count.
-        /// </summary>
-        long TotalFrame { get; }
-
-        /// <summary>
         /// Decode one frame to codec context.<br/>
         /// Decoder may skip frames that are not a keyframe and whose dts(decompression timestamp) is less than <paramref name="requiredTime"/>.<br/>
         /// If hardware decoding is enabled, the decoder ignores <paramref name="requiredTime"/>.
@@ -35,5 +30,26 @@ namespace LivreNoirLibrary.Media
         /// <exception cref="OutOfMemoryException"/>
         /// <exception cref="InvalidOperationException"/>
         bool GetFrame(Span<byte> buffer, out Rational pts, out Rational duration);
+    }
+
+    public static partial class IMediaExtensions
+    {
+        extension (IVideoDecodeContext ctx)
+        {
+            /// <summary>
+            /// Approximate output frame count.
+            /// </summary>
+            public long TotalFrame => (ctx.Duration * ctx.FrameRate).Ceiling();
+
+            /// <summary>
+            /// Approximate output duration.
+            /// </summary>
+            public double TotalSeconds => (double)ctx.Duration;
+
+            /// <summary>
+            /// Approximate output duration in ticks
+            /// </summary>
+            public long TotalTicks => (long)(ctx.TotalSeconds * TimeSpan.TicksPerSecond);
+        }
     }
 }

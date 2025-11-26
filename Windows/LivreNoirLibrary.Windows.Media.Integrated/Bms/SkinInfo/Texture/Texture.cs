@@ -7,6 +7,7 @@ namespace LivreNoirLibrary.Windows.Media.Bms.SkinInfo
         public const string Key_StageFile = "#STAGEFILE";
         public const string Key_Banner = "#BANNER";
         public const string Key_BackBmp = "#BACKBMP";
+        public const string Key_Bmp00 = "#BMP00";
         public static bool IsReservedKey(string? key) => key is Key_StageFile or Key_Banner or Key_BackBmp;
 
         public string Key { get; set => SetValue(ref field, value); } = "";

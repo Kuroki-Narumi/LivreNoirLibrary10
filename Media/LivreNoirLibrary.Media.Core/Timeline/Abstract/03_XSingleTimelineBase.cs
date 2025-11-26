@@ -37,16 +37,6 @@ namespace LivreNoirLibrary.Media
         }
 
         public void Set(TX position, TValue value) => AddItem(position, value);
-        public TValue Get(TX position, TValue ifnone) => Get(position, SearchMode.PreviousOrEqual, ifnone);
-
-        public TValue Get(TX position, SearchMode type, TValue ifnone)
-        {
-            if (TryGetValue(position, type, out _, out var value))
-            {
-                return value;
-            }
-            return ifnone;
-        }
 
         public void CopyTo(IXSingleTimeline<TX, TValue> destination, TX destOffset) => CopyToCore(destination, GetPositionIndex(), destOffset);
         public void CopyTo(IXSingleTimeline<TX, TValue> destination, Range<TX> srcRange, TX destOffset) => CopyToCore(destination, GetPositionIndex(srcRange), destOffset);

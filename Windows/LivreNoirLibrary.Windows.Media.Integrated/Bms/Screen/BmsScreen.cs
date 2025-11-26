@@ -1,206 +1,264 @@
-﻿using LivreNoirLibrary.Debug;
+﻿using LivreNoirLibrary.Collections;
+using LivreNoirLibrary.Debug;
 using LivreNoirLibrary.Media;
 using LivreNoirLibrary.Media.Bms;
-using LivreNoirLibrary.ObjectModel;
+using LivreNoirLibrary.Media.Bms.ViewModels;
+using LivreNoirLibrary.Windows.Controls.Bms.Elements;
+using LivreNoirLibrary.Windows.Media;
+using LivreNoirLibrary.Windows.Media.Bms.SkinInfo;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
+using System.Text;
+using System.Threading.Tasks;
 using System.Windows;
-using System.Windows.Controls;
-using LivreNoirLibrary.Windows.Controls.Bms;
-using LivreNoirLibrary.Collections;
-using LivreNoirLibrary.Media.Bms.ViewModels;
+using System.Windows.Media;
+using System.Windows.Media.Imaging;
+using static System.Windows.Forms.VisualStyles.VisualStyleElement;
 
-namespace LivreNoirLibrary.Windows.Media.Bms
+namespace LivreNoirLibrary.Windows.Controls.Bms
 {
-    public class BmsScreen : ObservableObjectBase, SkinInfo.IVariableProvider
+    public partial class BmsScreen : FrameworkElement, IVariableProvider
     {
-        public SkinInfo.Skin? Skin { get; private set => SetValue(ref field, value); }
-        public string? BmsPath { get; private set => SetValue(ref field, value); }
-        public BmsViewModel BmsData { get; } = new();
-        public string? Directory => Path.GetDirectoryName(BmsPath);
+        public const int DefaultWidth = 1920;
+        public const int DefaultHeight = 1080;
 
-        public double HighSpeed { get; set => SetValue(ref field, value); } = 1;
+        [DependencyProperty]
+        private Skin? _skin;
+        [DependencyProperty]
+        private string? _bmsPath;
+        [DependencyProperty(SetterScope = Scope.Private)]
+        private bool _isBmsReady;
+        [DependencyProperty]
+        private double _highSpeed = 2.5;
+        [DependencyProperty]
+        private FixedHighSpeedMode _fixedHighSpeedMode = FixedHighSpeedMode.MainTimeBpm;
+        [DependencyProperty(SetterScope = Scope.Private)]
+        private double _fixedHighSpeed = 1.0;
+
+        public string? Directory => Path.GetDirectoryName(_bmsPath);
+        public SimpleBmsViewModel ViewModel { get; } = new();
         public Dictionary<string, string> Options { get; } = [];
         public Dictionary<string, string> Variables { get; } = [];
 
-        public Canvas MainCanvas { get; } = new() { ClipToBounds = true };
-        public BgaImageSource BgaImageSource => _bgaSource;
+        private WriteableBitmap _bitmap;
+        private Rect _bitmapRect;
+        private bool _needEnsureBitmap;
+        private bool _needRender;
+        private readonly FloatBitmap _buffer1 = new(0, 0);
+        private readonly UnmanagedArray<float> _buffer2 = new();
 
-        private readonly BmsTextureCache _textureCache = new();
-        private readonly BgaImageSource _bgaSource = new();
-        private readonly List<GroupElement> _groupElements = [];
-        private readonly List<ImageElement> _imageElements = [];
-        private readonly List<BgaElement> _bgaElements = [];
-        private readonly List<NoteAreaElement> _noteElements = [];
-
+        private readonly List<ScreenElement> _children = [];
         private readonly BmsTimer _timer = new();
-        private readonly NoteElementCollection _notes = new();
         private readonly TimingList _timingList = new();
+        private readonly TextureCache _textureCache = new();
+        private readonly MediaCache _mediaCache = new();
+        private readonly NoteElementCollection _notes = new();
+        private readonly BgaParams _bga = new();
 
-        public void LoadSkin(SkinInfo.Skin? skin)
+        public BmsScreen()
         {
-            Skin = skin;
-            _textureCache.Clear();
-            var main = MainCanvas;
-            main.Children.Clear();
-            var groups = _groupElements;
-            var images = _imageElements;
-            var bgas = _bgaElements;
-            var notes = _noteElements;
-            groups.Clear();
-            images.Clear();
-            bgas.Clear();
-            notes.Clear();
-            if (skin is not null)
-            {
-                var (w, h) = skin.BaseSize;
-                main.Width = w;
-                main.Height = h;
-                main.Background = MediaUtils.GetBrush(skin.Background.ToColor());
-                void AppendChild(Canvas canvas, SkinInfo.SkinElement element, int depth = 0)
-                {
-                    ScreenElementViewModel e = new();
-                    UIElement? c = null;
-                    switch (element)
-                    {
-                        case SkinInfo.Group g:
-                            GroupElement group = new(g);
-                            groups.Add(group);
-                            c = group;
-                            foreach (var cc in g.Children)
-                            {
-                                if (cc is SkinInfo.SkinElement ee)
-                                {
-                                    AppendChild(group, ee, depth + 1);
-                                }
-                            }
-                            break;
-                        case SkinInfo.Image i:
-                            ImageElement image = new(i);
-                            images.Add(image);
-                            c = image;
-                            break;
-                        case SkinInfo.Bga b:
-                            BgaElement bga = new(b, _bgaSource);
-                            bgas.Add(bga);
-                            c = bga;
-                            break;
-                        case SkinInfo.NoteArea n:
-                            NoteAreaElement note = new(n);
-                            notes.Add(note);
-                            c = note;
-                            break;
-                        default:
-                            break;
-                    }
-                    if (c is not null)
-                    {
-                        canvas.Children.Add(c);
-                    }
-                }
-                foreach (var child in skin.Children)
-                {
-                    if (child is SkinInfo.SkinElement e)
-                    {
-                        AppendChild(main, e);
-                    }
-                }
-            }
-        }
-
-        public void DetermineExpressions()
-        {
-            if (Skin is { } skin)
-            {
-                foreach (var element in _groupElements.AsSpan())
-                {
-                    element.LoadDestination(skin, this);
-                }
-                foreach (var element in _imageElements.AsSpan())
-                {
-                    element.LoadDestination(skin, this);
-                }
-                foreach (var element in _bgaElements.AsSpan())
-                {
-                    element.LoadDestination(skin, this);
-                }
-                foreach (var element in _noteElements.AsSpan())
-                {
-                    element.LoadDestination(skin, this);
-                }
-            }
-        }
-
-        public bool OpenBms(string path)
-        {
-            _bgaSource.Clear();
-            try
-            {
-                var root = LivreNoirLibrary.Media.Bms.BmsData.Open(path);
-                BmsPath = path;
-                BmsData.Root = root;
-                _textureCache.LoadBms(BmsData, Directory!);
-                return true;
-            }
-            catch (Exception ex)
-            {
-                ExConsole.Write(ex);
-                BmsData.Root = null!;
-                return false;
-            }
-        }
-        
-        public void SetupPlay(bool autoPlay)
-        {
-            _timer.Remove(TimerId.Play_LoadingStart);
-            _timer.Remove(TimerId.Play_LoadingFinished);
-            _timer.Remove(TimerId.Play_MusicStart);
-            _timer.Remove(TimerId.Play_Miss);
-            _timer.Remove(TimerId.Play_FullCombo);
-            _timer.Set(TimerId.Scene_Start, 0);
-            if (BmsData is { } data)
-            {
-                var timing = _timingList;
-                timing.Load(data, Directory!, autoPlay);
-                _notes.Setup(timing);
-            }
-        }
-
-        public void Update(long absoluteTick)
-        {
-            var timer = _timer;
-            foreach (var element in _groupElements.AsSpan())
-            {
-                element.Update(timer, absoluteTick);
-            }
-            var tc = _textureCache;
-            foreach (var element in _imageElements.AsSpan())
-            {
-                element.Update(timer, absoluteTick, tc);
-            }
-            if (Skin is SkinInfo.PlaySkin)
-            {
-                _bgaSource.Update(_timingList, timer, absoluteTick);
-                foreach (var element in _bgaElements.AsSpan())
-                {
-                    element.Update(timer, absoluteTick);
-                }
-                var hs = HighSpeed;
-                _notes.Update(_timingList, timer, absoluteTick, hs);
-                foreach (var element in _noteElements.AsSpan())
-                {
-                    element.Update(_notes, timer, absoluteTick, tc, hs);
-                }
-            }
+            _bitmap = CreateBitmap(DefaultWidth, DefaultHeight);
+            _needEnsureBitmap = true;
+            ClipToBounds = true;
         }
 
         public bool TryGetOption(string key, [MaybeNullWhen(false)] out string value) => Options.TryGetValue(key, out value);
         public bool TryGetVariable(string key, [MaybeNullWhen(false)] out string value) => Variables.TryGetValue(key, out value);
 
-        public void StartLoading(long tick) => _timer.Set(TimerId.Play_LoadingStart, tick);
-        public void FinishLoading(long tick) => _timer.Set(TimerId.Play_LoadingFinished, tick);
-        public void StartMusic(long tick) => _timer.Set(TimerId.Play_MusicStart, tick);
+        private void OnSkinChanged(Skin? value)
+        {
+            _textureCache.Clear();
+            var children = _children;
+            children.Clear();
+            if (value is not null)
+            {
+                var (w, h) = value.BaseSize;
+                Width = w;
+                Height = h;
+                _needEnsureBitmap = true;
+                foreach (var child in value.Children)
+                {
+                    if (child is SkinElement element)
+                    {
+                        AppendChild(children, element);
+                    }
+                }
+            }
+            InvalidateVisual();
+        }
+
+        static void AppendChild(List<ScreenElement> children, SkinElement element)
+        {
+            ScreenElement? e = null;
+            switch (element)
+            {
+                case Group g:
+                    GroupElement group = new(g);
+                    e = group;
+                    foreach (var gchild in g.Children.AsSpan())
+                    {
+                        if (gchild is SkinElement gelement)
+                        {
+                            AppendChild(group.Children, gelement);
+                        }
+                    }
+                    break;
+                case Image i:
+                    e = new ImageElement(i);
+                    break;
+                case Bga b:
+                    e = new BgaElement(b);
+                    break;
+                case NoteArea n:
+                    e = new NoteAreaElement(n);
+                    break;
+            }
+            if (e is not null)
+            {
+                children.Add(e);
+            }
+        }
+
+        public void DetermineExpressions()
+        {
+            if (_skin is { } skin)
+            {
+                foreach (var element in _children.AsSpan())
+                {
+                    element.DetermineExpressions(skin, this);
+                }
+            }
+        }
+
+        private void OnBmsPathChanged(string? value)
+        {
+            _mediaCache.Clear();
+            if (File.Exists(value))
+            {
+                var vm = ViewModel;
+                try
+                {
+                    vm.Data = BmsData.Open(value);
+                    var basePath = Directory!;
+                    var cache = _textureCache;
+                    cache.Set(Texture.Key_StageFile, vm.StageFile, basePath);
+                    cache.Set(Texture.Key_Banner, vm.Banner, basePath);
+                    cache.Set(Texture.Key_BackBmp, vm.BackBmp, basePath);
+                    cache.Set(Texture.Key_Bmp00, vm.GetDefValue(DefType.Bmp, 0), basePath);
+                    IsBmsReady = true;
+                    return;
+                }
+                catch (Exception ex)
+                {
+                    ExConsole.Write(ex);
+                    vm.Data.Clear();
+                }
+            }
+            IsBmsReady = false;
+        }
+
+        public void SetupPlay(bool autoPlay)
+        {
+            var timer = _timer;
+            timer.Remove(TimerId.Play_LoadingStart);
+            timer.Remove(TimerId.Play_LoadingFinished);
+            timer.Remove(TimerId.Play_MusicStart);
+            timer.Remove(TimerId.Play_Miss);
+            timer.Remove(TimerId.Play_FullCombo);
+            timer.Set(TimerId.Scene_Start, 0);
+            _bga.Setup();
+            if (_isBmsReady)
+            {
+                var timing = _timingList;
+                timing.Load(ViewModel, Directory!, autoPlay);
+                _notes.Setup(timing);
+                FixedHighSpeed = _fixedHighSpeedMode switch
+                {
+                    FixedHighSpeedMode.MinBpm => 60 / timing.MinTempo,
+                    FixedHighSpeedMode.MaxBpm => 60 / timing.MaxTempo,
+                    FixedHighSpeedMode.MainBpm => 60 / timing.MainTempo,
+                    FixedHighSpeedMode.MainTimeBpm => 60 / timing.MainTimeTempo,
+                    _ => 1,
+                };
+            }
+        }
+
+        public void StartLoading(double time) => _timer.Set(TimerId.Play_LoadingStart, time);
+        public void FinishLoading(double time) => _timer.Set(TimerId.Play_LoadingFinished, time);
+        public void StartMusic(double time) => _timer.Set(TimerId.Play_MusicStart, time);
+
+        public void Update(double time)
+        {
+            UpdateArgs args = new(_timer, time, _timingList, _textureCache, _mediaCache, _notes, _bga, _highSpeed * _fixedHighSpeed);
+            _notes.Update(args);
+            _bga.Update(args);
+            
+            foreach (var child in _children.AsSpan())
+            {
+                child.Update(args);
+            }
+            _needRender = true;
+            InvalidateVisual();
+        }
+
+        protected override void OnRender(DrawingContext drawingContext)
+        {
+            EnsureRender();
+            base.OnRender(drawingContext);
+            drawingContext.DrawImage(_bitmap, _bitmapRect);
+        }
+
+        private WriteableBitmap CreateBitmap(int width, int height)
+        {
+            if (_bitmap is null || _bitmap.PixelWidth < width || _bitmap.PixelHeight < height)
+            {
+                _bitmap = Bitmap.Create(width, height);
+                _bitmapRect = new(0, 0, width, height);
+            }
+            return _bitmap;
+        }
+
+        private void EnsureRender()
+        {
+            if (_skin is not { } skin)
+            {
+                return;
+            }
+            var (w, h) = skin.BaseSize;
+            // 描画範囲の検証
+            if (_needEnsureBitmap)
+            {
+                CreateBitmap(w, h);
+                _needEnsureBitmap = false;
+                _needRender = true;
+            }
+            // 描画
+            if (_needRender)
+            {
+                using (var p = _bitmap.BeginWrite())
+                {
+                    p.Fill(_skin!.Background);
+                    var buffer1 = _buffer1;
+                    var buffer2 = _buffer2;
+                    foreach (var child in _children.AsSpan())
+                    {
+                        child.Render(p, buffer1, buffer2);
+                    }
+                }
+                _needRender = false;
+            }
+        }
+
+        public unsafe void CopyPixels(Span<byte> destination, int destWidth)
+        {
+            EnsureRender();
+            var (w, h) = _skin!.BaseSize;
+            fixed (byte* buffer = destination)
+            {
+                _bitmap.CopyPixels(new(0, 0, w, h), (nint)buffer, destination.Length, destWidth * 4);
+            }
+        }
     }
 }

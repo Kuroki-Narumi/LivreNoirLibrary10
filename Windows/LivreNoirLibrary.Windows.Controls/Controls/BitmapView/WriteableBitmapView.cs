@@ -2,7 +2,6 @@
 using System.Windows;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
-using LivreNoirLibrary.Windows.Media;
 
 namespace LivreNoirLibrary.Windows.Controls
 {
@@ -20,6 +19,7 @@ namespace LivreNoirLibrary.Windows.Controls
 
         private bool _needRefresh;
 
+        public WriteableBitmap? Bitmap => _bitmap;
         public double RequiredWidth => _requiredWidth;
         public double RequiredHeight => _requiredHeight;
 
@@ -76,10 +76,7 @@ namespace LivreNoirLibrary.Windows.Controls
 
         protected override void OnRender(DrawingContext dc)
         {
-            if (_bitmap is null)
-            {
-                _bitmap = Bitmap.Create(_bitmapWidth, _bitmapHeight);
-            }
+            _bitmap ??= Media.Bitmap.Create(_bitmapWidth, _bitmapHeight);
             if (_needRefresh)
             {
                 _needRefresh = false;
@@ -92,19 +89,5 @@ namespace LivreNoirLibrary.Windows.Controls
         protected virtual void Refresh() { }
         protected virtual double GetBitmapOffsetX() => 0;
         protected virtual double GetBitmapOffsetY() => 0;
-
-        protected bool TryGetBitmapPointer(out BitmapPointer pointer)
-        {
-            if (_bitmap is { } bitmap)
-            {
-                pointer = new(bitmap);
-                return true;
-            }
-            else
-            {
-                pointer = default;
-                return false;
-            }
-        }
     }
 }

@@ -31,6 +31,9 @@ namespace LivreNoirLibrary.Windows.Media
             return brush;
         }
         public static SolidColorBrush GetBrush(byte a, byte r, byte g, byte b) => GetBrush(Color.FromArgb(a, r, g, b));
+        public static SolidColorBrush GetBrush(float a, float r, float g, float b) => GetBrush(Color.FromScRgb(a, r, g, b));
+        public static SolidColorBrush GetBrush(byte r, byte g, byte b) => GetBrush(Color.FromRgb(r, g, b));
+        public static SolidColorBrush GetBrush(float r, float g, float b) => GetBrush(Color.FromScRgb(1, r, g, b));
         public static SolidColorBrush GetBrush(string colorCode) => GetBrush(colorCode.ToColor());
 
         public static Pen? GetPen(Brush? brush, double th)

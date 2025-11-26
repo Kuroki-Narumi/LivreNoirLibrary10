@@ -1,7 +1,7 @@
 sampler2D input1 : register(s0);
 float4 color : register(c0);
 static const float4 transparent = float4(0, 0, 0, 0);
-static const float3 threshold = float3(0.00392f);
+static const float3 threshold = float3(0.00392f, 0.00392f, 0.00392f);
 
 float4 main(float2 uv : TEXCOORD) : COLOR
 {

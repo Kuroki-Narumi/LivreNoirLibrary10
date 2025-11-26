@@ -29,7 +29,7 @@ namespace LivreNoirLibrary.Media.Bms
         extension (IBmsViewModel vm)
         {
             public string? GetDefValue(DefType type, int key, bool containsCurrent = true)
-                => vm.GetInheritedValue((data, out value) => data.DefLists.TryGetValue(type, key, out value!), (string?)null, containsCurrent);
+                => vm.GetInheritedValue<string>((data, out value) => data.DefLists.TryGetValue(type, key, out value!), null, containsCurrent);
 
             public bool TryGetDefKey(DefType type, string value, out int key)
                 => vm.TryGetInheritedValue((data, out key) => data.DefLists.TryGetKey(type, value, out key), out key);
@@ -42,17 +42,17 @@ namespace LivreNoirLibrary.Media.Bms
                 }
             }
 
-            public bool TryGetWavePath(int index, string root, [MaybeNullWhen(false)] out string name, [MaybeNullWhen(false)] out string path) 
-                => TryGetPathCore(vm, DefType.Wav, index, root, FileUtils.TryGetAudioFileName!, out name, out path);
+            public bool TryGetWavePath(int index, string root, [MaybeNullWhen(false)] out string defValue, [MaybeNullWhen(false)] out string path) 
+                => TryGetPathCore(vm, DefType.Wav, index, root, FileUtils.TryGetAudioFileName!, out defValue, out path);
 
-            public bool TryGetImagePath(int index, string root, [MaybeNullWhen(false)] out string name, [MaybeNullWhen(false)] out string path) 
-                => TryGetPathCore(vm, DefType.Bmp, index, root, FileUtils.TryGetImageFileName!, out name, out path);
+            public bool TryGetImagePath(int index, string root, [MaybeNullWhen(false)] out string defValue, [MaybeNullWhen(false)] out string path) 
+                => TryGetPathCore(vm, DefType.Bmp, index, root, FileUtils.TryGetImageFileName!, out defValue, out path);
 
-            public bool TryGetVideoPath(int index, string root, [MaybeNullWhen(false)] out string name, [MaybeNullWhen(false)] out string path) 
-                => TryGetPathCore(vm, DefType.Bmp, index, root, FileUtils.TryGetVideoFileName!, out name, out path);
+            public bool TryGetVideoPath(int index, string root, [MaybeNullWhen(false)] out string defValue, [MaybeNullWhen(false)] out string path) 
+                => TryGetPathCore(vm, DefType.Bmp, index, root, FileUtils.TryGetVideoFileName!, out defValue, out path);
 
-            public bool TryGetMediaPath(int index, string root, [MaybeNullWhen(false)] out string name, [MaybeNullWhen(false)] out string path) 
-                => TryGetPathCore(vm, DefType.Bmp, index, root, FileUtils.TryGetMediaFileName!, out name, out path);
+            public bool TryGetMediaPath(int index, string root, [MaybeNullWhen(false)] out string defValue, [MaybeNullWhen(false)] out string path) 
+                => TryGetPathCore(vm, DefType.Bmp, index, root, FileUtils.TryGetMediaFileName!, out defValue, out path);
 
             public bool IsDefined(DefType type, int index)
             {

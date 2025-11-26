@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace LivreNoirLibrary.Media.Bms.ViewModels
 {
-    public class SimpleBmsViewModel(IBmsData data) : IBmsViewModel
+    public class SimpleBmsViewModel(IBmsData? data = null) : IBmsViewModel
     {
         private bool _isTimeCounterReady;
         private readonly TimeCounter _timeCounter = new();
@@ -20,15 +20,13 @@ namespace LivreNoirLibrary.Media.Bms.ViewModels
                     BarLengthCache.Clear();
                 }
             }
-        } = data;
+        } = data ?? new BmsData();
 
         IBmsData IBmsViewModel.Root => Data;
         IBmsDataUnit IBmsViewModel.CurrentData => Data.Root;
         IEnumerable<IBmsDataUnit> IBmsViewModel.EnumerateParents() => [Data.Root];
         IEnumerable<IBmsDataUnit> IBmsViewModel.ReverseEnumerateParents() => [Data.Root];
 
-        public ITimeline ParentTimeline { get; } = new Timeline();
-        public ITimeCounter TimeCounter => GetTimeCounter();
         public DoubleBarLengthCache BarLengthCache { get; } = new();
 
         public void InvalidateTimeCounter()
@@ -36,7 +34,7 @@ namespace LivreNoirLibrary.Media.Bms.ViewModels
             _isTimeCounterReady = false;
         }
 
-        protected ITimeCounter GetTimeCounter()
+        protected TimeCounter GetTimeCounter()
         {
             if (!_isTimeCounterReady)
             {
@@ -45,5 +43,13 @@ namespace LivreNoirLibrary.Media.Bms.ViewModels
             }
             return _timeCounter;
         }
+
+        public double MinTempo => GetTimeCounter().MinTempo;
+        public double MaxTempo => GetTimeCounter().MaxTempo;
+        public double MainTempo => GetTimeCounter().MainTempo;
+        public double MainTimeTempo => GetTimeCounter().MainTimeTempo;
+        public double Beat2Time(double absolutePosition) => GetTimeCounter().Beat2Time(absolutePosition);
+        public double Time2Beat(double time) => GetTimeCounter().Time2Beat(time);
+        public double GetHighSpeed(double time) => GetTimeCounter().GetHighSpeed(time);
     }
 }

@@ -1,33 +1,22 @@
-﻿using System;
-using System.Windows;
-using System.Windows.Data;
-using System.Windows.Media;
-using LivreNoirLibrary.Media.Bms;
-using LivreNoirLibrary.Windows.Media.Bms;
+﻿using LivreNoirLibrary.Collections;
+using LivreNoirLibrary.Media;
 using LivreNoirLibrary.Windows.Media.Bms.SkinInfo;
 
-namespace LivreNoirLibrary.Windows.Controls.Bms
+namespace LivreNoirLibrary.Windows.Controls.Bms.Elements
 {
-    public partial class BgaElement : ScreenElementBase
+    public sealed class BgaElement(Bga source) : GroupElementBase(source)
     {
-        [DependencyProperty]
-        private VisualBrush? _brush;
+        private BgaParams? _params;
 
-        public BgaElement(Bga source, BgaImageSource imageSource) : base(source)
+        public override void Update(in UpdateArgs args)
         {
-            SetBinding(BrushProperty, new Binding(nameof(BgaImageSource.VisualBrush)) { Source = imageSource });
+            base.Update(args);
+            _params = args.Bga;
         }
 
-        public void Update(BmsTimer timer, long absoluteTick)
+        protected override void RenderChildren(IBitmap target, FloatBitmap buffer1, UnmanagedArray<float> buffer2)
         {
-            ViewModel.Update(timer, absoluteTick);
-            InvalidateVisual();
-        }
-
-        protected override void OnRender(DrawingContext drawingContext)
-        {
-            base.OnRender(drawingContext);
-            drawingContext.DrawRectangle(_brush, null, new(0, 0, Width, Height));
+            _params?.Render(target, buffer1, buffer2);
         }
     }
 }

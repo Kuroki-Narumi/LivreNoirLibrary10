@@ -6,57 +6,73 @@ using LivreNoirLibrary.ObjectModel;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Threading;
 
 namespace LivreNoirLibrary.Media.Integrated
 {
-    public readonly record struct AssembleResult(WaveData WaveData, float ActualGain)
-    {
-        public static implicit operator AssembleResult((WaveData, float) tuple) => new(tuple.Item1, tuple.Item2);
-    }
+    using AssembleResult = (WaveData WaveData, float ActualGain);
 
     public static partial class MediaExtensions
     {
-        public static AssembleResult Assemble(this IBmsViewModel data, AssembleOptions option, string directory) => Assemble(data, option, directory, null, CancellationToken.None);
-        public static AssembleResult Assemble(this IBmsViewModel data, AssembleOptions options, string directory, ProgressReporter? reporter, CancellationToken c)
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static Predicate<Note> GetDefaultPredicate<T>(IBmsViewModel vm, T options) where T : IAssemblePlaysLongEndOptions
+        {
+            var includeLongEnd = options.PlaysLongEnd && vm.LnObj is 0;
+            return n => n.IsMainSound(includeLongEnd);
+        }
+
+        public static AssembleResult Assemble<T>(
+            this IBmsViewModel vm, IWaveBufferProvider provider, T options,
+            ProgressReporter? reporter = null, CancellationToken c = default)
+            where T : IAssemblePlaysLongEndOptions, IConvertTargetOptions, IAdjustOptions
         {
             reporter?.Report("Creating Timeline ...", 0, 100);
-            var includeLongEnd = options.PlayLongEnd && data.LnObj is 0;
-            Predicate<Note> selector = options.Target.Type switch
+            var includeLongEnd = options.PlaysLongEnd && vm.LnObj is 0;
+            Predicate<Note> selector = options.ConvertTarget.Type switch
             {
                 ConvertTargetType.Key => n => n.IsVisibleKey(includeLongEnd),
                 ConvertTargetType.Bgm => n => n.IsBgm(),
                 _ => n => n.IsMainSound(includeLongEnd),
             };
-            var list = SoundTimingList.Create(data, selector);
-            return AssembleCore(data, options, directory, list, options.Adjust ? list.FirstTick : 0, 0, reporter, c);
+            var list = SoundTimingList.Create(vm, selector);
+            options.Offset = options.AdjustBeginning ? list.FirstTime : 0;
+            options.Length = 0;
+            return Assemble(vm, provider, list, options, reporter, c);
         }
 
-        public static AssembleResult AssembleSelection(this IBmsViewModel data, AssembleOptions option, Selection selection, string directory) => AssembleSelection(data, option, selection, directory, null, CancellationToken.None);
-        public static AssembleResult AssembleSelection(this IBmsViewModel data, AssembleOptions options, Selection selection, string directory, ProgressReporter? reporter, CancellationToken c)
+        public static AssembleResult AssembleSelection<T>(
+            this IBmsViewModel vm, IWaveBufferProvider provider, T options, 
+            Selection selection, ProgressReporter? reporter = null, CancellationToken c = default)
+            where T : IAssemblePlaysLongEndOptions
         {
             reporter?.Report("Creating Timeline ...", 0, 100);
-            var includeLongEnd = options.PlayLongEnd && data.LnObj is 0;
-            var list = SoundTimingList.Create(data, selection, n => n.IsMainSound(includeLongEnd));
-            return AssembleCore(data, options, directory, list, list.FirstTick, 0, reporter, c);
+            var list = SoundTimingList.Create(vm, selection, GetDefaultPredicate(vm, options));
+            options.Offset = list.FirstTime;
+            options.Length = 0;
+            return Assemble(vm, provider, list, options, reporter, c);
         }
 
-        public static AssembleResult AssembleForPreview(this IBmsViewModel data, AssembleOptions options, string directory) => AssembleForPreview(data, options, directory, null, CancellationToken.None);
-        public static AssembleResult AssembleForPreview(this IBmsViewModel data, AssembleOptions options, string directory, ProgressReporter? reporter, CancellationToken c)
+        public static AssembleResult AssembleForPreview<T>(
+            this IBmsViewModel vm, IWaveBufferProvider provider, T options, 
+            ProgressReporter? reporter = null, CancellationToken c = default)
+            where T : IAssemblePreviewOptions
         {
             reporter?.Report("Creating Timeline ...", 0, 100);
-            var start = data.TimeCounter.Beat2Tick(data.GetAbsolutePosition(options.PreviewStart));
+            var start = vm.Position2Tick(options.PreviewStart);
             var b = TimeUtils.Seconds2Ticks(options.PreviewBody);
             var fo = TimeUtils.Seconds2Ticks(options.PreviewFadeOut);
 
-            var list = SoundTimingList.Create(data, null, start + b + fo);
+            var list = SoundTimingList.Create(vm, GetDefaultPredicate(vm, options), start + b + fo);
 
             var fi = TimeUtils.Seconds2Ticks(options.PreviewFadeIn);
             if (fi > start)
             {
                 fi = start;
             }
-            var (result, gain) = AssembleCore(data, options, directory, list, start - fi, fi + b + fo, reporter, c);
+            options.Offset = start - fi;
+            options.Length = fi + b + fo;
+            var (result, gain) = Assemble(vm, provider, list, options, reporter, c);
             reporter?.Report("Apply fade ...", 100, 100);
             var rate = result.SampleRate;
             if (fi is > 0)
@@ -73,152 +89,146 @@ namespace LivreNoirLibrary.Media.Integrated
             return (result, gain);
         }
 
-        private static AssembleResult AssembleCore(IBmsViewModel data, AssembleOptions options, string directory, SoundTimingList timings, long headroom, long lengthLimit, ProgressReporter? reporter, CancellationToken c)
+        public static AssembleResult Assemble<T>(this IBmsViewModel vm, 
+            IWaveBufferProvider provider, ISoundList soundList, T options, 
+            ProgressReporter? p = null, CancellationToken c = default)
+            where T : IAssembleCoreOptions
         {
             c.ThrowIfCancellationRequested();
-            var ogain = options.Gain;
-            var gain = WaveBuffer.Level2Value(ogain);
-            var normalize = options.NormalizeMode;
-            var needGain = ogain is not 0 || normalize is not 0;
-            var overlap = options.Overlap;
+            var gain = options.Gain;
+            var actualGain = WaveBuffer.Level2Value(gain);
+            var normalizeMode = options.NormalizeMode;
+            var keyVolume = options.KeyVolume;
+            var bgmVolume = options.BgmVolume;
+            var notOverlap = !options.Overlap;
 
-            var marker = options.Marker;
-            SortedList<long, List<string>> markerList = [];
+            var directory = options.RootDirectory;
+            var headroom = options.Offset;
+            var totalLength = options.Length;
+
+            var setMarker = options.SetMarker;
+            SortedSet<int> markers = [];
+
             var sampleRate = 0;
             var sampleLimit = int.MaxValue;
             var needInitialize = true;
+
             WaveData result = new()
             {
-                Tempo = data.Bpm
+                Tempo = vm.Bpm
             };
-            WaveBuffer buffer = new();
 
-            int ToSamples(long tick) => (int)(tick * sampleRate / TimeSpan.TicksPerSecond);
-            int ToOffset(long tick) => (int)((tick - headroom) * sampleRate / TimeSpan.TicksPerSecond);
-            void Append(string name, long position, long tickLength)
-            {
-                var srcOffset = 0;
-                var offset = ToOffset(position);
-                var length = tickLength is >= 0 ? Math.Min(ToSamples(tickLength), buffer.SampleLength) : buffer.SampleLength;
-                if (offset is < 0)
-                {
-                    length += offset;
-                    srcOffset = -offset;
-                    offset = 0;
-                }
-                if (offset + length > sampleLimit)
-                {
-                    length = sampleLimit - offset;
-                }
-                if (length is > 0)
-                {
-                    result.Append(buffer, offset, srcOffset, length);
-                    if (marker && offset is >= 0)
-                    {
-                        if (!markerList.TryGetValue(offset, out var list))
-                        {
-                            list = [];
-                            markerList.Add(offset, list);
-                        }
-                        switch (list.Count)
-                        {
-                            case < 3:
-                                list.Add(name);
-                                break;
-                            case 3:
-                                list.Add("...");
-                                break;
-                        }
-                    }
-                }
-            }
-
-            reporter?.Report("Assembling ...", 1, 100);
-
+            p?.Report("Assembling ...", 1, 100);
             var current = 0;
-            var count = timings.Count;
-            var max = 98.0 / count;
-            foreach (var (index, list) in timings)
+            var count = soundList.Count;
+            var max = 98d / count;
+            foreach (var (id, list) in soundList.EnumerateSoundList())
             {
                 c.ThrowIfCancellationRequested();
-                if (data.TryGetWavePath(index, directory, out var name, out var path))
-                {
-                    try
-                    {
-                        buffer.AutoDecode(path, needInitialize);
-                    }
-                    catch
-                    {
-                        ExConsole.Write($"Failed to open {path}");
-                        continue;
-                    }
-                }
-                else
+                if (!(vm.TryGetWavePath(id, directory, out var name, out var path) && provider.TryGetWaveBuffer(path, out var buffer)))
                 {
                     continue;
                 }
                 if (needInitialize)
                 {
                     sampleRate = buffer.SampleRate;
-                    if (lengthLimit is > 0)
+                    if (totalLength is > 0)
                     {
-                        sampleLimit = ToSamples(lengthLimit);
+                        sampleLimit = ToSamples(totalLength);
                     }
                     result.SetLayout(sampleRate, buffer.Channels);
-                    result.EnsureSampleLength(Math.Min(sampleLimit, ToOffset(timings.LastTick)));
+                    result.EnsureSampleLength(Math.Min(sampleLimit, ToOffset(soundList.LastTime)));
                     needInitialize = false;
                 }
-                foreach (var item in list.AsSpan())
+                foreach (var (time, length, isBgm) in list.AsSpan())
                 {
-                    Append(name!, item.Position, overlap ? 0 : item.Length);
+                    c.ThrowIfCancellationRequested();
+                    var sourceOffset = 0;
+                    var offset = ToOffset(time);
+                    var sampleLength = (notOverlap && length is >= 0) ? Math.Min(ToSamples(length), buffer.SampleLength) : buffer.SampleLength;
+                    if (offset is < 0)
+                    {
+                        sampleLength += offset;
+                        sourceOffset = -offset;
+                        offset = 0;
+                    }
+                    sampleLength = Math.Min(sampleLength, sampleLimit - offset);
+                    if (sampleLength is > 0)
+                    {
+                        result.Append(buffer, offset, sourceOffset, sampleLength, isBgm ? bgmVolume : keyVolume);
+                        if (setMarker)
+                        {
+                            markers.Add(offset);
+                        }
+                    }
                 }
                 current++;
-                reporter?.Report($"Assembling ({current} of {count})", 1.0 + current * max, 100);
+                p?.Report($"Assembling ({current} of {count})", 1.0 + current * max, 100);
             }
-            if (needGain)
+
+            if (gain is not 0 || normalizeMode is not 0)
             {
-                reporter?.Report("Normalizing ...", 99, 100);
-                Console.WriteLine($"gain={gain}, mode={normalize}");
-                switch (normalize)
+                p?.Report("Normalizing ...", 99, 100);
+                Console.WriteLine($"gain={gain}, mode={normalizeMode}");
+                switch (normalizeMode)
                 {
                     case NormalizeMode.Peak:
-                        gain /= result.GetPeak();
+                        actualGain /= result.GetPeak();
                         break;
                     case NormalizeMode.Rms:
-                        gain /= result.GetRms();
+                        actualGain /= result.GetRms();
                         break;
                     case NormalizeMode.Lufs:
-                        gain *= WaveBuffer.Level2Value(-result.GetLufs());
+                        actualGain *= WaveBuffer.Level2Value(-result.GetLufs());
                         break;
                 }
-                result.Multiply(gain);
+                result.Multiply(actualGain);
             }
-            foreach (var (pos, names) in markerList)
+
+            if (setMarker)
             {
-                result.Markers.Set(pos, string.Join(" + ", names));
+                var format = SliceUtils.GetIndexFormat(markers.Count);
+                current = 0;
+                foreach (var pos in markers)
+                {
+                    current++;
+                    result.Markers.Set(pos, current.ToString(format));
+                }
             }
             result.Software = "LivreNoirLibrary";
-            return (result, gain);
+
+            return (result, actualGain);
+
+            int ToSamples(double time) => (int)(time * sampleRate);
+            int ToOffset(double time) => (int)((time - headroom) * sampleRate);
         }
 
-        public static void ReplaceToAssembled(this IBmsViewModel data, AssembleOptions options, Selection selection, string defName, out Selection newSelection, out int defId)
+        public static void ReplaceToAssembled(this IBmsViewModel data, IAssembleReplaceOptions options, Selection selection, string defName, out Selection newSelection, out int defId)
         {
-            if (!data.TryGetDefKey(DefType.Wav, defName, out defId))
-            {
-                defId = data.FindFreeDefIndex(DefType.Wav);
-                data.CurrentData.DefLists.Set(DefType.Wav, defId, defName);
-            }
             switch (options.ReplaceMode)
             {
                 case AssembleReplaceMode.Selection:
+                    defId = EnsureDefId();
                     newSelection = data.CombineSequence(selection, defId);
                     break;
                 case AssembleReplaceMode.All:
+                    defId = EnsureDefId();
                     newSelection = data.CombineSequenceAll(selection, defId, options.ReplaceMargin);
                     break;
                 default:
+                    defId = 0;
                     newSelection = selection;
                     return;
+            }
+
+            int EnsureDefId()
+            {
+                if (!data.TryGetDefKey(DefType.Wav, defName, out var defId))
+                {
+                    defId = data.FindFreeDefIndex(DefType.Wav);
+                    data.CurrentData.DefLists.Set(DefType.Wav, defId, defName);
+                }
+                return defId;
             }
         }
     }

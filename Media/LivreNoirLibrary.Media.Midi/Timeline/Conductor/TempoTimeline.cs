@@ -66,7 +66,7 @@ namespace LivreNoirLibrary.Media.Midi
             }
         }
 
-        public int Get(Rational position) => Get(position, DefaultTempo);
+        public int Get(Rational position) => this.Get(position, DefaultTempo);
         public double GetBpm(Rational position) => TimeUtils.MicroSeconds2Bpm(Get(position));
         public void SetBpm(Rational position, double value) => Set(position, TimeUtils.Bpm2MicroSeconds(value));
 

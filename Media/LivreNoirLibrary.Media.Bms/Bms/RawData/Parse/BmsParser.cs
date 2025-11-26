@@ -1,4 +1,5 @@
 ﻿using LivreNoirLibrary.Collections;
+using LivreNoirLibrary.Debug;
 using LivreNoirLibrary.Text;
 using System;
 using System.Collections.Generic;

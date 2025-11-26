@@ -1,50 +1,40 @@
-﻿using System;
-using System.Windows;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
+﻿using LivreNoirLibrary.Collections;
 using LivreNoirLibrary.Media;
-using LivreNoirLibrary.Media.Bms;
-using LivreNoirLibrary.Windows.Media;
 using LivreNoirLibrary.Windows.Media.Bms.SkinInfo;
+using System;
+using System.Diagnostics.CodeAnalysis;
+using DrRect = System.Drawing.Rectangle;
 
-namespace LivreNoirLibrary.Windows.Controls.Bms
+namespace LivreNoirLibrary.Windows.Controls.Bms.Elements
 {
-    public class ImageElement(Image source) : ScreenElementBase(source)
+    public sealed class ImageElement(Image source) : ScreenElement(source)
     {
-        private readonly Image _skinInfo = source;
-        private bool _isTextureValid;
+        private readonly Image _source = source;
         private TextureData _textureData;
-        private TextureCacheKey _bitmapKey;
-        private CroppedBitmap? _bitmap;
+        private UIntBitmap? _bitmap;
+        private DrRect _sourceRect;
 
-        public void LoadDestination(Skin skin, IVariableProvider? provider)
+        public override void DetermineExpressions(Skin skin, IVariableProvider? provider)
         {
-            _isTextureValid = skin.TryGetTexture(_skinInfo.Texture, provider, out _textureData);
-            IScreenElementExtension.LoadDestination(this, skin, provider);
+            base.DetermineExpressions(skin, provider);
+            IsValid = skin.TryGetTexture(_source.Texture, provider, out _textureData);
         }
 
-        public void Update(BmsTimer timer, long absoluteTick, TextureCache cache)
+        public override void Update(in UpdateArgs args)
         {
-            if (_isTextureValid)
+            base.Update(args);
+            if (IsValid)
             {
-                var index = timer.GetFrameIndex(_skinInfo.SourceTimer, absoluteTick, _textureData);
-                _bitmap = cache.GetBitmap(_textureData, index, out var key);
-                if (ViewModel.Update(timer, absoluteTick) || _bitmapKey != key)
-                {
-                    _bitmapKey = key;
-                    InvalidateVisual();
-                }
-            }
-            else
-            {
-                ViewModel.Visibility = Visibility.Collapsed;
+                var index = args.Timer.GetFrameIndex(_source.SourceTimer, args.AbsoluteTime, _textureData);
+                IsVisible = args.Textures.TryGetTexture(_textureData, index, out _bitmap, out _sourceRect);
             }
         }
 
-        protected override void OnRender(DrawingContext drawingContext)
+        protected override bool TryGetBitmap([MaybeNullWhen(false)] out IBitmap bitmap, out DrRect rect, FloatBitmap buffer1, UnmanagedArray<float> buffer2)
         {
-            base.OnRender(drawingContext);
-            drawingContext.DrawImage(_bitmap, new(0, 0, Width, Height));
+            bitmap = _bitmap;
+            rect = _sourceRect;
+            return bitmap is not null;
         }
     }
 }

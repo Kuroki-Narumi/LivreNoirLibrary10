@@ -1,4 +1,5 @@
-﻿using System;
+﻿using LivreNoirLibrary.Collections;
+using System;
 using System.Collections.Generic;
 using System.Numerics;
 using System.Runtime.CompilerServices;
@@ -13,20 +14,39 @@ namespace LivreNoirLibrary.Media
         public const float Epsilon = 1e-6f;
         public const float RoundOffset = 0.5f;
 
-        public const uint Mask_A = 0xFF000000;
-        public const uint Mask_R = 0x00FF0000;
-        public const uint Mask_G = 0x0000FF00;
-        public const uint Mask_B = 0x000000FF;
-
         public const byte ColorIndex_A = 3;
         public const byte ColorIndex_R = 2;
         public const byte ColorIndex_G = 1;
         public const byte ColorIndex_B = 0;
 
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static uint GetMask(int index, byte value = 255) => (uint)value << (index * 8);
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static (uint Clear, uint Set) GetClearSetMask(int index, byte value) => (~GetMask(index), GetMask(index, value));
+        private static readonly Dictionary<ColorFlags, uint> _masks = new()
+        {
+            [ColorFlags.A] = 0x01000000,
+            [ColorFlags.R] = 0x00010000,
+            [ColorFlags.G] = 0x00000100,
+            [ColorFlags.B] = 0x00000001,
+        };
+
+        public static uint GetMask(ColorFlags flags, byte value = 255)
+        {
+            if (!_masks.TryGetValue(flags, out var mask))
+            {
+                mask = 0u;
+                void Update(ColorFlags reference)
+                {
+                    if ((flags & reference) is not 0)
+                    {
+                        mask |= _masks[reference];
+                    }
+                }
+                Update(ColorFlags.A);
+                Update(ColorFlags.R);
+                Update(ColorFlags.G);
+                Update(ColorFlags.B);
+                _masks[flags] = mask;
+            }
+            return mask * value;
+        }
 
         public static uint ToUInt(byte a, byte r, byte g, byte b) => ((uint)a << 24) | ((uint)r << 16) | ((uint)g << 8) | b;
         public static (byte A, byte R, byte G, byte B) ToColor(uint value) => unchecked(((byte)(value >> 24), (byte)(value >> 16), (byte)(value >> 8), (byte)value));
@@ -228,5 +248,58 @@ namespace LivreNoirLibrary.Media
         public static int GetInt(float value) => (int)Math.Clamp(FloatFactor * value + RoundOffset, 0, FloatFactor);
         public static float GetFloat(byte value) => value * InvertFactor;
         public static float GetFloat(int value) => value * InvertFactor;
+
+        private static readonly float[] _scRgbTable = CreateScRgbTable();
+
+        static float[] CreateScRgbTable()
+        {
+            var table = new float[256];
+            // 低輝度領域
+            for (var i = 1; i <= 10; i++)
+            {
+                table[i] = i * InvertFactor / 12.92f;
+            }
+            // 高輝度領域
+            for (var i = 11; i <= 254; i++)
+            {
+                table[i] = MathF.Pow((i * InvertFactor + 0.055f) / 1.055f, 2.4f);
+            }
+            table[255] = 1;
+            return table;
+        }
+
+        public static float RgbToScRgb(byte value) => _scRgbTable[value];
+
+        const int RgbTableSize = 65536;
+        const float RgbScale = 65535;
+        private static readonly byte[] _rgbTable = CreateRgbTable();
+
+        static byte[] CreateRgbTable()
+        {
+            var table = new byte[RgbTableSize];
+            for (var i = 0; i < RgbTableSize; i++)
+            {
+                table[i] = ScRgbToRgbImpl(i / RgbScale);
+            }
+            return table;
+        }
+
+        public static byte ScRgbToRgbImpl(float value)
+        {
+            return value > 0.0
+                ? (byte)(value switch
+                {
+                    <= 0.0031308f => (byte)((value * 12.92f * 255.0f) + 0.5f),
+                    < 1 => (byte)(((MathF.Pow(value, 1.0f / 2.4f) * 1.055f - 0.055f) * 255.0f) + 0.5f),
+                    _ => 255,
+                })
+                : (byte)0;
+        }
+
+        public static byte ScRgbToRgb(float value)
+        {
+            var index = Math.Clamp((int)(value * RgbScale), 0, RgbTableSize - 1);
+            return _rgbTable[index];
+        }
     }
 }

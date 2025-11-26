@@ -90,6 +90,15 @@ namespace LivreNoirLibrary.Media.Bms
 
         public static bool IsBga(this Channel channel) => _bga.Contains(channel);
         public static bool IsArgb(this Channel channel) => _argb.Contains(channel);
+        public static bool IsOpacity(this Channel channel) => channel is >= Channel.Opacity_Base and <= Channel.Opacity_Poor;
+        public static Channel ToBga(this Channel channel) => channel switch
+        {
+            Channel.Bga_Base or Channel.Argb_Base or Channel.Opacity_Base => Channel.Bga_Base,
+            Channel.Bga_Layer1 or Channel.Argb_Layer1 or Channel.Opacity_Layer1 => Channel.Bga_Layer1,
+            Channel.Bga_Layer2 or Channel.Argb_Layer2 or Channel.Opacity_Layer2 => Channel.Bga_Layer2,
+            Channel.Bga_Poor or Channel.Argb_Poor or Channel.Opacity_Poor => Channel.Bga_Poor,
+            _ => Channel.None,
+        };
 
         public static bool IsReserved(this Channel channel) => _reserved.Contains(channel);
         public static bool IsNamed(this Channel channel) => _named.Contains(channel);
@@ -156,13 +165,13 @@ namespace LivreNoirLibrary.Media.Bms
             Channel.Opacity_Base,
             Channel.Opacity_Layer1,
             Channel.Opacity_Layer2,
+            Channel.Opacity_Poor,
             Channel.Bgm_Volume,
             Channel.Key_Volume,
         ];
 
         private static readonly SortedSet<Channel> _conductor =
         [
-            Channel.Bpm_Base,
             Channel.Bpm,
             Channel.Stop,
             Channel.Scroll,

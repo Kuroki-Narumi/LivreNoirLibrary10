@@ -88,7 +88,7 @@ namespace LNImageEditor
             if (ImageList.SelectedItem is ImageItem item)
             {
                 var rect = ImageRectSelector.GetRect();
-                if (item.Image.GetRect() != rect && this.SaveFileDialog(FileDialogOptions.WithInitialPath(item.FullPath), Filters.Image_Save) is string path)
+                if (item.Image.Rect != rect && this.SaveFileDialog(FileDialogOptions.WithInitialPath(item.FullPath), Filters.Image_Save) is string path)
                 {
                     CroppedBitmap cropped = new(item.Image, rect);
                     cropped.SaveImage(path, BitmapEncodeType.Auto);
@@ -125,7 +125,7 @@ namespace LNImageEditor
                             c.ThrowIfCancellationRequested();
                             p.Report($"{item.Filename}: 境界の検出");
                             var rect = item.Image.GetOpaqueRect();
-                            if (rect != item.Image.GetRect())
+                            if (rect != item.Image.Rect)
                             {
                                 CroppedBitmap cropped = new(item.Image, rect);
                                 c.ThrowIfCancellationRequested();

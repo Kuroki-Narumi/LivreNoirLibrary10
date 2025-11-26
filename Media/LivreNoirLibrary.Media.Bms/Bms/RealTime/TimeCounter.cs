@@ -9,8 +9,7 @@ namespace LivreNoirLibrary.Media.Bms
 
         public void Load(double initialTempo, IBarPositionProvider<double> provider, IListEnumerable<BarPosition, Note> timeline)
         {
-            Clear();
-            InitializeTimeInfo(initialTempo);
+            BeginInit(initialTempo);
             TimingInfoState state = new(initialTempo);
             foreach (var (pos, list) in timeline.EnumerateList())
             {
@@ -26,6 +25,7 @@ namespace LivreNoirLibrary.Media.Bms
                 }
                 ApplyTimeInfo(ref state);
             }
+            EndInit(ref state);
         }
     }
 }

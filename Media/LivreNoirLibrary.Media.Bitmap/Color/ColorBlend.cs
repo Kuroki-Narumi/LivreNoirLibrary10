@@ -1,187 +1,187 @@
-﻿using System;
-using System.Drawing;
+﻿using LivreNoirLibrary.Debug;
+using LivreNoirLibrary.Numerics;
+using System;
 using System.Numerics;
 using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 
 namespace LivreNoirLibrary.Media
 {
-    public interface IColorBlend
-    {
-        Vector<float> Blend(Vector<float> back, Vector<float> front);
-    }
-
     public static unsafe partial class ColorBlend
     {
         public static readonly Vector<float> FloatFactor = Vector.Create(ColorUtils.FloatFactor);
         public static readonly Vector<float> InvertFactor = Vector.Create(ColorUtils.InvertFactor);
+
         public static readonly Vector<float> Epsilon = Vector.Create(ColorUtils.Epsilon);
-        public static readonly Vector<float> RoundOffset = Vector.Create(ColorUtils.RoundOffset);
-        public static readonly Vector<int> AlphaSelector = CreateAlphaSelector();
-        private unsafe static Vector<int> CreateAlphaSelector()
+        public static readonly Vector<int> AlphaSelector = Vector.Equals(Vector<float>.One, VectorUtils.CreateRepeating([0, 0, 0, 1f]));
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        private static void BlendCore(ref Vector<float> back, in Vector<float> backAlpha, in Vector<float> front, in Vector<float> frontAlpha, BlendFunc blend)
         {
-            var count = Vector<float>.Count;
-            var span = (stackalloc float[count]);
-            for (var i = 0; i < count; i++)
-            {
-                span[i] = (i % 4) is ColorUtils.ColorIndex_A ? 1 : 0;
-            }
-            return Vector.Equals(Vector<float>.One, Vector.Create(span));
+            // Fb, Ff := Porter Duff 演算の定数 (ここでは Fb = 1 - front.A, Ff = 1)
+            // C := 合成後の色
+            // a := 合成後のアルファ
+            // C' := ブレンド後コンポジット前の色
+            var factor = backAlpha * (Vector<float>.One - frontAlpha);
+            // a = back.A * Fb + front.A * Ff
+            var newAlpha = factor + frontAlpha;
+            // C' = back.A * blended + (1 - back.A) * front
+            var color = backAlpha * blend(back, front) + (Vector<float>.One - backAlpha) * front;
+            // C = (back.A * Fb * back + front.A * Ff * C') / a
+            color = (factor * back + frontAlpha * color) / (newAlpha + Epsilon);
+            // アルファとそれ以外を分けて反映
+            back = Vector.ConditionalSelect(AlphaSelector, newAlpha, color);
         }
 
-        internal static void BlendCore<T>(uint* pointer, int bitmapWidth, int width, int height, LnColor color, T blend)
-            where T : IColorBlend
+        public static void BlendUInt(uint* pointer, int targetWidth, int width, int height, BlendFunc blend, LnColor color)
         {
+            var count = Vector<float>.Count;
             width *= 4;
+            var invertFactor = InvertFactor;
+            // 前景ベクトル
+            var ca = ColorUtils.GetFloat(color.A);
+            var cr = ColorUtils.RgbToScRgb(color.R);
+            var cg = ColorUtils.RgbToScRgb(color.G);
+            var cb = ColorUtils.RgbToScRgb(color.B);
+            var frontVector = VectorUtils.CreateRepeating([cb, cg, cr, ca]);
+            var frontAlphaVector = Vector.Create(ca);
+
             Parallel.For(0, height, y =>
             {
+                var w = width;
                 // byteの各要素をfloatへ変換するために、ポインタをbyte*に変換
-                var backP = (byte*)(pointer + y * bitmapWidth);
-                // 定数ベクトル
-                var count = Vector<float>.Count;
-                var floatFactor = FloatFactor;
-                var invertFactor = InvertFactor;
-                var epsilon = Epsilon;
-                var roundOffset = RoundOffset;
-                var one = Vector<float>.One;
-                var condition = AlphaSelector;
+                var backP = (byte*)(pointer + y * targetWidth);
                 // float変換用の作業バッファ
-                var backBuffer = (stackalloc float[count]);
-                var backAlphaBuffer = (stackalloc float[count]);
-                // 前景ベクトル
-                var c = color;
-                var frontP = (byte*)&c;
-                for (var i = 0; i < count; i++)
-                {
-                    backBuffer[i] = frontP[i % 4];
-                    backAlphaBuffer[i] = frontP[0];
-                }
-                // 正規化してベクトル化
-                var frontVector = Vector.Create(backBuffer) * invertFactor;
-                var frontAlphaVector = Vector.Create(backAlphaBuffer) * invertFactor;
+                var backBuffer = stackalloc float[count];
+                var backAlphaBuffer = stackalloc float[count];
 
-                // 切りの良い部分
-                for (; width >= count; width -= count)
+                for (; w >= count; w -= count)
                 {
                     Process(backBuffer, backAlphaBuffer, count);
                 }
-                // 余り
-                if (width is > 0)
+                if (w is > 0)
                 {
-                    Process(backBuffer, backAlphaBuffer, width);
+                    Process(backBuffer, backAlphaBuffer, w);
                 }
 
                 [MethodImpl(MethodImplOptions.AggressiveInlining)]
-                void Process(Span<float> backBuffer, Span<float> backAlphaBuffer, int count)
+                void Process(float* backBuffer, float* backAlphaBuffer, int count)
                 {
                     // byteの値をそのままバッファへ格納
                     for (var i = 0; i < count; i++)
                     {
-                        backBuffer[i] = backP[i];
+                        backBuffer[i] = ColorUtils.RgbToScRgb(backP[i]);
                         // alpha値は4の倍数ごとに同じ値になる
                         backAlphaBuffer[i] = backP[i / 4 * 4 + ColorUtils.ColorIndex_A];
                     }
                     // 正規化してベクトル化
-                    var backVector = Vector.Create(backBuffer) * invertFactor;
-                    var backAlphaVector = Vector.Create(backAlphaBuffer) * invertFactor;
+                    var backVector = *(Vector<float>*)backBuffer;
+                    var backAlphaVector = *(Vector<float>*)backAlphaBuffer * invertFactor;
 
-                    // Fb, Ff := Porter Duff 演算の定数 (ここでは Fb = 1 - front.A, Ff = 1)
-                    // C := 合成後の色
-                    // a := 合成後のアルファ
-                    // C' := ブレンド後コンポジット前の色
-                    var factor = backAlphaVector * (one - frontAlphaVector);
-                    // a = back.A * Fb + front.A * Ff
-                    var newAlpha = factor + frontAlphaVector;
-                    // C' = back.A * blended + (1 - back.A) * front
-                    var color = backAlphaVector * blend.Blend(backVector, frontVector) + (one - backAlphaVector) * frontVector;
-                    // C = (back.A * Fb * back + front.A * Ff * C') / a
-                    color = (factor * backVector + frontAlphaVector * color) / (newAlpha + epsilon);
-                    // アルファとそれ以外を分けて反映
-                    backVector = Vector.ConditionalSelect(condition, newAlpha, color);
-                    // byte値へ復元しつつ範囲も制限する
-                    backVector = Vector.Clamp(backVector * floatFactor + roundOffset, Vector<float>.Zero, floatFactor);
+                    BlendCore(ref backVector, backAlphaVector, frontVector, frontAlphaVector, blend);
+
                     // バッファへ書き戻す
-                    backVector.CopyTo(backBuffer);
-                    for (var i = 0; i < count; i++)
+                    *(Vector<float>*)backBuffer = backVector;
+                    for (var i = 0; i < count; i += 4)
                     {
-                        backP[i] = (byte)backBuffer[i];
+                        backP[i + ColorUtils.ColorIndex_B] = ColorUtils.ScRgbToRgb(backBuffer[i + ColorUtils.ColorIndex_B]);
+                        backP[i + ColorUtils.ColorIndex_G] = ColorUtils.ScRgbToRgb(backBuffer[i + ColorUtils.ColorIndex_G]);
+                        backP[i + ColorUtils.ColorIndex_R] = ColorUtils.ScRgbToRgb(backBuffer[i + ColorUtils.ColorIndex_R]);
+                        backP[i + ColorUtils.ColorIndex_A] = ColorUtils.GetByte(backBuffer[i + ColorUtils.ColorIndex_A]);
                     }
                     backP += count;
                 }
             });
         }
 
-        internal static void BlendCore<T>(uint* backPointer, int backWidth, uint* frontPointer, int frontWidth, int width, int height, T blend)
-            where T : IColorBlend
+        public static void BlendFloat(float* pointer, int targetWidth, int width, int height, BlendFunc blend, Vector<float> color)
         {
+            var count = Vector<float>.Count;
+            var invertFactor = InvertFactor;
+            var frontAlpha = FloatColor.FillAlphaToAll(color);
+            targetWidth *= 4;
             width *= 4;
+
+            Parallel.For(0, height, y =>
+            {
+                var w = width;
+                var backP = (Vector<float>*)(pointer + y * targetWidth);
+                for (; w >= count; w -= count, backP++)
+                {
+                    var back = *backP;
+                    BlendCore(ref back, FloatColor.FillAlphaToAll(back), color, frontAlpha, blend);
+                    *backP = back;
+                }
+                if (w is > 0)
+                {
+                    var back = VectorUtils.CreateRepeating(new ReadOnlySpan<float>(backP, w));
+                    BlendCore(ref back, FloatColor.FillAlphaToAll(back), color, frontAlpha, blend);
+                    var singleBack = (float*)backP;
+                    for (var i = 0; i < w; i++, singleBack++)
+                    {
+                        *singleBack = back[i];
+                    }
+                }
+            });
+        }
+
+        public static void BlendUIntUInt(uint* back, int backWidth, uint* front, int frontWidth, int width, int height, BlendFunc blend, Vector<float> colorCorrection)
+        {
+            // 定数ベクトル
+            var count = Vector<float>.Count;
+            var invertFactor = InvertFactor;
+            width *= 4;
+
             Parallel.For(0, height, y =>
             {
                 var w = width;
                 // byteの各要素をfloatへ変換するために、ポインタをbyte*に変換
-                var backP = (byte*)(backPointer + y * backWidth);
-                var frontP = (byte*)(frontPointer + y * frontWidth);
-                // 定数ベクトル
-                var count = Vector<float>.Count;
-                var floatFactor = FloatFactor;
-                var invertFactor = InvertFactor;
-                var epsilon = Epsilon;
-                var roundOffset = RoundOffset;
-                var one = Vector<float>.One;
-                var condition = AlphaSelector;
+                var backP = (byte*)(back + y * backWidth);
+                var frontP = (byte*)(front + y * frontWidth);
                 // float変換用の作業バッファ
-                var backBuffer = (stackalloc float[count]);
-                var frontBuffer = (stackalloc float[count]);
-                var backAlphaBuffer = (stackalloc float[count]);
-                var frontAlphaBuffer = (stackalloc float[count]);
-                // 切りの良い部分
+                var backBuffer = stackalloc float[count];
+                var backAlphaBuffer = stackalloc float[count];
+                var frontBuffer = stackalloc float[count];
+                var frontAlphaBuffer = stackalloc float[count];
+
                 for (; w >= count; w -= count)
                 {
                     Process(backBuffer, backAlphaBuffer, frontBuffer, frontAlphaBuffer, count);
                 }
-                // 余り
                 if (w is > 0)
                 {
                     Process(backBuffer, backAlphaBuffer, frontBuffer, frontAlphaBuffer, w);
                 }
 
                 [MethodImpl(MethodImplOptions.AggressiveInlining)]
-                void Process(Span<float> backBuffer, Span<float> backAlphaBuffer, Span<float> frontBuffer, Span<float> frontAlphaBuffer, int count)
+                void Process(float* backBuffer, float* backAlphaBuffer, float* frontBuffer, float* frontAlphaBuffer, int count)
                 {
                     // byteの値をそのままバッファへ格納
                     for (var i = 0; i < count; i++)
                     {
-                        backBuffer[i] = backP[i];
-                        frontBuffer[i] = frontP[i];
+                        backBuffer[i] = ColorUtils.RgbToScRgb(backP[i]);
+                        frontBuffer[i] = ColorUtils.RgbToScRgb(frontP[i]);
                         // alpha値は4の倍数ごとに同じ値になる
-                        backAlphaBuffer[i] = backP[i / 4 * 4 + ColorUtils.ColorIndex_A];
-                        frontAlphaBuffer[i] = frontP[i / 4 * 4 + ColorUtils.ColorIndex_A];
+                        var alphaIndex = i / 4 * 4 + ColorUtils.ColorIndex_A;
+                        backAlphaBuffer[i] = backP[alphaIndex];
+                        frontAlphaBuffer[i] = frontP[alphaIndex];
                     }
                     // 正規化してベクトル化
-                    var backVector = Vector.Create(backBuffer) * invertFactor;
-                    var backAlphaVector = Vector.Create(backAlphaBuffer) * invertFactor;
-                    var frontVector = Vector.Create(frontBuffer) * invertFactor;
-                    var frontAlphaVector = Vector.Create(frontAlphaBuffer) * invertFactor;
-                    // Fb, Ff := Porter Duff 演算の定数 (ここでは Fb = 1 - front.A, Ff = 1)
-                    // C := 合成後の色
-                    // a := 合成後のアルファ
-                    // C' := ブレンド後コンポジット前の色
-                    var factor = backAlphaVector * (one - frontAlphaVector);
-                    // a = back.A * Fb + front.A * Ff
-                    var newAlpha = factor + frontAlphaVector;
-                    // C' = back.A * blended + (1 - back.A) * front
-                    var color = backAlphaVector * blend.Blend(backVector, frontVector) + (one - backAlphaVector) * frontVector;
-                    // C = (back.A * Fb * back + front.A * Ff * C') / a
-                    color = (factor * backVector + frontAlphaVector * color) / (newAlpha + epsilon);
-                    // アルファとそれ以外を分けて反映
-                    backVector = Vector.ConditionalSelect(condition, newAlpha, color);
-                    // byte値へ復元しつつ範囲も制限する
-                    backVector = Vector.Clamp(backVector * floatFactor + roundOffset, Vector<float>.Zero, floatFactor);
+                    var backVector = *(Vector<float>*)backBuffer;
+                    var backAlphaVector = *(Vector<float>*)backAlphaBuffer * invertFactor;
+                    var frontVector = *(Vector<float>*)frontBuffer * colorCorrection;
+                    var frontAlphaVector = *(Vector<float>*)frontAlphaBuffer * invertFactor * colorCorrection[ColorUtils.ColorIndex_A];
+
+                    BlendCore(ref backVector, backAlphaVector, frontVector, frontAlphaVector, blend);
+
                     // バッファへ書き戻す
-                    backVector.CopyTo(backBuffer);
-                    for (var i = 0; i < count; i++)
+                    *(Vector<float>*)backBuffer = backVector;
+                    for (var i = 0; i < count; i += 4)
                     {
-                        backP[i] = (byte)backBuffer[i];
+                        backP[i + ColorUtils.ColorIndex_B] = ColorUtils.ScRgbToRgb(backBuffer[i + ColorUtils.ColorIndex_B]);
+                        backP[i + ColorUtils.ColorIndex_G] = ColorUtils.ScRgbToRgb(backBuffer[i + ColorUtils.ColorIndex_G]);
+                        backP[i + ColorUtils.ColorIndex_R] = ColorUtils.ScRgbToRgb(backBuffer[i + ColorUtils.ColorIndex_R]);
+                        backP[i + ColorUtils.ColorIndex_A] = ColorUtils.GetByte(backBuffer[i + ColorUtils.ColorIndex_A]);
                     }
                     backP += count;
                     frontP += count;
@@ -189,51 +189,150 @@ namespace LivreNoirLibrary.Media
             });
         }
 
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static void Blend<T>(LnBitmapData back, LnColor color, T blend)
-            where T : IColorBlend
+        public static void BlendUIntFloat(uint* back, int backWidth, float* front, int frontWidth, int width, int height, BlendFunc blend, Vector<float> colorCorrection)
         {
-            if (back.IsValid)
+            // 定数ベクトル
+            var count = Vector<float>.Count;
+            var invertFactor = InvertFactor;
+            frontWidth *= 4;
+            width *= 4;
+
+            Parallel.For(0, height, y =>
             {
-                var (pb, wb, hb) = back;
-                BlendCore(pb, wb, wb, hb, color, blend);
-            }
+                var w = width;
+                // byteの各要素をfloatへ変換するために、ポインタをbyte*に変換
+                var backP = (byte*)(back + y * backWidth);
+                var frontP = (Vector<float>*)(front + y * frontWidth);
+                // float変換用の作業バッファ
+                var backBuffer = stackalloc float[count];
+                var backAlphaBuffer = stackalloc float[count];
+
+                for (; w >= count; w -= count, frontP++)
+                {
+                    var front = *frontP * colorCorrection;
+                    Process(backBuffer, backAlphaBuffer, front, FloatColor.FillAlphaToAll(front), count);
+                }
+                if (w is > 0)
+                {
+                    var front = VectorUtils.CreateRepeating(new ReadOnlySpan<float>(frontP, w)) * colorCorrection;
+                    Process(backBuffer, backAlphaBuffer, front, FloatColor.FillAlphaToAll(front), w);
+                }
+
+                [MethodImpl(MethodImplOptions.AggressiveInlining)]
+                void Process(float* backBuffer, float* backAlphaBuffer, Vector<float> front, Vector<float> frontAlpha, int count)
+                {
+                    // byteの値をそのままバッファへ格納
+                    for (var i = 0; i < count; i++)
+                    {
+                        backBuffer[i] = ColorUtils.RgbToScRgb(backP[i]);
+                        // alpha値は4の倍数ごとに同じ値になる
+                        backAlphaBuffer[i] = backP[i / 4 * 4 + ColorUtils.ColorIndex_A];
+                    }
+                    // 正規化してベクトル化
+                    var backVector = *(Vector<float>*)backBuffer;
+                    var backAlphaVector = *(Vector<float>*)backAlphaBuffer * invertFactor;
+
+                    BlendCore(ref backVector, backAlphaVector, front, frontAlpha, blend);
+
+                    // バッファへ書き戻す
+                    *(Vector<float>*)backBuffer = backVector;
+                    for (var i = 0; i < count; i += 4)
+                    {
+                        backP[i + ColorUtils.ColorIndex_B] = ColorUtils.ScRgbToRgb(backBuffer[i + ColorUtils.ColorIndex_B]);
+                        backP[i + ColorUtils.ColorIndex_G] = ColorUtils.ScRgbToRgb(backBuffer[i + ColorUtils.ColorIndex_G]);
+                        backP[i + ColorUtils.ColorIndex_R] = ColorUtils.ScRgbToRgb(backBuffer[i + ColorUtils.ColorIndex_R]);
+                        backP[i + ColorUtils.ColorIndex_A] = ColorUtils.GetByte(backBuffer[i + ColorUtils.ColorIndex_A]);
+                    }
+                    backP += count;
+                }
+            });
         }
 
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static void Blend<T>(LnBitmapData back, Rectangle rect, LnColor color, T blend)
-            where T : IColorBlend
+        public static void BlendFloatUInt(float* back, int backWidth, uint* front, int frontWidth, int width, int height, BlendFunc blend, Vector<float> colorCorrection)
         {
-            if (back.IsValid && Structs.Adjust(ref rect, back))
+            var count = Vector<float>.Count;
+            var invertFactor = InvertFactor;
+            backWidth *= 4;
+            width *= 4;
+
+            Parallel.For(0, height, y =>
             {
-                BlendCore(back.Offset(rect.X, rect.Y), back.Width, rect.Width, rect.Height, color, blend);
-            }
+                var w = width;
+                var backP = (Vector<float>*)(back + y * backWidth);
+                var frontP = (byte*)(front + y * frontWidth);
+                // float変換用の作業バッファ
+                var frontBuffer = stackalloc float[count];
+                var frontAlphaBuffer = stackalloc float[count];
+
+                for (; w >= count; w -= count, backP++)
+                {
+                    var back = *backP;
+                    var (front, frontAlpha) = GetFrontVector(frontBuffer, frontAlphaBuffer, count);
+                    BlendCore(ref back, FloatColor.FillAlphaToAll(back), front, frontAlpha, blend);
+                    *backP = back;
+                }
+                if (w is > 0)
+                {
+                    var back = VectorUtils.CreateRepeating(new ReadOnlySpan<float>(backP, w));
+                    var (front, frontAlpha) = GetFrontVector(frontBuffer, frontAlphaBuffer, w);
+                    BlendCore(ref back, FloatColor.FillAlphaToAll(back), front, frontAlpha, blend);
+                    var singleBack = (float*)backP;
+                    for (var i = 0; i < w; i++, singleBack++)
+                    {
+                        *singleBack = back[i];
+                    }
+                }
+
+                [MethodImpl(MethodImplOptions.AggressiveInlining)]
+                (Vector<float>, Vector<float>) GetFrontVector(float* frontBuffer, float* frontAlphaBuffer, int count)
+                {
+                    // byteの値をそのままバッファへ格納
+                    for (var i = 0; i < count; i++)
+                    {
+                        frontBuffer[i] = ColorUtils.RgbToScRgb(frontP[i]);
+                        // alpha値は4の倍数ごとに同じ値になる
+                        frontAlphaBuffer[i] = frontP[i / 4 * 4 + ColorUtils.ColorIndex_A];
+                    }
+                    // 正規化してベクトル化
+                    var frontVector = *(Vector<float>*)frontBuffer * colorCorrection;
+                    var frontAlphaVector = *(Vector<float>*)frontAlphaBuffer * invertFactor * colorCorrection[ColorUtils.ColorIndex_A];
+                    frontP += count;
+                    return (frontVector, frontAlphaVector);
+                }
+            });
         }
 
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static void Blend<T>(LnBitmapData back, LnBitmapData front, T blend)
-            where T : IColorBlend
+        public static void BlendFloatFloat(float* back, int backWidth, float* front, int frontWidth, int width, int height, BlendFunc blend, Vector<float> colorCorrection)
         {
-            if (back.IsValid && front.IsValid)
-            {
-                var (pb, wb, hb) = back;
-                var (pf, wf, hf) = front;
-                var width = Math.Min(wb, wf);
-                var height = Math.Min(hb, hf);
-                BlendCore(pb, wb, pf, wf, width, height, blend);
-            }
-        }
+            var count = Vector<float>.Count;
+            backWidth *= 4;
+            frontWidth *= 4;
+            width *= 4;
 
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static void Blend<T>(LnBitmapData back, LnBitmapData front, Point backPoint, Rectangle frontRect, T blend)
-            where T : IColorBlend
-        {
-            var (backX, backY) = backPoint;
-            var (frontX, frontY, width, height) = frontRect;
-            if (back.IsValid && front.IsValid && Structs.Adjust(ref backX, ref backY, ref width, ref height, back) && Structs.Adjust(ref frontRect, front))
+            Parallel.For(0, height, y =>
             {
-                BlendCore(back.Offset(backX, backY), back.Width, front.Offset(frontX, frontY), front.Width, width, height, blend);
-            }
+                var w = width;
+                var backP = (Vector<float>*)(back + y * backWidth);
+                var frontP = (Vector<float>*)(front + y * frontWidth);
+                for (; w >= count; w -= count, backP++, frontP++)
+                {
+                    var back = *backP;
+                    var front = *frontP * colorCorrection;
+                    BlendCore(ref back, FloatColor.FillAlphaToAll(back), front, FloatColor.FillAlphaToAll(front), blend);
+                    *backP = back;
+                }
+                if (w is > 0)
+                {
+                    var back = VectorUtils.CreateRepeating(new ReadOnlySpan<float>(backP, w));
+                    var front = VectorUtils.CreateRepeating(new ReadOnlySpan<float>(frontP, w)) * colorCorrection;
+                    BlendCore(ref back, FloatColor.FillAlphaToAll(back), front, FloatColor.FillAlphaToAll(front), blend);
+                    var singleBack = (float*)backP;
+                    for (var i = 0; i < w; i++, singleBack++)
+                    {
+                        *singleBack = back[i];
+                    }
+                }
+            });
         }
     }
 }

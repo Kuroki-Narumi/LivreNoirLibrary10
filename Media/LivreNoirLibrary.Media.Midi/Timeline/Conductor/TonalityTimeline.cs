@@ -28,6 +28,6 @@ namespace LivreNoirLibrary.Media.Midi
             }
         }
 
-        public Tonality Get(Rational position) => Get(position, default);
+        public Tonality Get(Rational position) => this.Get(position, default);
     }
 }

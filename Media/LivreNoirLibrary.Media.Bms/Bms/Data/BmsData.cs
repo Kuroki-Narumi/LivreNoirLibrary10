@@ -202,6 +202,7 @@ namespace LivreNoirLibrary.Media.Bms
         public void Dump(Stream stream, bool indent)
         {
             BmsFormatter formatter = new(this);
+            formatter.Prepare(Root);
             formatter.Format(stream, null, indent);
         }
     }

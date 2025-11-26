@@ -12,7 +12,7 @@ namespace LivreNoirLibrary.Windows
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static LnColor ToLnColor(this in Color color) => new(color.A, color.R, color.G, color.B);
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static LnColor ToLnColorWithoutAlpha(this in Color color) => new(color.R, color.G, color.B);
+        public static LnColor ToLnColorWithoutAlpha(this in Color color) => LnColor.FromRgb(color.R, color.G, color.B);
 
         public static string GetColorCode(this Color color, bool alpha = true)
         {

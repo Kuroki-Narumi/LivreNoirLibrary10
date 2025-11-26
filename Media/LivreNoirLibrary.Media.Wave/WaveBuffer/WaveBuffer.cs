@@ -20,7 +20,7 @@ namespace LivreNoirLibrary.Media.Wave
         private int _channels = DefaultChannels;
         protected readonly MarkerCollection _markers = [];
 
-        public Span<float> Data => _data.AsSpan(0, _data_length);
+        public Span<float> Data => _data.Slice(0, _data_length);
         public int SampleRate => _sample_rate;
         public int Channels => _channels;
         public int TotalSample => _data_length;

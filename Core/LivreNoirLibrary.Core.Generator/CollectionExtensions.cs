@@ -62,14 +62,14 @@ internal class CollectionExtensions : IIncrementalGenerator
     }
 
     public const string Template = $$"""
-                public static bool TrySearch(this {{PH_Source}}{{PH_Target}}, {{PH_Type2}} value, SearchMode type, out int index, out {{PH_Type1}} actualValue)
+                public static bool TrySearch(this {{PH_Source}}{{PH_Target}}, {{PH_Type2}} value, SearchMode mode, out int index, out {{PH_Type1}} actualValue)
                 {
-                    return TrySearch<{{PH_Type1}}, {{PH_Type2}}, Comparer_{{PH_Type1}}_{{PH_Type2}}>({{PH_Target}}, value, type, out index, out actualValue);
+                    return TrySearch<{{PH_Type1}}, {{PH_Type2}}, Comparer_{{PH_Type1}}_{{PH_Type2}}>({{PH_Target}}, value, mode, out index, out actualValue);
                 }
 
-                public static int FindIndex(this {{PH_Source}}{{PH_Target}}, {{PH_Type2}} value, SearchMode type)
+                public static int FindIndex(this {{PH_Source}}{{PH_Target}}, {{PH_Type2}} value, SearchMode mode)
                 {
-                    return FindIndex<{{PH_Type1}}, {{PH_Type2}}, Comparer_{{PH_Type1}}_{{PH_Type2}}>({{PH_Target}}, value, type);
+                    return FindIndex<{{PH_Type1}}, {{PH_Type2}}, Comparer_{{PH_Type1}}_{{PH_Type2}}>({{PH_Target}}, value, mode);
                 }
 
                 public static int FindNearestIndex(this {{PH_Source}}{{PH_Target}}, {{PH_Type2}} value)

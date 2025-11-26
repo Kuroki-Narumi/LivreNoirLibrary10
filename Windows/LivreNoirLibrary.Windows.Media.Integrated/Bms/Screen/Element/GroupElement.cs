@@ -1,27 +1,41 @@
-﻿using System;
-using System.Windows.Controls;
-using LivreNoirLibrary.Media.Bms;
-using LivreNoirLibrary.Windows.Media.Bms;
+﻿using LivreNoirLibrary.Collections;
+using LivreNoirLibrary.Media;
 using LivreNoirLibrary.Windows.Media.Bms.SkinInfo;
+using System.Collections.Generic;
 
-namespace LivreNoirLibrary.Windows.Controls.Bms
+namespace LivreNoirLibrary.Windows.Controls.Bms.Elements
 {
-    public class GroupElement : Canvas, IScreenElement
+    public sealed class GroupElement(Group source) : GroupElementBase(source)
     {
-        public SkinElement SkinElement { get; }
-        public ScreenElementViewModel ViewModel { get; }
+        private readonly Group _source = source;
 
-        public GroupElement(Group source)
+        public bool ClipToBounds { get; private set; }
+        public List<ScreenElement> Children { get; } = [];
+
+        public override void DetermineExpressions(Skin skin, IVariableProvider? provider)
         {
-            SkinElement = source;
-            ViewModel = this.CreateVideModel(source);
+            base.DetermineExpressions(skin, provider);
+            foreach (var child in Children.AsSpan())
+            {
+                child.DetermineExpressions(skin, provider);
+            }
+            ClipToBounds = _source.ClipToBounds;
         }
 
-        public void Update(BmsTimer timer, long absoluteTick)
+        public override void Update(in UpdateArgs args)
         {
-            if (ViewModel.Update(timer, absoluteTick))
+            base.Update(args);
+            foreach (var child in Children.AsSpan())
             {
-                InvalidateVisual();
+                child.Update(args);
+            }
+        }
+
+        protected override void RenderChildren(IBitmap target, FloatBitmap buffer1, UnmanagedArray<float> buffer2)
+        {
+            foreach (var child in Children.AsSpan())
+            {
+                child.Render(target, buffer1, buffer2);
             }
         }
     }

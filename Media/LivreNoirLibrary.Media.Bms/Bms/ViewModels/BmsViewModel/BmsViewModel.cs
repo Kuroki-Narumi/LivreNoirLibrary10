@@ -16,14 +16,11 @@ namespace LivreNoirLibrary.Media.Bms.ViewModels
         private readonly List<FlowAddress> _flowAddressList = [];
 
         private readonly InheritedTimeline _timeline = new();
-        private bool _isTimeCounterReady;
-        private readonly TimeCounter _timeCounter = new();
 
         public BmsData Root { get; set => SetValue(ref field, value ?? new(), OnRootChanged); }
         IBmsData IBmsViewModel.Root => Root;
         public IBmsDataUnit CurrentData => _inheritanceList[^1];
         public IListEnumerable<BarPosition, Note> CurrentTimeline => _timeline;
-        public ITimeCounter TimeCounter => GetTimeCounter();
         public DoubleBarLengthCache BarLengthCache { get; } = new();
         public FlowViewModelCollection FlowViewModel { get; }
 
@@ -67,6 +64,9 @@ namespace LivreNoirLibrary.Media.Bms.ViewModels
             }
         }
 
+        private bool _isTimeCounterReady;
+        private readonly TimeCounter _timeCounter = new();
+
         public void InvalidateTimeCounter()
         {
             _isTimeCounterReady = false;
@@ -81,6 +81,14 @@ namespace LivreNoirLibrary.Media.Bms.ViewModels
             }
             return _timeCounter;
         }
+
+        public double MinTempo => GetTimeCounter().MinTempo;
+        public double MaxTempo => GetTimeCounter().MaxTempo;
+        public double MainTempo => GetTimeCounter().MainTempo;
+        public double MainTimeTempo => GetTimeCounter().MainTimeTempo;
+        public double Beat2Time(double absolutePosition) => GetTimeCounter().Beat2Time(absolutePosition);
+        public double Time2Beat(double time) => GetTimeCounter().Time2Beat(time);
+        public double GetHighSpeed(double time) => GetTimeCounter().GetHighSpeed(time);
 
         public BmsHistoryData GetHistoryData()
         {

@@ -1,7 +1,8 @@
-﻿using LivreNoirLibrary.ObjectModel;
+﻿using LivreNoirLibrary.Collections;
+using LivreNoirLibrary.ObjectModel;
 using System;
 using System.Collections.Generic;
-using System.Threading;
+using System.Runtime.CompilerServices;
 
 namespace LivreNoirLibrary.Media.Bms.ViewModels
 {
@@ -35,12 +36,21 @@ namespace LivreNoirLibrary.Media.Bms.ViewModels
             CurrentTimeline = current.Timeline;
         }
 
-        public IEnumerable<(BarPosition, List<Note>)> EnumerateList() => EnumerateCore(GetEnumerator());
-        public IEnumerable<(BarPosition, List<Note>)> ReverseEnumerateList() => EnumerateCore(GetReverseEnumerator());
+        public TwoMergedEnumerator<BarPosition, List<Note>> GetEnumerator() 
+            => new(ParentTimeline.EnumerateList(), CurrentTimeline.EnumerateList());
+        public TwoMergedEnumerator<BarPosition, List<Note>> GetEnumerator(Range<BarPosition> range) 
+            => new(ParentTimeline.EnumerateList(range), CurrentTimeline.EnumerateList(range));
+        public TwoMergedEnumerator<BarPosition, List<Note>> GetReverseEnumerator() 
+            => new(ParentTimeline.ReverseEnumerateList(), CurrentTimeline.ReverseEnumerateList());
+        public TwoMergedEnumerator<BarPosition, List<Note>> GetReverseEnumerator(Range<BarPosition> range) 
+            => new(ParentTimeline.ReverseEnumerateList(range), CurrentTimeline.ReverseEnumerateList(range));
 
-        public TwoMergedEnumerator<BarPosition, List<Note>> GetEnumerator() => new(ParentTimeline.EnumerateList(), CurrentTimeline.EnumerateList());
-        public TwoMergedEnumerator<BarPosition, List<Note>> GetReverseEnumerator() => new(ParentTimeline.ReverseEnumerateList(), CurrentTimeline.ReverseEnumerateList());
+        IEnumerable<(BarPosition, List<Note>)> IListEnumerable<BarPosition, Note>.EnumerateList() => EnumerateCore(GetEnumerator());
+        IEnumerable<(BarPosition, List<Note>)> IListEnumerable<BarPosition, Note>.EnumerateList(Range<BarPosition> range) => EnumerateCore(GetEnumerator());
+        IEnumerable<(BarPosition, List<Note>)> IListEnumerable<BarPosition, Note>.ReverseEnumerateList() => EnumerateCore(GetReverseEnumerator());
+        IEnumerable<(BarPosition, List<Note>)> IListEnumerable<BarPosition, Note>.ReverseEnumerateList(Range<BarPosition> range) => EnumerateCore(GetReverseEnumerator());
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private static IEnumerable<(BarPosition, List<Note>)> EnumerateCore(TwoMergedEnumerator<BarPosition, List<Note>> enumer)
         {
             var buffer = ObjectPool.Rent<List<Note>>();
@@ -67,10 +77,10 @@ namespace LivreNoirLibrary.Media.Bms.ViewModels
             }
         }
 
-        public void ApplyTimeline(IBarPositionProvider<double> provider, ITimelineViewModel vm, double initialTempo, bool abortIfInvalidTempo)
+        public void RefreshTimeline(IBarPositionProvider<double> provider, ITimelineViewModel target, double initialTempo, bool abortIfInvalidTempo)
         {
             TimingInfoState state = new(initialTempo);
-            vm.BeginTimelineRefresh(initialTempo);
+            target.BeginTimelineRefresh(initialTempo);
             foreach (var (pos, list1, list2) in this)
             {
                 if (abortIfInvalidTempo && state.IsInvalidTempo)
@@ -81,15 +91,15 @@ namespace LivreNoirLibrary.Media.Bms.ViewModels
                 state.Setup(beat);
                 if (list1 is not null)
                 {
-                    vm.ApplyParentTimeline(pos, ref state, list1);
+                    target.ApplyParentTimeline(pos, ref state, list1);
                 }
                 if (list2 is not null)
                 {
-                    vm.ApplyCurrentTimeline(pos, ref state, list2);
+                    target.ApplyCurrentTimeline(pos, ref state, list2);
                 }
-                vm.ApplyTimeInfo(ref state);
+                target.ApplyTimeInfo(ref state);
             }
-            vm.FinisTimelineRefresh();
+            target.FinisTimelineRefresh();
         }
     }
 }

@@ -28,7 +28,7 @@ namespace LivreNoirLibrary.Media.Bms
         public readonly double CurrentPosition => _position;
         public readonly bool IsInvalidTempo => _tempo is <= 0;
 
-        public (double Time, long Tick) Setup(double beat)
+        public double Setup(double beat)
         {
             _beat = beat;
             _time = _previousTime + (beat - _previousBeat) * _timePerBeat;
@@ -37,7 +37,7 @@ namespace LivreNoirLibrary.Media.Bms
             Stop = 0;
             Scroll = double.NaN;
             Speed = double.NaN;
-            return (_time, TimeUtils.Seconds2Ticks(_time));
+            return _time;
         }
 
         public bool Update(Note note)

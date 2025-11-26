@@ -3,8 +3,6 @@ using LivreNoirLibrary.ObjectModel;
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Reflection.PortableExecutable;
-using System.Text.Json;
 
 namespace LivreNoirLibrary.Media.Bms
 {
@@ -69,7 +67,6 @@ namespace LivreNoirLibrary.Media.Bms
 
         public SortedList.Enumerator<int, double> GetEnumerator() => new(_numbers, _values);
         IEnumerator<(int, double)> IEnumerable<(int, double)>.GetEnumerator() => GetEnumerator();
-        System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator() => GetEnumerator();
 
         public void Merge(IBarLengthCollection source)
         {

@@ -28,7 +28,7 @@ namespace LivreNoirLibrary.Media.Midi
             _number_list.Clear();
         }
 
-        public TimeSignature Get(Rational position) => Get(position, TimeSignature.Default);
+        public TimeSignature Get(Rational position) => this.Get(position, TimeSignature.Default);
 
         public TimeSignature GetByNumber(int number)
         {

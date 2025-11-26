@@ -1,13 +1,12 @@
 ﻿using LivreNoirLibrary.Collections;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 
 namespace LivreNoirLibrary.Media.Bms
 {
     public static partial class BmsExtensions
     {
-        extension(IListEnumerable<double, Note> timeline)
+        extension<TX>(IListEnumerable<TX, Note> timeline) where TX : struct
         {
             public int GetNoteCount(bool includeLongEnd = false)
             {

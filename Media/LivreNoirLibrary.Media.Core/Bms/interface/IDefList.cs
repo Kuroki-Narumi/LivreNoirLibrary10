@@ -7,7 +7,7 @@ using System.IO;
 
 namespace LivreNoirLibrary.Media.Bms
 {
-    public interface IDefList : ICount, IEnumerable<(short, string)>, IDumpable, ILoadable, IClear
+    public interface IDefList : IEnumerable<(short, string)>, ICount, IClear, IDumpable, ILoadable
     {
         int MaxIndex { get; }
         IEnumerable<short> Keys { get; }

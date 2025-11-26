@@ -27,7 +27,7 @@ namespace LivreNoirLibrary.Media
         /// <param name="value">When this method returns, contains the value associated with the found position, if the search is successful;
         /// otherwise, the default value for <typeparamref name="TValue"/>.</param>
         /// <returns><see langword="true"/> if an value is found; otherwise, <see langword="false"/>.</returns>
-        bool TryGetValue(TY key, TX position, SearchMode type, out TX actualPosition, [MaybeNullWhen(false)] out TValue value);
+        bool TryGetValue(TY key, TX position, SearchMode mode, out TX actualPosition, [MaybeNullWhen(false)] out TValue value);
 
         /// <summary>
         /// Attempts to find the value with the specified key and the nearest to the specified position.

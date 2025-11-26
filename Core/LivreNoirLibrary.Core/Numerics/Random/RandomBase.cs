@@ -18,7 +18,7 @@ namespace LivreNoirLibrary.Numerics
 
         public sealed override int Next(int maxValue)
         {
-            ArgumentOutOfRangeException.ThrowIfNegative(maxValue, nameof(maxValue));
+            ArgumentOutOfRangeException.ThrowIfNegative(maxValue);
             if (maxValue is > 1)
             {
                 return (int)(((Generate() >> 32) * (ulong)maxValue) >> 32);
@@ -39,12 +39,12 @@ namespace LivreNoirLibrary.Numerics
 
         public sealed override long NextInt64(long maxValue)
         {
-            ArgumentOutOfRangeException.ThrowIfNegative(maxValue, nameof(maxValue));
+            ArgumentOutOfRangeException.ThrowIfNegative(maxValue);
             if (maxValue is > 1)
             {
                 var m = (ulong)maxValue;
                 var x = Generate();
-                var high = Math.BigMul(x, m, out var low);
+                var high = Math.BigMul(x, m, out _);
                 return (long)high;
             }
             return 0;

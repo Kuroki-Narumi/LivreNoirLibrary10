@@ -6,46 +6,117 @@
         xmlns:local="clr-namespace:LivreNoirLibrary.SandBox"
         xmlns:ct="clr-namespace:LivreNoirLibrary.Windows.Controls;assembly=LivreNoirLibrary.Windows.Controls"
         xmlns:cc="clr-namespace:LivreNoirLibrary.Windows.Media.Bms.SkinInfo;assembly=LivreNoirLibrary.Windows.Media.Integrated"
+        xmlns:media="clr-namespace:LivreNoirLibrary.Windows.Media;assembly=LivreNoirLibrary.Windows.Media"
         mc:Ignorable="d" d:DataContext="{d:DesignInstance Type=local:BmsVideoCreator}"
-        Title="MainWindow" Height="450" Width="800" AllowDrop="True">
-    <Grid>
-        <Grid x:Name="MainUI">
-            <Grid.Resources>
-                <Style TargetType="ct:Button">
-                    <Setter Property="Margin" Value="4"/>
-                </Style>
-                <Style TargetType="ct:LabeledSlider">
-                    <Setter Property="Margin" Value="4"/>
-                    <Setter Property="SliderWidth" Value="160"/>
-                    <Setter Property="IsTextEditable" Value="True"/>
-                    <Setter Property="Minimum" Value="256"/>
-                    <Setter Property="Maximum" Value="1920"/>
-                    <Setter Property="IsSnapToTickEnabled" Value="True"/>
-                    <Setter Property="TickFrequency" Value="16"/>
-                    <EventSetter Event="PreviewMouseWheel" Handler="LabeledSlider_PreviewMouseWheel"/>
-                </Style>
-                <Style TargetType="ComboBox" BasedOn="{StaticResource ComboBoxBase}">
-                    <Setter Property="Margin" Value="4"/>
-                    <EventSetter Event="PreviewMouseWheel" Handler="ComboBox_PreviewMouseWheel"/>
-                </Style>
-            </Grid.Resources>
-            <Grid.RowDefinitions>
-                <RowDefinition Height="Auto"/>
-                <RowDefinition Height="*"/>
-            </Grid.RowDefinitions>
-            <WrapPanel Orientation="Horizontal">
-                <ct:Button Icon="{x:Static ct:Icons.Open}" Command="ApplicationCommands.Open"/>
-                <ct:Button Icon="{x:Static ct:Icons.Save}" Command="ApplicationCommands.Save"/>
-                <ct:Button Icon="{x:Static ct:Icons.Wave}" Click="OnClick_Assemble"/>
-                <ComboBox ItemsSource="{x:Static local:BmsVideoCreator.FpsList}" SelectedItem="{Binding FrameRate}"/>
-                <ct:Button Icon="{x:Static ct:Icons.Camera}" Click="OnClick_Video"/>
-            </WrapPanel>
-            <Rectangle Grid.Row="1">
-                <Rectangle.Fill>
-                    <VisualBrush Visual="{Binding Screen.MainCanvas}" Stretch="Uniform"/>
-                </Rectangle.Fill>
-            </Rectangle>
-        </Grid>
-        <ct:TaskProgressBar x:Name="TaskProgressBar"/>
-    </Grid>
+        Title="MainWindow" Height="450" Width="800">
+    <Window.Resources>
+        <Style TargetType="ct:Button">
+            <Setter Property="Margin" Value="4"/>
+        </Style>
+        <Style TargetType="ComboBox" BasedOn="{StaticResource ComboBoxBase}">
+            <Setter Property="Margin" Value="4"/>
+            <EventSetter Event="PreviewMouseWheel" Handler="ComboBox_PreviewMouseWheel"/>
+        </Style>
+    </Window.Resources>
+    <TabControl>
+        <TabItem Header="BMS">
+            <Grid AllowDrop="True" DragOver="OnDragOver_Bms" Drop="OnDrop_Bms">
+                <Grid x:Name="MainUI">
+                    <Grid.Resources>
+                        <Style TargetType="ct:LabeledSlider">
+                            <Setter Property="Margin" Value="4"/>
+                            <Setter Property="SliderWidth" Value="160"/>
+                            <Setter Property="IsTextEditable" Value="True"/>
+                            <Setter Property="Minimum" Value="256"/>
+                            <Setter Property="Maximum" Value="1920"/>
+                            <Setter Property="IsSnapToTickEnabled" Value="True"/>
+                            <Setter Property="TickFrequency" Value="16"/>
+                            <EventSetter Event="PreviewMouseWheel" Handler="LabeledSlider_PreviewMouseWheel"/>
+                        </Style>
+                    </Grid.Resources>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
+                    <WrapPanel Orientation="Horizontal">
+                        <ct:Button Icon="{x:Static ct:Icons.Open}" Command="ApplicationCommands.Open"/>
+                        <ct:Button Icon="{x:Static ct:Icons.Save}" Command="ApplicationCommands.Save"/>
+                        <ct:Button Icon="{x:Static ct:Icons.Wave}" Click="OnClick_Assemble"/>
+                        <ComboBox ItemsSource="{x:Static local:BmsVideoCreator.FpsList}" SelectedItem="{Binding FrameRate}"/>
+                        <ct:Button Icon="{x:Static ct:Icons.Camera}" Click="OnClick_Video"/>
+                    </WrapPanel>
+                    <Rectangle Grid.Row="1">
+                        <Rectangle.Fill>
+                            <VisualBrush Visual="{Binding Screen}" Stretch="Uniform"/>
+                        </Rectangle.Fill>
+                    </Rectangle>
+                </Grid>
+                <ct:TaskProgressBar x:Name="TaskProgressBar"/>
+            </Grid>
+        </TabItem>
+        <TabItem Header="Picture">
+            <Grid Margin="4">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="4"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="4"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+                <Grid.Resources>
+                    <Style TargetType="TextBlock">
+                    </Style>
+                    <Style TargetType="Grid" x:Key="MainGrid">
+                        <Setter Property="Grid.Row" Value="1"/>
+                        <Setter Property="Background" Value="Gray"/>
+                        <Setter Property="AllowDrop" Value="True"/>
+                        <EventSetter Event="DragOver" Handler="OnDragOver_Image"/>
+                        <EventSetter Event="Drop" Handler="OnDrop_Image"/>
+                    </Style>
+                    <Style TargetType="Rectangle">
+                        <Setter Property="Fill" Value="{x:Static media:MediaUtils.TransparentCheckerBrush}"/>
+                    </Style>
+                </Grid.Resources>
+                <Grid Grid.Column="0">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
+                    <TextBlock Text="Source"/>
+                    <Grid Style="{StaticResource MainGrid}">
+                        <Rectangle Width="{Binding ActualWidth, ElementName=Image_Source}" Height="{Binding ActualHeight, ElementName=Image_Source}"/>
+                        <Image x:Name="Image_Source"/>
+                    </Grid>
+                </Grid>
+                <Grid Grid.Column="2">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
+                    <TextBlock Text="Target" />
+                    <Grid Style="{StaticResource MainGrid}">
+                        <Rectangle Width="{Binding ActualWidth, ElementName=Image_Target}" Height="{Binding ActualHeight, ElementName=Image_Target}"/>
+                        <Image x:Name="Image_Target"/>
+                    </Grid>
+                </Grid>
+                <Grid Grid.Column="4">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock Text="Result" VerticalAlignment="Bottom"/>
+                        <ComboBox Name="ComboBox_BlendMode" ItemsSource="{x:Static local:MainWindow.BlendModes}" SelectedIndex="0"/>
+                        <ct:LabeledSlider x:Name="Slider_Opacity" SliderWidth="50" Minimum="0" Maximum="100" Value="100" TickFrequency="5" IsSnapToTickEnabled="True"/>
+                        <ct:Button Icon="{x:Static ct:Icons.Check_Green}" Click="OnClick_Image_Blend"/>
+                        <ct:Button Icon="{x:Static ct:Icons.Save}" Click="OnClick_Image_Save"/>
+                    </StackPanel>
+                    <Grid Style="{StaticResource MainGrid}" AllowDrop="False">
+                        <Rectangle Width="{Binding ActualWidth, ElementName=Image_Result}" Height="{Binding ActualHeight, ElementName=Image_Result}"/>
+                        <Image x:Name="Image_Result"/>
+                    </Grid>
+                </Grid>
+            </Grid>
+        </TabItem>
+    </TabControl>
 </Window>

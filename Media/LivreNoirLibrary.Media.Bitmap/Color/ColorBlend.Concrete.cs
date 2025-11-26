@@ -1,135 +1,91 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Numerics;
-using System.Runtime.CompilerServices;
 
 namespace LivreNoirLibrary.Media
 {
+    public delegate Vector<float> BlendFunc(Vector<float> back, Vector<float> front);
+
     public static partial class ColorBlend
     {
-        public static readonly Blend_Alpha Alpha = new();
-        public static readonly Blend_Add Add = new();
-        public static readonly Blend_Subtract Subtract = new();
-        public static readonly Blend_Multiply Multiply = new();
-        public static readonly Blend_Screen Screen = new();
-        public static readonly Blend_Overlay Overlay = new();
-        public static readonly Blend_Darken Darken = new();
-        public static readonly Blend_Lighten Lighten = new();
-        public static readonly Blend_ColorDodge ColorDodge = new();
-        public static readonly Blend_ColorBurn ColorBurn = new();
-        public static readonly Blend_HardLight HardLight = new();
-        public static readonly Blend_SoftLight SoftLight = new();
-        public static readonly Blend_Difference Difference = new();
-        public static readonly Blend_Exclusion Exclusion = new();
+        static readonly Vector<float> Half = Vector.Create(0.5f);
 
-        public readonly struct Blend_Alpha : IColorBlend
+        private static readonly Dictionary<BlendMode, BlendFunc> _funcs = new()
         {
-            public Vector<float> Blend(Vector<float> back, Vector<float> front)
-            {
-                return front;
-            }
+            [BlendMode.Alpha] = Alpha,
+            [BlendMode.Add] = Add,
+            [BlendMode.Subtract] = Subtract,
+            [BlendMode.Multiply] = Multiply,
+            [BlendMode.Screen] = Screen,
+            [BlendMode.Overlay] = Overlay,
+            [BlendMode.Darken] = Darken,
+            [BlendMode.Lighten] = Lighten,
+            [BlendMode.ColorDodge] = ColorDodge,
+            [BlendMode.ColorBurn] = ColorBurn,
+            [BlendMode.HardLight] = HardLight,
+            [BlendMode.SoftLight] = SoftLight,
+            [BlendMode.Difference] = Difference,
+            [BlendMode.Exclusion] = Exclusion,
+        };
+
+        public static bool TryGetBlendFunc(BlendMode mode, [MaybeNullWhen(false)] out BlendFunc blendFunc) => _funcs.TryGetValue(mode, out blendFunc);
+
+        public static Vector<float> Alpha(Vector<float> back, Vector<float> front) => front;
+
+        public static Vector<float> Add(Vector<float> back, Vector<float> front) => Vector.Min(back + front, Vector<float>.One);
+
+        public static Vector<float> Subtract(Vector<float> back, Vector<float> front) => Vector.Max(back - front, Vector<float>.Zero);
+
+        public static Vector<float> Multiply(Vector<float> back, Vector<float> front) => back * front;
+
+        public static Vector<float> Screen(Vector<float> back, Vector<float> front)
+        {
+            var one = Vector<float>.One;
+            return one - (one - back) * (one - front);
         }
 
-        public readonly struct Blend_Add : IColorBlend
+        public static Vector<float> Overlay(Vector<float> back, Vector<float> front) => HardLight(front, back);
+
+        public static Vector<float> Darken(Vector<float> back, Vector<float> front) => Vector.Min(back, front);
+
+        public static Vector<float> Lighten(Vector<float> back, Vector<float> front) => Vector.Max(back, front);
+
+        public static Vector<float> ColorDodge(Vector<float> back, Vector<float> front)
         {
-            public Vector<float> Blend(Vector<float> back, Vector<float> front) => Vector.Min(back + front, Vector<float>.One);
+            var one = Vector<float>.One;
+            return Vector.Min(back / (one - front + Epsilon), one);
         }
 
-        public readonly struct Blend_Subtract : IColorBlend
+        public static Vector<float> ColorBurn(Vector<float> back, Vector<float> front)
         {
-            public Vector<float> Blend(Vector<float> back, Vector<float> front) => Vector.Max(back - front, Vector<float>.Zero);
+            var one = Vector<float>.One;
+            return one - Vector.Min((one - back) / (front + Epsilon), one);
         }
 
-        public readonly struct Blend_Multiply : IColorBlend
+        public static Vector<float> HardLight(Vector<float> back, Vector<float> front)
         {
-            [MethodImpl(MethodImplOptions.AggressiveInlining)]
-            public static Vector<float> StaticBlend(Vector<float> back, Vector<float> front) => back * front;
-
-            public Vector<float> Blend(Vector<float> back, Vector<float> front) => StaticBlend(back, front);
+            var screen = Screen(back, front * 2 - Vector<float>.One);
+            var multiply = Multiply(back, front * 2);
+            var condition = Vector.LessThanOrEqual(front, Half);
+            return Vector.ConditionalSelect(condition, multiply, screen);
         }
 
-        public readonly struct Blend_Screen : IColorBlend
+        public static Vector<float> SoftLight(Vector<float> back, Vector<float> front)
         {
-            [MethodImpl(MethodImplOptions.AggressiveInlining)]
-            public static Vector<float> StaticBlend(Vector<float> back, Vector<float> front)
-            {
-                var one = Vector<float>.One;
-                return one - (one - back) * (one - front);
-            }
-
-            public Vector<float> Blend(Vector<float> back, Vector<float> front) => StaticBlend(back, front);
+            var one = Vector<float>.One;
+            var d1 = ((back * 16 - Vector.Create(12f)) * back + Vector.Create(4f)) * back;
+            var d2 = Vector.SquareRoot(back);
+            var condition = Vector.LessThanOrEqual(back, Vector.Create(0.25f));
+            d1 = Vector.ConditionalSelect(condition, d1, d2);
+            var v1 = back - (one - front * 2) * back * (one - back);
+            var v2 = back + (front * 2 - one) * (d1 - back);
+            condition = Vector.LessThanOrEqual(front, Half);
+            return Vector.ConditionalSelect(condition, v1, v2);
         }
 
-        public readonly struct Blend_Overlay : IColorBlend
-        {
-            public Vector<float> Blend(Vector<float> back, Vector<float> front) => Blend_HardLight.StaticBlend(front, back);
-        }
+        public static Vector<float> Difference(Vector<float> back, Vector<float> front) => Vector.Abs(back - front);
 
-        public readonly struct Blend_Darken : IColorBlend
-        {
-            public Vector<float> Blend(Vector<float> back, Vector<float> front) => Vector.Min(back, front);
-        }
-
-        public readonly struct Blend_Lighten : IColorBlend
-        {
-            public Vector<float> Blend(Vector<float> back, Vector<float> front) => Vector.Max(back, front);
-        }
-
-        public readonly struct Blend_ColorDodge : IColorBlend
-        {
-            public Vector<float> Blend(Vector<float> back, Vector<float> front)
-            {
-                var one = Vector<float>.One;
-                return Vector.Min(back / (one - front + Epsilon), one);
-            }
-        }
-
-        public readonly struct Blend_ColorBurn : IColorBlend
-        {
-            public Vector<float> Blend(Vector<float> back, Vector<float> front)
-            {
-                var one = Vector<float>.One;
-                return one - Vector.Min((one - back) / (front + Epsilon), one);
-            }
-        }
-
-        public readonly struct Blend_HardLight : IColorBlend
-        {
-            [MethodImpl(MethodImplOptions.AggressiveInlining)]
-            public static Vector<float> StaticBlend(Vector<float> back, Vector<float> front)
-            {
-                var screen = Blend_Screen.StaticBlend(back, front * 2 - Vector<float>.One);
-                var multiply = Blend_Multiply.StaticBlend(back, front * 2);
-                var condition = Vector.LessThanOrEqual(front, RoundOffset);
-                return Vector.ConditionalSelect(condition, multiply, screen);
-            }
-
-            public Vector<float> Blend(Vector<float> back, Vector<float> front) => StaticBlend(back, front);
-        }
-
-        public readonly struct Blend_SoftLight : IColorBlend
-        {
-            public Vector<float> Blend(Vector<float> back, Vector<float> front)
-            {
-                var one = Vector<float>.One;
-                var d1 = ((back * 16 - Vector.Create(12f)) * back + Vector.Create(4f)) * back;
-                var d2 = Vector.SquareRoot(back);
-                var condition = Vector.LessThanOrEqual(back, Vector.Create(0.25f));
-                d1 = Vector.ConditionalSelect(condition, d1, d2);
-                var v1 = back - (one - front * 2) * back * (one - back);
-                var v2 = back + (front * 2 - one) * (d1 - back);
-                condition = Vector.LessThanOrEqual(front, RoundOffset);
-                return Vector.ConditionalSelect(condition, v1, v2);
-            }
-        }
-
-        public readonly struct Blend_Difference : IColorBlend
-        {
-            public Vector<float> Blend(Vector<float> back, Vector<float> front) => Vector.Abs(back - front);
-        }
-
-        public readonly struct Blend_Exclusion : IColorBlend
-        {
-            public Vector<float> Blend(Vector<float> back, Vector<float> front) => back + front - back * front * 2;
-        }
+        public static Vector<float> Exclusion(Vector<float> back, Vector<float> front) => back + front - back * front * 2;
     }
 }

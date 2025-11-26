@@ -18,6 +18,7 @@ using LivreNoirLibrary.Media.Wave;
 using LivreNoirLibrary.Numerics;
 using LivreNoirLibrary.ObjectModel;
 using LivreNoirLibrary.Windows;
+using LivreNoirLibrary.Windows.Controls.Bms;
 using LivreNoirLibrary.Windows.Media;
 using LivreNoirLibrary.Windows.Media.Bms;
 using LivreNoirLibrary.Windows.Media.Bms.SkinInfo;
@@ -32,30 +33,35 @@ namespace LivreNoirLibrary.SandBox
 
         [JsonIgnore]
         public BmsScreen Screen { get; } = new();
-        public AssembleOptions AssembleOptions { get; set => SetValue(ref field, value); } = new() { Marker = false, Gain = -3 };
+        public AssembleOptions AssembleOptions { get; set => SetValue(ref field, value); } = new() { SetMarker = false, Gain = -3 };
 
         public Rational FrameRate { get; set => SetValue(ref field, value); } = FrameRates.Fps60;
-        public bool IsHevc { get; set => SetValue(ref field, value); } = true;
+        public bool IsHevc { get; set => SetValue(ref field, value); } = false;
         public int ApproximateKbps { get; set => SetValue(ref field, value); } = 10000;
         public double FadeinTime { get; set; } = 0;
         public double LoadTime { get; set; } = 0;
         public double LoadCompleteTime { get; set; } = 0;
         public double FadeoutTime { get; set; } = 1;
 
-        public void LoadSkin(Skin? skin) => Screen.LoadSkin(skin);
-        public bool OpenBms(string path) => Screen.OpenBms(path);
+        public void LoadSkin(Skin? skin) => Screen.Skin = skin;
+        public bool OpenBms(string path)
+        {
+            Screen.BmsPath = path;
+            return Screen.IsBmsReady;
+        }
 
         private WaveData? _assembledData;
 
         public void Assemble(ProgressReporter p, CancellationToken c)
         {
             _assembledData = null;
-            if (Screen.BmsData is { } data)
+            if (Screen.IsBmsReady)
             {
                 try
                 {
                     p.Report("Assembling...", null);
-                    (_assembledData, _) = data.Assemble(AssembleOptions, Screen.Directory!, p, c);
+                    AssembleOptions.RootDirectory = Screen.Directory!;
+                    (_assembledData, _) = Screen.ViewModel.Assemble(WaveBufferProvider.Default, AssembleOptions, p, c);
                 }
                 catch (OperationCanceledException)
                 {
@@ -83,14 +89,11 @@ namespace LivreNoirLibrary.SandBox
         public void CreateVideo(string path, WaveData waveBuffer, ProgressReporter p, CancellationToken c)
         {
             var screen = Screen;
-            if (screen.BmsData is not null)
+            if (screen.Skin is { } skin && screen.IsBmsReady)
             {
                 screen.DetermineExpressions();
                 screen.SetupPlay(true);
-                var mainCanvas = screen.MainCanvas;
-                var width = (int)mainCanvas.Width;
-                var height = (int)mainCanvas.Height;
-
+                var (width, height) = skin.BaseSize;
                 // エンコーダー
                 using FFmpegEncoder encoder = new(path);
                 var fps = FrameRate;
@@ -113,11 +116,11 @@ namespace LivreNoirLibrary.SandBox
                 var audioSpan = audioBuffer.AsSpan();
 
                 // タイマー
-                var fadeinFinish = TimeUtils.Seconds2Ticks(FadeinTime);
-                var loadingFinish = fadeinFinish + TimeUtils.Seconds2Ticks(LoadTime);
-                var musicStart = loadingFinish + TimeUtils.Seconds2Ticks(LoadCompleteTime);
-                var fadeoutStart = musicStart + TimeUtils.Seconds2Ticks(waveBuffer.TotalSeconds);
-                var totalTime = fadeoutStart + TimeUtils.Seconds2Ticks(FadeoutTime);
+                var fadeinFinish = FadeinTime;
+                var loadingFinish = fadeinFinish + LoadTime;
+                var musicStart = loadingFinish + LoadCompleteTime;
+                var fadeoutStart = musicStart + waveBuffer.TotalSeconds;
+                var totalTime = fadeoutStart + FadeoutTime;
                 screen.StartLoading(0);
                 screen.FinishLoading(loadingFinish);
                 screen.StartMusic(musicStart);
@@ -126,7 +129,7 @@ namespace LivreNoirLibrary.SandBox
                 var t0 = Stopwatch.GetTimestamp();
                 var fps_threshold = fps_den * fps_num;
                 var fps_total = 0L;
-                var totalFrame = (int)(TimeUtils.Ticks2Seconds(totalTime) * fps);
+                var totalFrame = (int)(totalTime * fps);
 
                 p.Report("Encoding...", null);
                 try
@@ -134,16 +137,15 @@ namespace LivreNoirLibrary.SandBox
                     screen.StartLoading(0);
                     for (var frame = 0; frame < totalFrame; frame++)
                     {
-                        var tick = frame * TimeSpan.TicksPerSecond * fps_den / fps_num;
+                        var time = (double)frame * fps_den / fps_num;
                         c.ThrowIfCancellationRequested();
                         var report = $"Write frame {frame}/{totalFrame}({frame / Stopwatch.GetElapsedTime(t0).TotalSeconds:0.000}fps)";
                         p.Report(report, frame, totalFrame);
 
-                        screen.Update(tick);
+                        screen.Update(time);
                         // 画面更新を待つ
+                        screen.CopyPixels(videoSpan, width);
                         DependencyObjectExtensions.WaitForUpdate();
-                        renderTarget.Render(mainCanvas);
-                        renderTarget.CopyPixels(videoBuffer, videoBufferStride, 0);
                         // 映像フレームの書き込み
                         encoder.WritePixels(videoSpan);
                         c.ThrowIfCancellationRequested();
@@ -170,6 +172,7 @@ namespace LivreNoirLibrary.SandBox
                         {
                             var source = waveBuffer.Data;
                             var audioSpan = source.Slice(audioIndex, audioUnit);
+                            audioSpan.Clamp(-1, 1);
                             encoder.WriteSamples(audioSpan);
                             audioIndex += audioSpan.Length;
                             audioUnit = Math.Min(audioUnit, source.Length - audioIndex);

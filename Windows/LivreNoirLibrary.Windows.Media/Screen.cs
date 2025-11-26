@@ -11,6 +11,10 @@ namespace LivreNoirLibrary.Windows.Media
     public static partial class Screen
     {
         public const DrIm.PixelFormat DrPF = DrIm.PixelFormat.Format32bppArgb;
+
+        private static Dr.Bitmap _dr_buffer = new(1, 1, DrPF);
+        private static WriteableBitmap _buffer = Bitmap.Create(1, 1);
+
         public static BitmapSource Buffer => _buffer;
 
         public static double Left { get; }
@@ -32,9 +36,6 @@ namespace LivreNoirLibrary.Windows.Media
             Right = Left + Width;
             Bottom = Top + Height;
         }
-
-        private static Dr.Bitmap _dr_buffer = new(1, 1, DrPF);
-        private static WriteableBitmap _buffer = Bitmap.Create(1,1);
 
         public static void SetSize(int width, int height)
         {

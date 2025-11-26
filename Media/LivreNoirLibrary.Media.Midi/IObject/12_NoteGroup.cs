@@ -478,10 +478,10 @@ namespace LivreNoirLibrary.Media.Midi
             }
         }
 
-        public bool TryFindMarker(Rational position, SearchMode type, out Rational actualPosition)
+        public bool TryFindMarker(Rational position, SearchMode mode, out Rational actualPosition)
         {
             var ary = GetMarkersArray();
-            var index = ary.FindIndex(position, type);
+            var index = ary.FindIndex(position, mode);
             if ((uint)index < (uint)ary.Length)
             {
                 actualPosition = ary[index];

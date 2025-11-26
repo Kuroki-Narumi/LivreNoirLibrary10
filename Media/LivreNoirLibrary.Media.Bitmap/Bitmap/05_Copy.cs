@@ -1,0 +1,455 @@
+﻿using LivreNoirLibrary.Collections;
+using System;
+using System.Drawing;
+using System.Runtime.CompilerServices;
+using System.Runtime.Intrinsics;
+using System.Threading.Tasks;
+
+namespace LivreNoirLibrary.Media
+{
+    public static unsafe partial class BitmapOperation
+    {
+        extension<T>(T bitmap) where T : IBitmap
+        {
+            public void CopyTo<TDest>(TDest destination)
+                where TDest : IBitmap
+            {
+                if (bitmap.IsFloat)
+                {
+                    destination.CopyFloatFrom(bitmap.Pointer, bitmap.Width, bitmap.Height, bitmap.Stride);
+                }
+                else
+                {
+                    destination.CopyByteFrom(bitmap.Pointer, bitmap.Width, bitmap.Height, bitmap.Stride);
+                }
+            }
+
+            public void CopyByteFrom(ReadOnlySpan<byte> source, int sourceWidth)
+            {
+                ArgumentOutOfRangeException.ThrowIfGreaterThan(sourceWidth, source.Length);
+                var stride = sourceWidth * 4;
+                fixed (byte* ptr = source)
+                {
+                    CopyByteFrom(bitmap, (nint)ptr, sourceWidth, source.Length / stride, stride);
+                }
+            }
+
+            public void CopyByteFrom(nint source, int sourceWidth, int sourceHeight, int sourceStride)
+            {
+                sourceWidth = Math.Min(sourceWidth, bitmap.Width);
+                sourceHeight = Math.Min(sourceHeight, bitmap.Height);
+                if (bitmap.IsFloat)
+                {
+                    Parallel.For(0, sourceHeight, y =>
+                    {
+                        var srcPtr = (byte*)(source + y * sourceStride);
+                        var destPtr = (float*)bitmap.Offset(y);
+                        for (var i = 0; i < sourceWidth; i++)
+                        {
+                            *destPtr++ = ColorUtils.RgbToScRgb(*srcPtr++); // B
+                            *destPtr++ = ColorUtils.RgbToScRgb(*srcPtr++); // G
+                            *destPtr++ = ColorUtils.RgbToScRgb(*srcPtr++); // R
+                            *destPtr++ = ColorUtils.GetFloat(*srcPtr++); // A
+                        }
+                    });
+                }
+                else
+                {
+                    Parallel.For(0, sourceHeight, y =>
+                    {
+                        var srcPtr = (uint*)(source + y * sourceStride);
+                        var destPtr = (uint*)bitmap.Offset(y);
+                        SimdOperations.CopyFrom(destPtr, srcPtr, sourceWidth);
+                    });
+                }
+            }
+
+            public void CopyFloatFrom(ReadOnlySpan<float> source, int sourceWidth)
+            {
+                ArgumentOutOfRangeException.ThrowIfGreaterThan(sourceWidth, source.Length);
+                var stride = sourceWidth * 4;
+                fixed (float* ptr = source)
+                {
+                    CopyFloatFrom(bitmap, (nint)ptr, sourceWidth, source.Length / stride, stride * 4);
+                }
+            }
+
+            public void CopyFloatFrom(nint source, int sourceWidth, int sourceHeight, int sourceStride)
+            {
+                sourceWidth = Math.Min(sourceWidth, bitmap.Width);
+                sourceHeight = Math.Min(sourceHeight, bitmap.Height);
+                if (bitmap.IsFloat)
+                {
+                    Parallel.For(0, sourceHeight, y =>
+                    {
+                        var srcPtr = (float*)(source + y * sourceStride);
+                        var destPtr = (float*)bitmap.Offset(y);
+                        SimdOperations.CopyFrom(destPtr, srcPtr, sourceWidth * 4);
+                    });
+                }
+                else
+                {
+                    Parallel.For(0, sourceHeight, y =>
+                    {
+                        var srcPtr = (float*)(source + y * sourceStride);
+                        var destPtr = (byte*)bitmap.Offset(y);
+                        for (var i = 0; i < sourceWidth; i++)
+                        {
+                            *destPtr++ = ColorUtils.ScRgbToRgb(*srcPtr++); // B
+                            *destPtr++ = ColorUtils.ScRgbToRgb(*srcPtr++); // G
+                            *destPtr++ = ColorUtils.ScRgbToRgb(*srcPtr++); // R
+                            *destPtr++ = ColorUtils.GetByte(*srcPtr++); // A
+                        }
+                    });
+                }
+            }
+
+            public unsafe void WriteBytesTo(Span<byte> destination, int destWidth)
+            {
+                ArgumentOutOfRangeException.ThrowIfGreaterThan(destWidth, destination.Length);
+                var stride = destWidth * 4;
+                fixed (byte* ptr = destination)
+                {
+                    WriteBytesTo(bitmap, (nint)ptr, destWidth, destination.Length / stride, stride);
+                }
+            }
+
+            public unsafe void WriteBytesTo(nint destination, int destWidth, int destHeight, int destStride)
+            {
+                destWidth = Math.Min(destStride, bitmap.Width);
+                destHeight = Math.Min(destHeight, bitmap.Height);
+                if (bitmap.IsFloat)
+                {
+                    Parallel.For(0, destHeight, y =>
+                    {
+                        var srcPtr = (float*)bitmap.Offset(y);
+                        var destPtr = (byte*)(destination + y * destStride);
+                        for (var i = 0; i < destWidth; i++)
+                        {
+                            *destPtr++ = ColorUtils.ScRgbToRgb(*srcPtr++); // B
+                            *destPtr++ = ColorUtils.ScRgbToRgb(*srcPtr++); // G
+                            *destPtr++ = ColorUtils.ScRgbToRgb(*srcPtr++); // R
+                            *destPtr++ = ColorUtils.GetByte(*srcPtr++); // A
+                        }
+                    });
+                }
+                else
+                {
+                    var source = (byte*)bitmap.Pointer;
+                    Parallel.For(0, destHeight, y =>
+                    {
+                        var srcPtr = (uint*)bitmap.Offset(y);
+                        var destPtr = (uint*)(source + y * destStride);
+                        SimdOperations.CopyFrom(destPtr, srcPtr, destWidth);
+                    });
+                }
+            }
+
+            public bool StretchCopy<TDest>(TDest destination, UnmanagedArray<float>? buffer = null, bool tweet = false) where TDest : IBitmap
+                => bitmap.StretchCopy(destination, bitmap.Rect, buffer, tweet);
+
+            public bool StretchCopy<TDest>(TDest destination, Rectangle sourceRect, UnmanagedArray<float>? buffer = null, bool tweet = false)
+                where TDest : IBitmap
+            {
+                if (!bitmap.Adjust(ref sourceRect))
+                {
+                    return false;
+                }
+                var (srcX, srcY, srcW, srcH) = sourceRect;
+                var destW = destination.Width;
+                var destH = destination.Height;
+                if (destW is <= 0 || destH is <= 0)
+                {
+                    return false;
+                }
+
+                var t0 = System.Diagnostics.Stopwatch.GetTimestamp();
+                var t = t0;
+                void Tweet(string message)
+                {
+                    if (tweet)
+                    {
+                        var t1 = System.Diagnostics.Stopwatch.GetTimestamp();
+                        Console.WriteLine($"  {message} - in {(double)(t1 - t0) / TimeSpan.TicksPerMillisecond:F3}ms");
+                        t0 = t1;
+                    }
+                }
+
+                if (tweet)
+                {
+                    Console.WriteLine("StretchCopy");
+                }
+
+                // 拡縮の必要無し
+                if (srcW == destW && srcH == destH)
+                {
+                    if (bitmap.IsFloat)
+                    {
+                        destination.CopyFloatFrom(bitmap.Offset(srcX, srcY), srcW, srcH, bitmap.Stride);
+                    }
+                    else
+                    {
+                        destination.CopyByteFrom(bitmap.Offset(srcX, srcY), srcW, srcH, bitmap.Stride);
+                    }
+                    Tweet("total");
+                    return true;
+                }
+                var scaleX = (float)srcW / destW;
+                var scaleY = (float)srcH / destH;
+                // Lanczos3Kernelで参照する元画像の範囲
+                var rangeX = 3f;
+                var rangeY = 3f;
+                var distanceFactorX = 1f;
+                var distanceFactorY = 1f;
+                // 縮小する場合は元画像の範囲を大きくする
+                if (scaleX is > 1)
+                {
+                    rangeX *= scaleX;
+                    distanceFactorX /= scaleX;
+                }
+                if (scaleY is > 1)
+                {
+                    rangeY *= scaleY;
+                    distanceFactorY /= scaleY;
+                }
+                
+                // 横縮小の結果を保持するためのバッファ
+                var needDispose = buffer is null;
+                buffer ??= new();
+                // 重みを考慮したバッファサイズの決定
+                var weightXCount = (int)(rangeX + 0.5f) * 2 + 1;
+                var weightYCount = (int)(rangeY + 0.5f) * 2 + 1;
+                buffer.EnsureSize(destW * srcH * 4 + Math.Max(destW * (weightXCount + 2), destH * weightYCount));
+                var bufferData = new FloatBitmap(buffer, destW, srcH, false);
+
+                // 重みの事前計算
+                var weightBegin = (float*)bufferData.Offset(srcH);
+                var pointer = weightBegin;
+                for (var dx = 0; dx < destW; dx++)
+                {
+                    // 出力ピクセル中心に対応する source 座標
+                    var srcCenterX = (dx + 0.5f) * scaleX - 0.5f;
+                    // 参照範囲
+                    var minX = Math.Max((int)Math.Ceiling(srcCenterX - rangeX), 0);
+                    var maxX = Math.Min((int)Math.Floor(srcCenterX + rangeX), srcW - 1);
+                    *(pointer++) = minX;
+                    *(pointer++) = maxX - minX;
+                    for (var x = minX; x <= maxX; x++)
+                    {
+                        pointer[x - minX] = Lanczos3Kernel((x - srcCenterX) * distanceFactorX);
+                    }
+                    pointer += weightXCount;
+                }
+
+                Tweet("preparation");
+
+                // 横拡縮
+                if (bitmap.IsFloat)
+                {
+                    var hSrcPointer = (Vector128<float>*)bitmap.Offset(srcX, srcY);
+                    var alphaSelector = Vector128.Equals(Vector128<float>.One, Vector128.Create(0, 0, 0, 1f));
+                    Parallel.For(0, srcH, y =>
+                    {
+                        var destPointer = (Vector128<float>*)bufferData.Offset(y);
+                        var fixedOffset = srcW * y;
+                        for (var dx = 0; dx < destW; dx++, destPointer++)
+                        {
+                            // 出力ピクセル中心に対応する source 座標
+                            var srcCenterX = (dx + 0.5f) * scaleX - 0.5f;
+                            // 重みキャッシュ
+                            var weights = weightBegin + dx * (weightXCount + 2);
+                            // 参照範囲
+                            var minX = (int)*(weights++);
+                            var range = (int)*(weights++);
+                            var srcPointer = hSrcPointer + minX + fixedOffset;
+                            var weightSum = 0f;
+                            *destPointer = Vector128<float>.Zero;
+                            for (var x = 0; x <= range; x++, srcPointer++, weights++)
+                            {
+                                var weight = *weights;
+                                weightSum += weight;
+                                var alpha = FloatColor.FillAlphaToAll(*srcPointer * weight);
+                                var rgb = *srcPointer * alpha;
+                                *destPointer += Vector128.ConditionalSelect(alphaSelector, alpha, rgb);
+                            }
+                            if (weightSum is > 0)
+                            {
+                                *destPointer /= weightSum;
+                            }
+                        }
+                    });
+                }
+                else
+                {
+                    var hSrcPointer = (byte*)bitmap.Offset(srcX, srcY);
+                    Parallel.For(0, srcH, y =>
+                    {
+                        var destPointer = (float*)bufferData.Offset(y);
+                        var fixedOffset = y * srcW * 4;
+                        for (var dx = 0; dx < destW; dx++, destPointer += 4)
+                        {
+                            // 出力ピクセル中心に対応する source 座標
+                            var srcCenterX = (dx + 0.5f) * scaleX - 0.5f;
+                            // 重みキャッシュ
+                            var weights = weightBegin + dx * (weightXCount + 2);
+                            // 参照範囲
+                            var minX = (int)*(weights++);
+                            var range = (int)*(weights++);
+                            var srcPointer = hSrcPointer + minX * 4 + fixedOffset;
+                            var weightSum = 0f;
+                            destPointer[0] = destPointer[1] = destPointer[2] = destPointer[3] = 0;
+                            for (var x = 0; x <= range; x++, srcPointer += 4, weights++)
+                            {
+                                weightSum += *weights;
+                                var alpha = ColorUtils.GetFloat(srcPointer[ColorUtils.ColorIndex_A]) * *weights;
+                                destPointer[ColorUtils.ColorIndex_B] += ColorUtils.RgbToScRgb(srcPointer[ColorUtils.ColorIndex_B]) * alpha;
+                                destPointer[ColorUtils.ColorIndex_G] += ColorUtils.RgbToScRgb(srcPointer[ColorUtils.ColorIndex_G]) * alpha;
+                                destPointer[ColorUtils.ColorIndex_R] += ColorUtils.RgbToScRgb(srcPointer[ColorUtils.ColorIndex_R]) * alpha;
+                                destPointer[ColorUtils.ColorIndex_A] += alpha;
+                            }
+                            if (weightSum is > 0)
+                            {
+                                *(Vector128<float>*)destPointer /= weightSum;
+                            }
+                        }
+                    });
+                }
+
+                Tweet("horizontal scaling");
+
+                var vSrcPointer = (Vector128<float>*)bufferData.Pointer;
+                // 縦拡縮
+                if (destination.IsFloat)
+                {
+                    Parallel.For(0, destH, dy =>
+                    {
+                        var destPointer = (Vector128<float>*)destination.Offset(dy);
+                        var stride = bufferData.Stride;
+                        // 出力ピクセル中心に対応する source 座標
+                        var srcCenterY = (dy + 0.5f) * scaleY - 0.5f;
+                        // 参照範囲
+                        var minY = Math.Max((int)Math.Ceiling(srcCenterY - rangeY), 0);
+                        var maxY = Math.Min((int)Math.Floor(srcCenterY + rangeY), srcH - 1);
+                        var range = maxY - minY;
+                        // 重みの事前計算
+                        var weights = weightBegin + dy * weightYCount;
+                        for (var y = minY; y <= maxY; y++)
+                        {
+                            weights[y - minY] = Lanczos3Kernel((y - srcCenterY) * distanceFactorY);
+                        }
+                        var fixedOffset = minY * destW;
+                        for (var dx = 0; dx < destW; dx++, destPointer++)
+                        {
+                            Vector128<float> vector = default;
+                            var weightSum = 0f;
+                            var srcPointer = vSrcPointer + dx + fixedOffset;
+                            for (var y = 0; y <= range; y++, srcPointer += destW)
+                            {
+                                var weight = weights[y];
+                                weightSum += weight;
+                                vector += *srcPointer * weight;
+                            }
+                            if (weightSum is > 0)
+                            {
+                                vector /= weightSum;
+                            }
+                            *destPointer = Vector128.Clamp(vector, Vector128<float>.Zero, Vector128<float>.One);
+                        }
+                    });
+                }
+                else
+                {
+                    Parallel.For(0, destH, dy =>
+                    {
+                        var destPointer = (byte*)destination.Offset(dy);
+                        var stride = bufferData.Stride;
+                        // 出力ピクセル中心に対応する source 座標
+                        var srcCenterY = (dy + 0.5f) * scaleY - 0.5f;
+                        // 参照範囲
+                        var minY = Math.Max((int)Math.Ceiling(srcCenterY - rangeY), 0);
+                        var maxY = Math.Min((int)Math.Floor(srcCenterY + rangeY), srcH - 1);
+                        var range = maxY - minY;
+                        // 重みの事前計算
+                        var weights = weightBegin + dy * weightYCount;
+                        for (var y = minY; y <= maxY; y++)
+                        {
+                            weights[y - minY] = Lanczos3Kernel((y - srcCenterY) * distanceFactorY);
+                        }
+                        var fixedOffset = minY * destW;
+                        for (var dx = 0; dx < destW; dx++)
+                        {
+                            Vector128<float> vector = default;
+                            var weightSum = 0f;
+                            var srcPointer = vSrcPointer + dx + fixedOffset;
+                            for (var y = 0; y <= range; y++, srcPointer += destW)
+                            {
+                                var weight = weights[y];
+                                weightSum += weight;
+                                vector += *srcPointer * weight;
+                            }
+                            if (weightSum is > 0)
+                            {
+                                vector /= weightSum;
+                            }
+                            *(destPointer++) = ColorUtils.ScRgbToRgb(vector[ColorUtils.ColorIndex_B]);
+                            *(destPointer++) = ColorUtils.ScRgbToRgb(vector[ColorUtils.ColorIndex_G]);
+                            *(destPointer++) = ColorUtils.ScRgbToRgb(vector[ColorUtils.ColorIndex_R]);
+                            *(destPointer++) = ColorUtils.GetByte(vector[ColorUtils.ColorIndex_A]);
+                        }
+                    });
+                }
+
+                Tweet("vertical scaling");
+                t0 = t;
+                Tweet("total");
+
+                bufferData = null;
+                if (needDispose)
+                {
+                    buffer.Dispose();
+                }
+
+                return true;
+            }
+        }
+
+        const int TableSize = 65536;
+        const float Center = TableSize / 2;
+        const float Scale = Center / 3 - 1;
+
+        static readonly float[] _lanczos3Table = CreateLanczos3Table();
+
+        static float[] CreateLanczos3Table()
+        {
+            var result = new float[TableSize];
+            for (var i = 0; i < TableSize; i++)
+            {
+                var x = (i - Center) / Scale;
+                if (x is 0)
+                {
+                    result[i] = 1;
+                }
+                else if (x is >= 3 or <= -3)
+                {
+                    result[i] = 0;
+                }
+                else
+                {
+                    var pix = MathF.PI * x;
+                    result[i] = (MathF.Sin(pix) / pix) * (MathF.Sin(pix  / 3) / (pix / 3));
+                }
+            }
+            return result;
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        static float Lanczos3Kernel(float x)
+        {
+            x = x * Scale + Center;
+            var index = (int)x;
+            var y0 = _lanczos3Table[index];
+            var y1 = _lanczos3Table[index + 1];
+            return y0 + (y1 - y0) * (x - index);
+        }
+    }
+}

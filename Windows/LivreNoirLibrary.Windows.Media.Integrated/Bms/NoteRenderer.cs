@@ -16,7 +16,7 @@ namespace LivreNoirLibrary.Windows.Controls.Bms
         private const int CharWidth = 7;
         private const int CharHeight = 9;
 
-        private static readonly LnColor _defaultColor = new(255, 255, 255);
+        private static readonly LnColor _defaultColor = LnColor.FromRgb(255, 255, 255);
         private static readonly DrawingVisual _dv = new();
         private static readonly Dictionary<char, ImageSource> _resources;
         private static readonly Dictionary<string, RenderTargetBitmap> _whiteCache = [];
@@ -120,9 +120,9 @@ namespace LivreNoirLibrary.Windows.Controls.Bms
             {
                 var source = GetTextSource(text);
                 WriteableBitmap b = new(source);
-                using (BitmapPointer p = new(b))
+                using (var p = b.BeginWrite())
                 {
-                    BitmapOperation.Multiply(p, lnColor);
+                    p.Blend(BlendMode.Multiply, lnColor);
                 }
                 bitmap = b;
                 dic.Add(text, bitmap);

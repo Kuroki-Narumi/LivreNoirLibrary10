@@ -21,6 +21,15 @@ namespace LivreNoirLibrary.Media
             /// <returns>the value at or just before the specified position, if any; otherwise, the value specified by <paramref name="ifNone"/>.</returns>
             public TValue Get(TX position, TValue ifNone) => obj.TryGetValue(position, SearchMode.PreviousOrEqual, out _, out var value) ? value : ifNone;
 
+            /// <summary>
+            /// Gets the current value of this <see cref="IXSingleTimeline{TX, TValue}"/> with the fallback value, using the given search mode.
+            /// </summary>
+            /// <param name="position">the position to get value.</param>
+            /// <param name="mode">The search mode that determines how the position is matched.</param>
+            /// <param name="ifNone">the fallback value if this <see cref="IXSingleTimeline{TX, TValue}"/> does not have a value at or before the specified position.</param>
+            /// <returns>the value at or just before the specified position, if any; otherwise, the value specified by <paramref name="ifNone"/>.</returns>
+            public TValue Get(TX position, SearchMode mode, TValue ifNone) => obj.TryGetValue(position, mode, out _, out var value) ? value : ifNone;
+
             /// <inheritdoc cref=" IXSingleTimeline{TX, TValue}.CopyTo(IXSingleTimeline{TX, TValue}, TX)"/>
             public void CopyTo(IXSingleTimeline<TX, TValue> destination) => obj.CopyTo(destination, default);
 

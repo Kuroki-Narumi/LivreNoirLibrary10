@@ -9,27 +9,14 @@ namespace LivreNoirLibrary.Media.Bms
     {
         extension (IBmsViewModel vm)
         {
-            public Selection CreateSelection(IEnumerable<(BarPosition, Note)> notes, Selection? selection = null)
+            public Selection CreateSelection(IListEnumerable<BarPosition, Note> timeline, Range<BarPosition> range, Selection? selection = null)
             {
-                var timeCounter = vm.TimeCounter;
                 selection ??= [];
-                foreach (var (position, note) in notes)
-                {
-                    var absPos = vm.GetAbsolutePosition(position);
-                    selection.Add(position, vm.GetHead(position), absPos, timeCounter.Beat2Time(absPos), note);
-                }
-                return selection;
-            }
-
-            public Selection CreateSelection(Range<BarPosition> range, Selection? selection = null)
-            {
-                var timeCounter = vm.TimeCounter;
-                selection ??= [];
-                foreach (var (position, list) in vm.CurrentData.Timeline.EnumerateList(range))
+                foreach (var (position, list) in timeline.EnumerateList(range))
                 {
                     var head = vm.GetHead(position);
                     var absPos = vm.GetAbsolutePosition(position);
-                    var time = timeCounter.Beat2Time(absPos);
+                    var time = vm.Beat2Time(absPos);
                     foreach (var note in list.AsSpan())
                     {
                         selection.Add(position, head, absPos, time, note);
@@ -37,6 +24,8 @@ namespace LivreNoirLibrary.Media.Bms
                 }
                 return selection;
             }
+
+            public Selection CreateSelection(Range<BarPosition> range, Selection? selection = null) => CreateSelection(vm, vm.CurrentData.Timeline, range, selection);
 
             public void RemoveSelection(Selection selection)
             {
@@ -75,11 +64,10 @@ namespace LivreNoirLibrary.Media.Bms
                 var barNumber = int.MaxValue;
                 if (useRealTime)
                 {
-                    var timeCounter = vm.TimeCounter;
-                    var timeOffset = timeCounter.Beat2Time(offset);
+                    var timeOffset = vm.Beat2Time(offset);
                     foreach (var (_, _, time, note) in selection)
                     {
-                        Add(timeCounter.Time2Beat(time + timeOffset), note);
+                        Add(vm.Time2Beat(time + timeOffset), note);
                     }
                 }
                 else
@@ -156,16 +144,15 @@ namespace LivreNoirLibrary.Media.Bms
                 }
             }
 
-            public Selection CombineSequenceAll(Selection source, int targetKey, int marginMs)
+            public Selection CombineSequenceAll(Selection source, int targetKey, double margin)
             {
                 // preparation
                 if (!source.TryGetFirstSound(out var firstItem, false))
                 {
                     return source;
                 }
-                var counter = vm.TimeCounter;
                 var selectionOffset = firstItem.AbsolutePosition;
-                var offset = counter.Beat2Time(selectionOffset);
+                var offset = vm.Beat2Time(selectionOffset);
                 List<(double Offset, string DefValue)> noteList = [];
                 HashSet<Channel> longHeadLanes = [];
                 string GetDefValue(double id) => vm.GetDefValue(DefType.Wav, (int)id) ?? $@"\\\***{id}***\\\";
@@ -177,7 +164,7 @@ namespace LivreNoirLibrary.Media.Bms
                         var isNormal = note.IsNormal();
                         if (isNormal || (note.IsLongEnd() && longHeadLanes.Contains(ch)))
                         {
-                            noteList.Add((counter.Beat2Time(p) - offset, GetDefValue(note.Value)));
+                            noteList.Add((vm.Beat2Time(p) - offset, GetDefValue(note.Value)));
                             if (isNormal)
                             {
                                 longHeadLanes.Add(ch);
@@ -204,7 +191,7 @@ namespace LivreNoirLibrary.Media.Bms
                 {
                     if (note.IsPlayableSound(true))
                     {
-                        var time = counter.Beat2Time(vm.GetAbsolutePosition(pos));
+                        var time = vm.Position2Time(pos);
                         decTimeline.Add(time, new NoteCache(pos, note));
                         if (GetDefValue(note.Value) == firstDefValue)
                         {
@@ -216,7 +203,7 @@ namespace LivreNoirLibrary.Media.Bms
                 // replace
                 var modified = false;
                 Selection newSelection = [];
-                var m = marginMs * 0.001 + 0.000001; // 1us default margin
+                margin = Math.Max(0, margin) + 0.000001; // 1us default margin
                 List<(double Second, double Offset, NoteCache Note)> nearestNotes = [];
                 List<(double Second, NoteCache Note)> sequence = [];
                 foreach (var (headPos, headSecond, lane) in candidatePositions)
@@ -228,7 +215,7 @@ namespace LivreNoirLibrary.Media.Bms
                         {
                             // マージン範囲全体を探索
                             var second = headSecond + innerSecond;
-                            foreach (var (actualSecond, nlist) in decTimeline.EnumerateList(RangeUtils.Get(second - m, second + m, true)))
+                            foreach (var (actualSecond, nlist) in decTimeline.EnumerateList(RangeUtils.Get(second - margin, second + margin, true)))
                             {
                                 if (nlist.Find(pn => GetDefValue(pn.Note.Value) == defValue) is { } actualNote)
                                 {

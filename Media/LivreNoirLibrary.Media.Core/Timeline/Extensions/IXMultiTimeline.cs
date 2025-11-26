@@ -280,51 +280,6 @@ namespace LivreNoirLibrary.Media
                 return false;
             }
 
-            /// <summary>
-            /// Attempts to find the first value that match the condition defined by the specified predicate within the specified range.
-            /// </summary>
-            /// <param name="predicate">the predicate that defines the conditions to match.</param>
-            /// <param name="range">The range of positions to find.</param>
-            /// <param name="position">When this method returns, contains the position of the nearest value found, if any; 
-            /// otherwise, the default value for the type.</param>
-            /// <param name="value">When this method returns, contains the value associated with the nearest value, if found; 
-            /// otherwise, the default value for the type.</param>
-            /// <returns><see langword="true"/> if a value is found; otherwise, <see langword="false"/>.</returns>
-            public bool Find(Predicate<TX, TValue> predicate, Range<TX> range, out TX position, [MaybeNullWhen(false)] out TValue value)
-                => Find(obj.EnumerateList(range), predicate, out position, out value);
-
-            /// <summary>
-            /// Attempts to find the last value that match the condition defined by the specified predicate within the specified range.
-            /// </summary>
-            /// <param name="predicate">the predicate that defines the conditions to match.</param>
-            /// <param name="range">The range of positions to find.</param>
-            /// <param name="position">When this method returns, contains the position of the nearest value found, if any; 
-            /// otherwise, the default value for the type.</param>
-            /// <param name="value">When this method returns, contains the value associated with the nearest value, if found; 
-            /// otherwise, the default value for the type.</param>
-            /// <returns><see langword="true"/> if a value is found; otherwise, <see langword="false"/>.</returns>
-            public bool FindLast(Predicate<TX, TValue> predicate, Range<TX> range, out TX position, [MaybeNullWhen(false)] out TValue value)
-                => FindLast(obj.ReverseEnumerateList(range), predicate, out position, out value);
-
-            /// <summary>
-            /// Find all values that match the condition defined by the specified predicate within the specified range.
-            /// </summary>
-            /// <param name="predicate">the predicate that defines the conditions to match.</param>
-            /// <param name="list"></param>
-            /// <returns></returns>
-            public List<(TX, TValue)> FindAll(Predicate<TX, TValue> predicate, Range<TX> range, List<(TX, TValue)>? list = null)
-            {
-                list ??= [];
-                foreach (var (position, value) in obj.Range(range))
-                {
-                    if (predicate(position, value))
-                    {
-                        list.Add((position, value));
-                    }
-                }
-                return list;
-            }
-
             /// <inheritdoc cref=" IXMultiTimeline{TX, TValue}.CopyTo(IXMultiTimeline{TX, TValue}, TX)"/>
             public void CopyTo(IXMultiTimeline<TX, TValue> destination) => obj.CopyTo(destination, Range<TX>.All, default);
 

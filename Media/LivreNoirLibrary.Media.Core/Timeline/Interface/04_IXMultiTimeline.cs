@@ -27,20 +27,6 @@ namespace LivreNoirLibrary.Media
         List<TValue> GetOrAddList(TX position);
 
         /// <summary>
-        /// Returns an enumerable object that enumerates the the position and item list pairs within the specified range.
-        /// </summary>
-        /// <param name="range">the range of positions to iterate.</param>
-        /// <returns>an enumerable that can be used to iterate within the specified range.</returns>
-        IEnumerable<(TX, List<TValue>)> EnumerateList(Range<TX> range);
-
-        /// <summary>
-        /// Returns an enumerable object that enumerates the the position and item list pairs within the specified range in reverse order.
-        /// </summary>
-        /// <param name="range">the range of positions to iterate.</param>
-        /// <returns>an enumerable that can be used to iterate within the specified range.</returns>
-        IEnumerable<(TX, List<TValue>)> ReverseEnumerateList(Range<TX> range);
-
-        /// <summary>
         /// Attempts to retrieve the value list associated with the specified position, using the given search mode.
         /// </summary>
         /// <param name="position">The position to search for.</param>
@@ -50,7 +36,7 @@ namespace LivreNoirLibrary.Media
         /// <param name="values">When this method returns, the value list associated with the found position, if the search is successful;
         /// otherwise, the default value for <typeparamref name="TValue"/>.</param>
         /// <returns><see langword="true"/> if an value is found; otherwise, <see langword="false"/>.</returns>
-        bool TryGetValue(TX position, SearchMode type, out TX actualPosition, [MaybeNullWhen(false)] out List<TValue> values);
+        bool TryGetValue(TX position, SearchMode mode, out TX actualPosition, [MaybeNullWhen(false)] out List<TValue> values);
 
         /// <summary>
         /// Attempts to find the value list with the nearest to the specified position.

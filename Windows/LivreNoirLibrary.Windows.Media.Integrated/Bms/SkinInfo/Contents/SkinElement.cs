@@ -1,4 +1,5 @@
-﻿using LivreNoirLibrary.Media.Bms;
+﻿using LivreNoirLibrary.Media;
+using LivreNoirLibrary.Media.Bms;
 
 namespace LivreNoirLibrary.Windows.Media.Bms.SkinInfo
 {
@@ -7,5 +8,6 @@ namespace LivreNoirLibrary.Windows.Media.Bms.SkinInfo
         public TimerId DestTimer { get; set => SetValue(ref field, value); }
         public ValueExpression? DestLoopStart { get; set => SetValue(ref field, value); }
         public ValueExpression? DestLoopEnd { get; set => SetValue(ref field, value); }
+        public BlendMode Blend { get; set => SetValue(ref field, value); }
     }
 }

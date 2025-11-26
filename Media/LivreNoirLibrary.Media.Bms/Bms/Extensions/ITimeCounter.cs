@@ -13,5 +13,20 @@ namespace LivreNoirLibrary.Media.Bms
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static double Tick2Beat(this ITimeCounter counter, long ticks) => counter.Time2Beat(TimeUtils.Ticks2Seconds(ticks));
+
+        extension<T>(T obj) where T : IBarPositionProvider<double>, ITimeCounter
+        {
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
+            public double Position2Time(BarPosition position) => obj.Beat2Time(obj.GetAbsolutePosition(position));
+
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
+            public BarPosition Time2Position(double time) => obj.GetBarPosition(obj.Time2Beat(time));
+
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
+            public long Position2Tick(BarPosition position) => obj.Beat2Tick(obj.GetAbsolutePosition(position));
+
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
+            public BarPosition Tick2Position(long time) => obj.GetBarPosition(obj.Tick2Beat(time));
+        }
     }
 }

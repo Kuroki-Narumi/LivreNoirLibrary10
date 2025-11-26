@@ -1,5 +1,8 @@
-﻿using System;
+﻿using LivreNoirLibrary.Collections;
+using LivreNoirLibrary.Debug;
+using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace LivreNoirLibrary.Media.Bms
 {
@@ -12,6 +15,15 @@ namespace LivreNoirLibrary.Media.Bms
         private readonly List<double> _speedTimeList = [];
         private readonly List<double> _speedValueList = [];
 
+        private TempoInfo? _lastTempoInfo;
+        private readonly List<int> _tempoList = [];
+        private readonly List<TempoInfo> _tempoInfoList = [];
+
+        public double MinTempo => _tempoList.Count is 0 ? -1 : _tempoList[0];
+        public double MaxTempo => _tempoList.Count is 0 ? -1 : _tempoList[^1];
+        public double MainTempo => _tempoList.Count is 0 ? -1 : SortedList.MaxKeyBy(_tempoList, _tempoInfoList, value => value.BeatLength);
+        public double MainTimeTempo => _tempoList.Count is 0 ? -1 : SortedList.MaxKeyBy(_tempoList, _tempoInfoList, value => value.TimeLength);
+
         public virtual void Clear()
         {
             _beatList.Clear();
@@ -20,14 +32,13 @@ namespace LivreNoirLibrary.Media.Bms
             _timeItemList.Clear();
             _speedTimeList.Clear();
             _speedValueList.Clear();
+            _tempoList.Clear();
+            _tempoInfoList.Clear();
         }
 
-        public void InitializeTimeInfo(double initialTempo)
+        public void BeginInit(double initialTempo)
         {
-            _beatList.Clear();
-            _beatItemList.Clear();
-            _timeList.Clear();
-            _timeItemList.Clear();
+            Clear();
 
             TimingInfo timingInfo = new(0, 0, 0, initialTempo, 0, 1);
             _beatList.Add(0);
@@ -37,6 +48,10 @@ namespace LivreNoirLibrary.Media.Bms
 
             _speedTimeList.Add(0);
             _speedValueList.Add(1);
+
+            _lastTempoInfo = new();
+            _tempoList.Add((int)initialTempo);
+            _tempoInfoList.Add(_lastTempoInfo);
         }
 
         public void ApplyTimeInfo(ref TimingInfoState state)
@@ -67,9 +82,14 @@ namespace LivreNoirLibrary.Media.Bms
                     _timeItemList.Add(info);
                 }
 
+                var tempo = (int)Math.Max(state.CurrentTempo, 0);
+                _lastTempoInfo?.Add(beat, time);
+                _lastTempoInfo = SortedList.GetOrAdd(_tempoList, _tempoInfoList, tempo);
+
                 var stop = info.Stop;
                 if (stop is not 0)
                 {
+                    _timeItemList[^1] = _timeItemList[^1].AsStop();
                     time += stop;
                     info = new(beat, info.Position, time, info.Tempo, 0, info.Scroll);
                     _timeList.Add(time);
@@ -91,21 +111,12 @@ namespace LivreNoirLibrary.Media.Bms
             }
         }
 
-        public List<TempoInfo<double>> GetTempoInfos(List<TempoInfo<double>>? list = null)
+        public void EndInit(ref TimingInfoState state)
         {
-            list ??= [];
-            var seconds = _timeList;
-            var items = _timeItemList;
-            var c = seconds.Count;
-            for (var i = 1; i < c; i++)
-            {
-                var curSec = seconds[i - 1];
-                var nextSec = seconds[i];
-                var item = items[i - 1];
-                list.Add(new(item.Tempo, curSec, nextSec));
-            }
-            list.Add(new(items[^1].Tempo, seconds[^1], -1, true));
-            return list;
+            _lastTempoInfo?.Add(state.CurrentBeat, state.CurrentTime);
+            _lastTempoInfo = null;
+            SortedList.Remove(_tempoList, _tempoInfoList, 0);
+            ExConsole.Write($"Min={MinTempo}bpm, Max={MaxTempo}bpm, Main={MainTempo}bpm, MainTime={MainTimeTempo}bpm");
         }
 
         public double Beat2Time(double absolutePosition)
@@ -166,6 +177,27 @@ namespace LivreNoirLibrary.Media.Bms
             }
         }
 
-        public double GetHighSpeed(double time) => Collections.SortedList.TryGetValue(_speedTimeList, _speedValueList, time, out var value) ? value : 1;
+        public double GetHighSpeed(double time) => SortedList.TryGetValue(_speedTimeList, _speedValueList, time, out var value) ? value : 1;
+
+        private class TempoInfo
+        {
+            public double LastBeat { get; set; }
+            public double LastTime { get; set; }
+            public double BeatLength { get; set; }
+            public double TimeLength { get; set; }
+
+            public TempoInfo Init(double beat, double time)
+            {
+                LastBeat = beat;
+                LastTime = time;
+                return this;
+            }
+
+            public void Add(double beat, double time)
+            {
+                BeatLength += beat - LastBeat;
+                TimeLength += time - LastTime;
+            }
+        }
     }
 }

@@ -1318,7 +1318,7 @@
                                 x:Name="PART_ScrollContentPresenter" Grid.Row="0" Grid.Column="0" CanVerticallyScroll="False" CanHorizontallyScroll="False" 
                                 CanContentScroll="{TemplateBinding CanContentScroll}" Content="{TemplateBinding Content}"/>
                         </Grid>
-                        <Grid x:Name="PART_VerticalScrollBarArea" Grid.Row="0" Grid.Column="1">
+                        <Grid x:Name="PART_VerticalScrollBarArea" Grid.Row="0" Grid.Column="1" Visibility="{TemplateBinding ComputedVerticalScrollBarVisibility}">
                             <Grid.RowDefinitions>
                                 <RowDefinition Height="*" MaxHeight="{DynamicResource {x:Static SystemParameters.VerticalScrollBarButtonHeightKey}}"/>
                                 <RowDefinition Height="0.00001*"/>
@@ -1327,9 +1327,9 @@
                             <ScrollBar 
                                 x:Name="PART_VerticalScrollBar" Grid.RowSpan="3" Cursor="Arrow" AutomationProperties.AutomationId="VerticalScrollBar" 
                                 Minimum="0" Maximum="{TemplateBinding ScrollableHeight}" Value="{Binding VerticalOffset, Mode=OneWay, RelativeSource={RelativeSource Mode=TemplatedParent}}" 
-                                ViewportSize="{TemplateBinding ViewportHeight}" Visibility="{TemplateBinding ComputedVerticalScrollBarVisibility}"/>
+                                ViewportSize="{TemplateBinding ViewportHeight}"/>
                         </Grid>
-                        <Grid x:Name="PART_HorizontalScrollBarArea" Grid.Row="1" Grid.Column="0">
+                        <Grid x:Name="PART_HorizontalScrollBarArea" Grid.Row="1" Grid.Column="0" Visibility="{TemplateBinding ComputedHorizontalScrollBarVisibility}">
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="*" MaxWidth="{DynamicResource {x:Static SystemParameters.HorizontalScrollBarButtonWidthKey}}"/>
                                 <ColumnDefinition Width="0.00001*"/>
@@ -1338,7 +1338,7 @@
                             <ScrollBar 
                                 x:Name="PART_HorizontalScrollBar" Grid.ColumnSpan="3" Cursor="Arrow" AutomationProperties.AutomationId="HorizontalScrollBar" Orientation="Horizontal" 
                                 Minimum="0" Maximum="{TemplateBinding ScrollableWidth}" Value="{Binding HorizontalOffset, Mode=OneWay, RelativeSource={RelativeSource Mode=TemplatedParent}}" 
-                                ViewportSize="{TemplateBinding ViewportWidth}" Visibility="{TemplateBinding ComputedHorizontalScrollBarVisibility}"/>
+                                ViewportSize="{TemplateBinding ViewportWidth}"/>
                         </Grid>
                     </Grid>
                 </ControlTemplate>

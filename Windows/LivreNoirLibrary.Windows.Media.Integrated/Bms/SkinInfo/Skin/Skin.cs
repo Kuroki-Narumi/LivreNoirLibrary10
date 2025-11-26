@@ -17,7 +17,7 @@ namespace LivreNoirLibrary.Windows.Media.Bms.SkinInfo
         public Version Version { get; set => SetValue(ref field, value); } = new(1, 0);
         public string? Author { get; set => SetValue(ref field, value); }
         public System.Drawing.Size BaseSize { get; set => SetValue(ref field, value); }
-        public LnColor Background { get; set => SetValue(ref field, value); } = new(0, 0, 0);
+        public LnColor Background { get; set => SetValue(ref field, value); } = LnColor.FromRgb(0, 0, 0);
 
         public ObservableList<string> Includes { get; } = [];
         public OptionCollection Options { get; } = [];
@@ -177,7 +177,7 @@ namespace LivreNoirLibrary.Windows.Media.Bms.SkinInfo
             var h = Resolve(texture.Height);
             var divX = Math.Max(Resolve(texture.DivX), 1);
             var divY = Math.Max(Resolve(texture.DivY), 1);
-            var period = Math.Max(TimeUtils.Seconds2Ticks(TryResolveValue<double>(texture.LoopPeriod, provider, out var v) ? v : 0), 0);
+            var period = Math.Max(TryResolveValue<double>(texture.LoopPeriod, provider, out var v) ? v : 0, 0);
             data = new(source, x, y, w, h, divX, divY, period);
             return true;
         }

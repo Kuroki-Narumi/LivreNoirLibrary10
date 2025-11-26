@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Globalization;
+using System.Linq;
 using System.Text;
 using LivreNoirLibrary.Collections;
 using LivreNoirLibrary.ObjectModel;
@@ -9,6 +10,20 @@ namespace LivreNoirLibrary.Text
 {
     public static partial class StringExtensions
     {
+        public static string GetTypeName<T>(this T obj) => GetFriendlyName(typeof(T));
+
+        public static string GetFriendlyName(this Type type)
+        {
+            var typeName = type.Name;
+            if (!type.IsGenericType)
+            {
+                return typeName;
+            }
+            var baseName = typeName[..typeName.IndexOf('`')];
+            var args = type.GetGenericArguments().Select(GetFriendlyName);
+            return $"{baseName}<{string.Join(", ", args)}>";
+        }
+
         public static string[] SplitLines(this string? text, bool trim = false)
         {
             var buffer = ObjectPool.Rent<List<string>>();

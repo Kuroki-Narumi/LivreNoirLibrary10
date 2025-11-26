@@ -1,8 +1,11 @@
 ﻿using LivreNoirLibrary.Collections;
+using LivreNoirLibrary.Numerics;
 using LivreNoirLibrary.ObjectModel;
+using LivreNoirLibrary.Text;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
+using System.Numerics;
 using System.Runtime.InteropServices;
 
 namespace LivreNoirLibrary.Media.Bms
@@ -10,13 +13,13 @@ namespace LivreNoirLibrary.Media.Bms
     public class TimingList : TimeCounterBase
     {
         private readonly SortedDictionary<int, List<SoundInfo>> _bgm = [];
-        private readonly LongKeyTimeline<Channel, KeyInfo> _key = [];
-        private readonly Dictionary<Channel, LongTimeline<string>> _bga = [];
-        private readonly Dictionary<Channel, LongMultiTimeline<int>> _meta = [];
+        private readonly DoubleKeyTimeline<Channel, KeyInfo> _key = [];
+        private readonly Dictionary<Channel, BgaInfo> _bga = [];
+        private readonly Dictionary<Channel, DoubleMultiTimeline<int>> _meta = [];
 
         public string Directory { get; private set; } = "";
         public bool AutoPlay { get; private set; }
-        public IEnumerable<(Channel, long, KeyInfo)> KeyInfos => _key;
+        public IEnumerable<(Channel, double, KeyInfo)> KeyInfos => _key;
 
         public override void Clear()
         {
@@ -29,11 +32,12 @@ namespace LivreNoirLibrary.Media.Bms
 
         public void Load(IBmsViewModel source, string directory, bool autoPlay)
         {
-            Clear();
+            const float colorFactor = 1f / 255f;
+
             Directory = directory;
             AutoPlay = autoPlay;
             var initialTempo = source.Bpm;
-            InitializeTimeInfo(initialTempo);
+            BeginInit(initialTempo);
             TimingInfoState state = new(initialTempo);
             var keyList = _key;
             var bgmList = _bgm;
@@ -52,7 +56,7 @@ namespace LivreNoirLibrary.Media.Bms
                         break;
                     }
                     // 現在値
-                    var (time, tick) = state.Setup(source.GetAbsolutePosition(pos));
+                    var time = state.Setup(source.GetAbsolutePosition(pos));
                     foreach (var note in list.AsSpan())
                     {
                         if (state.Update(note))
@@ -85,10 +89,10 @@ namespace LivreNoirLibrary.Media.Bms
                                     bList.Add(soundInfo);
                                     if (channel is > 0)
                                     {
-                                        if (!keyList.TryGetValue(channel, tick, SearchMode.Equal, out _, out var keyInfo))
+                                        if (!keyList.TryGetValue(channel, time, SearchMode.Equal, out _, out var keyInfo))
                                         {
                                             keyInfo = new(time);
-                                            keyList.Set(channel, tick, keyInfo);
+                                            keyList.Set(channel, time, keyInfo);
                                             lastNoteLane[channel] = keyInfo;
                                         }
                                         keyInfo.Sounds.Add(soundInfo);
@@ -97,7 +101,7 @@ namespace LivreNoirLibrary.Media.Bms
                                 case NoteType.Mine:
                                     if (channel is > 0)
                                     {
-                                        keyList.Set(channel, tick, new(time, true));
+                                        keyList.Set(channel, time, new(time, true));
                                     }
                                     break;
                                 case NoteType.LongEnd:
@@ -116,15 +120,29 @@ namespace LivreNoirLibrary.Media.Bms
                                 path ??= "";
                                 bgaFilenames.Add(value, path);
                             }
-                            bgaList.GetOrAdd(channel).Set(tick, path);
+                            bgaList.GetOrAdd(channel).Layer.Set(time, path);
+                        }
+                        else if (channel.IsArgb())
+                        {
+                            if (TupleStringConverter.TryConvertFromString<int, int, int, int>(source.GetDefValue(DefType.Argb, (int)note.Value), out var tuple))
+                            {
+                                var item = bgaList.GetOrAdd(channel.ToBga());
+                                item.Rgb.Set(time, new(tuple.Item2 * colorFactor, tuple.Item3 * colorFactor, tuple.Item4 * colorFactor));
+                                item.Opacity.Set(time, tuple.Item1 * colorFactor);
+                            }
+                        }
+                        else if (channel.IsOpacity())
+                        {
+                            bgaList.GetOrAdd(channel.ToBga()).Opacity.Set(time, value * colorFactor);
                         }
                         else
                         {
-                            metaList.GetOrAdd(channel).Add(tick, value);
+                            metaList.GetOrAdd(channel).Add(time, value);
                         }
                     }
                     ApplyTimeInfo(ref state);
                 }
+                EndInit(ref state);
                 // 小節線
                 foreach (var (_, head, length) in source.EnumerateBars())
                 {
@@ -140,12 +158,30 @@ namespace LivreNoirLibrary.Media.Bms
             }
         }
 
-        public bool TryGetBgaInfo(Channel channel, long tick, out long startTick, [MaybeNullWhen(false)] out string path)
+        public bool TryGetBgaLayer(Channel channel, double time, out double start, [MaybeNullWhen(false)] out string path)
         {
-            startTick = default;
+            start = default;
             path = default;
-            return _bga.TryGetValue(channel, out var timeline) &&
-                timeline.TryGetValue(tick, SearchMode.PreviousOrEqual, out startTick, out path);
+            return _bga.TryGetValue(channel, out var bga) &&
+                bga.Layer.TryGetValue(time, SearchMode.PreviousOrEqual, out start, out path);
+        }
+
+        public bool TryGetColorCorrection(Channel channel, double time, out Vector<float> vector)
+        {
+            if (_bga.TryGetValue(channel, out var bga))
+            {
+                var opacity = bga.Opacity.TryGetValue(time, SearchMode.PreviousOrEqual, out _, out var a);
+                if (bga.Rgb.TryGetValue(time, SearchMode.PreviousOrEqual, out _, out var rgb))
+                {
+                    var (r, g, b) = rgb;
+                    vector = VectorUtils.CreateRepeating([b, g, r, a]);
+                    return true;
+                }
+                vector = VectorUtils.CreateRepeating([1, 1, 1, a]);
+                return opacity;
+            }
+            vector = default;
+            return false;
         }
 
         public class SoundInfo(double time, Channel channel, string path)
@@ -164,5 +200,14 @@ namespace LivreNoirLibrary.Media.Bms
             public bool IsMine { get; } = isMine;
             public List<SoundInfo> Sounds { get; } = [];
         }
+
+        private class BgaInfo
+        {
+            public DoubleTimeline<string> Layer { get; } = [];
+            public DoubleTimeline<Rgb> Rgb { get; } = [];
+            public DoubleTimeline<float> Opacity { get; } = [];
+        }
+
+        private readonly record struct Rgb(float R, float G, float B);
     }
 }

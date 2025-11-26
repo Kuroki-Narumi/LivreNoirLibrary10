@@ -1,4 +1,5 @@
 ﻿using LivreNoirLibrary.Collections;
+using LivreNoirLibrary.Debug;
 using System;
 using System.Collections.Generic;
 
@@ -32,9 +33,9 @@ namespace LivreNoirLibrary.Media.Bms
                     var value = note.Value;
                     if (ch.IsConductor())
                     {
-                        BmsUtils.TryGetDefType(ch, out var defType);
                         if (ch is not Channel.Bpm || value.NeedsBpmDef())
                         {
+                            BmsUtils.TryGetDefType(ch, out var defType);
                             var dic = conductorDefs.GetOrAdd(defType);
                             if (!dic.TryGetValue(value, out var index))
                             {
@@ -63,13 +64,16 @@ namespace LivreNoirLibrary.Media.Bms
                         }
                         else if (ch.IsKey())
                         {
-                            void ApplyLastNote()
+                            void ApplyLastNote(bool needToChangeLong)
                             {
-                                if (lastNote.TryGetValue(ch, out var prev))
+                                if (lastNote.Remove(ch, out var prev))
                                 {
+                                    if (needToChangeLong)
+                                    {
+                                        ch = ch.ToLong();
+                                    }
                                     var (pp, pn) = prev;
                                     bars.GetOrAdd(pp.Bar).Add(ch, pp.Offset, (int)pn.Value);
-                                    lastNote.Remove(ch);
                                 }
                             }
 
@@ -77,7 +81,7 @@ namespace LivreNoirLibrary.Media.Bms
                             switch (noteType)
                             {
                                 case NoteType.Normal:
-                                    ApplyLastNote();
+                                    ApplyLastNote(false);
                                     if (lnObj is 0)
                                     {
                                         lastNote[ch] = (pos, note);
@@ -87,8 +91,7 @@ namespace LivreNoirLibrary.Media.Bms
                                 case NoteType.LongEnd:
                                     if (lnObj is 0)
                                     {
-                                        ch = ch.ToLong();
-                                        ApplyLastNote();
+                                        ApplyLastNote(true);
                                     }
                                     else
                                     {

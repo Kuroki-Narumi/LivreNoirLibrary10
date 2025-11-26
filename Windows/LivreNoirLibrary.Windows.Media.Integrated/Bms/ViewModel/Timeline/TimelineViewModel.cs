@@ -61,7 +61,6 @@ namespace LivreNoirLibrary.Windows.Controls.Bms
             problems.ClearWithoutNotify();
             if (source is not null)
             {
-                var counter = source.TimeCounter;
                 var duplicatedChannel = _duplicated_channel;
                 var lastNotes = _lastNotes;
                 var radix = Radix;
@@ -71,7 +70,7 @@ namespace LivreNoirLibrary.Windows.Controls.Bms
                 {
                     var head = source.GetHead(pos);
                     var absPos = source.GetAbsolutePosition(pos);
-                    var time = counter.Beat2Time(absPos);
+                    var time = source.Beat2Time(absPos);
                     foreach (var note in list.AsSpan())
                     {
                         var ch = note.Channel;

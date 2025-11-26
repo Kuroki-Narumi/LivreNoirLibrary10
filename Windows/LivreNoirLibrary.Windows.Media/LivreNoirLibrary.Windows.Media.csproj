@@ -17,15 +17,47 @@
 
 	<ItemGroup>
 	  <None Remove="Effects\Shaders\transparent.ps" />
+	  <None Remove="Effects\Shaders\_add.ps" />
+	  <None Remove="Effects\Shaders\_alpha.ps" />
+	  <None Remove="Effects\Shaders\_color_burn.ps" />
+	  <None Remove="Effects\Shaders\_color_dodge.ps" />
+	  <None Remove="Effects\Shaders\_darken.ps" />
+	  <None Remove="Effects\Shaders\_difference.ps" />
+	  <None Remove="Effects\Shaders\_exclusion.ps" />
+	  <None Remove="Effects\Shaders\_hard_light.ps" />
+	  <None Remove="Effects\Shaders\_lighten.ps" />
+	  <None Remove="Effects\Shaders\_multiply.ps" />
+	  <None Remove="Effects\Shaders\_overlay.ps" />
+	  <None Remove="Effects\Shaders\_screen.ps" />
+	  <None Remove="Effects\Shaders\_soft_light.ps" />
+	  <None Remove="Effects\Shaders\_subtract.ps" />
 	</ItemGroup>
 
 	<ItemGroup>
 	  <ProjectReference Include="..\..\Media\LivreNoirLibrary.Media.Bitmap\LivreNoirLibrary.Media.Bitmap.csproj" />
 	  <ProjectReference Include="..\LivreNoirLibrary.Windows.Core\LivreNoirLibrary.Windows.Core.csproj" />
+		<ProjectReference Include="..\LivreNoirLibrary.Windows.SourceGenerator\LivreNoirLibrary.Windows.SourceGenerator.csproj">
+			<OutputItemType>Analyzer</OutputItemType>
+			<ReferenceOutputAssembly>false</ReferenceOutputAssembly>
+		</ProjectReference>
 	</ItemGroup>
 
 	<ItemGroup>
 	  <Resource Include="Effects\Shaders\transparent.ps" />
+	  <Resource Include="Effects\Shaders\_add.ps" />
+	  <Resource Include="Effects\Shaders\_alpha.ps" />
+	  <Resource Include="Effects\Shaders\_color_burn.ps" />
+	  <Resource Include="Effects\Shaders\_color_dodge.ps" />
+	  <Resource Include="Effects\Shaders\_darken.ps" />
+	  <Resource Include="Effects\Shaders\_difference.ps" />
+	  <Resource Include="Effects\Shaders\_exclusion.ps" />
+	  <Resource Include="Effects\Shaders\_hard_light.ps" />
+	  <Resource Include="Effects\Shaders\_lighten.ps" />
+	  <Resource Include="Effects\Shaders\_multiply.ps" />
+	  <Resource Include="Effects\Shaders\_overlay.ps" />
+	  <Resource Include="Effects\Shaders\_screen.ps" />
+	  <Resource Include="Effects\Shaders\_soft_light.ps" />
+	  <Resource Include="Effects\Shaders\_subtract.ps" />
 	</ItemGroup>
 
 </Project>

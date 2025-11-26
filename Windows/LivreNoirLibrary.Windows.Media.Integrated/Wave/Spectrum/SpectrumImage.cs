@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using LivreNoirLibrary.Collections;
 using LivreNoirLibrary.Media;
 using LivreNoirLibrary.Numerics;
+using LivreNoirLibrary.Windows.Media;
 
 namespace LivreNoirLibrary.Windows.Controls.Wave
 {
@@ -56,44 +57,39 @@ namespace LivreNoirLibrary.Windows.Controls.Wave
 
         protected override unsafe void Refresh()
         {
-            if (!TryGetBitmapPointer(out var b) || _owner.SpectrumData is not { } data)
+            if (Bitmap is not { } b || _owner.SpectrumData is not { } data)
             {
                 return;
             }
             data.Update(_owner.SamplePosition);
-            try
-            {
-                var bitmap = b.ToBitmapData();
-                var w = (int)RequiredWidth;
-                var count = 0;
-                var channels = Math.Min(data.Channels, 2);
-                // 描画用のピクセルデータ
-                var colors = stackalloc uint[2];
-                colors[0] = ColorUtils.Mask_R | ColorUtils.Mask_A;
-                colors[1] = ColorUtils.Mask_B | ColorUtils.Mask_A;
+            using var bitmap = b.BeginWrite();
+            var w = (int)RequiredWidth;
+            var stride = bitmap.Width;
+            var count = 0;
+            var channels = Math.Min(data.Channels, 2);
+            // 描画用のピクセルデータ
+            var colors = stackalloc uint[2];
+            colors[0] = ColorUtils.GetMask(ColorFlags.R | ColorFlags.A);
+            colors[1] = ColorUtils.GetMask(ColorFlags.B | ColorFlags.A);
 
-                foreach (var (y, height, dataCount) in _posList.AsSpan())
-                {
-                    var current = bitmap.Offset(y);
-                    SimdOperations.Clear(current, w);
-                    for (var c = 0; c < channels; c++)
-                    {
-                        var length = (Math.Clamp(data.Range(c, count, dataCount).Max(), 0, 1) * w).RoundToInt();
-                        SimdOperations.Or(current, colors[c], w);
-                    }
-                    if (height is > 1)
-                    {
-                        for (var oy = 1; oy < height; oy++)
-                        {
-                            SimdOperations.CopyFrom(bitmap.Offset(y + oy), current, w);
-                        }
-                    }
-                    count += dataCount;
-                }
-            }
-            finally
+            foreach (var (y, height, dataCount) in _posList.AsSpan())
             {
-                b.Dispose();
+                var current = (uint*)bitmap.Offset(y);
+                SimdOperations.Clear(current, w);
+                for (var c = 0; c < channels; c++)
+                {
+                    var length = (Math.Clamp(data.Range(c, count, dataCount).Max(), 0, 1) * w).RoundToInt();
+                    SimdOperations.Or(current, colors[c], w);
+                }
+                if (height is > 1)
+                {
+                    var target = (uint*)bitmap.Offset(y + 1);
+                    for (var oy = 1; oy < height; oy++, target += stride)
+                    {
+                        SimdOperations.CopyFrom(target, current, w);
+                    }
+                }
+                count += dataCount;
             }
         }
 

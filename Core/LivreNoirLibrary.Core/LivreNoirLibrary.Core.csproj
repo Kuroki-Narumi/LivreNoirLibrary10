@@ -11,6 +11,7 @@
 	  <RootNamespace>LivreNoirLibrary</RootNamespace>
 	  <EmitCompilerGeneratedFiles>true</EmitCompilerGeneratedFiles>
 	  <BaseOutputPath>..\..\bin</BaseOutputPath>
+	  <OutputType>Library</OutputType>
   </PropertyGroup>
 	<ItemGroup>
 		<ProjectReference Include="..\LivreNoirLibrary.Core.Generator\LivreNoirLibrary.Core.Generator.csproj">

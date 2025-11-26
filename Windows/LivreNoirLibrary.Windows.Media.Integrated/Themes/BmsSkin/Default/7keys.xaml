@@ -1,4 +1,4 @@
-<PlaySkin DisplayName="7keys default" KeyCount="5, 7" Version="1.0" Author="ROKINA" BaseSize="1280, 720" Background="#121">
+<PlaySkin DisplayName="7keys default" KeyCount="5, 7" Version="1.0" Author="ROKINA" BaseSize="1280, 720" Background="#000">
 	<Skin.Options>
 		<ListOption Key="Layout">
 			<Option Value="Separate" IsDefault="true"/>
@@ -32,26 +32,32 @@
 		<Texture Key="background_2p" BasedOn="skin_bm" Rect="0, 32, 320, 32"/>
 		<Texture Key="barline" BasedOn="skin_bm" Rect="296, 66, 24, 1"/>
 		
-		<Texture Key="note_red" BasedOn="skin_bm" Rect="0, 64, 60, 6"/>
+		<Texture Key="note_red" BasedOn="skin_bm" Rect="0, 64, 60, 8"/>
 		<Texture Key="note_red_long_head" BasedOn="skin_bm" Rect="0, 93, 60, 12"/>
 		<Texture Key="note_red_long_tail" BasedOn="skin_bm" Rect="0, 80, 60, 12"/>
 		<Texture Key="note_red_long_body" BasedOn="skin_bm" Rect="0, 110, 60, 1"/>
 		<Texture Key="note_red_long_body_active" BasedOn="skin_bm" Rect="0, 111, 60, 17" DivY="17" LoopPeriod="0.25"/>
-		<Texture Key="note_red_mine" BasedOn="skin_bm" Rect="0, 72, 60, 6"/>
+		<Texture Key="note_red_mine" BasedOn="skin_bm" Rect="0, 72, 60, 8"/>
 
-		<Texture Key="note_white" BasedOn="skin_bm" Rect="60, 64, 38, 6"/>
+		<Texture Key="note_white" BasedOn="skin_bm" Rect="60, 64, 38, 8"/>
 		<Texture Key="note_white_long_head" BasedOn="skin_bm" Rect="60, 93, 38, 12"/>
 		<Texture Key="note_white_long_tail" BasedOn="skin_bm" Rect="60, 80, 38, 12"/>
 		<Texture Key="note_white_long_body" BasedOn="skin_bm" Rect="60, 110, 38, 1"/>
 		<Texture Key="note_white_long_body_active" BasedOn="skin_bm" Rect="60, 111, 38, 17" DivY="17" LoopPeriod="0.25"/>
-		<Texture Key="note_white_mine" BasedOn="skin_bm" Rect="60, 72, 38, 6"/>
+		<Texture Key="note_white_mine" BasedOn="skin_bm" Rect="60, 72, 38, 8"/>
 
-		<Texture Key="note_blue" BasedOn="skin_bm" Rect="98, 64, 30, 6"/>
+		<Texture Key="note_blue" BasedOn="skin_bm" Rect="98, 64, 30, 8"/>
 		<Texture Key="note_blue_long_head" BasedOn="skin_bm" Rect="98, 93, 30, 12"/>
 		<Texture Key="note_blue_long_tail" BasedOn="skin_bm" Rect="98, 80, 30, 12"/>
 		<Texture Key="note_blue_long_body" BasedOn="skin_bm" Rect="98, 110, 30, 1"/>
 		<Texture Key="note_blue_long_body_active" BasedOn="skin_bm" Rect="98, 111, 30, 17" DivY="17" LoopPeriod="0.25"/>
-		<Texture Key="note_blue_mine" BasedOn="skin_bm" Rect="98, 72, 30, 6"/>
+		<Texture Key="note_blue_mine" BasedOn="skin_bm" Rect="98, 72, 30, 8"/>
+
+		<Texture Key="bm_bomb" Source="bm_bomb.png"/>
+		<Texture Key="bomb_1" BasedOn="bm_bomb" Rect="0,   0, 2896, 192" DivX="16" LoopPeriod="0.25"/>
+		<Texture Key="bomb_2" BasedOn="bm_bomb" Rect="0, 192, 2896, 192" DivX="16" LoopPeriod="0.25"/>
+		<Texture Key="bomb_3" BasedOn="bm_bomb" Rect="0, 384, 2896, 192" DivX="16" LoopPeriod="0.25"/>
+		<Texture Key="bomb_4" BasedOn="bm_bomb" Rect="0, 576, 2896, 192" DivX="16" LoopPeriod="0.25"/>
 	</Skin.Textures>
 	
 	<Image Texture="background_1p" DestTimer="Scene_Start">
@@ -218,4 +224,18 @@
 				  Mine="note_red_mine">
 		</NoteLane>
 	</NoteArea>
+	
+	<!-- 1P Bomb -->
+	<Group DestTimer="Scene_Start">
+		<Destination X="$Variables.layout_1p_frame" Y="0" Width="320" Height="512"/>
+		<!-- 1P Scratch -->
+		<Image Texture="bomb_1" SourceTimer="Play_MusicStart" DestTimer="Scene_Start" DestLoopEnd="0.25" Blend="Add">
+			<Destination Rect="32, 506, 240, 192" Origin="0.436, 0.432"/>
+			<Destination Time="0.25" />
+		</Image>
+		<!-- 1P 1 -->
+		<Image Texture="bomb_2" SourceTimer="Play_MusicStart" DestTimer="Scene_Start" Blend="Add" DestLoopEnd="0.25">
+			<Destination Rect="83, 506, 240, 192" Opacity="0.2" Origin="0.436, 0.432"/>
+		</Image>
+	</Group>
 </PlaySkin>

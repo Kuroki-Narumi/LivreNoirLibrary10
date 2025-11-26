@@ -4,34 +4,33 @@ using LivreNoirLibrary.Media;
 
 namespace LivreNoirLibrary.Windows.Media
 {
-    public readonly unsafe struct BitmapPointer : IDisposable
+    public readonly unsafe struct BitmapPointer : IBitmap, IDisposable
     {
         private readonly WriteableBitmap _bitmap;
-        private readonly byte* _pointer;
-        private readonly int _spanLength;
-        private readonly int _width;
-        private readonly int _height;
+        private readonly bool _needFlush;
 
-        public bool IsValid => _pointer is not null;
+        public nint Pointer { get; }
+        public int Width { get; }
+        public int Height { get; }
+        public bool IsFloat => false;
 
-        public BitmapPointer(WriteableBitmap bitmap)
+        internal BitmapPointer(WriteableBitmap bitmap, bool needFlush = true)
         {
             _bitmap = bitmap;
-            _pointer = (byte*)bitmap.BackBuffer;
-            _width = bitmap.PixelWidth;
-            _height = bitmap.PixelHeight;
-            _spanLength = bitmap.BackBufferStride * bitmap.PixelHeight;
+            _needFlush = needFlush;
+            Pointer = bitmap.BackBuffer;
+            Width = _bitmap.PixelWidth;
+            Height = _bitmap.PixelHeight;
             bitmap.Lock();
         }
 
         public void Dispose()
         {
-            _bitmap.AddDirtyRect(_bitmap.GetRect());
+            if (_needFlush)
+            {
+                _bitmap.AddDirtyRect(_bitmap.Rect);
+            }
             _bitmap.Unlock();
         }
-
-        public Span<byte> AsSpan() => new(_pointer, _spanLength);
-        public LnBitmapData ToBitmapData() => new(_pointer, _width, _height);
-        public static implicit operator LnBitmapData(BitmapPointer value) => value.ToBitmapData();
     }
 }

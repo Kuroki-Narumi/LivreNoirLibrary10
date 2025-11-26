@@ -285,6 +285,42 @@ namespace LivreNoirLibrary.Collections
             }
         }
 
+        private static void CopyFromCore<T>(T* destination, T* source, T factor, int length)
+            where T : unmanaged, INumber<T>
+        {
+            var count = Vector<T>.Count;
+            var srcVec = (Vector<T>*)source;
+            var dstVec = (Vector<T>*)destination;
+            for (; length >= count; length -= count, srcVec++, dstVec++)
+            {
+                *dstVec = *srcVec * factor;
+            }
+            source = (T*)srcVec;
+            destination = (T*)dstVec;
+            for (; length is > 0; length--, source++, destination++)
+            {
+                *destination = *source * factor;
+            }
+        }
+
+        private static void AddCore<T>(T* destination, T* source, T factor, int length)
+            where T : unmanaged, INumber<T>
+        {
+            var count = Vector<T>.Count;
+            var srcVec = (Vector<T>*)source;
+            var dstVec = (Vector<T>*)destination;
+            for (; length >= count; length -= count, srcVec++, dstVec++)
+            {
+                *dstVec += *srcVec * factor;
+            }
+            source = (T*)srcVec;
+            destination = (T*)dstVec;
+            for (; length is > 0; length--, source++, destination++)
+            {
+                *destination += *source * factor;
+            }
+        }
+
         private static unsafe void MinCore<T>(T* destination, T value, int length)
             where T : unmanaged, INumber<T>
         {
@@ -524,7 +560,7 @@ namespace LivreNoirLibrary.Collections
             if (length >= count)
             {
                 var srcVec = (Vector<T>*)source;
-                var resultVec = new Vector<T>();
+                var resultVec = Vector<T>.Zero;
                 for (; length >= count; length -= count, srcVec++)
                 {
                     resultVec += *srcVec;
@@ -551,7 +587,7 @@ namespace LivreNoirLibrary.Collections
             if (length >= count)
             {
                 var srcVec = (Vector<T>*)source;
-                var resultVec = new Vector<T>();
+                var resultVec = Vector<T>.Zero;
                 for (; length >= count; length -= count, srcVec++)
                 {
                     resultVec += *srcVec * *srcVec;

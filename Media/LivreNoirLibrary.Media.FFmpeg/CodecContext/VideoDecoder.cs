@@ -11,10 +11,9 @@ namespace LivreNoirLibrary.Media.FFmpeg
         private long _keyframe_min_interval = -1;
         private long _keyframe_max_interval = -1;
         private readonly List<(long, Rational)> _pos_cache = [];
+        private Rational _startTime;
 
         public Rational Duration { get; private set; }
-        public long TotalFrame => (Duration * _frame_rate).Ceiling();
-        public long TotalTicks => Duration.ToTicks();
 
         public long MaxKeyframeInterval => _keyframe_max_interval;
         public long MinKeyframeInterval => _keyframe_min_interval;
@@ -70,6 +69,8 @@ namespace LivreNoirLibrary.Media.FFmpeg
             // キーフレームリストの取得
             _base_context.EstimateKeyFrames(stream, out _keyframe_min_interval, out _keyframe_max_interval);
             _pos_cache.Clear();
+            // オフセット
+            _startTime = new Rational(_base_context._format_context->start_time, ffmpeg.AV_TIME_BASE);
         }
 
         private void SeekCore(long posNum, long posDen)
@@ -91,7 +92,7 @@ namespace LivreNoirLibrary.Media.FFmpeg
         {
             lock (_lock)
             {
-                var len = TotalTicks;
+                var len = this.TotalTicks;
                 if (ticks is < 0)
                 {
                     ticks += len;
@@ -134,7 +135,7 @@ namespace LivreNoirLibrary.Media.FFmpeg
                         return false;
                     }
                     var timeBase = _stream->time_base;
-                    var time = packet->dts.ToRational(timeBase);
+                    var time = packet->dts.ToRational(timeBase) - _startTime;
                     /*
                      * Dts(秒) = dts * timeBase.num / timeBase.den
                      * Req(秒) = requiredTime.Numerator / requiredTime.Denominator
@@ -194,11 +195,11 @@ namespace LivreNoirLibrary.Media.FFmpeg
                     _pos_cache.RemoveAt(index);
                     if (rawPts is >= 0)
                     {
-                        pts = rawPts.ToRational(timeBase);
+                        pts = rawPts.ToRational(timeBase) - _startTime;
                     }
                     else
                     {
-                        pts = frame->best_effort_timestamp.ToRational(timeBase);
+                        pts = frame->best_effort_timestamp.ToRational(timeBase) - _startTime;
                     }
                     return true;
                 }

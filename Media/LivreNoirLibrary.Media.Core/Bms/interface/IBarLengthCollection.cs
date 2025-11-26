@@ -2,10 +2,11 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using LivreNoirLibrary.ObjectModel;
 
 namespace LivreNoirLibrary.Media.Bms
 {
-    public interface IBarLengthCollection : ICount, IEnumerable<(int, double)>, IDumpable, ILoadable, IBarLengthProvider<double>
+    public interface IBarLengthCollection : IBarLengthProvider<double>, IEnumerable<(int, double)>, ICount, IClear, IDumpable, ILoadable
     {
         bool TryGetValue(int number, out double value);
         bool Set(int number, double value);
@@ -39,5 +40,7 @@ namespace LivreNoirLibrary.Media.Bms
         }
 
         double IBarLengthProvider<double>.GetBarLength(int number) => TryGetValue(number, out var value) ? value : BmsConstants.DefaultBarLength;
+
+        System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator() => GetEnumerator();
     }
 }

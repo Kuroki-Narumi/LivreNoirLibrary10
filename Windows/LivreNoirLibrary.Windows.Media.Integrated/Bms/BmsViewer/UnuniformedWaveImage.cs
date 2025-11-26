@@ -63,23 +63,19 @@ namespace LivreNoirLibrary.Windows.Controls.Bms
 
         protected override void Refresh()
         {
-            if (!TryGetBitmapPointer(out var b))
+            if (Bitmap is not { } source)
             {
                 return;
             }
             var offset = _pixelOffset;
-            try
-            {
-                var bitmap = b.ToBitmapData();
-                var h = (int)RequiredHeight;
-                WaveImage.AdjustRefreshArea((int)_lastHeight, h, offset, _lastPixelOffset, bitmap, out var top, out var bottom);
-            }
-            finally
-            {
-                b.Dispose();
-                _lastHeight = RequiredHeight;
-                _lastPixelOffset = offset;
-            }
+            using var bitmap = source.BeginWrite();
+            var h = (int)RequiredHeight;
+            WaveImage.AdjustRefreshArea((int)_lastHeight, h, offset, _lastPixelOffset, bitmap, out var top, out var bottom);
+
+            // TODO
+
+            _lastHeight = RequiredHeight;
+            _lastPixelOffset = offset;
         }
     }
 }

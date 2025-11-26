@@ -96,7 +96,7 @@ namespace LivreNoirLibrary.Media
         /// <param name="values">When this method returns, the value list associated with the found position, if the search is successful;
         /// otherwise, the default value for <typeparamref name="TValue"/>.</param>
         /// <returns><see langword="true"/> if an value is found; otherwise, <see langword="false"/>.</returns>
-        bool TryGetValue(TY key, TX position, SearchMode type, out TX actualPosition, [MaybeNullWhen(false)] out List<TValue> values);
+        bool TryGetValue(TY key, TX position, SearchMode mode, out TX actualPosition, [MaybeNullWhen(false)] out List<TValue> values);
 
         /// <summary>
         /// Attempts to find the value list with the specified key and the nearest to the specified position.

@@ -6,43 +6,43 @@ namespace LivreNoirLibrary.Media.Bms
 {
     public class BmsTimer : IClear
     {
-        private readonly Dictionary<TimerId, long> _timers = [];
+        private readonly Dictionary<TimerId, double> _timers = [];
 
         public void Clear()
         {
             _timers.Clear();
         }
 
-        public void Set(TimerId id, long absoluteTick) => _timers[id] = absoluteTick;
+        public void Set(TimerId id, double time) => _timers[id] = time;
         public bool Remove(TimerId id) => _timers.Remove(id);
 
-        public long Get(TimerId id, long absolutTick)
+        public double Get(TimerId id, double time)
         {
-            if (_timers.TryGetValue(id, out var startTick))
+            if (_timers.TryGetValue(id, out var start))
             {
-                return absolutTick - startTick;
+                return time - start;
             }
             return -1;
         }
 
-        public bool TryGet(TimerId id, long absoluteTick, out long relativeTick)
+        public bool TryGet(TimerId id, double time, out double relativeTime)
         {
-            relativeTick = _timers.TryGetValue(id, out var startTick) ? absoluteTick - startTick : -1;
-            return relativeTick is >= 0;
+            relativeTime = _timers.TryGetValue(id, out var start) ? time - start : -1;
+            return relativeTime is >= 0;
         }
 
-        public static int GetFrameIndex(long relativeTick, in TextureData texData)
+        public static int GetFrameIndex(double relativeTime, in TextureData texData)
         {
             var period = texData.LoopPeriod;
             var maxPattern = texData.DivX * texData.DivY;
-            return period is > 0 ? (int)(relativeTick * maxPattern / period) : 0;
+            return period is > 0 ? (int)(relativeTime * maxPattern / period) : 0;
         }
 
-        public int GetFrameIndex(TimerId timerId, long absoluteTick, in TextureData texData)
+        public int GetFrameIndex(TimerId timerId, double time, in TextureData texData)
         {
             var period = texData.LoopPeriod;
             var maxPattern = texData.DivX * texData.DivY;
-            return period is > 0 && TryGet(timerId, absoluteTick, out var relativeTick) ? (int)(relativeTick * maxPattern / period) : 0;
+            return period is > 0 && TryGet(timerId, time, out var relativeTime) ? (int)(relativeTime * maxPattern / period) : 0;
         }
     }
 }
