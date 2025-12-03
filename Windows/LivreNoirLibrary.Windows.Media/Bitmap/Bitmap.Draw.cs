@@ -2,6 +2,7 @@ using System;
 using System.Windows;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
+using LivreNoirLibrary.Collections;
 using LivreNoirLibrary.Media;
 
 namespace LivreNoirLibrary.Windows.Media
@@ -40,16 +41,16 @@ namespace LivreNoirLibrary.Windows.Media
                 p.FillTriangle(new(x0, y0, x1, y1, x2, y2), color1.ToLnColor(), color2.ToLnColor(), radial);
             }
 
-            public void DrawBorder(int thickness, Color color, bool keepSource = false)
+            public void DrawBorder(int thickness, Color color, bool keepSource = false, UnmanagedArray<uint>? buffer = null)
             {
                 using var p = bitmap.BeginWrite();
-                p.DrawBorder(thickness, color.ToLnColor(), keepSource);
+                p.DrawBorder(thickness, color.ToLnColor(), keepSource, buffer);
             }
 
-            public void DrawBorderSimple(int thickness, Color color)
+            public void DrawBorderSimple(int thickness, Color color, UnmanagedArray<uint>? buffer = null)
             {
                 using var p = bitmap.BeginWrite();
-                p.DrawBorderSimple(thickness, color.ToLnColor());
+                p.DrawBorderSimple(thickness, color.ToLnColor(), buffer);
             }
         }
     }

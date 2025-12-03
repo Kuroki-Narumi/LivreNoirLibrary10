@@ -11,10 +11,10 @@ namespace LivreNoirLibrary.Windows.Controls.Bms
         public readonly TextureCache Textures;
         public readonly MediaCache Media;
         public readonly NoteElementCollection Notes;
-        public readonly BgaParams Bga;
+        public readonly BgaSource Bga;
         public readonly double HighSpeed;
 
-        public UpdateArgs(BmsTimer timer, double absoluteTime, TimingList timings, TextureCache textures, MediaCache media, NoteElementCollection notes, BgaParams bga, double highSpeed)
+        public UpdateArgs(BmsTimer timer, double absoluteTime, TimingList timings, TextureCache textures, MediaCache media, NoteElementCollection notes, BgaSource bga, double highSpeed)
         {
             Timer = timer;
             AbsoluteTime = absoluteTime;

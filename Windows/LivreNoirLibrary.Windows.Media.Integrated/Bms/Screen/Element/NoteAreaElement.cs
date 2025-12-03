@@ -7,15 +7,21 @@ using LivreNoirLibrary.Windows.Media.Bms.SkinInfo;
 using System;
 using System.Collections.Generic;
 using System.Windows;
+using System.Numerics;
+using LivreNoirLibrary.Numerics;
 
 namespace LivreNoirLibrary.Windows.Controls.Bms.Elements
 {
     public sealed class NoteAreaElement : GroupElementBase
     {
+        public const double DefaultbaseHeight = 8;
+
         private readonly NoteArea _source;
         private readonly Dictionary<int, NoteLaneInfo> _lanes = [];
-        private readonly List<(UIntBitmap Source, System.Drawing.Rectangle SourceRect, System.Drawing.Rectangle DestRect)> _children = [];
+        private readonly List<(UIntBitmap Source, System.Drawing.Rectangle SourceRect, Rect DestRect)> _children = [];
         private TextureData _barLine;
+        private TextureData _judgeLine;
+        private double _baseHeight;
 
         public NoteAreaElement(NoteArea source) : base(source)
         {
@@ -33,6 +39,8 @@ namespace LivreNoirLibrary.Windows.Controls.Bms.Elements
         {
             base.DetermineExpressions(skin, provider);
             _barLine = GetTexture(_source.BarLine);
+            _judgeLine = GetTexture(_source.JudgeLine);
+            _baseHeight = skin.TryResolveValue<double>(_source.BaseHeight, provider, out var baseHeight) ? baseHeight : DefaultbaseHeight;
             foreach (var (_, child) in _lanes)
             {
                 var source = child.Source;
@@ -74,10 +82,12 @@ namespace LivreNoirLibrary.Windows.Controls.Bms.Elements
                 var areaHeight = DestHeight;
                 var barTexture = _barLine;
                 var width = DestWidth;
+                var baseHeight = _baseHeight;
                 foreach (var bar in notes.BarLines)
                 {
                     AddChild(barTexture, 0, width, bar.RelativePosition);
                 }
+                AddChild(_judgeLine, 0, width, 0, -1);
                 foreach (var child in notes.VisibleChildren)
                 {
                     if (lanes.TryGetValue(child.Lane, out var laneInfo))
@@ -102,22 +112,25 @@ namespace LivreNoirLibrary.Windows.Controls.Bms.Elements
                 {
                     if (texture.TryGetTexture(data, BmsTimer.GetFrameIndex(relativeTime, data), out var bitmap, out var sourceRect))
                     {
-                        var h = height is 0 ? sourceRect.Height : height * areaHeight * highSpeed;
+                        var h = height switch
+                        {
+                            0 => sourceRect.Height,
+                            > 0 => height * areaHeight * highSpeed,
+                            _ => baseHeight,
+                        };
                         var y = areaHeight - areaHeight * offset * highSpeed - h - finalOffset;
-                        var rect = new Rect(x, y, width, h).ToDrawingRect();
-                        children.Add((bitmap, sourceRect, rect));
+                        children.Add((bitmap, sourceRect, new(x, y, width, h)));
                     }
                 }
             }
         }
 
-        protected override void RenderChildren(IBitmap target, FloatBitmap buffer1, UnmanagedArray<float> buffer2)
+        protected override void RenderChildren(in RenderArgs args)
         {
-            foreach (var (source, sourceRect, targetRect) in _children.AsSpan())
+            var colorCorrection = args.ColorCorrection;
+            foreach (var (source, sourceRect, (x, y, width, height)) in _children.AsSpan())
             {
-                buffer1.Resize(targetRect.Width, targetRect.Height);
-                source.StretchCopy(buffer1, sourceRect, buffer2);
-                target.Blend(buffer1, targetRect.Location, BlendMode.Alpha);
+                RenderSource(args, source, sourceRect, x, y, width, height, BlendMode.Alpha, colorCorrection);
             }
         }
 

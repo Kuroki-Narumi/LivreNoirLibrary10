@@ -4,9 +4,9 @@ using LivreNoirLibrary.ObjectModel;
 using LivreNoirLibrary.Text;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Diagnostics.CodeAnalysis;
 using System.Numerics;
-using System.Runtime.InteropServices;
 
 namespace LivreNoirLibrary.Media.Bms
 {
@@ -87,7 +87,7 @@ namespace LivreNoirLibrary.Media.Bms
                                     }
                                     SoundInfo soundInfo = new(time, channel, path);
                                     bList.Add(soundInfo);
-                                    if (channel is > 0)
+                                    if (channel.IsKey())
                                     {
                                         if (!keyList.TryGetValue(channel, time, SearchMode.Equal, out _, out var keyInfo))
                                         {
@@ -99,7 +99,7 @@ namespace LivreNoirLibrary.Media.Bms
                                     }
                                     break;
                                 case NoteType.Mine:
-                                    if (channel is > 0)
+                                    if (channel.IsKey())
                                     {
                                         keyList.Set(channel, time, new(time, true));
                                     }
@@ -147,7 +147,8 @@ namespace LivreNoirLibrary.Media.Bms
                 foreach (var (_, head, length) in source.EnumerateBars())
                 {
                     var time = Beat2Time(head);
-                    keyList.Set(Channel.Bar, TimeUtils.Seconds2Ticks(time), new(time, false) { Length = length });
+                    //barList.Set(time, (head, length));
+                    keyList.Set(Channel.Bar, time, new(time, false));
                 }
             }
             finally

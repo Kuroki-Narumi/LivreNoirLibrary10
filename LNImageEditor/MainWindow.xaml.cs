@@ -139,5 +139,10 @@ namespace LNImageEditor
                 });
             }
         }
+
+        private void OnMouseWheel_Tab(object sender, MouseWheelEventArgs e)
+        {
+            (sender as TabControl)?.ChangeByWheel(e);
+        }
     }
 }

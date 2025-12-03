@@ -12,6 +12,7 @@ namespace LivreNoirLibrary.Windows.Controls.Bms
         private readonly List<NoteInfo> _children = [];
         private readonly List<BarLineInfo> _barLines = [];
         private readonly List<NoteInfo> _visible = [];
+        private readonly TimerInfoList _timers = [];
         private int _barStart;
         private int _barLength;
 
@@ -20,29 +21,61 @@ namespace LivreNoirLibrary.Windows.Controls.Bms
 
         public void Setup(TimingList timings)
         {
+            if (false)
+            {
+                var beat = 80;
+                var time = timings.Beat2Time(beat);
+                var pos = timings.Time2Position(time);
+                System.Windows.Clipboard.SetText($"{timings.GetTimingInfoText()}{beat}\t{time}\t{pos}\t{timings.Time2Beat(time)}{Environment.NewLine}{timings.GetTempoInfoText()}");
+            }
+
             var bars = _barLines;
             var children = _children;
+            var timers = _timers;
             bars.Clear();
             children.Clear();
+            timers.Clear();
             foreach (var (channel, time, info) in timings.KeyInfos)
             {
-                var startPos = (double)timings.Time2Position(info.Time);
+                var startPos = (double)timings.Time2Position(time);
                 if (channel is Channel.Bar)
                 {
                     bars.Add(new(time, startPos));
                 }
                 else
                 {
+                    var end = time + info.Length;
                     var lane = channel - Channel.Visible_Start;
+                    var id = BmsTimer.Lane2TimerId(lane);
+                    var isVisible = !info.IsMine;
+                    if (isVisible)
+                    {
+                        // Press
+                        timers.Add(id + 1, time);
+                        // Bomb
+                        timers.Add(id + 3, end);
+                    }
                     if (info.Length is > 0)
                     {
-                        var end = info.Time + info.Length;
                         var endPos = (double)timings.Time2Position(end);
                         children.Add(new(lane, time, end, startPos, endPos - startPos, info.IsMine));
+                        // Release
+                        timers.AddRelease(id + 2, id + 1, end);
+                        // LongBomb
+                        var len = info.Length;
+                        for (var offset = 0d; offset < len; offset += 0.125)
+                        {
+                            timers.Add(id + 4, time + offset);
+                        }
                     }
                     else
                     {
                         children.Add(new(lane, time, time, startPos, 0, info.IsMine));
+                        if (isVisible)
+                        {
+                            // Release
+                            timers.AddRelease(id + 2, id + 1, time + 0.01);
+                        }
                     }
                 }
             }
@@ -54,21 +87,24 @@ namespace LivreNoirLibrary.Windows.Controls.Bms
             var timings = args.Timings;
             var visible = _visible;
             visible.Clear();
-            if (args.Timer.TryGet(TimerId.Play_MusicStart, args.AbsoluteTime, out var currentTime))
+            var absTime = args.AbsoluteTime;
+            var timer = args.Timer;
+            if (timer.TryGet(TimerId.Play_MusicStart, absTime, out var currentTime))
             {
                 var start = timings.Time2Position(currentTime);
                 var end = start + 1 / args.HighSpeed;
                 foreach (var child in _children.AsSpan())
                 {
-                    if (child.EndTime >= currentTime && child.VisualStart <= end && (child.VisualStart + child.VisualLength) >= start)
+                    if (child.EndTime >= currentTime && 
+                        child.VisualStart <= end && (child.VisualStart + child.VisualLength) >= start)
                     {
                         var offset = child.VisualStart - start;
                         child.CurrentOffset = offset;
-                        child.IsVisible = true;
                         child.IsActive = offset is <= 0;
                         visible.Add(child);
                     }
                 }
+                _timers.Advance(timer, currentTime, absTime - currentTime);
                 (_barStart, _barLength) = _barLines.IndexRange<BarLineInfo, double, BarLineInfoComparer>(RangeUtils.Get(start, end));
                 foreach (var bar in BarLines)
                 {
@@ -84,6 +120,53 @@ namespace LivreNoirLibrary.Windows.Controls.Bms
             public bool IsActive { get; set; }
         }
 
+        public class TimerInfoList : Dictionary<TimerId, TimerInfo>
+        {
+            public void Add(TimerId id, double value) => this.GetOrAdd(id).Add(value);
+
+            public void AddRelease(TimerId releaseId, TimerId pressId, double value)
+            {
+                var list = this.GetOrAdd(releaseId);
+                list.Add(value);
+                list.PressId = pressId;
+            }
+
+            public void Advance(BmsTimer timer, double relativeTime, double offset)
+            {
+                foreach (var (id, list) in this)
+                {
+                    list.Advance(timer, id, relativeTime, offset);
+                }
+            }
+        }
+
+        public class TimerInfo : List<double>
+        {
+            public TimerId PressId { get; set; }
+            private int _index = 0;
+
+            public void Advance(BmsTimer timer, TimerId id, double relativeTime, double offset)
+            {
+                var index = _index;
+                for (; index < Count; index++)
+                {
+                    if (this[index] <= relativeTime)
+                    {
+                        timer.Set(id, relativeTime + offset);
+                        if (PressId is not 0)
+                        {
+                            timer.Remove(PressId);
+                        }
+                    }
+                    else
+                    {
+                        break;
+                    }
+                }
+                _index = index;
+            }
+        }
+
         public record BarLineInfo(double Time, double Position)
         {
             public double RelativePosition { get; set; }
@@ -91,7 +174,7 @@ namespace LivreNoirLibrary.Windows.Controls.Bms
 
         private readonly struct BarLineInfoComparer : IComparer<BarLineInfo>, IComparer<BarLineInfo, double>
         {
-            public int Compare(BarLineInfo? x, BarLineInfo? y) => x!.Time.CompareTo(y!.Time);
+            public int Compare(BarLineInfo? x, BarLineInfo? y) => x!.Position.CompareTo(y!.Position);
             public static int Compare(BarLineInfo x, double y) => x.Position.CompareTo(y);
             public static bool IsXCloserThanY(BarLineInfo x, BarLineInfo y, double z) => x.Position + y.Position < z * 2;
         }

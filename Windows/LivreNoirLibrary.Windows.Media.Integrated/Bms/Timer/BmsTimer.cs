@@ -42,7 +42,20 @@ namespace LivreNoirLibrary.Media.Bms
         {
             var period = texData.LoopPeriod;
             var maxPattern = texData.DivX * texData.DivY;
-            return period is > 0 && TryGet(timerId, time, out var relativeTime) ? (int)(relativeTime * maxPattern / period) : 0;
+            return period is > 0 && TryGet(timerId, time, out var relativeTime) ? (int)(relativeTime * maxPattern / (period + 0.0001)) : 0;
+        }
+
+        public static TimerId Lane2TimerId(int lane) => (TimerId)(1000 + lane * 10);
+
+        public static bool TryGetButtonTimer(Channel channel, out TimerId id)
+        {
+            if (channel.TryGetLane(out var lane) && lane is > 0)
+            {
+                id = Lane2TimerId(lane);
+                return true;
+            }
+            id = 0;
+            return false;
         }
     }
 }

@@ -19,12 +19,15 @@ namespace LivreNoirLibrary.Benchmark
         {
             base.OnStartup(e);
             //PointerTest.Run();
-            //ColorTest.Check();
+
+            BenchmarkRunner.Run<ColorTest>();
+
             //JsonTest.Test();
             //BenchmarkRunner.Run<VectorTest>();
             //BenchmarkRunner.Run<Lanczos3Test>();
             //Lanczos3Test.Check();
 
+            /*
             BenchmarkRunner.Run<VectorTest2>();
 
             var test1 = new VectorTest2();
@@ -35,6 +38,10 @@ namespace LivreNoirLibrary.Benchmark
             test1.Manual();
             test2.ShuffleNative();
             Console.WriteLine($"process is equal: {test1._results.SequenceEqual(test2._results)}");
+            */
+
+            //BenchmarkRunner.Run<DoubleRectTest>();
+            //DoubleRectTest.Validate();
         }
     }
 

@@ -114,7 +114,7 @@ namespace LivreNoirLibrary.Media.Bms
                     channel = current.UpdateBgmLane(number);
                     noteCreator = v => new(channel, v);
                 }
-                else if (channel.IsWavDef())
+                else if (channel.IsSoundLane())
                 {
                     var (lane, type) = channel.Split();
                     noteCreator = type switch

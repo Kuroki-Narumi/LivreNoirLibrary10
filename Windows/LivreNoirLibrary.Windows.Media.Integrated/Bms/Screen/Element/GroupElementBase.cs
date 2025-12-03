@@ -1,29 +1,21 @@
-﻿using LivreNoirLibrary.Collections;
-using LivreNoirLibrary.Media;
-using System;
-using System.Drawing;
-using System.Diagnostics.CodeAnalysis;
+﻿using LivreNoirLibrary.Numerics;
 using LivreNoirLibrary.Windows.Media.Bms.SkinInfo;
+using System;
 
 namespace LivreNoirLibrary.Windows.Controls.Bms.Elements
 {
     public abstract class GroupElementBase(SkinElement source) : ScreenElement(source)
     {
-        private readonly FloatBitmap _buffer = new(0, 0);
-
-        protected override bool TryGetBitmap([MaybeNullWhen(false)] out IBitmap bitmap, out Rectangle rect, FloatBitmap buffer1, UnmanagedArray<float> buffer2)
+        protected override void RenderCore(in RenderArgs args)
         {
-            var w = (int)DestWidth;
-            var h = (int)DestHeight;
-            var buffer = _buffer;
-            buffer.Resize(w, h, false);
-            buffer.Clear();
-            RenderChildren(buffer, buffer1, buffer2);
-            bitmap = _buffer;
-            rect = buffer.Rect;
-            return true;
+            var (px, py, pw, ph) = args.Rect;
+            var x = DestX;
+            var y = DestY;
+            var width = Math.Min(DestWidth, pw - x);
+            var height = Math.Min(DestHeight, ph - y);
+            RenderChildren(args.Descend(new(x + px, y + py, width, height), args.ColorCorrection * OpacityMask));
         }
 
-        protected abstract void RenderChildren(IBitmap target, FloatBitmap buffer1, UnmanagedArray<float> buffer2);
+        protected abstract void RenderChildren(in RenderArgs args);
     }
 }

@@ -25,7 +25,7 @@ internal class TupleConverter : IIncrementalGenerator
         context.RegisterPostInitializationOutput(Generate);
     }
 
-    private void Generate(IncrementalGeneratorPostInitializationContext context)
+    private static void Generate(IncrementalGeneratorPostInitializationContext context)
     {
         StringBuilder sb = new();
         sb.AppendLine(Code_Header);

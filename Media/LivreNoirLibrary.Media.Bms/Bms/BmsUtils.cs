@@ -49,27 +49,16 @@ namespace LivreNoirLibrary.Media.Bms
 
         public static bool TryGetLane(this Channel channel, out int lane)
         {
-            switch (channel)
+            lane = channel switch
             {
-                case >= Channel.Visible_Start and <= Channel.Visible_End:
-                    lane = channel - Channel.Visible_Start;
-                    return true;
-                case >= Channel.Invisible_Start and <= Channel.Invisible_End:
-                    lane = channel - Channel.Invisible_Start;
-                    return true;
-                case >= Channel.Long_Start and <= Channel.Long_End:
-                    lane = channel - Channel.Long_Start;
-                    return true;
-                case >= Channel.Mine_Start and <= Channel.Mine_End:
-                    lane = channel - Channel.Mine_Start;
-                    return true;
-                case >= Channel.Bgm_Start and <= Channel.Bgm_End:
-                    lane = Channel.Bgm_Start - channel;
-                    return true;
-                default:
-                    lane = int.MaxValue;
-                    return false;
-            }
+                >= Channel.Visible_Start and <= Channel.Visible_End => channel - Channel.Visible_Start,
+                >= Channel.Invisible_Start and <= Channel.Invisible_End => channel - Channel.Invisible_Start,
+                >= Channel.Long_Start and <= Channel.Long_End => channel - Channel.Long_Start,
+                >= Channel.Mine_Start and <= Channel.Mine_End => channel - Channel.Mine_Start,
+                >= Channel.Bgm_Start and <= Channel.Bgm_End => Channel.Bgm_Start - channel,
+                _ => int.MaxValue,
+            };
+            return lane is not int.MaxValue;
         }
 
         public static bool TryGetChannel(this int lane, out Channel channel)
@@ -108,7 +97,7 @@ namespace LivreNoirLibrary.Media.Bms
             Channel.Bgm => (Channel.Bgm_Start, NoteType.Normal),
             >= Channel.Invisible_Start and <= Channel.Invisible_End => (channel - Channel.Invisible_Start + Channel.Visible_Start, NoteType.Invisible),
             >= Channel.Long_Start and <= Channel.Long_End => (channel - Channel.Long_Start + Channel.Visible_Start, NoteType.LongEnd),
-            >= Channel.Mine_Start and <= Channel.Mine_End => (channel - Channel.Mine_Start + Channel.Mine_End, NoteType.Mine),
+            >= Channel.Mine_Start and <= Channel.Mine_End => (channel - Channel.Mine_Start + Channel.Visible_Start, NoteType.Mine),
             _ => (channel, NoteType.Normal),
         };
 

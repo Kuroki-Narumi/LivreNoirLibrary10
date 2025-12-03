@@ -1,10 +1,10 @@
 ﻿using LivreNoirLibrary.Collections;
 using LivreNoirLibrary.Media;
 using LivreNoirLibrary.Media.Bms;
+using LivreNoirLibrary.Numerics;
 using LivreNoirLibrary.Windows.Media.Bms.SkinInfo;
 using System;
-using System.Diagnostics.CodeAnalysis;
-using System.Windows;
+using System.Numerics;
 using DrRect = System.Drawing.Rectangle;
 
 namespace LivreNoirLibrary.Windows.Controls.Bms.Elements
@@ -24,9 +24,10 @@ namespace LivreNoirLibrary.Windows.Controls.Bms.Elements
             private set
             {
                 field = value;
-                _opacityMask = new FloatColor((float)value, 1, 1, 1);
+                OpacityMask = new((float)value, 1, 1, 1);
             }
         }
+        public FloatColor OpacityMask { get; private set; }
         public double Angle { get; private set; }
         public double RotateOriginX { get; private set; }
         public double RotateOriginY { get; private set; }
@@ -36,7 +37,6 @@ namespace LivreNoirLibrary.Windows.Controls.Bms.Elements
         public double LoopInterval { get; private set; }
         public BlendMode BlendMode { get; private set; }
 
-        private System.Numerics.Vector<float> _opacityMask;
         private readonly DoubleTimeline<double> _slopes = [];
         private readonly DestinationTimeline _dest_x = new(0);
         private readonly DestinationTimeline _dest_y = new(0);
@@ -124,9 +124,9 @@ namespace LivreNoirLibrary.Windows.Controls.Bms.Elements
             BlendMode = element.Blend;
         }
 
-        protected void UpdateParameters(BmsTimer timer, double absoluteTime)
+        public virtual void Update(in UpdateArgs args)
         {
-            if (timer.TryGet(TimerId, absoluteTime, out var relativeTime) && relativeTime is >= 0)
+            if (args.Timer.TryGet(TimerId, args.AbsoluteTime, out var relativeTime) && relativeTime is >= 0)
             {
                 var loopStart = LoopStart;
                 var loopEnd = LoopEnd;
@@ -142,65 +142,53 @@ namespace LivreNoirLibrary.Windows.Controls.Bms.Elements
                     {
                         relativeTime = (relativeTime - loopStart) % interval + loopStart;
                     }
-                    if (_slopes.TryGetValue(relativeTime, SearchMode.PreviousOrEqual, out _, out var slope))
-                    {
-                        var x = _dest_x.GetBlended(relativeTime, slope);
-                        var y = _dest_y.GetBlended(relativeTime, slope);
-                        var w = _dest_w.GetBlended(relativeTime, slope);
-                        var h = _dest_h.GetBlended(relativeTime, slope);
-                        var ox = _dest_ox.GetBlended(relativeTime, slope);
-                        var oy = _dest_oy.GetBlended(relativeTime, slope);
-                        var op = _dest_opacity.GetBlended(relativeTime, slope);
-                        var a = _dest_angle.GetBlended(relativeTime, slope);
-                        var aox = _dest_aox.GetBlended(relativeTime, slope);
-                        var aoy = _dest_aoy.GetBlended(relativeTime, slope);
-                        DestX = x - w * ox;
-                        DestY = y - h * oy;
-                        DestWidth = w;
-                        DestHeight = h;
-                        Opacity = op;
-                        Angle = a;
-                        RotateOriginX = aox;
-                        RotateOriginY = aoy;
-                        IsVisible = true;
-                        return;
-                    }
+                }
+                if (_slopes.TryGetValue(relativeTime, SearchMode.PreviousOrEqual, out _, out var slope))
+                {
+                    var x = _dest_x.GetBlended(relativeTime, slope);
+                    var y = _dest_y.GetBlended(relativeTime, slope);
+                    var w = _dest_w.GetBlended(relativeTime, slope);
+                    var h = _dest_h.GetBlended(relativeTime, slope);
+                    var ox = _dest_ox.GetBlended(relativeTime, slope);
+                    var oy = _dest_oy.GetBlended(relativeTime, slope);
+                    var op = _dest_opacity.GetBlended(relativeTime, slope);
+                    var a = _dest_angle.GetBlended(relativeTime, slope);
+                    var aox = _dest_aox.GetBlended(relativeTime, slope);
+                    var aoy = _dest_aoy.GetBlended(relativeTime, slope);
+                    DestX = x - w * ox;
+                    DestY = y - h * oy;
+                    DestWidth = w;
+                    DestHeight = h;
+                    Opacity = op;
+                    Angle = a;
+                    RotateOriginX = aox;
+                    RotateOriginY = aoy;
+                    IsVisible = true;
+                    return;
                 }
             }
             IsVisible = false;
         }
 
-        public virtual void Update(in UpdateArgs args)
-        {
-            UpdateParameters(args.Timer, args.AbsoluteTime);
-        }
-
-        public unsafe void Render(IBitmap target, FloatBitmap buffer1, UnmanagedArray<float> buffer2)
+        public void Render(in RenderArgs args)
         {
             if (IsValid && IsVisible)
             {
-                RenderCore(target, buffer1, buffer2);
+                var t0 = System.Diagnostics.Stopwatch.GetTimestamp();
+                RenderCore(args);
+                var time = TimeUtils.Ticks2Milliseconds(System.Diagnostics.Stopwatch.GetTimestamp() - t0);
+                args.TotalTimes[this] += time;
             }
         }
 
-        protected virtual void RenderCore(IBitmap target, FloatBitmap buffer1, UnmanagedArray<float> buffer2)
+        protected abstract void RenderCore(in RenderArgs args);
+
+        public static void RenderSource(in RenderArgs args,
+            IBitmap source, DrRect sourceRect, double destX, double destY, double destWidth, double destHeight,
+            BlendMode blendMode, FloatColor colorCorrection)
         {
-            if (TryGetBitmap(out var source, out var sourceRect, buffer1, buffer2))
-            {
-                var destRect = new Rect(DestX, DestY, DestWidth, DestHeight).ToDrawingRect();
-                if (sourceRect.Size == destRect.Size)
-                {
-                    target.Blend(source, sourceRect, destRect.Location, BlendMode, _opacityMask);
-                }
-                else
-                {
-                    buffer1.Resize(destRect.Width, destRect.Height);
-                    source.StretchCopy(buffer1, sourceRect, buffer2);
-                    target.Blend(buffer1, buffer1.Rect, destRect.Location, BlendMode, _opacityMask);
-                }
-            }
+            var (target, buffer1, parentRect, _) = args;
+            source.CopyTo(sourceRect, target, parentRect, new(destX + parentRect.X, destY + parentRect.Y, destWidth, destHeight), blendMode, colorCorrection, buffer1);
         }
-
-        protected abstract bool TryGetBitmap([MaybeNullWhen(false)] out IBitmap bitmap, out DrRect rect, FloatBitmap buffer1, UnmanagedArray<float> buffer2);
     }
 }

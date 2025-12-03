@@ -3,6 +3,7 @@ namespace LivreNoirLibrary.Media
 {
     public enum BlendMode
     {
+        Overwrite,
         Alpha,
         Add,
         Subtract,

@@ -7,9 +7,8 @@ namespace LivreNoirLibrary.Windows.Controls.Bms.Elements
 {
     public sealed class GroupElement(Group source) : GroupElementBase(source)
     {
-        private readonly Group _source = source;
+        internal readonly Group _source = source;
 
-        public bool ClipToBounds { get; private set; }
         public List<ScreenElement> Children { get; } = [];
 
         public override void DetermineExpressions(Skin skin, IVariableProvider? provider)
@@ -19,7 +18,6 @@ namespace LivreNoirLibrary.Windows.Controls.Bms.Elements
             {
                 child.DetermineExpressions(skin, provider);
             }
-            ClipToBounds = _source.ClipToBounds;
         }
 
         public override void Update(in UpdateArgs args)
@@ -31,11 +29,11 @@ namespace LivreNoirLibrary.Windows.Controls.Bms.Elements
             }
         }
 
-        protected override void RenderChildren(IBitmap target, FloatBitmap buffer1, UnmanagedArray<float> buffer2)
+        protected override void RenderChildren(in RenderArgs args)
         {
             foreach (var child in Children.AsSpan())
             {
-                child.Render(target, buffer1, buffer2);
+                child.Render(args);
             }
         }
     }

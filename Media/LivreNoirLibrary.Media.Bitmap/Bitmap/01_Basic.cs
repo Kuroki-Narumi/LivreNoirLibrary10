@@ -17,6 +17,7 @@ namespace LivreNoirLibrary.Media
             public int Stride => bitmap.Width * bitmap.BytesPerPixel;
             public int ByteSize => bitmap.Height * bitmap.Stride;
             public Rectangle Rect => new(0, 0, bitmap.Width, bitmap.Height);
+            public DoubleRect DoubleRect => new(0, 0, bitmap.Width, bitmap.Height);
 
             public nint Offset(int x, int y) => bitmap.Pointer + (x + y * bitmap.Width) * bitmap.BytesPerPixel;
             public nint Offset(int y) => bitmap.Pointer + y * bitmap.Stride;
@@ -33,6 +34,7 @@ namespace LivreNoirLibrary.Media
                     return default;
                 }
                 AssertType(bitmap, false);
+
 
                 // Alphaの位置にビットシフト
                 var th = (transparentAlpha + 1u) << 24;
@@ -68,9 +70,9 @@ namespace LivreNoirLibrary.Media
                 }
             }
 
-            public Rectangle GetOpaqueRect(int margin = 0, float alpha = 0)
+            public Rectangle GetOpaqueRect(int margin = 0, float transparentAlpha = 0)
             {
-                if (!bitmap.IsValid || alpha is >= 1)
+                if (!bitmap.IsValid || transparentAlpha is >= 1)
                 {
                     return default;
                 }
@@ -84,20 +86,20 @@ namespace LivreNoirLibrary.Media
                     left = -1;
                     right = -1;
                     // 左端の検出
-                    var ptr = p;
-                    for (var x = 0; x < w; x++, ptr++)
+                    var ptr = p + 3;
+                    for (var x = 0; x < w; x++, ptr += 4)
                     {
-                        if (*ptr > alpha)
+                        if (*ptr > transparentAlpha)
                         {
                             left = right = x;
                             break;
                         }
                     }
                     // 右端の検出
-                    ptr = p + (w - 1);
-                    for (var x = w - 1; x > left; x--, ptr--)
+                    ptr = p + (w - 1) + 3;
+                    for (var x = w - 1; x > left; x--, ptr-=4)
                     {
-                        if (*ptr > alpha)
+                        if (*ptr > transparentAlpha)
                         {
                             right = x;
                             break;
@@ -123,31 +125,18 @@ namespace LivreNoirLibrary.Media
             var top = -1;
             var bottom = -1;
 
-            // 上端の検出
-            var ptr = pointer;
-            for (var y = 0; y < h; y++, ptr += stride)
+            for (var y = 0; y < h; y++, pointer += stride)
             {
-                if (check(ptr, out var currentLeft, out var currentRight))
+                if (check(pointer, out var currentLeft, out var currentRight))
                 {
                     // 左右端の更新
                     left = Math.Min(left, currentLeft);
                     right = Math.Max(right, currentRight);
-                    top = bottom = y;
-                    break;
-                }
-            }
-
-            // 下端の検出
-            ptr = pointer + stride * (h - 1);
-            for (var y = h - 1; y >= 0; y--, ptr -= stride)
-            {
-                if (check(ptr, out var currentLeft, out var currentRight))
-                {
-                    // 左右端の更新
-                    left = Math.Min(left, currentLeft);
-                    right = Math.Max(right, currentRight);
+                    if (top is -1)
+                    {
+                        top = y;
+                    }
                     bottom = y;
-                    break;
                 }
             }
 

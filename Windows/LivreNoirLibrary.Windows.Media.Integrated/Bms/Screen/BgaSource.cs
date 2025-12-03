@@ -1,29 +1,51 @@
 ﻿using LivreNoirLibrary.Collections;
-using LivreNoirLibrary.Debug;
 using LivreNoirLibrary.Media;
 using LivreNoirLibrary.Media.Bms;
+using LivreNoirLibrary.Numerics;
 using LivreNoirLibrary.ObjectModel;
 using LivreNoirLibrary.Windows.Media;
 using System;
+using System.Numerics;
+using System.Windows;
 
 namespace LivreNoirLibrary.Windows.Controls.Bms
 {
-    public class BgaParams : ObservableObjectBase
+    public class BgaSource : ObservableObjectBase
     {
-        public LnColor Background { get; set => SetValue(ref field, value); }
-        public LnColor Transparent { get; set => SetValue(ref field, value); }
+        public LnColor Background { get; set => SetValue(ref field, value); } = LnColor.FromRgb(0, 0, 0);
+        public LnColor Transparent { get; set => SetValue(ref field, value); } = LnColor.FromRgb(0, 0, 0);
 
-        public bool ShowBaseLayer { get; set => SetValue(ref field, value); } = true;
-        public bool ShowLayer1 { get; set => SetValue(ref field, value); } = true;
-        public bool ShowLayer2 { get; set => SetValue(ref field, value); } = true;
-        public bool ShowMissLayer { get; set => SetValue(ref field, value); } = true;
-        public bool HideOnMiss { get; set => SetValue(ref field, value); }
+        public BgaShowFlags ShowFlags
+        {
+            get;
+            set => SetValue(ref field, value, [nameof(ShowBaseLayer), nameof(ShowLayer1), nameof(ShowLayer2), nameof(ShowMissLayer), nameof(HideOnMiss)]);
+        } = BgaShowFlags.Default;
+
+        public bool ShowBaseLayer { get => GetShowFlag(BgaShowFlags.Base); set => SetShowFlag(BgaShowFlags.Base, value); }
+        public bool ShowLayer1 { get => GetShowFlag(BgaShowFlags.Layer1); set => SetShowFlag(BgaShowFlags.Layer1, value); }
+        public bool ShowLayer2 { get => GetShowFlag(BgaShowFlags.Layer2); set => SetShowFlag(BgaShowFlags.Layer2, value); }
+        public bool ShowMissLayer { get => GetShowFlag(BgaShowFlags.Miss); set => SetShowFlag(BgaShowFlags.Miss, value); }
+        public bool HideOnMiss { get => GetShowFlag(BgaShowFlags.HideOnMiss); set => SetShowFlag(BgaShowFlags.HideOnMiss, value); }
+
         public double MissLayerDisplayTime { get; set => SetValue(ref field, value); } = 0.5;
 
         private readonly LayerState _base = new(Channel.Bga_Base);
         private readonly LayerState _layer1 = new(Channel.Bga_Layer1);
         private readonly LayerState _layer2 = new(Channel.Bga_Layer2);
         private readonly LayerState _poor = new(Channel.Bga_Poor);
+
+        private bool GetShowFlag(BgaShowFlags flag) => (ShowFlags & flag) is not 0;
+        private void SetShowFlag(BgaShowFlags flags, bool value)
+        {
+            if (value)
+            {
+                ShowFlags |= flags;
+            }
+            else
+            {
+                ShowFlags &= ~flags;
+            }
+        }
 
         public void Setup()
         {
@@ -54,13 +76,13 @@ namespace LivreNoirLibrary.Windows.Controls.Bms
             }
         }
 
-        public void Render(IBitmap target, FloatBitmap buffer1, UnmanagedArray<float> buffer2)
+        public void Render(in RenderArgs args)
         {
-            target.Fill(Background);
-            _base.Render(target, buffer1, buffer2);
-            _layer1.Render(target, buffer1, buffer2);
-            _layer2.Render(target, buffer1, buffer2);
-            _poor.Render(target, buffer1, buffer2);
+            args.RenderTarget.Fill(args.Rect.Round(), Background);
+            _base.Render(args);
+            _layer1.Render(args);
+            _layer2.Render(args);
+            _poor.Render(args);
         }
 
         private class LayerState(Channel channel)
@@ -69,7 +91,7 @@ namespace LivreNoirLibrary.Windows.Controls.Bms
             public bool IsVisible { get; set; }
 
             private readonly UIntBitmap _bitmap = new(0, 0);
-            private System.Numerics.Vector<float> _colorCorrection = default;
+            private FloatColor _colorCorrection = default;
 
             public bool CheckPoorState(bool show, TimingList timings, in UpdateArgs args, double currentTime, double duration, LnColor transparent)
             {
@@ -107,11 +129,11 @@ namespace LivreNoirLibrary.Windows.Controls.Bms
                 IsVisible = true;
                 if (timings.TryGetColorCorrection(Channel, currentTime, out var vector))
                 {
-                    _colorCorrection = vector;
+                    _colorCorrection = (FloatColor)vector;
                 }
                 else
                 {
-                    _colorCorrection = System.Numerics.Vector<float>.One;
+                    _colorCorrection = FloatColor.White;
                 }
                 var width = source.Width;
                 var height = source.Height;
@@ -120,30 +142,29 @@ namespace LivreNoirLibrary.Windows.Controls.Bms
                 _bitmap.SetTransparent(transparent);
             }
 
-            public void Render(IBitmap target, FloatBitmap buffer1, UnmanagedArray<float> buffer2)
+            public void Render(in RenderArgs args)
             {
                 if (IsVisible)
                 {
+                    var (target, buffer, parentRect, colorCorrection) = args;
                     var source = _bitmap;
                     var originalWidth = source.Width;
                     var originalHeight = source.Height;
                     // ソースサイズが256ピクセル未満の場合は、256ピクセルとみなす
                     var sourceWidth = Math.Max(originalWidth, 256);
                     var sourceHeight = Math.Max(originalHeight, 256);
-                    var destWidth = target.Width;
-                    var destHeight = target.Height;
+                    var destWidth = parentRect.Width.RoundToInt();
+                    var destHeight = parentRect.Height.RoundToInt();
                     // 拡大率
-                    var scale = Math.Min((double)destWidth / sourceWidth, destHeight / sourceHeight);
+                    var scale = Math.Min((double)destWidth / sourceWidth, (double)destHeight / sourceHeight);
                     // コピー先の座標(中央揃え)
-                    var destX = (int)((destWidth - sourceWidth * scale) / 2);
-                    var destY = (int)((destHeight - sourceHeight * scale) / 2);
+                    var destX = parentRect.X + (int)((destWidth - sourceWidth * scale) / 2);
+                    var destY = parentRect.Y + (int)((destHeight - sourceHeight * scale) / 2);
                     // 実際のコピー先サイズ
-                    destWidth = (int)(originalWidth * scale);
-                    destHeight = (int)(originalHeight * scale);
+                    destWidth = (originalWidth * scale).RoundToInt();
+                    destHeight = (originalHeight * scale).RoundToInt();
 
-                    buffer1.Resize(destWidth, destHeight, false);
-                    _bitmap.StretchCopy(buffer1, buffer2);
-                    target.Blend(buffer1, new System.Drawing.Point(destX, destY), BlendMode.Alpha, _colorCorrection);
+                    _bitmap.CopyTo(_bitmap.Rect, target, parentRect, new(destX, destY, destWidth, destHeight), BlendMode.Alpha, _colorCorrection * colorCorrection, buffer);
                 }
             }
         }

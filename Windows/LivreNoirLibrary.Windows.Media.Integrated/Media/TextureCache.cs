@@ -93,7 +93,7 @@ namespace LivreNoirLibrary.Windows.Media
                     sy += sh * (divIndex / divX);
                 }
                 // 切り抜き範囲が有効な場合
-                if (sx < pw && sw is > 0 && sw <= pw && sy < ph && sh is > 0 && sh <= ph)
+                if (sx < pw && sw is > 0 && sy < ph && sh is > 0)
                 {
                     source = bitmap;
                     sourceRect = new(sx, sy, sw, sh);

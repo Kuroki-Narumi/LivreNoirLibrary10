@@ -7,7 +7,7 @@ using DrRect = System.Drawing.Rectangle;
 
 namespace LivreNoirLibrary.Windows.Controls.Bms.Elements
 {
-    public sealed class ImageElement(Image source) : ScreenElement(source)
+    public sealed class ImageElement(Image source) : SingleElement(source)
     {
         private readonly Image _source = source;
         private TextureData _textureData;
@@ -26,11 +26,11 @@ namespace LivreNoirLibrary.Windows.Controls.Bms.Elements
             if (IsValid)
             {
                 var index = args.Timer.GetFrameIndex(_source.SourceTimer, args.AbsoluteTime, _textureData);
-                IsVisible = args.Textures.TryGetTexture(_textureData, index, out _bitmap, out _sourceRect);
+                IsVisible &= args.Textures.TryGetTexture(_textureData, index, out _bitmap, out _sourceRect);
             }
         }
 
-        protected override bool TryGetBitmap([MaybeNullWhen(false)] out IBitmap bitmap, out DrRect rect, FloatBitmap buffer1, UnmanagedArray<float> buffer2)
+        protected override bool TryGetBitmap([MaybeNullWhen(false)] out IBitmap bitmap, out DrRect rect, FloatBitmap buffer)
         {
             bitmap = _bitmap;
             rect = _sourceRect;

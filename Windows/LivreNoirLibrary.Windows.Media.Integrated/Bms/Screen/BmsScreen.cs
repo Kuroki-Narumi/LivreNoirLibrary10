@@ -10,12 +10,11 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
+using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
-using static System.Windows.Forms.VisualStyles.VisualStyleElement;
 
 namespace LivreNoirLibrary.Windows.Controls.Bms
 {
@@ -31,11 +30,13 @@ namespace LivreNoirLibrary.Windows.Controls.Bms
         [DependencyProperty(SetterScope = Scope.Private)]
         private bool _isBmsReady;
         [DependencyProperty]
-        private double _highSpeed = 2.5;
+        private double _highSpeed = 1;
         [DependencyProperty]
         private FixedHighSpeedMode _fixedHighSpeedMode = FixedHighSpeedMode.MainTimeBpm;
         [DependencyProperty(SetterScope = Scope.Private)]
         private double _fixedHighSpeed = 1.0;
+        [DependencyProperty(SetterScope = Scope.Private)]
+        private string? _debugText;
 
         public string? Directory => Path.GetDirectoryName(_bmsPath);
         public SimpleBmsViewModel ViewModel { get; } = new();
@@ -46,8 +47,7 @@ namespace LivreNoirLibrary.Windows.Controls.Bms
         private Rect _bitmapRect;
         private bool _needEnsureBitmap;
         private bool _needRender;
-        private readonly FloatBitmap _buffer1 = new(0, 0);
-        private readonly UnmanagedArray<float> _buffer2 = new();
+        private readonly FloatBitmap _buffer = new(0, 0);
 
         private readonly List<ScreenElement> _children = [];
         private readonly BmsTimer _timer = new();
@@ -55,7 +55,9 @@ namespace LivreNoirLibrary.Windows.Controls.Bms
         private readonly TextureCache _textureCache = new();
         private readonly MediaCache _mediaCache = new();
         private readonly NoteElementCollection _notes = new();
-        private readonly BgaParams _bga = new();
+        private readonly BgaSource _bga = new();
+        private DebugItem _debugRoot;
+        private readonly Dictionary<object, DebugItem> _debugDic = [];
 
         public BmsScreen()
         {
@@ -69,6 +71,8 @@ namespace LivreNoirLibrary.Windows.Controls.Bms
 
         private void OnSkinChanged(Skin? value)
         {
+            DebugText = null;
+            _debugDic.Clear();
             _textureCache.Clear();
             var children = _children;
             children.Clear();
@@ -85,39 +89,39 @@ namespace LivreNoirLibrary.Windows.Controls.Bms
                         AppendChild(children, element);
                     }
                 }
+                _debugRoot = new(value.Name ?? value.GetType().Name, 0, 0);
+            }
+            else
+            {
+                _debugRoot = default;
             }
             InvalidateVisual();
         }
 
-        static void AppendChild(List<ScreenElement> children, SkinElement element)
+        void AppendChild(List<ScreenElement> children, SkinElement element, int indent = 1)
         {
-            ScreenElement? e = null;
-            switch (element)
+            ScreenElement? e = element switch
             {
-                case Group g:
-                    GroupElement group = new(g);
-                    e = group;
-                    foreach (var gchild in g.Children.AsSpan())
+                Group g => new GroupElement(g),
+                Image i => new ImageElement(i),
+                Bga b => new BgaElement(b),
+                NoteArea n => new NoteAreaElement(n),
+                _ => null,
+            };
+            if (e is not null)
+            {
+                _debugDic[e] = new(element.Name ?? element.GetType().Name, indent, 0);
+                children.Add(e);
+                if (e is GroupElement g)
+                {
+                    foreach (var gchild in g._source.Children.AsSpan())
                     {
                         if (gchild is SkinElement gelement)
                         {
-                            AppendChild(group.Children, gelement);
+                            AppendChild(g.Children, gelement, indent + 1);
                         }
                     }
-                    break;
-                case Image i:
-                    e = new ImageElement(i);
-                    break;
-                case Bga b:
-                    e = new BgaElement(b);
-                    break;
-                case NoteArea n:
-                    e = new NoteAreaElement(n);
-                    break;
-            }
-            if (e is not null)
-            {
-                children.Add(e);
+                }
             }
         }
 
@@ -174,15 +178,24 @@ namespace LivreNoirLibrary.Windows.Controls.Bms
                 var timing = _timingList;
                 timing.Load(ViewModel, Directory!, autoPlay);
                 _notes.Setup(timing);
-                FixedHighSpeed = _fixedHighSpeedMode switch
+                FixedHighSpeed = 240d / _fixedHighSpeedMode switch
                 {
-                    FixedHighSpeedMode.MinBpm => 60 / timing.MinTempo,
-                    FixedHighSpeedMode.MaxBpm => 60 / timing.MaxTempo,
-                    FixedHighSpeedMode.MainBpm => 60 / timing.MainTempo,
-                    FixedHighSpeedMode.MainTimeBpm => 60 / timing.MainTimeTempo,
-                    _ => 1,
+                    FixedHighSpeedMode.MinBpm => timing.MinTempo,
+                    FixedHighSpeedMode.MaxBpm => timing.MaxTempo,
+                    FixedHighSpeedMode.MainBpm => timing.MainTempo,
+                    FixedHighSpeedMode.MainTimeBpm => timing.MainTimeTempo,
+                    _ => 60,
                 };
             }
+
+            _debugRoot = _debugRoot.Reset();
+            var debug = _debugDic;
+            var keys = debug.Keys.ToArray();
+            foreach (var key in keys)
+            {
+                debug[key] = debug[key].Reset();
+            }
+            DebugText = null;
         }
 
         public void StartLoading(double time) => _timer.Set(TimerId.Play_LoadingStart, time);
@@ -237,16 +250,19 @@ namespace LivreNoirLibrary.Windows.Controls.Bms
             // 描画
             if (_needRender)
             {
+                var t0 = System.Diagnostics.Stopwatch.GetTimestamp();
                 using (var p = _bitmap.BeginWrite())
                 {
                     p.Fill(_skin!.Background);
-                    var buffer1 = _buffer1;
-                    var buffer2 = _buffer2;
+                    RenderArgs args = new(p, _buffer, _debugDic);
                     foreach (var child in _children.AsSpan())
                     {
-                        child.Render(p, buffer1, buffer2);
+                        child.Render(args);
                     }
                 }
+                var time = TimeUtils.Ticks2Milliseconds(System.Diagnostics.Stopwatch.GetTimestamp() - t0);
+                _debugRoot += time;
+                ConstructDebugText();
                 _needRender = false;
             }
         }
@@ -259,6 +275,31 @@ namespace LivreNoirLibrary.Windows.Controls.Bms
             {
                 _bitmap.CopyPixels(new(0, 0, w, h), (nint)buffer, destination.Length, destWidth * 4);
             }
+        }
+
+        readonly StringBuilder _debugBuilder = new();
+
+        void ConstructDebugText()
+        {
+            var total = _debugRoot.Time;
+            _debugBuilder.Clear();
+            AppendLine(_debugRoot, total);
+            foreach (var (_, item) in _debugDic)
+            {
+                if (item.Time is not 0)
+                {
+                    _debugBuilder.AppendLine();
+                    AppendLine(item, total);
+                }
+            }
+            DebugText = _debugBuilder.ToString();
+        }
+
+        void AppendLine(in DebugItem item, double total)
+        {
+            _debugBuilder.Append(' ', item.Indent * 2);
+            _debugBuilder.Append(item.Name);
+            _debugBuilder.Append($" - {item.Time / total:P2}({item.Time:F3}ms)");
         }
     }
 }

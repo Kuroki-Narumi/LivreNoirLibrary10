@@ -37,7 +37,7 @@ namespace LivreNoirLibrary.Windows.Media.Bms.SkinInfo
 
         public override string ToString() => Type is 0 ? $"{Value}" : $"${Type}.{Key}";
 
-        [GeneratedRegex(@"^\$([^.\s]+)[.\s](.+)")]
+        [GeneratedRegex(@"^\$([^.\s]+)[$.\s](.+)")]
         private static partial Regex GR_Parser { get; }
     }
 }

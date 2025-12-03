@@ -50,6 +50,9 @@
                             <VisualBrush Visual="{Binding Screen}" Stretch="Uniform"/>
                         </Rectangle.Fill>
                     </Rectangle>
+                    <Border Grid.Row="1" Background="{ct:BrushProvider 8000}" HorizontalAlignment="Left" VerticalAlignment="Top" Padding="2">
+                        <TextBlock Text="{Binding Screen.DebugText}" Foreground="White"/>
+                    </Border>
                 </Grid>
                 <ct:TaskProgressBar x:Name="TaskProgressBar"/>
             </Grid>
@@ -85,7 +88,7 @@
                     <TextBlock Text="Source"/>
                     <Grid Style="{StaticResource MainGrid}">
                         <Rectangle Width="{Binding ActualWidth, ElementName=Image_Source}" Height="{Binding ActualHeight, ElementName=Image_Source}"/>
-                        <Image x:Name="Image_Source"/>
+                        <ct:ImageRectSelectorView x:Name="Image_Source"/>
                     </Grid>
                 </Grid>
                 <Grid Grid.Column="2">
@@ -96,7 +99,7 @@
                     <TextBlock Text="Target" />
                     <Grid Style="{StaticResource MainGrid}">
                         <Rectangle Width="{Binding ActualWidth, ElementName=Image_Target}" Height="{Binding ActualHeight, ElementName=Image_Target}"/>
-                        <Image x:Name="Image_Target"/>
+                        <ct:ImageRectSelectorView x:Name="Image_Target"/>
                     </Grid>
                 </Grid>
                 <Grid Grid.Column="4">

@@ -5,13 +5,11 @@ using System.Numerics;
 
 namespace LivreNoirLibrary.Media
 {
-    public delegate Vector<float> BlendFunc(Vector<float> back, Vector<float> front);
-
     public static partial class ColorBlend
     {
         static readonly Vector<float> Half = Vector.Create(0.5f);
 
-        private static readonly Dictionary<BlendMode, BlendFunc> _funcs = new()
+        private static readonly Dictionary<BlendMode, BlendCoreFunc> _funcs = new()
         {
             [BlendMode.Alpha] = Alpha,
             [BlendMode.Add] = Add,
@@ -29,7 +27,7 @@ namespace LivreNoirLibrary.Media
             [BlendMode.Exclusion] = Exclusion,
         };
 
-        public static bool TryGetBlendFunc(BlendMode mode, [MaybeNullWhen(false)] out BlendFunc blendFunc) => _funcs.TryGetValue(mode, out blendFunc);
+        public static bool TryGetBlendFunc(BlendMode mode, [MaybeNullWhen(false)] out BlendCoreFunc blendFunc) => _funcs.TryGetValue(mode, out blendFunc);
 
         public static Vector<float> Alpha(Vector<float> back, Vector<float> front) => front;
 

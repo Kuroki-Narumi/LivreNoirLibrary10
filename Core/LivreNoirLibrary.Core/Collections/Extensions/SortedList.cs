@@ -297,10 +297,10 @@ namespace LivreNoirLibrary.Collections
 
         public static Enumerator<TKey, TValue> GetEnumerator<TKey, TValue>(List<TKey> keys, List<TValue> values) => new(keys, values);
 
-        public struct Enumerator<TKey, TValue>(List<TKey> keys, List<TValue> values) : IEnumerator<(TKey, TValue)>, IEnumerable<(TKey, TValue)>
+        public ref struct Enumerator<TKey, TValue>(List<TKey> keys, List<TValue> values)
         {
-            private readonly List<TKey> _keys = keys;
-            private readonly List<TValue> _values = values;
+            private readonly ReadOnlySpan<TKey> _keys = keys.AsSpan();
+            private readonly ReadOnlySpan<TValue> _values = values.AsSpan();
             private readonly int _count = keys.Count;
             private int _index = 0;
             private (TKey, TValue) _current;
@@ -319,13 +319,39 @@ namespace LivreNoirLibrary.Collections
             }
 
             public readonly Enumerator<TKey, TValue> GetEnumerator() => this;
+        }
 
-            readonly object IEtor.Current => _current;
+        public static SafeEnumerator<TKey, TValue> GetSafeEnumerator<TKey, TValue>(List<TKey> keys, List<TValue> values) => new(keys, values);
+
+        public class SafeEnumerator<TKey, TValue>(List<TKey> keys, List<TValue> values) : IEnumerator<(TKey, TValue)>, IEnumerable<(TKey, TValue)>
+        {
+            private readonly List<TKey> _keys = keys;
+            private readonly List<TValue> _values = values;
+            private readonly int _count = keys.Count;
+            private int _index = 0;
+            private (TKey, TValue) _current;
+
+            public (TKey, TValue) Current => _current;
+
+            public bool MoveNext()
+            {
+                if (_index < _count)
+                {
+                    _current = new(_keys[_index], _values[_index]);
+                    _index++;
+                    return true;
+                }
+                return false;
+            }
+
+            public SafeEnumerator<TKey, TValue> GetEnumerator() => this;
+
+            object IEtor.Current => _current;
             void IEtor.Reset() => _index = 0;
-            readonly void IDisposable.Dispose() { }
+            void IDisposable.Dispose() { }
 
-            readonly IEnumerator<(TKey, TValue)> IEnumerable<(TKey, TValue)>.GetEnumerator() => this;
-            readonly IEtor IEble.GetEnumerator() => this;
+            IEnumerator<(TKey, TValue)> IEnumerable<(TKey, TValue)>.GetEnumerator() => this;
+            IEtor IEble.GetEnumerator() => this;
         }
 
         public static MergedEnumerator<TKey, TValue> GetMergedEnumerator<TKey, TValue>(List<TKey> keys1, List<TValue> values1, List<TKey> keys2, List<TValue> values2, IComparer<TKey>? comparer = null)

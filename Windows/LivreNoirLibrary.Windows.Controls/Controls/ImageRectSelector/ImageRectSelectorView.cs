@@ -452,11 +452,11 @@ namespace LivreNoirLibrary.Windows.Controls
             }
         }
 
-        public void SetOpaqueRect(int margin = 0, byte threshold = 1)
+        public void SetOpaqueRect(int margin = 0, byte transparentAlpha = 0)
         {
             if (_source is BitmapSource source)
             {
-                SetRect(source.GetOpaqueRect(margin, threshold));
+                SetRect(source.GetOpaqueRect(margin, transparentAlpha));
             }
         }
         public void SetOriginalRect() => SetRect(0, 0, _originalWidth, _originalHeight);

@@ -65,8 +65,8 @@ namespace LivreNoirLibrary.Media.Bms
             _values.RemoveAt(index);
         }
 
-        public SortedList.Enumerator<int, double> GetEnumerator() => new(_numbers, _values);
-        IEnumerator<(int, double)> IEnumerable<(int, double)>.GetEnumerator() => GetEnumerator();
+        public SortedList.Enumerator<int, double> GetEnumerator() => SortedList.GetEnumerator(_numbers, _values);
+        IEnumerator<(int, double)> IEnumerable<(int, double)>.GetEnumerator() => SortedList.GetSafeEnumerator(_numbers, _values);
 
         public void Merge(IBarLengthCollection source)
         {

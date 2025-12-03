@@ -3,6 +3,7 @@ using LivreNoirLibrary.Debug;
 using LivreNoirLibrary.IO;
 using LivreNoirLibrary.Media;
 using LivreNoirLibrary.Windows;
+using LivreNoirLibrary.Windows.Controls;
 using LivreNoirLibrary.Windows.Media;
 using System;
 using System.IO;
@@ -33,10 +34,18 @@ namespace LivreNoirLibrary.SandBox
 
         private void OnDrop_Image(object sender, DragEventArgs e)
         {
-            if (e.TryGetAvailable(ExtRegs.Image, out var path) && sender is FrameworkElement f && f.TryGetFirstDescendant<Image>(out var image))
+            if (e.TryGetAvailable(ExtRegs.Image, out var path) && sender is FrameworkElement f)
             {
-                WriteableBitmap bitmap = Bitmap.FromFile(path);
-                image.Source = bitmap;
+                WriteableBitmap bitmap = Bitmap.FromFile(path); 
+                if (f.TryGetFirstDescendant<ImageRectSelectorView>(out var selector))
+                {
+                    selector.Source = bitmap;
+                    selector.SetRect(bitmap.Rect);
+                }
+                else if (f.TryGetFirstDescendant<Image>(out var image))
+                {
+                    image.Source = bitmap;
+                }
                 _result = null;
             }
         }
@@ -52,10 +61,15 @@ namespace LivreNoirLibrary.SandBox
                 using (var targetBitmap = result.BeginWrite())
                 using (var sourceBitmap = source.BeginRead())
                 {
+                    /*
                     _buffer1.Resize(destW, destH);
                     sourceBitmap.StretchCopy(_buffer1, _buffer2, tweet: true);
-                    destination.CopyPixels(targetBitmap);
                     targetBitmap.Blend(_buffer1, (BlendMode)ComboBox_BlendMode.SelectedItem, new FloatColor((float)Slider_Opacity.Value * 0.01f, 1, 1, 1), tweet: true);
+                    */
+                    destination.CopyPixels(targetBitmap);
+                    sourceBitmap.CopyTo(Image_Source.GetRect().ToDoubleRect(),
+                        targetBitmap, targetBitmap.DoubleRect, Image_Target.GetRect().ToDoubleRect(),
+                        (BlendMode)ComboBox_BlendMode.SelectedItem, new FloatColor((float)Slider_Opacity.Value * 0.01f, 1, 1, 1), _buffer1, true);
                 }
                 Image_Result.Source = result;
             }
@@ -68,13 +82,6 @@ namespace LivreNoirLibrary.SandBox
             if (Image_Result.Source is BitmapSource bitmap && this.SaveFileDialog(filters: Filters.Image_Save) is { } path)
             {
                 bitmap.SaveImage(path, BitmapEncodeType.Auto);
-                //return;
-                _test ??= Bitmap.Create(bitmap.PixelWidth, (Image_Source.Source as BitmapSource)!.PixelHeight);
-                using (var p = _test.BeginWrite())
-                {
-                    new FloatBitmap(_buffer2, p.Width, p.Height).CopyTo(p);
-                }
-                _test.SaveImage(path + ".mid.png");
             }
         }
     }

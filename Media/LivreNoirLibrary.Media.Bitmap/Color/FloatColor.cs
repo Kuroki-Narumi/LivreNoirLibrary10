@@ -16,6 +16,9 @@ namespace LivreNoirLibrary.Media
     [TypeConverter(typeof(FloatColorTypeConverter))]
     public readonly unsafe struct FloatColor : IEquatable<FloatColor>, IEqualityOperators<FloatColor, FloatColor, bool>, ISpanParsable<FloatColor>
     {
+        public static FloatColor White { get; } = new(1, 1, 1, 1);
+        public static FloatColor Black { get; } = new(1, 0, 0, 0);
+
         private readonly Vector<float> _vector;
         public float B => _vector[0];
         public float G => _vector[1];
@@ -57,6 +60,11 @@ namespace LivreNoirLibrary.Media
             g = G;
             b = B;
         }
+
+        public static FloatColor operator +(FloatColor left, FloatColor right) => new(left._vector + right._vector);
+        public static FloatColor operator -(FloatColor left, FloatColor right) => new(left._vector - right._vector);
+        public static FloatColor operator *(FloatColor left, FloatColor right) => new(left._vector * right._vector);
+        public static FloatColor operator /(FloatColor left, FloatColor right) => new(left._vector / right._vector);
 
         public static bool TryParse([NotNullWhen(true)] string? s, [MaybeNullWhen(false)] out FloatColor result) => TryParse(s.AsSpan(), null, out result);
         public static bool TryParse([NotNullWhen(true)] string? s, IFormatProvider? provider, [MaybeNullWhen(false)] out FloatColor result) => TryParse(s.AsSpan(), provider, out result);

@@ -270,8 +270,8 @@ namespace LivreNoirLibrary.Media
 
         public static float RgbToScRgb(byte value) => _scRgbTable[value];
 
-        const int RgbTableSize = 65536;
-        const float RgbScale = 65535;
+        const int RgbTableSize = 4096;
+        const float RgbScale = 4095;
         private static readonly byte[] _rgbTable = CreateRgbTable();
 
         static byte[] CreateRgbTable()
@@ -284,22 +284,21 @@ namespace LivreNoirLibrary.Media
             return table;
         }
 
-        public static byte ScRgbToRgbImpl(float value)
+        public static byte ScRgbToRgbImpl(float value) => value switch
         {
-            return value > 0.0
-                ? (byte)(value switch
-                {
-                    <= 0.0031308f => (byte)((value * 12.92f * 255.0f) + 0.5f),
-                    < 1 => (byte)(((MathF.Pow(value, 1.0f / 2.4f) * 1.055f - 0.055f) * 255.0f) + 0.5f),
-                    _ => 255,
-                })
-                : (byte)0;
-        }
+            not > 0 => 0,
+            <= 0.0031308f => (byte)((value * 12.92f * 255.0f) + 0.5f),
+            < 1 => (byte)(((MathF.Pow(value, 1.0f / 2.4f) * 1.055f - 0.055f) * 255.0f) + 0.5f),
+            _ => 255,
+        };
 
         public static byte ScRgbToRgb(float value)
         {
             var index = Math.Clamp((int)(value * RgbScale), 0, RgbTableSize - 1);
             return _rgbTable[index];
         }
+
+        public static float GetFloatAuto(byte value, int index) => (index & ColorIndex_A) is ColorIndex_A ? GetFloat(value) : RgbToScRgb(value);
+        public static byte GetByteAuto(float value, int index) => (index & ColorIndex_A) is ColorIndex_A ? GetByte(value) : ScRgbToRgb(value);
     }
 }

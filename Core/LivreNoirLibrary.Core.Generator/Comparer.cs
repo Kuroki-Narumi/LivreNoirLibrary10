@@ -13,7 +13,7 @@ internal class Comparer : IIncrementalGenerator
         context.RegisterPostInitializationOutput(Generate);
     }
 
-    private string GetCastTarget(string type2, string fallback)
+    private static string GetCastTarget(string type2, string fallback)
     {
         return type2 switch
         {
@@ -24,7 +24,7 @@ internal class Comparer : IIncrementalGenerator
         };
     }
 
-    private bool NeedsToCast(string type1, string type2, out string type)
+    private static bool NeedsToCast(string type1, string type2, out string type)
     {
         type = type1;
         switch (type1)
@@ -54,7 +54,7 @@ internal class Comparer : IIncrementalGenerator
         return type1 != type || type2 != type;
     }
 
-    private void Generate(IncrementalGeneratorPostInitializationContext context)
+    private static void Generate(IncrementalGeneratorPostInitializationContext context)
     {
         StringBuilder sb = new();
         sb.AppendLine("""

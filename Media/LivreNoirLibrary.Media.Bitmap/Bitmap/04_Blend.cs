@@ -1,4 +1,5 @@
-﻿using System;
+﻿using LivreNoirLibrary.Collections;
+using System;
 using System.Drawing;
 using System.Numerics;
 
@@ -6,6 +7,19 @@ namespace LivreNoirLibrary.Media
 {
     public static unsafe partial class BitmapOperation
     {
+        public static bool Adjust<T1, T2>(
+            T1 source, in DoubleRect sourceRect,
+            T2 destination, in DoubleRect destValidRect, in DoubleRect destRect, 
+            out Rectangle actualSourceRect, out Rectangle actualDestRect)
+            where T1 : IBitmap
+            where T2 : IBitmap
+        {
+            actualSourceRect = default;
+            actualDestRect = default;
+            return source.Pointer is not 0 && destination.Pointer is not 0 &&
+                Structs.Adjust(source.DoubleRect, sourceRect, destValidRect, destRect, out actualSourceRect, out actualDestRect);
+        }
+
         public static bool Adjust<T1, T2>(T1 source, T2 destination, ref Rectangle sourceRect, ref Point destLocation)
             where T1 : IBitmap
             where T2 : IBitmap
@@ -48,7 +62,7 @@ namespace LivreNoirLibrary.Media
             }
 
             public void Blend(BlendMode mode, FloatColor color) => bitmap.Blend(bitmap.Rect, mode, color);
-  
+
             public void Blend<TSource>(TSource source, Rectangle sourceRect, Point destLocation, BlendMode mode, Vector<float> colorCorrection, bool tweet = false)
                 where TSource : IBitmap
             {
@@ -70,25 +84,25 @@ namespace LivreNoirLibrary.Media
                     {
                         if (source.IsFloat)
                         {
-                            ColorBlend.BlendFloatFloat((float*)back, backW, (float*)front, frontW, width, height, func, colorCorrection);
+                            ColorBlend.BlendFloatToFloat((float*)front, frontW, (float*)back, backW, width, height, func, colorCorrection);
                         }
                         else
                         {
-                            ColorBlend.BlendFloatUInt((float*)back, backW, (uint*)front, frontW, width, height, func, colorCorrection);
+                            ColorBlend.BlendUIntToFloat((uint*)front, frontW, (float*)back, backW, width, height, func, colorCorrection);
                         }
                     }
                     else if (source.IsFloat)
                     {
-                        ColorBlend.BlendUIntFloat((uint*)back, backW, (float*)front, frontW, width, height, func, colorCorrection);
+                        ColorBlend.BlendFloatToUInt((float*)front, frontW, (uint*)back, backW, width, height, func, colorCorrection);
                     }
                     else
                     {
-                        ColorBlend.BlendUIntUInt((uint*)back, backW, (uint*)front, frontW, width, height, func, colorCorrection);
+                        ColorBlend.BlendUIntToUInt((uint*)front, frontW, (uint*)back, backW, width, height, func, colorCorrection);
                     }
 
                     if (tweet)
                     {
-                        Console.WriteLine($"  processed in {(double)(System.Diagnostics.Stopwatch.GetTimestamp() - t0) / TimeSpan.TicksPerMillisecond:F3}ms");
+                        Console.WriteLine($"  processed in {TimeUtils.Ticks2MsText(System.Diagnostics.Stopwatch.GetTimestamp() - t0)}");
                     }
                 }
             }

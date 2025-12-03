@@ -10,6 +10,10 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Include="..\..\Media\LivreNoirLibrary.Media.Bitmap\Structs\DoubleRect.cs" Link="src\DoubleRect.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="BenchmarkDotNet" Version="0.15.4" />
   </ItemGroup>
 

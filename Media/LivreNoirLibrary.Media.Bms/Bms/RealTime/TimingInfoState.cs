@@ -10,7 +10,8 @@ namespace LivreNoirLibrary.Media.Bms
         public double Speed { get; set; }
 
         private double _tempo = initialTempo;
-        private double _timePerBeat = 240 / initialTempo;
+        private int _tempoSign = 1;
+        private double _secondsPerBeat = 240 / initialTempo;
         private double _scroll = 1;
         private double _speed = 1;
 
@@ -31,8 +32,8 @@ namespace LivreNoirLibrary.Media.Bms
         public double Setup(double beat)
         {
             _beat = beat;
-            _time = _previousTime + (beat - _previousBeat) * _timePerBeat;
-            _position = _previousPosition + (beat - _previousBeat) * _scroll;
+            _time = _previousTime + (beat - _previousBeat) * _secondsPerBeat;
+            _position = _previousPosition + (beat - _previousBeat) * _scroll * _tempoSign;
             Tempo = double.NaN;
             Stop = 0;
             Scroll = double.NaN;
@@ -63,18 +64,27 @@ namespace LivreNoirLibrary.Media.Bms
         public bool Finalize(out TimingInfo info, out bool speedChanged, out double speed)
         {
             var tempo = Tempo;
-            var tempoChanged = double.IsFinite(tempo) && tempo != _tempo;
+            var tempoChanged = double.IsFinite(tempo) && tempo != (_tempo * _tempoSign);
             if (tempoChanged)
             {
+                if (tempo is >= 0)
+                {
+                    _tempoSign = 1;
+                }
+                else
+                {
+                    tempo = -tempo;
+                    _tempoSign = -1;
+                }
                 _tempo = tempo;
-                _timePerBeat = 240 / tempo;
+                _secondsPerBeat = 240 / tempo;
             }
             else
             {
                 tempo = _tempo;
             }
 
-            var stopTime = Stop * BmsConstants.StopUnit * _timePerBeat;
+            var stopTime = Stop * BmsConstants.StopUnit * _secondsPerBeat;
 
             var scroll = Scroll;
             var scrollChanged = double.IsFinite(scroll) && scroll != _scroll;
@@ -100,7 +110,7 @@ namespace LivreNoirLibrary.Media.Bms
 
             if (tempoChanged || stopTime is not 0 || scrollChanged || speedChanged)
             {
-                info = new(_beat, _position, _time, tempo, stopTime, scroll);
+                info = new(_beat, _time, _position, tempo, stopTime, scroll * _tempoSign);
                 _previousBeat = _beat;
                 _previousTime = _time + stopTime;
                 _previousPosition = _position;

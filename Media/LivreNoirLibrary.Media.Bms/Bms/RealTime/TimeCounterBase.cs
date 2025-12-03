@@ -1,8 +1,10 @@
 ﻿using LivreNoirLibrary.Collections;
 using LivreNoirLibrary.Debug;
+using LivreNoirLibrary.Numerics;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 
 namespace LivreNoirLibrary.Media.Bms
 {
@@ -14,6 +16,8 @@ namespace LivreNoirLibrary.Media.Bms
         private readonly List<TimingInfo> _timeItemList = [];
         private readonly List<double> _speedTimeList = [];
         private readonly List<double> _speedValueList = [];
+        private readonly List<double> _positionList = [];
+        private readonly List<List<TimingInfo>> _positionItemList = [];
 
         private TempoInfo? _lastTempoInfo;
         private readonly List<int> _tempoList = [];
@@ -21,6 +25,7 @@ namespace LivreNoirLibrary.Media.Bms
 
         public double MinTempo => _tempoList.Count is 0 ? -1 : _tempoList[0];
         public double MaxTempo => _tempoList.Count is 0 ? -1 : _tempoList[^1];
+        public double AverageTempo { get; private set; }
         public double MainTempo => _tempoList.Count is 0 ? -1 : SortedList.MaxKeyBy(_tempoList, _tempoInfoList, value => value.BeatLength);
         public double MainTimeTempo => _tempoList.Count is 0 ? -1 : SortedList.MaxKeyBy(_tempoList, _tempoInfoList, value => value.TimeLength);
 
@@ -34,13 +39,15 @@ namespace LivreNoirLibrary.Media.Bms
             _speedValueList.Clear();
             _tempoList.Clear();
             _tempoInfoList.Clear();
+            _positionList.Clear();
+            _positionItemList.Clear();
         }
 
         public void BeginInit(double initialTempo)
         {
             Clear();
 
-            TimingInfo timingInfo = new(0, 0, 0, initialTempo, 0, 1);
+            var timingInfo = TimingInfo.Create(initialTempo);
             _beatList.Add(0);
             _beatItemList.Add(timingInfo);
             _timeList.Add(0);
@@ -52,6 +59,9 @@ namespace LivreNoirLibrary.Media.Bms
             _lastTempoInfo = new();
             _tempoList.Add((int)initialTempo);
             _tempoInfoList.Add(_lastTempoInfo);
+
+            _positionList.Add(0);
+            _positionItemList.Add([timingInfo]);
         }
 
         public void ApplyTimeInfo(ref TimingInfoState state)
@@ -82,17 +92,26 @@ namespace LivreNoirLibrary.Media.Bms
                     _timeItemList.Add(info);
                 }
 
-                var tempo = (int)Math.Max(state.CurrentTempo, 0);
-                _lastTempoInfo?.Add(beat, time);
-                _lastTempoInfo = SortedList.GetOrAdd(_tempoList, _tempoInfoList, tempo);
-
-                var stop = info.Stop;
-                if (stop is not 0)
+                // position to info
+                var position = info.Position;
+                if (position is 0)
                 {
-                    _timeItemList[^1] = _timeItemList[^1].AsStop();
-                    time += stop;
-                    info = new(beat, info.Position, time, info.Tempo, 0, info.Scroll);
-                    _timeList.Add(time);
+                    _positionItemList[0].Add(info);
+                }
+                else
+                {
+                    SortedList.GetOrAdd(_positionList, _positionItemList, position).Add(info);
+                }
+
+                var tempo = (int)state.CurrentTempo;
+                _lastTempoInfo?.Add(beat, time);
+                _lastTempoInfo = SortedList.GetOrAdd(_tempoList, _tempoInfoList, tempo).Init(beat, time);
+
+                if (info.StopTime is not 0)
+                {
+                    (var before, info) = info.SplitStop();
+                    _timeItemList[^1] = before;
+                    _timeList.Add(info.Time);
                     _timeItemList.Add(info);
                 }
             }
@@ -116,7 +135,38 @@ namespace LivreNoirLibrary.Media.Bms
             _lastTempoInfo?.Add(state.CurrentBeat, state.CurrentTime);
             _lastTempoInfo = null;
             SortedList.Remove(_tempoList, _tempoInfoList, 0);
-            ExConsole.Write($"Min={MinTempo}bpm, Max={MaxTempo}bpm, Main={MainTempo}bpm, MainTime={MainTimeTempo}bpm");
+            var num = 0d;
+            var den = 0d;
+            foreach (var (tempo, item) in SortedList.GetEnumerator(_tempoList, _tempoInfoList))
+            {
+                var time = item.TimeLength;
+                num += time * tempo;
+                den += time;
+            }
+            AverageTempo = den is 0 ? 0 : (num / den).RoundToInt();
+            ExConsole.Write($"Min={MinTempo}bpm, Max={MaxTempo}bpm, Average={AverageTempo}bpm, Main={MainTempo}bpm, MainTime={MainTimeTempo}bpm");
+        }
+
+        public string GetTimingInfoText()
+        {
+            StringBuilder sb = new();
+            sb.AppendLine("Beat\tTime\tPosition\tTempo\tStopTime\tScroll");
+            foreach (var item in _timeItemList)
+            {
+                sb.AppendLine($"{item.Beat}\t{item.Time}\t{item.Position}\t{item.Tempo}\t{item.StopTime}\t{item.Scroll}");
+            }
+            return sb.ToString();
+        }
+
+        public string GetTempoInfoText()
+        {
+            StringBuilder sb = new();
+            sb.AppendLine($"Tempo\tBeats\tSeconds");
+            foreach (var (tempo, item) in SortedList.GetEnumerator(_tempoList, _tempoInfoList))
+            {
+                sb.AppendLine($"{tempo}\t{item.BeatLength}\t{item.TimeLength}");
+            }
+            return sb.ToString();
         }
 
         public double Beat2Time(double absolutePosition)
@@ -131,7 +181,7 @@ namespace LivreNoirLibrary.Media.Bms
                 index = Math.Max(~index - 1, 0);
                 var beatReference = _beatList[index];
                 var item = _beatItemList[index];
-                return item.Time + item.Stop + (absolutePosition - beatReference) * item.SecondsPerBeat;
+                return item.Time + item.StopTime + (absolutePosition - beatReference) * item.SecondsPerBeat;
             }
         }
 
@@ -181,10 +231,10 @@ namespace LivreNoirLibrary.Media.Bms
 
         private class TempoInfo
         {
-            public double LastBeat { get; set; }
-            public double LastTime { get; set; }
-            public double BeatLength { get; set; }
-            public double TimeLength { get; set; }
+            public double LastBeat { get; private set; }
+            public double LastTime { get; private set; }
+            public double BeatLength { get; private set; }
+            public double TimeLength { get; private set; }
 
             public TempoInfo Init(double beat, double time)
             {

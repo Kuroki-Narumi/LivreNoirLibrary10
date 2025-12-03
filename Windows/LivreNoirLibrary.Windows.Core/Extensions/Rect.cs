@@ -1,4 +1,6 @@
-﻿using System;
+﻿using LivreNoirLibrary.Media;
+using LivreNoirLibrary.Numerics;
+using System;
 using System.Drawing;
 using System.Runtime.CompilerServices;
 using System.Windows;
@@ -17,7 +19,19 @@ namespace LivreNoirLibrary.Windows
         public static Rect ToRect(this in Int32Rect rect) => new(rect.X, rect.Y, rect.Width, rect.Height);
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static Int32Rect ToInt32Rect(this in Rect rect) => new((int)rect.X, (int)rect.Y, (int)Math.Ceiling(rect.Width), (int)Math.Ceiling(rect.Height));
+        public static Int32Rect ToInt32Rect(this in Rect rect) => new(rect.X.RoundToInt(), rect.Y.RoundToInt(), rect.Width.RoundToInt(), rect.Height.RoundToInt());
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static Rect ToRect(this in DoubleRect rect) => new(rect.X, rect.Y, rect.Width, rect.Height);
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static Int32Rect ToInt32Rect(this in DoubleRect rect) => new(rect.X.RoundToInt(), rect.Y.RoundToInt(), rect.Width.RoundToInt(), rect.Height.RoundToInt());
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static DoubleRect ToDoubleRect(this in Int32Rect rect) => new(rect.X, rect.Y, rect.Width, rect.Height);
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static DoubleRect ToDoubleRect(this in Rect rect) => new(rect.X, rect.Y, rect.Width, rect.Height);
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static Rect ToRect(this (int, int, int, int) rect) => new(rect.Item1, rect.Item2, rect.Item3, rect.Item4);
@@ -26,7 +40,7 @@ namespace LivreNoirLibrary.Windows
         public static Int32Rect ToInt32Rect(this (int, int, int, int) rect) => new(rect.Item1, rect.Item2, rect.Item3, rect.Item4);
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static Rectangle ToDrawingRect(this in Rect rect) => new((int)rect.X, (int)rect.Y, (int)Math.Ceiling(rect.Width), (int)Math.Ceiling(rect.Height));
+        public static Rectangle ToDrawingRect(this in Rect rect) => new(rect.X.RoundToInt(), rect.Y.RoundToInt(), rect.Width.RoundToInt(), rect.Height.RoundToInt());
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static Rectangle ToDrawingRect(this in Int32Rect rect) => new(rect.X, rect.Y, rect.Width, rect.Height);

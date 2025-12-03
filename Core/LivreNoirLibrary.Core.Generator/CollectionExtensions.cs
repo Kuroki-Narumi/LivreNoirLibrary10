@@ -22,7 +22,7 @@ internal class CollectionExtensions : IIncrementalGenerator
             ($"IList<{PH_Type1}>", "list", $"IEnumerable<{PH_Type1}>"),
         ];
 
-    private void Generate(IncrementalGeneratorPostInitializationContext context)
+    private static void Generate(IncrementalGeneratorPostInitializationContext context)
     {
         StringBuilder sb = new();
         sb.AppendLine("""

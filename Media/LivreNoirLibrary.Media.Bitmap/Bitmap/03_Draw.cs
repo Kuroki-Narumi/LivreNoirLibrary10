@@ -269,11 +269,11 @@ namespace LivreNoirLibrary.Media
                 // 透明判定の一時保存用バッファ
                 var needDispose = buffer is null;
                 buffer ??= new();
-                buffer.EnsureSize(width * height, false);
+                buffer.EnsureSize(width * height + thickness + 1, false);
                 var bufferPtr = buffer.Pointer;
 
                 // 円範囲のキャッシュ
-                var dxCache = stackalloc int[thickness + 1];
+                var dxCache = (int*)buffer.Pointer + width * height;
                 var th2 = thickness * thickness;
                 for (var dx = 0; dx <= thickness; dx++)
                 {
@@ -301,14 +301,14 @@ namespace LivreNoirLibrary.Media
                                 alpha = Math.Max(alpha, SimdOperations.Max(pointer + (y + dy) * width + left, dWidth));
                             }
                         }
-                        bufferPtr[index] = color | (alpha & ColorUtils.GetMask(ColorFlags.A));
+                        bufferPtr[index] = c | (alpha & ColorUtils.GetMask(ColorFlags.A));
                         index++;
                     }
                 });
 
                 if (keepSource)
                 {
-                    ColorBlend.BlendUIntUInt(bufferPtr, width, pointer, width, width, height, ColorBlend.Alpha, Vector<float>.One);
+                    ColorBlend.BlendUIntToUInt(bufferPtr, width, pointer, width, width, height, ColorBlend.Alpha, Vector<float>.One);
                 }
                 SimdOperations.CopyFrom(pointer, buffer.Pointer, width * height);
 

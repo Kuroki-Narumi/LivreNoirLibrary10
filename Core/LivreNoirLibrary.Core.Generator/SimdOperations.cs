@@ -14,13 +14,14 @@ internal class SimdOperations : IIncrementalGenerator
         context.RegisterPostInitializationOutput(Generate);
     }
 
-    private void Generate(IncrementalGeneratorPostInitializationContext context)
+    private static void Generate(IncrementalGeneratorPostInitializationContext context)
     {
         // 算術
         var types = Unmanaged;
         Span<string> methods = ["CopyFrom", "Add", "Subtract", "Multiply", "Divide", "Min", "Max"];
         GenerateCore(context, Code_Vector_Overload, Code_Vector_Ptr, methods, types);
-        GenerateCore(context, Code_Vector_Overload2, Code_Vector_Ptr2, ["CopyFrom", "Add"], types, suffix: "F");
+        GenerateCore(context, Code_Vector_Factor_Overload, Code_Vector_Factor_Ptr, ["CopyFrom", "Add"], types, suffix: "F");
+        //GenerateCore(context, Code_Vector_Factor_Overload2, Code_Vector_Factor_Ptr2, ["CopyFrom", "Add"], types, suffix: "FV");
         GenerateCore(context, Code_Scalar_Overload, Code_Scalar_Ptr, methods, types, suffix: "S");
         GenerateCore(context, Code_2Scalar_Overload, Code_2Scalar_Ptr, ["Clamp"], types);
         GenerateCore(context, Code_Unary_Overload, Code_Unary_Ptr, ["Clear"], types);
@@ -241,7 +242,7 @@ namespace LivreNoirLibrary.Collections
         public static void {{PH_Method}}({{PH_Type}}* destination, {{PH_Type}}* source, int length) => {{PH_Method}}Core(destination, source, length);
 """;
 
-    private const string Code_Vector_Overload2 = $$"""
+    private const string Code_Vector_Factor_Overload = $$"""
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static void {{PH_Method}}(this {{PH_Destination}} destination, {{PH_Source}} source, {{PH_Type}} factor)
         {
@@ -268,9 +269,41 @@ namespace LivreNoirLibrary.Collections
         }
 """;
 
-    private const string Code_Vector_Ptr2 = $$"""
+    private const string Code_Vector_Factor_Ptr = $$"""
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static void {{PH_Method}}({{PH_Type}}* destination, {{PH_Type}}* source, {{PH_Type}} factor, int length) => {{PH_Method}}Core(destination, source, factor, length);
+""";
+
+    private const string Code_Vector_Factor_Overload2 = $$"""
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static void {{PH_Method}}(this {{PH_Destination}} destination, {{PH_Source}} source, Vector<{{PH_Type}}> factor)
+        {
+            var dst = {{PH_DestinationConvert}};
+            var src = {{PH_SourceConvert}};
+            var length = Math.Min(dst.Length, src.Length);
+            fixed ({{PH_Type}}* dstPtr = dst)
+            fixed ({{PH_Type}}* srcPtr = src)
+            {
+                {{PH_Method}}Core(dstPtr, srcPtr, factor, length);
+            }
+        }
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static void {{PH_Method}}(this {{PH_Destination}} destination, {{PH_Source}} source, Vector<{{PH_Type}}> factor, int dstOffset, int srcOffset, int length)
+        {
+            var dst = {{PH_DestinationConvert}};
+            var src = {{PH_SourceConvert}};
+            AdjustArgs(dst.Length, src.Length, ref dstOffset, ref srcOffset, ref length);
+            fixed ({{PH_Type}}* dstPtr = dst)
+            fixed ({{PH_Type}}* srcPtr = src)
+            {
+                {{PH_Method}}Core(dstPtr + dstOffset, srcPtr + srcOffset, factor, length);
+            }
+        }
+""";
+
+    private const string Code_Vector_Factor_Ptr2 = $$"""
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static void {{PH_Method}}({{PH_Type}}* destination, {{PH_Type}}* source, Vector<{{PH_Type}}> factor, int length) => {{PH_Method}}Core(destination, source, factor, length);
 """;
 
     private const string Code_Scalar_Overload = $$"""

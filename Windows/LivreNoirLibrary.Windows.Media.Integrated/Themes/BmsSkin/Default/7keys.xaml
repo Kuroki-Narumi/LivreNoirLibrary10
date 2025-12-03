@@ -6,31 +6,39 @@
 			<Option Value="Right" />
 		</ListOption>
 		<RangeOption Key="Bga Opacity" Minimum="0" Maximum="1" DefaultValue="1"/>
+		<RangeOption Key="Beam Opacity" Minimum="0" Maximum="1" DefaultValue="0.5"/>
+		<RangeOption Key="Beam Height" Minimum="0" Maximum="512" DefaultValue="432"/>
 	</Skin.Options>
 	<Skin.Variables>
 		<!-- frame position -->
 		<Variable Key="layout_1p_frame" Value="$Options.Layout">
-			<Convert From="Left" To="32"/>
-			<Convert From="Right" To="576"/>
-			<Convert From="Separate" To="32"/>
+			<Convert From="Left" To="0"/>
+			<Convert From="Right" To="512"/>
+			<Convert From="Separate" To="0"/>
 		</Variable>
 		<Variable Key="layout_2p_frame" Value="$Options.Layout">
 			<Convert From="Left" To="384"/>
-			<Convert From="Right" To="928"/>
-			<Convert From="Separate" To="928"/>
+			<Convert From="Right" To="896"/>
+			<Convert From="Separate" To="896"/>
 		</Variable>
 		<Variable Key="layout_bga" Value="$Options.Layout">
-			<Convert From="Left" To="752"/>
-			<Convert From="Right" To="16"/>
+			<Convert From="Left" To="768"/>
+			<Convert From="Right" To="0"/>
 			<Convert From="Separate" To="384"/>
 		</Variable>
 	</Skin.Variables>
 	<Skin.Textures>
 		<Texture Key="skin_bm" Source="skin_bm.png"/>
+		<Texture Key="bomb" Source="bm_bomb.png"/>
+		<Texture Key="obj" Source="bm_obj.png"/>
+		<Texture Key="frame" Source="bm_frame_7.png"/>
+		<Texture Key="beam" Source="bm_beam.png"/>
+		<Texture Key="judge" Source="bm_judge.png"/>
 		
 		<Texture Key="background_1p" BasedOn="skin_bm" Rect="0, 0, 320, 32"/>
 		<Texture Key="background_2p" BasedOn="skin_bm" Rect="0, 32, 320, 32"/>
 		<Texture Key="barline" BasedOn="skin_bm" Rect="296, 66, 24, 1"/>
+		<Texture Key="judgeline" BasedOn="skin_bm" Rect="296, 69, 24, 2"/>
 		
 		<Texture Key="note_red" BasedOn="skin_bm" Rect="0, 64, 60, 8"/>
 		<Texture Key="note_red_long_head" BasedOn="skin_bm" Rect="0, 93, 60, 12"/>
@@ -52,190 +60,437 @@
 		<Texture Key="note_blue_long_body" BasedOn="skin_bm" Rect="98, 110, 30, 1"/>
 		<Texture Key="note_blue_long_body_active" BasedOn="skin_bm" Rect="98, 111, 30, 17" DivY="17" LoopPeriod="0.25"/>
 		<Texture Key="note_blue_mine" BasedOn="skin_bm" Rect="98, 72, 30, 8"/>
+		
+		<Texture Key="beam_red" BasedOn="beam" Rect="50, 0, 48, 321"/>
+		<Texture Key="beam_white" BasedOn="beam" Rect="0, 0, 25, 321"/>
+		<Texture Key="beam_blue" BasedOn="beam" Rect="27, 0, 21, 321"/>
 
-		<Texture Key="bm_bomb" Source="bm_bomb.png"/>
-		<Texture Key="bomb_1" BasedOn="bm_bomb" Rect="0,   0, 2896, 192" DivX="16" LoopPeriod="0.25"/>
-		<Texture Key="bomb_2" BasedOn="bm_bomb" Rect="0, 192, 2896, 192" DivX="16" LoopPeriod="0.25"/>
-		<Texture Key="bomb_3" BasedOn="bm_bomb" Rect="0, 384, 2896, 192" DivX="16" LoopPeriod="0.25"/>
-		<Texture Key="bomb_4" BasedOn="bm_bomb" Rect="0, 576, 2896, 192" DivX="16" LoopPeriod="0.25"/>
+		<Texture Key="bomb_1" BasedOn="bomb" Rect="0,   0, 2896, 192" DivX="16" LoopPeriod="0.25"/>
+		<Texture Key="bomb_2" BasedOn="bomb" Rect="0, 192, 2896, 192" DivX="16" LoopPeriod="0.25"/>
+		<Texture Key="bomb_3" BasedOn="bomb" Rect="0, 384, 2896, 192" DivX="16" LoopPeriod="0.25"/>
+		<Texture Key="bomb_4" BasedOn="bomb" Rect="0, 576, 2896, 192" DivX="16" LoopPeriod="0.25"/>
+		
 	</Skin.Textures>
 	
-	<Image Texture="background_1p" DestTimer="Scene_Start">
-		<Destination X="$Variables.layout_1p_frame" Y="0" Width="320" Height="512"/>
-	</Image>
-	<Image Texture="background_2p" DestTimer="Scene_Start">
-		<Destination X="$Variables.layout_2p_frame" Y="0" Width="320" Height="512"/>
-	</Image>
-
-	<Bga DestTimer="Scene_Start">
+	<Bga>
 		<Destination X="$Variables.layout_bga" Y="0" Width="512" Height="512" Opacity="$Options.Bga Opacity"/>
 	</Bga>
 
-	<!-- 1P -->
-	<NoteArea DestTimer="Scene_Start" BarLine="barline">
-		<Destination X="$Variables.layout_1p_frame" Y="0" Width="320" Height="512"/>
-		<!-- 1P Scratch -->
-		<NoteLane Lane="6" X="2" Width="60"
-				  Note="note_red"
-				  LongHead="note_red_long_head"
-				  LongTail="note_red_long_tail"
-				  LongBody="note_red_long_body"
-				  ActiveLongBody="note_red_long_body_active"
-				  Mine="note_red_mine">
-		</NoteLane>
-		<!-- 1P 1 -->
-		<NoteLane Lane="1" X="64" Width="38"
-				  Note="note_white"
-				  LongHead="note_white_long_head"
-				  LongTail="note_white_long_tail"
-				  LongBody="note_white_long_body"
-				  ActiveLongBody="note_white_long_body_active"
-				  Mine="note_white_mine">
-		</NoteLane>
-		<!-- 1P 2 -->
-		<NoteLane Lane="2" X="104" Width="30"
-				  Note="note_blue"
-				  LongHead="note_blue_long_head"
-				  LongTail="note_blue_long_tail"
-				  LongBody="note_blue_long_body"
-				  ActiveLongBody="note_blue_long_body_active"
-				  Mine="note_blue_mine">
-		</NoteLane>
-		<!-- 1P 3 -->
-		<NoteLane Lane="3" X="136" Width="38"
-				  Note="note_white"
-				  LongHead="note_white_long_head"
-				  LongTail="note_white_long_tail"
-				  LongBody="note_white_long_body"
-				  ActiveLongBody="note_white_long_body_active"
-				  Mine="note_white_mine">
-		</NoteLane>
-		<!-- 1P 4 -->
-		<NoteLane Lane="4" X="176" Width="30"
-				  Note="note_blue"
-				  LongHead="note_blue_long_head"
-				  LongTail="note_blue_long_tail"
-				  LongBody="note_blue_long_body"
-				  ActiveLongBody="note_blue_long_body_active"
-				  Mine="note_blue_mine">
-		</NoteLane>
-		<!-- 1P 5 -->
-		<NoteLane Lane="5" X="208" Width="38"
-				  Note="note_white"
-				  LongHead="note_white_long_head"
-				  LongTail="note_white_long_tail"
-				  LongBody="note_white_long_body"
-				  ActiveLongBody="note_white_long_body_active"
-				  Mine="note_white_mine">
-		</NoteLane>
-		<!-- 1P 6 -->
-		<NoteLane Lane="8" X="248" Width="30"
-				  Note="note_blue"
-				  LongHead="note_blue_long_head"
-				  LongTail="note_blue_long_tail"
-				  LongBody="note_blue_long_body"
-				  ActiveLongBody="note_blue_long_body_active"
-				  Mine="note_blue_mine">
-		</NoteLane>
-		<!-- 1P 7 -->
-		<NoteLane Lane="9" X="280" Width="38"
-				  Note="note_white"
-				  LongHead="note_white_long_head"
-				  LongTail="note_white_long_tail"
-				  LongBody="note_white_long_body"
-				  ActiveLongBody="note_white_long_body_active"
-				  Mine="note_white_mine">
-		</NoteLane>
-	</NoteArea>
-	
-	<!-- 2P -->
-	<NoteArea DestTimer="Scene_Start" BarLine="barline">
-		<Destination X="$Variables.layout_2p_frame" Y="0" Width="320" Height="512"/>
-		<!-- 2P 1 -->
-		<NoteLane Lane="1" X="2" Width="38"
-				  Note="note_white"
-				  LongHead="note_white_long_head"
-				  LongTail="note_white_long_tail"
-				  LongBody="note_white_long_body"
-				  ActiveLongBody="note_white_long_body_active"
-				  Mine="note_white_mine">
-		</NoteLane>
-		<!-- 2P 2 -->
-		<NoteLane Lane="2" X="42" Width="30"
-				  Note="note_blue"
-				  LongHead="note_blue_long_head"
-				  LongTail="note_blue_long_tail"
-				  LongBody="note_blue_long_body"
-				  ActiveLongBody="note_blue_long_body_active"
-				  Mine="note_blue_mine">
-		</NoteLane>
-		<!-- 2P 3 -->
-		<NoteLane Lane="3" X="74" Width="38"
-				  Note="note_white"
-				  LongHead="note_white_long_head"
-				  LongTail="note_white_long_tail"
-				  LongBody="note_white_long_body"
-				  ActiveLongBody="note_white_long_body_active"
-				  Mine="note_white_mine">
-		</NoteLane>
-		<!-- 2P 4 -->
-		<NoteLane Lane="4" X="114" Width="30"
-				  Note="note_blue"
-				  LongHead="note_blue_long_head"
-				  LongTail="note_blue_long_tail"
-				  LongBody="note_blue_long_body"
-				  ActiveLongBody="note_blue_long_body_active"
-				  Mine="note_blue_mine">
-		</NoteLane>
-		<!-- 2P 5 -->
-		<NoteLane Lane="5" X="146" Width="38"
-				  Note="note_white"
-				  LongHead="note_white_long_head"
-				  LongTail="note_white_long_tail"
-				  LongBody="note_white_long_body"
-				  ActiveLongBody="note_white_long_body_active"
-				  Mine="note_white_mine">
-		</NoteLane>
-		<!-- 2P 6 -->
-		<NoteLane Lane="8" X="186" Width="30"
-				  Note="note_blue"
-				  LongHead="note_blue_long_head"
-				  LongTail="note_blue_long_tail"
-				  LongBody="note_blue_long_body"
-				  ActiveLongBody="note_blue_long_body_active"
-				  Mine="note_blue_mine">
-		</NoteLane>
-		<!-- 2P 7 -->
-		<NoteLane Lane="9" X="218" Width="38"
-				  Note="note_white"
-				  LongHead="note_white_long_head"
-				  LongTail="note_white_long_tail"
-				  LongBody="note_white_long_body"
-				  ActiveLongBody="note_white_long_body_active"
-				  Mine="note_white_mine">
-		</NoteLane>
-		<!-- 2P Scratch -->
-		<NoteLane Lane="6" X="258" Width="60"
-				  Note="note_red"
-				  LongHead="note_red_long_head"
-				  LongTail="note_red_long_tail"
-				  LongBody="note_red_long_body"
-				  ActiveLongBody="note_red_long_body_active"
-				  Mine="note_red_mine">
-		</NoteLane>
-	</NoteArea>
-	
-	<!-- 1P Bomb -->
-	<Group DestTimer="Scene_Start">
-		<Destination X="$Variables.layout_1p_frame" Y="0" Width="320" Height="512"/>
-		<!-- 1P Scratch -->
-		<Image Texture="bomb_1" SourceTimer="Play_MusicStart" DestTimer="Scene_Start" DestLoopEnd="0.25" Blend="Add">
-			<Destination Rect="32, 506, 240, 192" Origin="0.436, 0.432"/>
-			<Destination Time="0.25" />
+	<Group Name="1P Area">
+		<Destination X="$Variables.layout_1p_frame" Y="0" Width="384" Height="640"/>
+		
+		<Image Name="1P Background" Texture="background_1p">
+			<Destination Rect="32, 0, 320, 512"/>
 		</Image>
-		<!-- 1P 1 -->
-		<Image Texture="bomb_2" SourceTimer="Play_MusicStart" DestTimer="Scene_Start" Blend="Add" DestLoopEnd="0.25">
-			<Destination Rect="83, 506, 240, 192" Opacity="0.2" Origin="0.436, 0.432"/>
+
+		<Group Name="Beam">
+			<Destination Rect="32, 0, 320, 512" Opacity="$Options.Beam Opacity"/>
+			
+			<Image Name="SCR ON" Texture="beam_red" DestTimer="Play_Button6_Press">
+				<Destination Rect="32, 512, 60, 0" Origin="0.5, 1"/>
+				<Destination Time="0.05" Height="$Options.Beam Height"/>
+			</Image>
+			<Image Name="SCR OFF" Texture="beam_red" DestTimer="Play_Button6_Release" DestLoopStart="-1">
+				<Destination X="32" Y="512" Width="60" Height="$Options.Beam Height" Origin="0.5, 1" Opacity="1"/>
+				<Destination Time="0.1" Width="0" Opacity="0"/>
+			</Image>
+			
+			<Image Name="1 ON" Texture="beam_white" DestTimer="Play_Button1_Press">
+				<Destination Rect="83, 512, 38, 0" Origin="0.5, 1"/>
+				<Destination Time="0.06" Height="$Options.Beam Height"/>
+			</Image>
+			<Image Name="1 OFF" Texture="beam_white" DestTimer="Play_Button1_Release" DestLoopStart="-1">
+				<Destination X="83" Y="512" Width="38" Height="$Options.Beam Height" Origin="0.5, 1" Opacity="1"/>
+				<Destination Time="0.1" Width="0" Opacity="0"/>
+			</Image>
+			
+			<Image Name="2 ON" Texture="beam_blue" DestTimer="Play_Button2_Press">
+				<Destination Rect="119, 512, 30, 0" Origin="0.5, 1"/>
+				<Destination Time="0.07" Height="$Options.Beam Height"/>
+			</Image>
+			<Image Name="2 OFF" Texture="beam_blue" DestTimer="Play_Button2_Release" DestLoopStart="-1">
+				<Destination X="119" Y="512" Width="30" Height="$Options.Beam Height" Origin="0.5, 1" Opacity="1"/>
+				<Destination Time="0.1" Width="0" Opacity="0"/>
+			</Image>
+			
+			<Image Name="3 ON" Texture="beam_white" DestTimer="Play_Button3_Press">
+				<Destination Rect="155, 512, 38, 0" Origin="0.5, 1"/>
+				<Destination Time="0.08" Height="$Options.Beam Height"/>
+			</Image>
+			<Image Name="3 OFF" Texture="beam_white" DestTimer="Play_Button3_Release" DestLoopStart="-1">
+				<Destination X="155" Y="512" Width="38" Height="$Options.Beam Height" Origin="0.5, 1" Opacity="1"/>
+				<Destination Time="0.1" Width="0" Opacity="0"/>
+			</Image>
+			
+			<Image Name="4 ON" Texture="beam_blue" DestTimer="Play_Button4_Press">
+				<Destination Rect="191, 512, 30, 0" Origin="0.5, 1"/>
+				<Destination Time="0.09" Height="$Options.Beam Height"/>
+			</Image>
+			<Image Name="4 OFF" Texture="beam_blue" DestTimer="Play_Button4_Release" DestLoopStart="-1">
+				<Destination X="191" Y="512" Width="30" Height="$Options.Beam Height" Origin="0.5, 1" Opacity="1"/>
+				<Destination Time="0.1" Width="0" Opacity="0"/>
+			</Image>
+			
+			<Image Name="5 ON" Texture="beam_white" DestTimer="Play_Button5_Press">
+				<Destination Rect="227, 512, 38, 0" Origin="0.5, 1"/>
+				<Destination Time="0.10" Height="$Options.Beam Height"/>
+			</Image>
+			<Image Name="5 OFF" Texture="beam_white" DestTimer="Play_Button5_Release" DestLoopStart="-1">
+				<Destination X="227" Y="512" Width="38" Height="$Options.Beam Height" Origin="0.5, 1" Opacity="1"/>
+				<Destination Time="0.1" Width="0" Opacity="0"/>
+			</Image>
+			
+			<Image Name="6 ON" Texture="beam_blue" DestTimer="Play_Button8_Press">
+				<Destination Rect="263, 512, 30, 0" Origin="0.5, 1"/>
+				<Destination Time="0.11" Height="$Options.Beam Height"/>
+			</Image>
+			<Image Name="6 OFF" Texture="beam_blue" DestTimer="Play_Button8_Release" DestLoopStart="-1">
+				<Destination X="263" Y="512" Width="30" Height="$Options.Beam Height" Origin="0.5, 1" Opacity="1"/>
+				<Destination Time="0.1" Width="0" Opacity="0"/>
+			</Image>
+			
+			<Image Name="7 ON" Texture="beam_white" DestTimer="Play_Button9_Press">
+				<Destination Rect="299, 512, 38, 0" Origin="0.5, 1"/>
+				<Destination Time="0.12" Height="$Options.Beam Height"/>
+			</Image>
+			<Image Name="7 OFF" Texture="beam_white" DestTimer="Play_Button9_Release" DestLoopStart="-1">
+				<Destination X="299" Y="512" Width="38" Height="$Options.Beam Height" Origin="0.5, 1" Opacity="1"/>
+				<Destination Time="0.1" Width="0" Opacity="0"/>
+			</Image>
+		</Group>
+
+		<NoteArea BarLine="barline" JudgeLine="judgeline" BaseHeight="8">
+			<Destination Rect="32, 0, 320, 512"/>
+			
+			<NoteLane Name="SCR" Lane="6" X="2" Width="60"
+					  Note="note_red"
+					  LongHead="note_red_long_head"
+					  LongTail="note_red_long_tail"
+					  LongBody="note_red_long_body"
+					  ActiveLongBody="note_red_long_body_active"
+					  Mine="note_red_mine">
+			</NoteLane>
+			<NoteLane Name="1" Lane="1" X="64" Width="38"
+					  Note="note_white"
+					  LongHead="note_white_long_head"
+					  LongTail="note_white_long_tail"
+					  LongBody="note_white_long_body"
+					  ActiveLongBody="note_white_long_body_active"
+					  Mine="note_white_mine">
+			</NoteLane>
+			<NoteLane Name="2" Lane="2" X="104" Width="30"
+					  Note="note_blue"
+					  LongHead="note_blue_long_head"
+					  LongTail="note_blue_long_tail"
+					  LongBody="note_blue_long_body"
+					  ActiveLongBody="note_blue_long_body_active"
+					  Mine="note_blue_mine">
+			</NoteLane>
+			<NoteLane Name="3" Lane="3" X="136" Width="38"
+					  Note="note_white"
+					  LongHead="note_white_long_head"
+					  LongTail="note_white_long_tail"
+					  LongBody="note_white_long_body"
+					  ActiveLongBody="note_white_long_body_active"
+					  Mine="note_white_mine">
+			</NoteLane>
+			<NoteLane Name="4" Lane="4" X="176" Width="30"
+					  Note="note_blue"
+					  LongHead="note_blue_long_head"
+					  LongTail="note_blue_long_tail"
+					  LongBody="note_blue_long_body"
+					  ActiveLongBody="note_blue_long_body_active"
+					  Mine="note_blue_mine">
+			</NoteLane>
+			<NoteLane Name="5" Lane="5" X="208" Width="38"
+					  Note="note_white"
+					  LongHead="note_white_long_head"
+					  LongTail="note_white_long_tail"
+					  LongBody="note_white_long_body"
+					  ActiveLongBody="note_white_long_body_active"
+					  Mine="note_white_mine">
+			</NoteLane>
+			<NoteLane Name="6" Lane="8" X="248" Width="30"
+					  Note="note_blue"
+					  LongHead="note_blue_long_head"
+					  LongTail="note_blue_long_tail"
+					  LongBody="note_blue_long_body"
+					  ActiveLongBody="note_blue_long_body_active"
+					  Mine="note_blue_mine">
+			</NoteLane>
+			<NoteLane Name="7" Lane="9" X="280" Width="38"
+					  Note="note_white"
+					  LongHead="note_white_long_head"
+					  LongTail="note_white_long_tail"
+					  LongBody="note_white_long_body"
+					  ActiveLongBody="note_white_long_body_active"
+					  Mine="note_white_mine">
+			</NoteLane>
+		</NoteArea>
+
+		<Group Name="Bomb">
+			<Destination Rect="0, 0, 384, 640"/>
+
+			<!-- Normal Bomb -->
+			<Image Name="SCR" Texture="bomb_1" SourceTimer="Play_Button6_Bomb" DestTimer="Play_Button6_Bomb" DestLoopStart="-1" DestLoopEnd="0.25" Blend="Add">
+				<Destination Rect="64, 508, 280, 224" Origin="0.436, 0.432"/>
+			</Image>
+			<Image Name="1" Texture="bomb_1" SourceTimer="Play_Button1_Bomb" DestTimer="Play_Button1_Bomb" DestLoopStart="-1" DestLoopEnd="0.25" Blend="Add">
+				<Destination Rect="115, 508, 280, 224" Origin="0.436, 0.432"/>
+			</Image>
+			<Image Name="2" Texture="bomb_1" SourceTimer="Play_Button2_Bomb" DestTimer="Play_Button2_Bomb" DestLoopStart="-1" DestLoopEnd="0.25" Blend="Add">
+				<Destination Rect="151, 508, 280, 224" Origin="0.436, 0.432"/>
+			</Image>
+			<Image Name="3" Texture="bomb_1" SourceTimer="Play_Button3_Bomb" DestTimer="Play_Button3_Bomb" DestLoopStart="-1" DestLoopEnd="0.25" Blend="Add">
+				<Destination Rect="187, 508, 280, 224" Origin="0.436, 0.432"/>
+			</Image>
+			<Image Name="4" Texture="bomb_1" SourceTimer="Play_Button4_Bomb" DestTimer="Play_Button4_Bomb" DestLoopStart="-1" DestLoopEnd="0.25" Blend="Add">
+				<Destination Rect="223, 508, 280, 224" Origin="0.436, 0.432"/>
+			</Image>
+			<Image Name="5" Texture="bomb_1" SourceTimer="Play_Button5_Bomb" DestTimer="Play_Button5_Bomb" DestLoopStart="-1" DestLoopEnd="0.25" Blend="Add">
+				<Destination Rect="259, 508, 280, 224" Origin="0.436, 0.432"/>
+			</Image>
+			<Image Name="6" Texture="bomb_1" SourceTimer="Play_Button8_Bomb" DestTimer="Play_Button8_Bomb" DestLoopStart="-1" DestLoopEnd="0.25" Blend="Add">
+				<Destination Rect="295, 508, 280, 224" Origin="0.436, 0.432"/>
+			</Image>
+			<Image Name="7" Texture="bomb_1" SourceTimer="Play_Button9_Bomb" DestTimer="Play_Button9_Bomb" DestLoopStart="-1" DestLoopEnd="0.25" Blend="Add">
+				<Destination Rect="331, 508, 280, 224" Origin="0.436, 0.432"/>
+			</Image>
+
+			<!-- Long Bomb -->
+			<Image Name="LN SCR" Texture="bomb_2" SourceTimer="Play_Button6_LongBomb" DestTimer="Play_Button6_LongBomb" DestLoopStart="-1" DestLoopEnd="0.25" Blend="Add">
+				<Destination Rect="64, 508, 280, 224" Origin="0.436, 0.432"/>
+			</Image>
+			<Image Name="LN 1" Texture="bomb_2" SourceTimer="Play_Button1_LongBomb" DestTimer="Play_Button1_LongBomb" DestLoopStart="-1" DestLoopEnd="0.25" Blend="Add">
+				<Destination Rect="115, 508, 280, 224" Origin="0.436, 0.432"/>
+			</Image>
+			<Image Name="LN 2" Texture="bomb_2" SourceTimer="Play_Button2_LongBomb" DestTimer="Play_Button2_LongBomb" DestLoopStart="-1" DestLoopEnd="0.25" Blend="Add">
+				<Destination Rect="151, 508, 280, 224" Origin="0.436, 0.432"/>
+			</Image>
+			<Image Name="LN 3" Texture="bomb_2" SourceTimer="Play_Button3_LongBomb" DestTimer="Play_Button3_LongBomb" DestLoopStart="-1" DestLoopEnd="0.25" Blend="Add">
+				<Destination Rect="187, 508, 280, 224" Origin="0.436, 0.432"/>
+			</Image>
+			<Image Name="LN 4" Texture="bomb_2" SourceTimer="Play_Button4_LongBomb" DestTimer="Play_Button4_LongBomb" DestLoopStart="-1" DestLoopEnd="0.25" Blend="Add">
+				<Destination Rect="223, 508, 280, 224" Origin="0.436, 0.432"/>
+			</Image>
+			<Image Name="LN 5" Texture="bomb_2" SourceTimer="Play_Button5_LongBomb" DestTimer="Play_Button5_LongBomb" DestLoopStart="-1" DestLoopEnd="0.25" Blend="Add">
+				<Destination Rect="259, 508, 280, 224" Origin="0.436, 0.432"/>
+			</Image>
+			<Image Name="LN 6" Texture="bomb_2" SourceTimer="Play_Button8_LongBomb" DestTimer="Play_Button8_LongBomb" DestLoopStart="-1" DestLoopEnd="0.25" Blend="Add">
+				<Destination Rect="295, 508, 280, 224" Origin="0.436, 0.432"/>
+			</Image>
+			<Image Name="LN 7" Texture="bomb_2" SourceTimer="Play_Button9_LongBomb" DestTimer="Play_Button9_LongBomb" DestLoopStart="-1" DestLoopEnd="0.25" Blend="Add">
+				<Destination Rect="331, 508, 280, 224" Origin="0.436, 0.432"/>
+			</Image>
+		</Group>
+	</Group>
+
+	<Group Name="2P Area">
+		<Destination X="$Variables.layout_2p_frame" Y="0" Width="384" Height="640"/>
+
+		<Image Name="Background" Texture="background_2p">
+			<Destination Rect="32, 0, 320, 512"/>
 		</Image>
+
+		<Group Name="Beam">
+			<Destination Rect="32, 0, 320, 512" Opacity="$Options.Beam Opacity"/>
+			
+			<Image Name="1 ON" Texture="beam_white" DestTimer="Play_Button1_Press">
+				<Destination Rect="21, 512, 38, 0" Origin="0.5, 1"/>
+				<Destination Time="0.05" Height="$Options.Beam Height"/>
+			</Image>
+			<Image Name="1 OFF" Texture="beam_white" DestTimer="Play_Button1_Release" DestLoopStart="-1">
+				<Destination X="21" Y="512" Width="38" Height="$Options.Beam Height" Origin="0.5, 1" Opacity="1"/>
+				<Destination Time="0.1" Width="0" Opacity="0"/>
+			</Image>
+			
+			<Image Name="2 ON" Texture="beam_blue" DestTimer="Play_Button2_Press">
+				<Destination Rect="57, 512, 30, 0" Origin="0.5, 1"/>
+				<Destination Time="0.06" Height="$Options.Beam Height"/>
+			</Image>
+			<Image Name="2 OFF" Texture="beam_blue" DestTimer="Play_Button2_Release" DestLoopStart="-1">
+				<Destination X="57" Y="512" Width="30" Height="$Options.Beam Height" Origin="0.5, 1" Opacity="1"/>
+				<Destination Time="0.1" Width="0" Opacity="0"/>
+			</Image>
+			
+			<Image Name="3 ON" Texture="beam_white" DestTimer="Play_Button3_Press">
+				<Destination Rect="93, 512, 38, 0" Origin="0.5, 1"/>
+				<Destination Time="0.07" Height="$Options.Beam Height"/>
+			</Image>
+			<Image Name="3 OFF" Texture="beam_white" DestTimer="Play_Button3_Release" DestLoopStart="-1">
+				<Destination X="93" Y="512" Width="38" Height="$Options.Beam Height" Origin="0.5, 1" Opacity="1"/>
+				<Destination Time="0.1" Width="0" Opacity="0"/>
+			</Image>
+			
+			<Image Name="4 ON" Texture="beam_blue" DestTimer="Play_Button4_Press">
+				<Destination Rect="129, 512, 30, 0" Origin="0.5, 1"/>
+				<Destination Time="0.08" Height="$Options.Beam Height"/>
+			</Image>
+			<Image Name="4 OFF" Texture="beam_blue" DestTimer="Play_Button4_Release" DestLoopStart="-1">
+				<Destination X="129" Y="512" Width="30" Height="$Options.Beam Height" Origin="0.5, 1" Opacity="1"/>
+				<Destination Time="0.1" Width="0" Opacity="0"/>
+			</Image>
+			
+			<Image Name="5 ON" Texture="beam_white" DestTimer="Play_Button5_Press">
+				<Destination Rect="165, 512, 38, 0" Origin="0.5, 1"/>
+				<Destination Time="0.09" Height="$Options.Beam Height"/>
+			</Image>
+			<Image Name="5 OFF" Texture="beam_white" DestTimer="Play_Button5_Release" DestLoopStart="-1">
+				<Destination X="165" Y="512" Width="38" Height="$Options.Beam Height" Origin="0.5, 1" Opacity="1"/>
+				<Destination Time="0.1" Width="0" Opacity="0"/>
+			</Image>
+			
+			<Image Name="6 ON" Texture="beam_blue" DestTimer="Play_Button8_Press">
+				<Destination Rect="201, 512, 30, 0" Origin="0.5, 1"/>
+				<Destination Time="0.10" Height="$Options.Beam Height"/>
+			</Image>
+			<Image Name="6 OFF" Texture="beam_blue" DestTimer="Play_Button8_Release" DestLoopStart="-1">
+				<Destination X="201" Y="512" Width="30" Height="$Options.Beam Height" Origin="0.5, 1" Opacity="1"/>
+				<Destination Time="0.1" Width="0" Opacity="0"/>
+			</Image>
+			
+			<Image Name="7 ON" Texture="beam_white" DestTimer="Play_Button9_Press">
+				<Destination Rect="237, 512, 38, 0" Origin="0.5, 1"/>
+				<Destination Time="0.11" Height="$Options.Beam Height"/>
+			</Image>
+			<Image Name="7 OFF" Texture="beam_white" DestTimer="Play_Button9_Release" DestLoopStart="-1">
+				<Destination X="237" Y="512" Width="38" Height="$Options.Beam Height" Origin="0.5, 1" Opacity="1"/>
+				<Destination Time="0.1" Width="0" Opacity="0"/>
+			</Image>
+			
+			<Image Name="SCR ON" Texture="beam_red" DestTimer="Play_Button6_Press">
+				<Destination Rect="288, 512, 60, 0" Origin="0.5, 1"/>
+				<Destination Time="0.12" Height="$Options.Beam Height"/>
+			</Image>
+			<Image Name="SCR OFF" Texture="beam_red" DestTimer="Play_Button6_Release" DestLoopStart="-1">
+				<Destination X="288" Y="512" Width="60" Height="$Options.Beam Height" Origin="0.5, 1" Opacity="1"/>
+				<Destination Time="0.1" Width="0" Opacity="0"/>
+			</Image>
+		</Group>
+
+		<NoteArea BarLine="barline" JudgeLine="judgeline" BaseHeight="8">
+			<Destination Rect="32, 0, 320, 512"/>
+			
+			<NoteLane Name="1" Lane="1" X="2" Width="38"
+					  Note="note_white"
+					  LongHead="note_white_long_head"
+					  LongTail="note_white_long_tail"
+					  LongBody="note_white_long_body"
+					  ActiveLongBody="note_white_long_body_active"
+					  Mine="note_white_mine">
+			</NoteLane>
+			<NoteLane Name="1" Lane="2" X="42" Width="30"
+					  Note="note_blue"
+					  LongHead="note_blue_long_head"
+					  LongTail="note_blue_long_tail"
+					  LongBody="note_blue_long_body"
+					  ActiveLongBody="note_blue_long_body_active"
+					  Mine="note_blue_mine">
+			</NoteLane>
+			<NoteLane Name="3" Lane="3" X="74" Width="38"
+					  Note="note_white"
+					  LongHead="note_white_long_head"
+					  LongTail="note_white_long_tail"
+					  LongBody="note_white_long_body"
+					  ActiveLongBody="note_white_long_body_active"
+					  Mine="note_white_mine">
+			</NoteLane>
+			<NoteLane Name="4" Lane="4" X="114" Width="30"
+					  Note="note_blue"
+					  LongHead="note_blue_long_head"
+					  LongTail="note_blue_long_tail"
+					  LongBody="note_blue_long_body"
+					  ActiveLongBody="note_blue_long_body_active"
+					  Mine="note_blue_mine">
+			</NoteLane>
+			<NoteLane Name="5" Lane="5" X="146" Width="38"
+					  Note="note_white"
+					  LongHead="note_white_long_head"
+					  LongTail="note_white_long_tail"
+					  LongBody="note_white_long_body"
+					  ActiveLongBody="note_white_long_body_active"
+					  Mine="note_white_mine">
+			</NoteLane>
+			<NoteLane Name="6" Lane="8" X="186" Width="30"
+					  Note="note_blue"
+					  LongHead="note_blue_long_head"
+					  LongTail="note_blue_long_tail"
+					  LongBody="note_blue_long_body"
+					  ActiveLongBody="note_blue_long_body_active"
+					  Mine="note_blue_mine">
+			</NoteLane>
+			<NoteLane Name="7" Lane="9" X="218" Width="38"
+					  Note="note_white"
+					  LongHead="note_white_long_head"
+					  LongTail="note_white_long_tail"
+					  LongBody="note_white_long_body"
+					  ActiveLongBody="note_white_long_body_active"
+					  Mine="note_white_mine">
+			</NoteLane>
+			<NoteLane Name="SCR" Lane="6" X="258" Width="60"
+					  Note="note_red"
+					  LongHead="note_red_long_head"
+					  LongTail="note_red_long_tail"
+					  LongBody="note_red_long_body"
+					  ActiveLongBody="note_red_long_body_active"
+					  Mine="note_red_mine">
+			</NoteLane>
+		</NoteArea>
+
+		<Group Name="Bomb">
+			<Destination Rect="0, 0, 384, 640"/>
+
+			<!-- Normal Bomb -->
+			<Image Name="1" Texture="bomb_1" SourceTimer="Play_Button1_Bomb" DestTimer="Play_Button1_Bomb" DestLoopStart="-1" DestLoopEnd="0.25" Blend="Add">
+				<Destination Rect="53, 508, 280, 224" Origin="0.436, 0.432"/>
+			</Image>
+			<Image Name="2" Texture="bomb_1" SourceTimer="Play_Button2_Bomb" DestTimer="Play_Button2_Bomb" DestLoopStart="-1" DestLoopEnd="0.25" Blend="Add">
+				<Destination Rect="89, 508, 280, 224" Origin="0.436, 0.432"/>
+			</Image>
+			<Image Name="3" Texture="bomb_1" SourceTimer="Play_Button3_Bomb" DestTimer="Play_Button3_Bomb" DestLoopStart="-1" DestLoopEnd="0.25" Blend="Add">
+				<Destination Rect="125, 508, 280, 224" Origin="0.436, 0.432"/>
+			</Image>
+			<Image Name="4" Texture="bomb_1" SourceTimer="Play_Button4_Bomb" DestTimer="Play_Button4_Bomb" DestLoopStart="-1" DestLoopEnd="0.25" Blend="Add">
+				<Destination Rect="161, 508, 280, 224" Origin="0.436, 0.432"/>
+			</Image>
+			<Image Name="5" Texture="bomb_1" SourceTimer="Play_Button5_Bomb" DestTimer="Play_Button5_Bomb" DestLoopStart="-1" DestLoopEnd="0.25" Blend="Add">
+				<Destination Rect="197, 508, 280, 224" Origin="0.436, 0.432"/>
+			</Image>
+			<Image Name="6" Texture="bomb_1" SourceTimer="Play_Button8_Bomb" DestTimer="Play_Button8_Bomb" DestLoopStart="-1" DestLoopEnd="0.25" Blend="Add">
+				<Destination Rect="233, 508, 280, 224" Origin="0.436, 0.432"/>
+			</Image>
+			<Image Name="7" Texture="bomb_1" SourceTimer="Play_Button9_Bomb" DestTimer="Play_Button9_Bomb" DestLoopStart="-1" DestLoopEnd="0.25" Blend="Add">
+				<Destination Rect="269, 508, 280, 224" Origin="0.436, 0.432"/>
+			</Image>
+			<Image Name="SCR" Texture="bomb_1" SourceTimer="Play_Button6_Bomb" DestTimer="Play_Button6_Bomb" DestLoopStart="-1" DestLoopEnd="0.25" Blend="Add">
+				<Destination Rect="320, 508, 280, 224" Origin="0.436, 0.432"/>
+			</Image>
+
+			<!-- Long Bomb -->
+			<Image Name="LN 1" Texture="bomb_2" SourceTimer="Play_Button1_LongBomb" DestTimer="Play_Button1_LongBomb" DestLoopStart="-1" DestLoopEnd="0.25" Blend="Add">
+				<Destination Rect="53, 508, 280, 224" Origin="0.436, 0.432"/>
+			</Image>
+			<Image Name="LN 2" Texture="bomb_2" SourceTimer="Play_Button2_LongBomb" DestTimer="Play_Button2_LongBomb" DestLoopStart="-1" DestLoopEnd="0.25" Blend="Add">
+				<Destination Rect="89, 508, 280, 224" Origin="0.436, 0.432"/>
+			</Image>
+			<Image Name="LN 3" Texture="bomb_2" SourceTimer="Play_Button3_LongBomb" DestTimer="Play_Button3_LongBomb" DestLoopStart="-1" DestLoopEnd="0.25" Blend="Add">
+				<Destination Rect="125, 508, 280, 224" Origin="0.436, 0.432"/>
+			</Image>
+			<Image Name="LN 4" Texture="bomb_2" SourceTimer="Play_Button4_LongBomb" DestTimer="Play_Button4_LongBomb" DestLoopStart="-1" DestLoopEnd="0.25" Blend="Add">
+				<Destination Rect="161, 508, 280, 224" Origin="0.436, 0.432"/>
+			</Image>
+			<Image Name="LN 5" Texture="bomb_2" SourceTimer="Play_Button5_LongBomb" DestTimer="Play_Button5_LongBomb" DestLoopStart="-1" DestLoopEnd="0.25" Blend="Add">
+				<Destination Rect="197, 508, 280, 224" Origin="0.436, 0.432"/>
+			</Image>
+			<Image Name="LN 6" Texture="bomb_2" SourceTimer="Play_Button8_LongBomb" DestTimer="Play_Button8_LongBomb" DestLoopStart="-1" DestLoopEnd="0.25" Blend="Add">
+				<Destination Rect="233, 508, 280, 224" Origin="0.436, 0.432"/>
+			</Image>
+			<Image Name="LN 7" Texture="bomb_2" SourceTimer="Play_Button9_LongBomb" DestTimer="Play_Button9_LongBomb" DestLoopStart="-1" DestLoopEnd="0.25" Blend="Add">
+				<Destination Rect="269, 508, 280, 224" Origin="0.436, 0.432"/>
+			</Image>
+			<Image Name="LN SCR" Texture="bomb_2" SourceTimer="Play_Button6_LongBomb" DestTimer="Play_Button6_LongBomb" DestLoopStart="-1" DestLoopEnd="0.25" Blend="Add">
+				<Destination Rect="320, 508, 280, 224" Origin="0.436, 0.432"/>
+			</Image>
+		</Group>
 	</Group>
 </PlaySkin>
