@@ -14,28 +14,30 @@ namespace LivreNoirLibrary.Windows.Controls.Bms.Elements
         public SkinElement Source { get; } = source;
         public bool IsValid { get; protected set; } = true;
         public bool IsVisible { get; protected set; }
-        public double DestX { get; private set; }
-        public double DestY { get; private set; }
-        public double DestWidth { get; private set; }
-        public double DestHeight { get; private set; }
+        public double DestX { get; protected set; }
+        public double DestY { get; protected set; }
+        public double DestWidth { get; protected set; }
+        public double DestHeight { get; protected set; }
+        public double OriginX { get; protected set; }
+        public double OriginY { get; protected set; }
         public double Opacity
         {
-            get; 
-            private set
+            get;
+            protected set
             {
                 field = value;
                 OpacityMask = new((float)value, 1, 1, 1);
             }
         }
-        public FloatColor OpacityMask { get; private set; }
-        public double Angle { get; private set; }
-        public double RotateOriginX { get; private set; }
-        public double RotateOriginY { get; private set; }
-        public TimerId TimerId { get; private set; }
-        public double LoopStart { get; private set; }
-        public double LoopEnd { get; private set; }
-        public double LoopInterval { get; private set; }
-        public BlendMode BlendMode { get; private set; }
+        public FloatColor OpacityMask { get; protected set; }
+        public double Angle { get; protected set; }
+        public double RotateOriginX { get; protected set; }
+        public double RotateOriginY { get; protected set; }
+        public TimerId TimerId { get; protected set; }
+        public double LoopStart { get; protected set; }
+        public double LoopEnd { get; protected set; }
+        public double LoopInterval { get; protected set; }
+        public BlendMode BlendMode { get; protected set; }
 
         private readonly DoubleTimeline<double> _slopes = [];
         private readonly DestinationTimeline _dest_x = new(0);
@@ -68,10 +70,7 @@ namespace LivreNoirLibrary.Windows.Controls.Bms.Elements
         {
             ClearTimeline();
 
-            double Resolve(ValueExpression? expr, double defualtValue = 0)
-            {
-                return skin.TryResolveValue<double>(expr, provider, out var v) ? v : defualtValue;
-            }
+            double Resolve(ValueExpression? expr, double defaultValue = 0) => skin.ResolveValue(expr, provider, defaultValue);
 
             void SetIfNotNull(DestinationTimeline timeline, double time, ValueExpression? expr)
             {
@@ -155,10 +154,12 @@ namespace LivreNoirLibrary.Windows.Controls.Bms.Elements
                     var a = _dest_angle.GetBlended(relativeTime, slope);
                     var aox = _dest_aox.GetBlended(relativeTime, slope);
                     var aoy = _dest_aoy.GetBlended(relativeTime, slope);
-                    DestX = x - w * ox;
-                    DestY = y - h * oy;
+                    DestX = x;
+                    DestY = y;
                     DestWidth = w;
                     DestHeight = h;
+                    OriginX = ox;
+                    OriginY = oy;
                     Opacity = op;
                     Angle = a;
                     RotateOriginX = aox;

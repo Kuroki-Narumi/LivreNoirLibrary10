@@ -115,6 +115,19 @@ namespace LivreNoirLibrary.Media
             }
         }
 
+        public static bool Adjust<T1, T2>(
+            T1 source, in DoubleRect sourceRect,
+            T2 destination, in DoubleRect destValidRect, in DoubleRect destRect,
+            out Rectangle actualSourceRect, out Rectangle actualDestRect)
+            where T1 : IBitmap
+            where T2 : IBitmap
+        {
+            actualSourceRect = default;
+            actualDestRect = default;
+            return source.Pointer is not 0 && destination.Pointer is not 0 &&
+                Structs.Adjust(source.DoubleRect, sourceRect, destValidRect, destRect, out actualSourceRect, out actualDestRect);
+        }
+
         private delegate bool CheckLine<T>(T* p, out int left, out int right) where T : unmanaged;
 
         private static Rectangle GetOpaqueCore<T>(CheckLine<T> check, T* pointer, int w, int h, int stride, int margin)

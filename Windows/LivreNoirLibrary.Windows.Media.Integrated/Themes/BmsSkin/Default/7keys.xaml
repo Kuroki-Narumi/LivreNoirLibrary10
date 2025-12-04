@@ -7,24 +7,26 @@
 		</ListOption>
 		<RangeOption Key="Bga Opacity" Minimum="0" Maximum="1" DefaultValue="1"/>
 		<RangeOption Key="Beam Opacity" Minimum="0" Maximum="1" DefaultValue="0.5"/>
-		<RangeOption Key="Beam Height" Minimum="0" Maximum="512" DefaultValue="432"/>
+		<RangeOption Key="Beam Height" Minimum="0" Maximum="480" DefaultValue="432"/>
 	</Skin.Options>
 	<Skin.Variables>
 		<!-- frame position -->
-		<Variable Key="layout_1p_frame" Value="$Options.Layout">
-			<Convert From="Left" To="0"/>
-			<Convert From="Right" To="512"/>
-			<Convert From="Separate" To="0"/>
+		<Variable Key="layout_1p_frame" Source="$Options.Layout" DefaultValue="0">
+			<Convert From="Right" To="480"/>
 		</Variable>
-		<Variable Key="layout_2p_frame" Value="$Options.Layout">
+		<Variable Key="layout_2p_frame" Source="$Options.Layout" DefaultValue="896">
 			<Convert From="Left" To="384"/>
-			<Convert From="Right" To="896"/>
-			<Convert From="Separate" To="896"/>
 		</Variable>
-		<Variable Key="layout_bga" Value="$Options.Layout">
+		<Variable Key="layout_bga" Source="$Options.Layout" DefaultValue="384">
 			<Convert From="Left" To="768"/>
 			<Convert From="Right" To="0"/>
-			<Convert From="Separate" To="384"/>
+		</Variable>
+
+		<Variable Key="title_position" Source="$Options.StageFile Defined" DefaultValue="4">
+			<Convert From="True" To="244"/>
+		</Variable>
+		<Variable Key="title_width" Source="$Options.StageFile Defined" DefaultValue="1272">
+			<Convert From="True" To="1032"/>
 		</Variable>
 	</Skin.Variables>
 	<Skin.Textures>
@@ -66,10 +68,19 @@
 		<Texture Key="beam_blue" BasedOn="beam" Rect="27, 0, 21, 321"/>
 
 		<Texture Key="bomb_1" BasedOn="bomb" Rect="0,   0, 2896, 192" DivX="16" LoopPeriod="0.25"/>
-		<Texture Key="bomb_2" BasedOn="bomb" Rect="0, 192, 2896, 192" DivX="16" LoopPeriod="0.25"/>
+		<Texture Key="bomb_2" BasedOn="bomb" Rect="0, 192, 1448, 192" DivX="8" LoopPeriod="0.125"/>
+		
 		<Texture Key="bomb_3" BasedOn="bomb" Rect="0, 384, 2896, 192" DivX="16" LoopPeriod="0.25"/>
 		<Texture Key="bomb_4" BasedOn="bomb" Rect="0, 576, 2896, 192" DivX="16" LoopPeriod="0.25"/>
+
+		<Texture Key="judge_perfect" BasedOn="judge" Rect="0, 0, 120, 144" DivY="3" LoopPeriod="0.125"/>
+		<Texture Key="judge_great" BasedOn="judge" Rect="0, 144, 120, 96" DivY="2" LoopPeriod="0.125"/>
+		<Texture Key="judge_good" BasedOn="judge" Rect="0, 240, 105, 96" DivY="2" LoopPeriod="0.125"/>
+		<Texture Key="judge_bad" BasedOn="judge" Rect="105, 240, 76, 96" DivY="2" LoopPeriod="0.125"/>
+		<Texture Key="judge_poor" BasedOn="judge" Rect="181, 240, 104, 96" DivY="2" LoopPeriod="0.125"/>
 		
+		<Texture Key="judge_number_perfect" BasedOn="judge" Rect="120, 0, 240, 144" DivY="3" LoopPeriod="0.125"/>
+		<Texture Key="judge_number" BasedOn="judge" Rect="120, 144, 240, 96" DivY="2" LoopPeriod="0.125"/>
 	</Skin.Textures>
 	
 	<Bga>
@@ -80,87 +91,87 @@
 		<Destination X="$Variables.layout_1p_frame" Y="0" Width="384" Height="640"/>
 		
 		<Image Name="1P Background" Texture="background_1p">
-			<Destination Rect="32, 0, 320, 512"/>
+			<Destination Rect="32, 0, 320, 480"/>
 		</Image>
 
 		<Group Name="Beam">
-			<Destination Rect="32, 0, 320, 512" Opacity="$Options.Beam Opacity"/>
+			<Destination Rect="32, 0, 320, 480" Opacity="$Options.Beam Opacity"/>
 			
 			<Image Name="SCR ON" Texture="beam_red" DestTimer="Play_Button6_Press">
-				<Destination Rect="32, 512, 60, 0" Origin="0.5, 1"/>
+				<Destination Rect="32, 480, 60, 0" Origin="0.5, 1"/>
 				<Destination Time="0.05" Height="$Options.Beam Height"/>
 			</Image>
 			<Image Name="SCR OFF" Texture="beam_red" DestTimer="Play_Button6_Release" DestLoopStart="-1">
-				<Destination X="32" Y="512" Width="60" Height="$Options.Beam Height" Origin="0.5, 1" Opacity="1"/>
+				<Destination X="32" Y="480" Width="60" Height="$Options.Beam Height" Origin="0.5, 1" Opacity="1"/>
 				<Destination Time="0.1" Width="0" Opacity="0"/>
 			</Image>
 			
 			<Image Name="1 ON" Texture="beam_white" DestTimer="Play_Button1_Press">
-				<Destination Rect="83, 512, 38, 0" Origin="0.5, 1"/>
+				<Destination Rect="83, 480, 38, 0" Origin="0.5, 1"/>
 				<Destination Time="0.06" Height="$Options.Beam Height"/>
 			</Image>
 			<Image Name="1 OFF" Texture="beam_white" DestTimer="Play_Button1_Release" DestLoopStart="-1">
-				<Destination X="83" Y="512" Width="38" Height="$Options.Beam Height" Origin="0.5, 1" Opacity="1"/>
+				<Destination X="83" Y="480" Width="38" Height="$Options.Beam Height" Origin="0.5, 1" Opacity="1"/>
 				<Destination Time="0.1" Width="0" Opacity="0"/>
 			</Image>
 			
 			<Image Name="2 ON" Texture="beam_blue" DestTimer="Play_Button2_Press">
-				<Destination Rect="119, 512, 30, 0" Origin="0.5, 1"/>
+				<Destination Rect="119, 480, 30, 0" Origin="0.5, 1"/>
 				<Destination Time="0.07" Height="$Options.Beam Height"/>
 			</Image>
 			<Image Name="2 OFF" Texture="beam_blue" DestTimer="Play_Button2_Release" DestLoopStart="-1">
-				<Destination X="119" Y="512" Width="30" Height="$Options.Beam Height" Origin="0.5, 1" Opacity="1"/>
+				<Destination X="119" Y="480" Width="30" Height="$Options.Beam Height" Origin="0.5, 1" Opacity="1"/>
 				<Destination Time="0.1" Width="0" Opacity="0"/>
 			</Image>
 			
 			<Image Name="3 ON" Texture="beam_white" DestTimer="Play_Button3_Press">
-				<Destination Rect="155, 512, 38, 0" Origin="0.5, 1"/>
+				<Destination Rect="155, 480, 38, 0" Origin="0.5, 1"/>
 				<Destination Time="0.08" Height="$Options.Beam Height"/>
 			</Image>
 			<Image Name="3 OFF" Texture="beam_white" DestTimer="Play_Button3_Release" DestLoopStart="-1">
-				<Destination X="155" Y="512" Width="38" Height="$Options.Beam Height" Origin="0.5, 1" Opacity="1"/>
+				<Destination X="155" Y="480" Width="38" Height="$Options.Beam Height" Origin="0.5, 1" Opacity="1"/>
 				<Destination Time="0.1" Width="0" Opacity="0"/>
 			</Image>
 			
 			<Image Name="4 ON" Texture="beam_blue" DestTimer="Play_Button4_Press">
-				<Destination Rect="191, 512, 30, 0" Origin="0.5, 1"/>
+				<Destination Rect="191, 480, 30, 0" Origin="0.5, 1"/>
 				<Destination Time="0.09" Height="$Options.Beam Height"/>
 			</Image>
 			<Image Name="4 OFF" Texture="beam_blue" DestTimer="Play_Button4_Release" DestLoopStart="-1">
-				<Destination X="191" Y="512" Width="30" Height="$Options.Beam Height" Origin="0.5, 1" Opacity="1"/>
+				<Destination X="191" Y="480" Width="30" Height="$Options.Beam Height" Origin="0.5, 1" Opacity="1"/>
 				<Destination Time="0.1" Width="0" Opacity="0"/>
 			</Image>
 			
 			<Image Name="5 ON" Texture="beam_white" DestTimer="Play_Button5_Press">
-				<Destination Rect="227, 512, 38, 0" Origin="0.5, 1"/>
+				<Destination Rect="227, 480, 38, 0" Origin="0.5, 1"/>
 				<Destination Time="0.10" Height="$Options.Beam Height"/>
 			</Image>
 			<Image Name="5 OFF" Texture="beam_white" DestTimer="Play_Button5_Release" DestLoopStart="-1">
-				<Destination X="227" Y="512" Width="38" Height="$Options.Beam Height" Origin="0.5, 1" Opacity="1"/>
+				<Destination X="227" Y="480" Width="38" Height="$Options.Beam Height" Origin="0.5, 1" Opacity="1"/>
 				<Destination Time="0.1" Width="0" Opacity="0"/>
 			</Image>
 			
 			<Image Name="6 ON" Texture="beam_blue" DestTimer="Play_Button8_Press">
-				<Destination Rect="263, 512, 30, 0" Origin="0.5, 1"/>
+				<Destination Rect="263, 480, 30, 0" Origin="0.5, 1"/>
 				<Destination Time="0.11" Height="$Options.Beam Height"/>
 			</Image>
 			<Image Name="6 OFF" Texture="beam_blue" DestTimer="Play_Button8_Release" DestLoopStart="-1">
-				<Destination X="263" Y="512" Width="30" Height="$Options.Beam Height" Origin="0.5, 1" Opacity="1"/>
+				<Destination X="263" Y="480" Width="30" Height="$Options.Beam Height" Origin="0.5, 1" Opacity="1"/>
 				<Destination Time="0.1" Width="0" Opacity="0"/>
 			</Image>
 			
 			<Image Name="7 ON" Texture="beam_white" DestTimer="Play_Button9_Press">
-				<Destination Rect="299, 512, 38, 0" Origin="0.5, 1"/>
+				<Destination Rect="299, 480, 38, 0" Origin="0.5, 1"/>
 				<Destination Time="0.12" Height="$Options.Beam Height"/>
 			</Image>
 			<Image Name="7 OFF" Texture="beam_white" DestTimer="Play_Button9_Release" DestLoopStart="-1">
-				<Destination X="299" Y="512" Width="38" Height="$Options.Beam Height" Origin="0.5, 1" Opacity="1"/>
+				<Destination X="299" Y="480" Width="38" Height="$Options.Beam Height" Origin="0.5, 1" Opacity="1"/>
 				<Destination Time="0.1" Width="0" Opacity="0"/>
 			</Image>
 		</Group>
 
 		<NoteArea BarLine="barline" JudgeLine="judgeline" BaseHeight="8">
-			<Destination Rect="32, 0, 320, 512"/>
+			<Destination Rect="32, 0, 320, 480"/>
 			
 			<NoteLane Name="SCR" Lane="6" X="2" Width="60"
 					  Note="note_red"
@@ -233,143 +244,153 @@
 
 			<!-- Normal Bomb -->
 			<Image Name="SCR" Texture="bomb_1" SourceTimer="Play_Button6_Bomb" DestTimer="Play_Button6_Bomb" DestLoopStart="-1" DestLoopEnd="0.25" Blend="Add">
-				<Destination Rect="64, 508, 280, 224" Origin="0.436, 0.432"/>
+				<Destination Rect="64, 476, 280, 224" Origin="0.436, 0.432"/>
 			</Image>
 			<Image Name="1" Texture="bomb_1" SourceTimer="Play_Button1_Bomb" DestTimer="Play_Button1_Bomb" DestLoopStart="-1" DestLoopEnd="0.25" Blend="Add">
-				<Destination Rect="115, 508, 280, 224" Origin="0.436, 0.432"/>
+				<Destination Rect="115, 476, 280, 224" Origin="0.436, 0.432"/>
 			</Image>
 			<Image Name="2" Texture="bomb_1" SourceTimer="Play_Button2_Bomb" DestTimer="Play_Button2_Bomb" DestLoopStart="-1" DestLoopEnd="0.25" Blend="Add">
-				<Destination Rect="151, 508, 280, 224" Origin="0.436, 0.432"/>
+				<Destination Rect="151, 476, 280, 224" Origin="0.436, 0.432"/>
 			</Image>
 			<Image Name="3" Texture="bomb_1" SourceTimer="Play_Button3_Bomb" DestTimer="Play_Button3_Bomb" DestLoopStart="-1" DestLoopEnd="0.25" Blend="Add">
-				<Destination Rect="187, 508, 280, 224" Origin="0.436, 0.432"/>
+				<Destination Rect="187, 476, 280, 224" Origin="0.436, 0.432"/>
 			</Image>
 			<Image Name="4" Texture="bomb_1" SourceTimer="Play_Button4_Bomb" DestTimer="Play_Button4_Bomb" DestLoopStart="-1" DestLoopEnd="0.25" Blend="Add">
-				<Destination Rect="223, 508, 280, 224" Origin="0.436, 0.432"/>
+				<Destination Rect="223, 476, 280, 224" Origin="0.436, 0.432"/>
 			</Image>
 			<Image Name="5" Texture="bomb_1" SourceTimer="Play_Button5_Bomb" DestTimer="Play_Button5_Bomb" DestLoopStart="-1" DestLoopEnd="0.25" Blend="Add">
-				<Destination Rect="259, 508, 280, 224" Origin="0.436, 0.432"/>
+				<Destination Rect="259, 476, 280, 224" Origin="0.436, 0.432"/>
 			</Image>
 			<Image Name="6" Texture="bomb_1" SourceTimer="Play_Button8_Bomb" DestTimer="Play_Button8_Bomb" DestLoopStart="-1" DestLoopEnd="0.25" Blend="Add">
-				<Destination Rect="295, 508, 280, 224" Origin="0.436, 0.432"/>
+				<Destination Rect="295, 476, 280, 224" Origin="0.436, 0.432"/>
 			</Image>
 			<Image Name="7" Texture="bomb_1" SourceTimer="Play_Button9_Bomb" DestTimer="Play_Button9_Bomb" DestLoopStart="-1" DestLoopEnd="0.25" Blend="Add">
-				<Destination Rect="331, 508, 280, 224" Origin="0.436, 0.432"/>
+				<Destination Rect="331, 476, 280, 224" Origin="0.436, 0.432"/>
 			</Image>
 
 			<!-- Long Bomb -->
 			<Image Name="LN SCR" Texture="bomb_2" SourceTimer="Play_Button6_LongBomb" DestTimer="Play_Button6_LongBomb" DestLoopStart="-1" DestLoopEnd="0.25" Blend="Add">
-				<Destination Rect="64, 508, 280, 224" Origin="0.436, 0.432"/>
+				<Destination Rect="64, 476, 280, 224" Origin="0.436, 0.432"/>
 			</Image>
 			<Image Name="LN 1" Texture="bomb_2" SourceTimer="Play_Button1_LongBomb" DestTimer="Play_Button1_LongBomb" DestLoopStart="-1" DestLoopEnd="0.25" Blend="Add">
-				<Destination Rect="115, 508, 280, 224" Origin="0.436, 0.432"/>
+				<Destination Rect="115, 476, 280, 224" Origin="0.436, 0.432"/>
 			</Image>
 			<Image Name="LN 2" Texture="bomb_2" SourceTimer="Play_Button2_LongBomb" DestTimer="Play_Button2_LongBomb" DestLoopStart="-1" DestLoopEnd="0.25" Blend="Add">
-				<Destination Rect="151, 508, 280, 224" Origin="0.436, 0.432"/>
+				<Destination Rect="151, 476, 280, 224" Origin="0.436, 0.432"/>
 			</Image>
 			<Image Name="LN 3" Texture="bomb_2" SourceTimer="Play_Button3_LongBomb" DestTimer="Play_Button3_LongBomb" DestLoopStart="-1" DestLoopEnd="0.25" Blend="Add">
-				<Destination Rect="187, 508, 280, 224" Origin="0.436, 0.432"/>
+				<Destination Rect="187, 476, 280, 224" Origin="0.436, 0.432"/>
 			</Image>
 			<Image Name="LN 4" Texture="bomb_2" SourceTimer="Play_Button4_LongBomb" DestTimer="Play_Button4_LongBomb" DestLoopStart="-1" DestLoopEnd="0.25" Blend="Add">
-				<Destination Rect="223, 508, 280, 224" Origin="0.436, 0.432"/>
+				<Destination Rect="223, 476, 280, 224" Origin="0.436, 0.432"/>
 			</Image>
 			<Image Name="LN 5" Texture="bomb_2" SourceTimer="Play_Button5_LongBomb" DestTimer="Play_Button5_LongBomb" DestLoopStart="-1" DestLoopEnd="0.25" Blend="Add">
-				<Destination Rect="259, 508, 280, 224" Origin="0.436, 0.432"/>
+				<Destination Rect="259, 476, 280, 224" Origin="0.436, 0.432"/>
 			</Image>
 			<Image Name="LN 6" Texture="bomb_2" SourceTimer="Play_Button8_LongBomb" DestTimer="Play_Button8_LongBomb" DestLoopStart="-1" DestLoopEnd="0.25" Blend="Add">
-				<Destination Rect="295, 508, 280, 224" Origin="0.436, 0.432"/>
+				<Destination Rect="295, 476, 280, 224" Origin="0.436, 0.432"/>
 			</Image>
 			<Image Name="LN 7" Texture="bomb_2" SourceTimer="Play_Button9_LongBomb" DestTimer="Play_Button9_LongBomb" DestLoopStart="-1" DestLoopEnd="0.25" Blend="Add">
-				<Destination Rect="331, 508, 280, 224" Origin="0.436, 0.432"/>
+				<Destination Rect="331, 476, 280, 224" Origin="0.436, 0.432"/>
 			</Image>
 		</Group>
+
+		<Judge Name="Judge" DestTimer="Play_1P_Judge"
+			   Perfect="judge_perfect" PerfectCombo="judge_number_perfect"
+			   Great="judge_great" GreatCombo="judge_number"
+			   Good="judge_good" GoodCombo="judge_number"
+			   Bad="judge_bad"
+			   Miss="judge_poor"
+			   >
+			<Destination X="192" Y="352" Height="48" Origin="0.5, 1"/>
+		</Judge>
 	</Group>
 
 	<Group Name="2P Area">
 		<Destination X="$Variables.layout_2p_frame" Y="0" Width="384" Height="640"/>
 
 		<Image Name="Background" Texture="background_2p">
-			<Destination Rect="32, 0, 320, 512"/>
+			<Destination Rect="32, 0, 320, 480"/>
 		</Image>
 
 		<Group Name="Beam">
-			<Destination Rect="32, 0, 320, 512" Opacity="$Options.Beam Opacity"/>
+			<Destination Rect="32, 0, 320, 480" Opacity="$Options.Beam Opacity"/>
 			
 			<Image Name="1 ON" Texture="beam_white" DestTimer="Play_Button1_Press">
-				<Destination Rect="21, 512, 38, 0" Origin="0.5, 1"/>
+				<Destination Rect="21, 480, 38, 0" Origin="0.5, 1"/>
 				<Destination Time="0.05" Height="$Options.Beam Height"/>
 			</Image>
 			<Image Name="1 OFF" Texture="beam_white" DestTimer="Play_Button1_Release" DestLoopStart="-1">
-				<Destination X="21" Y="512" Width="38" Height="$Options.Beam Height" Origin="0.5, 1" Opacity="1"/>
+				<Destination X="21" Y="480" Width="38" Height="$Options.Beam Height" Origin="0.5, 1" Opacity="1"/>
 				<Destination Time="0.1" Width="0" Opacity="0"/>
 			</Image>
 			
 			<Image Name="2 ON" Texture="beam_blue" DestTimer="Play_Button2_Press">
-				<Destination Rect="57, 512, 30, 0" Origin="0.5, 1"/>
+				<Destination Rect="57, 480, 30, 0" Origin="0.5, 1"/>
 				<Destination Time="0.06" Height="$Options.Beam Height"/>
 			</Image>
 			<Image Name="2 OFF" Texture="beam_blue" DestTimer="Play_Button2_Release" DestLoopStart="-1">
-				<Destination X="57" Y="512" Width="30" Height="$Options.Beam Height" Origin="0.5, 1" Opacity="1"/>
+				<Destination X="57" Y="480" Width="30" Height="$Options.Beam Height" Origin="0.5, 1" Opacity="1"/>
 				<Destination Time="0.1" Width="0" Opacity="0"/>
 			</Image>
 			
 			<Image Name="3 ON" Texture="beam_white" DestTimer="Play_Button3_Press">
-				<Destination Rect="93, 512, 38, 0" Origin="0.5, 1"/>
+				<Destination Rect="93, 480, 38, 0" Origin="0.5, 1"/>
 				<Destination Time="0.07" Height="$Options.Beam Height"/>
 			</Image>
 			<Image Name="3 OFF" Texture="beam_white" DestTimer="Play_Button3_Release" DestLoopStart="-1">
-				<Destination X="93" Y="512" Width="38" Height="$Options.Beam Height" Origin="0.5, 1" Opacity="1"/>
+				<Destination X="93" Y="480" Width="38" Height="$Options.Beam Height" Origin="0.5, 1" Opacity="1"/>
 				<Destination Time="0.1" Width="0" Opacity="0"/>
 			</Image>
 			
 			<Image Name="4 ON" Texture="beam_blue" DestTimer="Play_Button4_Press">
-				<Destination Rect="129, 512, 30, 0" Origin="0.5, 1"/>
+				<Destination Rect="129, 480, 30, 0" Origin="0.5, 1"/>
 				<Destination Time="0.08" Height="$Options.Beam Height"/>
 			</Image>
 			<Image Name="4 OFF" Texture="beam_blue" DestTimer="Play_Button4_Release" DestLoopStart="-1">
-				<Destination X="129" Y="512" Width="30" Height="$Options.Beam Height" Origin="0.5, 1" Opacity="1"/>
+				<Destination X="129" Y="480" Width="30" Height="$Options.Beam Height" Origin="0.5, 1" Opacity="1"/>
 				<Destination Time="0.1" Width="0" Opacity="0"/>
 			</Image>
 			
 			<Image Name="5 ON" Texture="beam_white" DestTimer="Play_Button5_Press">
-				<Destination Rect="165, 512, 38, 0" Origin="0.5, 1"/>
+				<Destination Rect="165, 480, 38, 0" Origin="0.5, 1"/>
 				<Destination Time="0.09" Height="$Options.Beam Height"/>
 			</Image>
 			<Image Name="5 OFF" Texture="beam_white" DestTimer="Play_Button5_Release" DestLoopStart="-1">
-				<Destination X="165" Y="512" Width="38" Height="$Options.Beam Height" Origin="0.5, 1" Opacity="1"/>
+				<Destination X="165" Y="480" Width="38" Height="$Options.Beam Height" Origin="0.5, 1" Opacity="1"/>
 				<Destination Time="0.1" Width="0" Opacity="0"/>
 			</Image>
 			
 			<Image Name="6 ON" Texture="beam_blue" DestTimer="Play_Button8_Press">
-				<Destination Rect="201, 512, 30, 0" Origin="0.5, 1"/>
+				<Destination Rect="201, 480, 30, 0" Origin="0.5, 1"/>
 				<Destination Time="0.10" Height="$Options.Beam Height"/>
 			</Image>
 			<Image Name="6 OFF" Texture="beam_blue" DestTimer="Play_Button8_Release" DestLoopStart="-1">
-				<Destination X="201" Y="512" Width="30" Height="$Options.Beam Height" Origin="0.5, 1" Opacity="1"/>
+				<Destination X="201" Y="480" Width="30" Height="$Options.Beam Height" Origin="0.5, 1" Opacity="1"/>
 				<Destination Time="0.1" Width="0" Opacity="0"/>
 			</Image>
 			
 			<Image Name="7 ON" Texture="beam_white" DestTimer="Play_Button9_Press">
-				<Destination Rect="237, 512, 38, 0" Origin="0.5, 1"/>
+				<Destination Rect="237, 480, 38, 0" Origin="0.5, 1"/>
 				<Destination Time="0.11" Height="$Options.Beam Height"/>
 			</Image>
 			<Image Name="7 OFF" Texture="beam_white" DestTimer="Play_Button9_Release" DestLoopStart="-1">
-				<Destination X="237" Y="512" Width="38" Height="$Options.Beam Height" Origin="0.5, 1" Opacity="1"/>
+				<Destination X="237" Y="480" Width="38" Height="$Options.Beam Height" Origin="0.5, 1" Opacity="1"/>
 				<Destination Time="0.1" Width="0" Opacity="0"/>
 			</Image>
 			
 			<Image Name="SCR ON" Texture="beam_red" DestTimer="Play_Button6_Press">
-				<Destination Rect="288, 512, 60, 0" Origin="0.5, 1"/>
+				<Destination Rect="288, 480, 60, 0" Origin="0.5, 1"/>
 				<Destination Time="0.12" Height="$Options.Beam Height"/>
 			</Image>
 			<Image Name="SCR OFF" Texture="beam_red" DestTimer="Play_Button6_Release" DestLoopStart="-1">
-				<Destination X="288" Y="512" Width="60" Height="$Options.Beam Height" Origin="0.5, 1" Opacity="1"/>
+				<Destination X="288" Y="480" Width="60" Height="$Options.Beam Height" Origin="0.5, 1" Opacity="1"/>
 				<Destination Time="0.1" Width="0" Opacity="0"/>
 			</Image>
 		</Group>
 
 		<NoteArea BarLine="barline" JudgeLine="judgeline" BaseHeight="8">
-			<Destination Rect="32, 0, 320, 512"/>
+			<Destination Rect="32, 0, 320, 480"/>
 			
 			<NoteLane Name="1" Lane="1" X="2" Width="38"
 					  Note="note_white"
@@ -442,55 +463,82 @@
 
 			<!-- Normal Bomb -->
 			<Image Name="1" Texture="bomb_1" SourceTimer="Play_Button1_Bomb" DestTimer="Play_Button1_Bomb" DestLoopStart="-1" DestLoopEnd="0.25" Blend="Add">
-				<Destination Rect="53, 508, 280, 224" Origin="0.436, 0.432"/>
+				<Destination Rect="53, 476, 280, 224" Origin="0.436, 0.432"/>
 			</Image>
 			<Image Name="2" Texture="bomb_1" SourceTimer="Play_Button2_Bomb" DestTimer="Play_Button2_Bomb" DestLoopStart="-1" DestLoopEnd="0.25" Blend="Add">
-				<Destination Rect="89, 508, 280, 224" Origin="0.436, 0.432"/>
+				<Destination Rect="89, 476, 280, 224" Origin="0.436, 0.432"/>
 			</Image>
 			<Image Name="3" Texture="bomb_1" SourceTimer="Play_Button3_Bomb" DestTimer="Play_Button3_Bomb" DestLoopStart="-1" DestLoopEnd="0.25" Blend="Add">
-				<Destination Rect="125, 508, 280, 224" Origin="0.436, 0.432"/>
+				<Destination Rect="125, 476, 280, 224" Origin="0.436, 0.432"/>
 			</Image>
 			<Image Name="4" Texture="bomb_1" SourceTimer="Play_Button4_Bomb" DestTimer="Play_Button4_Bomb" DestLoopStart="-1" DestLoopEnd="0.25" Blend="Add">
-				<Destination Rect="161, 508, 280, 224" Origin="0.436, 0.432"/>
+				<Destination Rect="161, 476, 280, 224" Origin="0.436, 0.432"/>
 			</Image>
 			<Image Name="5" Texture="bomb_1" SourceTimer="Play_Button5_Bomb" DestTimer="Play_Button5_Bomb" DestLoopStart="-1" DestLoopEnd="0.25" Blend="Add">
-				<Destination Rect="197, 508, 280, 224" Origin="0.436, 0.432"/>
+				<Destination Rect="197, 476, 280, 224" Origin="0.436, 0.432"/>
 			</Image>
 			<Image Name="6" Texture="bomb_1" SourceTimer="Play_Button8_Bomb" DestTimer="Play_Button8_Bomb" DestLoopStart="-1" DestLoopEnd="0.25" Blend="Add">
-				<Destination Rect="233, 508, 280, 224" Origin="0.436, 0.432"/>
+				<Destination Rect="233, 476, 280, 224" Origin="0.436, 0.432"/>
 			</Image>
 			<Image Name="7" Texture="bomb_1" SourceTimer="Play_Button9_Bomb" DestTimer="Play_Button9_Bomb" DestLoopStart="-1" DestLoopEnd="0.25" Blend="Add">
-				<Destination Rect="269, 508, 280, 224" Origin="0.436, 0.432"/>
+				<Destination Rect="269, 476, 280, 224" Origin="0.436, 0.432"/>
 			</Image>
 			<Image Name="SCR" Texture="bomb_1" SourceTimer="Play_Button6_Bomb" DestTimer="Play_Button6_Bomb" DestLoopStart="-1" DestLoopEnd="0.25" Blend="Add">
-				<Destination Rect="320, 508, 280, 224" Origin="0.436, 0.432"/>
+				<Destination Rect="320, 476, 280, 224" Origin="0.436, 0.432"/>
 			</Image>
 
 			<!-- Long Bomb -->
 			<Image Name="LN 1" Texture="bomb_2" SourceTimer="Play_Button1_LongBomb" DestTimer="Play_Button1_LongBomb" DestLoopStart="-1" DestLoopEnd="0.25" Blend="Add">
-				<Destination Rect="53, 508, 280, 224" Origin="0.436, 0.432"/>
+				<Destination Rect="53, 476, 280, 224" Origin="0.436, 0.432"/>
 			</Image>
 			<Image Name="LN 2" Texture="bomb_2" SourceTimer="Play_Button2_LongBomb" DestTimer="Play_Button2_LongBomb" DestLoopStart="-1" DestLoopEnd="0.25" Blend="Add">
-				<Destination Rect="89, 508, 280, 224" Origin="0.436, 0.432"/>
+				<Destination Rect="89, 476, 280, 224" Origin="0.436, 0.432"/>
 			</Image>
 			<Image Name="LN 3" Texture="bomb_2" SourceTimer="Play_Button3_LongBomb" DestTimer="Play_Button3_LongBomb" DestLoopStart="-1" DestLoopEnd="0.25" Blend="Add">
-				<Destination Rect="125, 508, 280, 224" Origin="0.436, 0.432"/>
+				<Destination Rect="125, 476, 280, 224" Origin="0.436, 0.432"/>
 			</Image>
 			<Image Name="LN 4" Texture="bomb_2" SourceTimer="Play_Button4_LongBomb" DestTimer="Play_Button4_LongBomb" DestLoopStart="-1" DestLoopEnd="0.25" Blend="Add">
-				<Destination Rect="161, 508, 280, 224" Origin="0.436, 0.432"/>
+				<Destination Rect="161, 476, 280, 224" Origin="0.436, 0.432"/>
 			</Image>
 			<Image Name="LN 5" Texture="bomb_2" SourceTimer="Play_Button5_LongBomb" DestTimer="Play_Button5_LongBomb" DestLoopStart="-1" DestLoopEnd="0.25" Blend="Add">
-				<Destination Rect="197, 508, 280, 224" Origin="0.436, 0.432"/>
+				<Destination Rect="197, 476, 280, 224" Origin="0.436, 0.432"/>
 			</Image>
 			<Image Name="LN 6" Texture="bomb_2" SourceTimer="Play_Button8_LongBomb" DestTimer="Play_Button8_LongBomb" DestLoopStart="-1" DestLoopEnd="0.25" Blend="Add">
-				<Destination Rect="233, 508, 280, 224" Origin="0.436, 0.432"/>
+				<Destination Rect="233, 476, 280, 224" Origin="0.436, 0.432"/>
 			</Image>
 			<Image Name="LN 7" Texture="bomb_2" SourceTimer="Play_Button9_LongBomb" DestTimer="Play_Button9_LongBomb" DestLoopStart="-1" DestLoopEnd="0.25" Blend="Add">
-				<Destination Rect="269, 508, 280, 224" Origin="0.436, 0.432"/>
+				<Destination Rect="269, 476, 280, 224" Origin="0.436, 0.432"/>
 			</Image>
 			<Image Name="LN SCR" Texture="bomb_2" SourceTimer="Play_Button6_LongBomb" DestTimer="Play_Button6_LongBomb" DestLoopStart="-1" DestLoopEnd="0.25" Blend="Add">
-				<Destination Rect="320, 508, 280, 224" Origin="0.436, 0.432"/>
+				<Destination Rect="320, 476, 280, 224" Origin="0.436, 0.432"/>
 			</Image>
 		</Group>
+
+		<Judge Name="Judge" DestTimer="Play_1P_Judge"
+			   Perfect="judge_perfect" PerfectCombo="judge_number_perfect"
+			   Great="judge_great" GreatCombo="judge_number"
+			   Good="judge_good" GoodCombo="judge_number"
+			   Bad="judge_bad"
+			   Miss="judge_poor"
+			   >
+			<Destination X="192" Y="352" Height="48" Origin="0.5, 1"/>
+		</Judge>
+	</Group>
+
+	<Image Name="StageFile" Texture="#STAGEFILE">
+		<Destination Rect="0, 540, 240, 180"/>
+	</Image>
+	<Group>
+		<Destination X="$Variables.title_position" Y="600" Width="$Variables.title_width" Height="120"/>
+
+		<Text Name="Genre" FontFamily="VL PGothic" FontSize="32" FontWeight="Bold" Content="$Variables.Genre" StrokeThickness="4">
+			<Destination Y="4" Width="$Variables.title_width" Height="32"/>
+		</Text>
+		<Text Name="Title" FontFamily="VL PGothic" FontSize="48" FontWeight="Bold" Content="$Variables.FullTitle" StrokeThickness="6">
+			<Destination Y="36" Width="$Variables.title_width" Height="48"/>
+		</Text>
+		<Text Name="Artist" FontFamily="VL PGothic" FontSize="32" FontWeight="Bold" Content="$Variables.FullArtist" StrokeThickness="4">
+			<Destination Y="84" Width="$Variables.title_width" Height="32"/>
+		</Text>
 	</Group>
 </PlaySkin>

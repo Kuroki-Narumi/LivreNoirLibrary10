@@ -45,17 +45,35 @@ namespace LivreNoirLibrary.Media.Bms
             return period is > 0 && TryGet(timerId, time, out var relativeTime) ? (int)(relativeTime * maxPattern / (period + 0.0001)) : 0;
         }
 
-        public static TimerId Lane2TimerId(int lane) => (TimerId)(1000 + lane * 10);
+        public static TimerId JudgeType2TimerId(JudgeType type) => (TimerId)(TimerIdOffsets.GeneralJudge + (int)type);
+        public static TimerId Player2TimerId(int player) => (TimerId)(TimerIdOffsets.PlayerJudge + player * 10);
+        public static TimerId Lane2TimerId(int lane) => (TimerId)(TimerIdOffsets.Button + lane * 10);
 
-        public static bool TryGetButtonTimer(Channel channel, out TimerId id)
+        public void SetJudgeTimer(double time, JudgeType type, int player, int timing)
         {
-            if (channel.TryGetLane(out var lane) && lane is > 0)
+            Set(JudgeType2TimerId(type), time);
+            if (player is > 0)
             {
-                id = Lane2TimerId(lane);
-                return true;
+                var id = Player2TimerId(player);
+                Set(id + TimerIdOffsets.Judge, time);
+
+                if (timing is > 0)
+                {
+                    Set(id + TimerIdOffsets.Late, time);
+                }
+                else
+                {
+                    Remove(id + TimerIdOffsets.Late);
+                }
+                if (timing is < 0)
+                {
+                    Set(id + TimerIdOffsets.Early, time);
+                }
+                else
+                {
+                    Remove(id + TimerIdOffsets.Early);
+                }
             }
-            id = 0;
-            return false;
         }
     }
 }

@@ -24,7 +24,6 @@ namespace LivreNoirLibrary.SandBox
         ];
 
         private readonly FloatBitmap _buffer1 = new(0, 0);
-        private readonly UnmanagedArray<float> _buffer2 = new();
         private WriteableBitmap? _result;
 
         private void OnDragOver_Image(object sender, DragEventArgs e)
@@ -61,11 +60,6 @@ namespace LivreNoirLibrary.SandBox
                 using (var targetBitmap = result.BeginWrite())
                 using (var sourceBitmap = source.BeginRead())
                 {
-                    /*
-                    _buffer1.Resize(destW, destH);
-                    sourceBitmap.StretchCopy(_buffer1, _buffer2, tweet: true);
-                    targetBitmap.Blend(_buffer1, (BlendMode)ComboBox_BlendMode.SelectedItem, new FloatColor((float)Slider_Opacity.Value * 0.01f, 1, 1, 1), tweet: true);
-                    */
                     destination.CopyPixels(targetBitmap);
                     sourceBitmap.CopyTo(Image_Source.GetRect().ToDoubleRect(),
                         targetBitmap, targetBitmap.DoubleRect, Image_Target.GetRect().ToDoubleRect(),
@@ -74,8 +68,6 @@ namespace LivreNoirLibrary.SandBox
                 Image_Result.Source = result;
             }
         }
-
-        WriteableBitmap? _test;
 
         private void OnClick_Image_Save(object sender, RoutedEventArgs e)
         {

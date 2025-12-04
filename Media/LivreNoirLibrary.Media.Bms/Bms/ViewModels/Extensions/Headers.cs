@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Diagnostics.CodeAnalysis;
+using System.Reflection;
 
 namespace LivreNoirLibrary.Media.Bms
 {
@@ -7,6 +8,9 @@ namespace LivreNoirLibrary.Media.Bms
     {
         extension(IBmsViewModel vm)
         {
+            public bool IsHeaderDefined(HeaderType type, bool containsCurrent = true)
+                => !string.IsNullOrEmpty(vm.GetInheritedValue((data, out value) => data.MainHeaders.TryGetValue(type, out value!), "", containsCurrent));
+
             public double GetDoubleHeader(HeaderType type, double ifNone, bool containsCurrent = true)
                 => vm.GetInheritedValue((data, out value) => data.MainHeaders.TryGetDouble(type, out value), ifNone, containsCurrent);
 

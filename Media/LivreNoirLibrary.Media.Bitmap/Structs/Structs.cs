@@ -27,72 +27,24 @@ namespace LivreNoirLibrary.Media
             height = rect.Height;
         }
 
-        public static void Deconstruct(this in Rectangle rect, out Point point, out Size size)
-        {
-            point = rect.Location;
-            size = rect.Size;
-        }
-
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static bool Adjust(ref int x, ref int y, ref int w, ref int h, int width, int height)
+        public static bool Adjust(ref Rectangle rect, int width, int height)
         {
+            var (x, y, w, h) = rect;
             var x1 = Math.Max(x, 0);
             var y1 = Math.Max(y, 0);
             w = Math.Min(x + w, width) - x1;
             h = Math.Min(y + h, height) - y1;
             if (w is > 0 && h is > 0)
             {
-                x = x1;
-                y = y1;
+                rect = new(x1, y1, w, h);
                 return true;
             }
             else
             {
+                rect = default;
                 return false;
             }
-        }
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static bool Adjust(
-            ref int sx, ref int sy, ref int sw, ref int sh, 
-            ref int dx, ref int dy,
-            int sourceWidth, int sourceHeight, int destWidth, int destHeight)
-        {
-            // コピー先の実際の範囲
-            var x1 = Math.Max(dx, 0);
-            var y1 = Math.Max(dy, 0);
-            sw = Math.Min(dx + sw, destWidth) - x1;
-            sh = Math.Min(dy + sh, destHeight) - y1;
-            if (sw is <= 0 || sh is <= 0)
-            {
-                return false;
-            }
-            // コピーする座標を実際の範囲に合わせてシフト
-            sx += x1 - dx;
-            sy += y1 - dy;
-            dx = x1;
-            dy = y1;
-            return Adjust(ref sx, ref sy, ref sw, ref sh, sourceWidth, sourceHeight);
-        }
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static bool Adjust(ref Rectangle rect, int width, int height)
-        {
-            var (x, y, w, h) = rect;
-            var result = Adjust(ref x, ref y, ref w, ref h, width, height);
-            rect = new(x, y, w, h);
-            return result;
-        }
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static bool Adjust(ref Rectangle sourceRect, ref Point destLocation, int sourceWidth, int sourceHeight, int destWidth, int destHeight)
-        {
-            var (sx, sy, sw, sh) = sourceRect;
-            var (dx, dy) = destLocation;
-            var result = Adjust(ref sx, ref sy, ref sw, ref sh, ref dx, ref dy, sourceWidth, sourceHeight, destWidth, destHeight);
-            sourceRect = new(sx, sy, sw, sh);
-            destLocation = new(dx, dy);
-            return result;
         }
 
         /// <summary>
@@ -159,8 +111,8 @@ namespace LivreNoirLibrary.Media
 
             // [クリップ元 範囲] を [貼り付け先 範囲] に合わせる
             sourceLeft = Math.Max(sourceLeft, sourceX + (destLeft - destX) / scaleX);
-            sourceWidth = Math.Min(sourceRight - sourceLeft, (destRight - destLeft) / scaleX);
             sourceTop = Math.Max(sourceTop, sourceY + (destTop - destY) / scaleY);
+            sourceWidth = Math.Min(sourceRight - sourceLeft, (destRight - destLeft) / scaleX);
             sourceHeight = Math.Min(sourceBottom - sourceTop, (destBottom - destTop) / scaleY);
 
             // [貼り付け先 範囲] を [クリップ元 範囲] に合わせる
@@ -175,62 +127,6 @@ namespace LivreNoirLibrary.Media
 
             // 範囲矯正の結果幅や高さが有効でなくなる可能性がある
             return actualSourceRect.Width is > 0 && actualSourceRect.Height is > 0 && actualDestRect.Width is > 0 && actualDestRect.Height is > 0;
-        }
-
-        /// <summary>
-        /// <paramref name="sourceValidRect"/>で規定された有効範囲から<paramref name="sourceRect"/>で指定された範囲を切り抜き、
-        /// <paramref name="destValidRect"/>で規定された有効範囲内の<paramref name="destRect"/>で指定された範囲に貼り付けようとした際の、
-        /// 実際に参照するべき切り抜き元範囲を<paramref name="actualSourceRect"/>、実際の貼り付け先範囲を<paramref name="actualDestRect"/>へ格納し、
-        /// 切り抜き元及び貼り付け先の範囲が全て有効であるかどうかを返します。
-        /// </summary>
-        /// <param name="sourceValidRect">クリップ有効範囲</param>
-        /// <param name="sourceRect">クリップ元範囲</param>
-        /// <param name="destValidRect">貼り付け有効範囲</param>
-        /// <param name="destRect">貼り付け先範囲</param>
-        /// <param name="actualSourceRect">正規化されたクリップ元範囲</param>
-        /// <param name="actualDestRect">正規化された貼り付け先範囲</param>
-        /// <returns><see langword="true"/> if both <paramref name="actualSourceRect"/> and <paramref name="actualDestRect"/> are valid; otherwise, <see langword="false"/>.</returns>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static bool Adjust2(
-            in DoubleRect sourceValidRect, in DoubleRect sourceRect, 
-            in DoubleRect destValidRect, in DoubleRect destRect, 
-            out Rectangle actualSourceRect, out Rectangle actualDestRect)
-        {
-            actualSourceRect = default;
-            actualDestRect = default;
-            // 各範囲を正規化
-            var sourceClip = sourceValidRect.Intersect(sourceRect);
-            var destClip = destValidRect.Intersect(destRect);
-            if (sourceClip.IsEmpty || destClip.IsEmpty)
-            {
-                return false;
-            }
-            // 拡大率
-            var scaleX = destRect.Width / sourceRect.Width;
-            var scaleY = destRect.Height / sourceRect.Height;
-
-            // クリップ元の座標系で貼り付け先の範囲を正規化
-            var s2dLeft = sourceRect.X + (destClip.X - destRect.X) / scaleX;
-            var s2dTop = sourceRect.Y + (destClip.X - destRect.Y) / scaleY;
-            var s2dWidth = destClip.Width / scaleX;
-            var s2dHeight = destClip.Height / scaleY;
-            sourceClip = sourceClip.Intersect(new(s2dLeft, s2dTop, s2dWidth, s2dHeight));
-            if (sourceClip.IsEmpty)
-            {
-                return false;
-            }
-
-            // 貼り付け先の範囲を改めて計算
-            destClip = new(
-                destRect.X + (sourceClip.X - sourceRect.X) * scaleX,
-                destRect.Y + (sourceClip.Y - sourceRect.Y) * scaleY,
-                sourceClip.Width * scaleX,
-                sourceClip.Height * scaleY
-                );
-
-            actualSourceRect = sourceClip.Round();
-            actualDestRect = destClip.Round();
-            return true;
         }
     }
 }

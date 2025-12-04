@@ -28,6 +28,22 @@ namespace LivreNoirLibrary.Media.Bms
 
         extension (IBmsViewModel vm)
         {
+            public bool IsDefined(DefType type, int index)
+            {
+                if (vm.CurrentData.DefLists.ContainsKey(type, index))
+                {
+                    return true;
+                }
+                foreach (var data in vm.EnumerateParents())
+                {
+                    if (data.DefLists.ContainsKey(type, index))
+                    {
+                        return true;
+                    }
+                }
+                return false;
+            }
+
             public string? GetDefValue(DefType type, int key, bool containsCurrent = true)
                 => vm.GetInheritedValue<string>((data, out value) => data.DefLists.TryGetValue(type, key, out value!), null, containsCurrent);
 
@@ -53,22 +69,6 @@ namespace LivreNoirLibrary.Media.Bms
 
             public bool TryGetMediaPath(int index, string root, [MaybeNullWhen(false)] out string defValue, [MaybeNullWhen(false)] out string path) 
                 => TryGetPathCore(vm, DefType.Bmp, index, root, FileUtils.TryGetMediaFileName!, out defValue, out path);
-
-            public bool IsDefined(DefType type, int index)
-            {
-                if (vm.CurrentData.DefLists.ContainsKey(type, index))
-                {
-                    return true;
-                }
-                foreach (var data in vm.EnumerateParents())
-                {
-                    if (data.DefLists.ContainsKey(type, index))
-                    {
-                        return true;
-                    }
-                }
-                return false;
-            }
 
             public int FindFreeDefIndex(DefType type, int start = 1)
             {

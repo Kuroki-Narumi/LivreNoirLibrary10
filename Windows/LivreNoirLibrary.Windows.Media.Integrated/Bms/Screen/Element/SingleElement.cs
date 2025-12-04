@@ -14,7 +14,9 @@ namespace LivreNoirLibrary.Windows.Controls.Bms.Elements
         {
             if (TryGetBitmap(out var source, out var sourceRect, args.Buffer))
             {
-                RenderSource(args, source, sourceRect, DestX, DestY, DestWidth, DestHeight, BlendMode, args.ColorCorrection * OpacityMask);
+                var x = DestX - DestWidth * OriginX;
+                var y = DestY - DestHeight * OriginY;
+                RenderSource(args, source, sourceRect, x, y, DestWidth, DestHeight, BlendMode, args.ColorCorrection * OpacityMask);
             }
         }
 

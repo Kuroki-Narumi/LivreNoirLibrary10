@@ -40,18 +40,12 @@ namespace LivreNoirLibrary.Windows.Controls.Bms.Elements
             base.DetermineExpressions(skin, provider);
             _barLine = GetTexture(_source.BarLine);
             _judgeLine = GetTexture(_source.JudgeLine);
-            _baseHeight = skin.TryResolveValue<double>(_source.BaseHeight, provider, out var baseHeight) ? baseHeight : DefaultbaseHeight;
+            _baseHeight = skin.ResolveValue(_source.BaseHeight, provider, DefaultbaseHeight);
             foreach (var (_, child) in _lanes)
             {
                 var source = child.Source;
-                if (skin.TryResolveValue<double>(source.X, provider, out var v))
-                {
-                    child.X = v;
-                }
-                if (skin.TryResolveValue(source.Width, provider, out v))
-                {
-                    child.Width = v;
-                }
+                child.X = skin.ResolveValue(source.X, provider, 0d);
+                child.Width = skin.ResolveValue(source.Width, provider, 0d);
                 child.Note = GetTexture(source.Note);
                 child.LongHead = GetTexture(source.LongHead);
                 child.LongTail = GetTexture(source.LongTail);

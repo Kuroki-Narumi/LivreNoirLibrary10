@@ -21,14 +21,6 @@ namespace LivreNoirLibrary.Windows.Controls.Bms
 
         public void Setup(TimingList timings)
         {
-            if (false)
-            {
-                var beat = 80;
-                var time = timings.Beat2Time(beat);
-                var pos = timings.Time2Position(time);
-                System.Windows.Clipboard.SetText($"{timings.GetTimingInfoText()}{beat}\t{time}\t{pos}\t{timings.Time2Beat(time)}{Environment.NewLine}{timings.GetTempoInfoText()}");
-            }
-
             var bars = _barLines;
             var children = _children;
             var timers = _timers;
@@ -50,31 +42,22 @@ namespace LivreNoirLibrary.Windows.Controls.Bms
                     var isVisible = !info.IsMine;
                     if (isVisible)
                     {
-                        // Press
-                        timers.Add(id + 1, time);
-                        // Bomb
-                        timers.Add(id + 3, end);
+                        timers.Add(id + TimerIdOffsets.Press, time);
+                        timers.Add(id + TimerIdOffsets.Bomb, end);
                     }
                     if (info.Length is > 0)
                     {
                         var endPos = (double)timings.Time2Position(end);
                         children.Add(new(lane, time, end, startPos, endPos - startPos, info.IsMine));
-                        // Release
-                        timers.AddRelease(id + 2, id + 1, end);
-                        // LongBomb
-                        var len = info.Length;
-                        for (var offset = 0d; offset < len; offset += 0.125)
-                        {
-                            timers.Add(id + 4, time + offset);
-                        }
+                        timers.AddRelease(id + TimerIdOffsets.Release, id + TimerIdOffsets.Press, end);
+                        timers.Add(id + TimerIdOffsets.LongBomb, time);
                     }
                     else
                     {
                         children.Add(new(lane, time, time, startPos, 0, info.IsMine));
                         if (isVisible)
                         {
-                            // Release
-                            timers.AddRelease(id + 2, id + 1, time + 0.01);
+                            timers.AddRelease(id + TimerIdOffsets.Release, id + TimerIdOffsets.Press, time + 0.01);
                         }
                     }
                 }
@@ -89,18 +72,34 @@ namespace LivreNoirLibrary.Windows.Controls.Bms
             visible.Clear();
             var absTime = args.AbsoluteTime;
             var timer = args.Timer;
+            var judge = args.Judge;
+            judge.IsActive = false;
             if (timer.TryGet(TimerId.Play_MusicStart, absTime, out var currentTime))
             {
                 var start = timings.Time2Position(currentTime);
                 var end = start + 1 / args.HighSpeed;
                 foreach (var child in _children.AsSpan())
                 {
-                    if (child.EndTime >= currentTime && 
-                        child.VisualStart <= end && (child.VisualStart + child.VisualLength) >= start)
+                    if (child.EndTime < currentTime)
+                    {
+                        child.IsActive = false;
+                        if (!child.IsProcessed)
+                        {
+                            judge.UpdateJudge(timer, absTime + child.EndTime - currentTime, JudgeType.Perfect, ComboChange.Increase);
+                            child.IsProcessed = true;
+                        }
+                        continue;
+                    }
+                    if (child.VisualStart <= end && (child.VisualStart + child.VisualLength) >= start)
                     {
                         var offset = child.VisualStart - start;
                         child.CurrentOffset = offset;
-                        child.IsActive = offset is <= 0;
+                        if (offset is <= 0)
+                        {
+                            child.IsActive = true;
+                            judge.UpdateJudge(timer, absTime + child.Time - currentTime, JudgeType.Perfect, ComboChange.Continue);
+                            judge.IsActive = true;
+                        }
                         visible.Add(child);
                     }
                 }
@@ -118,6 +117,7 @@ namespace LivreNoirLibrary.Windows.Controls.Bms
             public double CurrentOffset { get; set; }
             public bool IsVisible { get; set; }
             public bool IsActive { get; set; }
+            public bool IsProcessed { get; set; }
         }
 
         public class TimerInfoList : Dictionary<TimerId, TimerInfo>
@@ -128,7 +128,7 @@ namespace LivreNoirLibrary.Windows.Controls.Bms
             {
                 var list = this.GetOrAdd(releaseId);
                 list.Add(value);
-                list.PressId = pressId;
+                list.ConflictId = pressId;
             }
 
             public void Advance(BmsTimer timer, double relativeTime, double offset)
@@ -142,7 +142,7 @@ namespace LivreNoirLibrary.Windows.Controls.Bms
 
         public class TimerInfo : List<double>
         {
-            public TimerId PressId { get; set; }
+            public TimerId ConflictId { get; set; }
             private int _index = 0;
 
             public void Advance(BmsTimer timer, TimerId id, double relativeTime, double offset)
@@ -153,9 +153,9 @@ namespace LivreNoirLibrary.Windows.Controls.Bms
                     if (this[index] <= relativeTime)
                     {
                         timer.Set(id, relativeTime + offset);
-                        if (PressId is not 0)
+                        if (ConflictId is not 0)
                         {
-                            timer.Remove(PressId);
+                            timer.Remove(ConflictId);
                         }
                     }
                     else

@@ -39,10 +39,8 @@ namespace LivreNoirLibrary.SandBox
 
             _skins = new();
             _skins.Load(Path.GetFullPath(@"Themes\BmsSkin\Default\", IO.General.GetAssemblyDir()));
-            if (_skins.PlaySkins[7] is { } enumer)
-            {
-                _creator.LoadSkin(enumer.First());
-            }
+            ComboBox_Skin.ItemsSource = _skins.PlaySkins[0];
+            ComboBox_Skin.SelectedIndex = 0;
         }
 
         protected override void OnActivated(EventArgs e)

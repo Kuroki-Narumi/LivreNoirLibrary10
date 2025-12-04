@@ -9,8 +9,8 @@ namespace LivreNoirLibrary.Windows.Controls.Bms.Elements
         protected override void RenderCore(in RenderArgs args)
         {
             var (px, py, pw, ph) = args.Rect;
-            var x = DestX;
-            var y = DestY;
+            var x = DestX - DestWidth * OriginX;
+            var y = DestY - DestHeight * OriginY;
             var width = Math.Min(DestWidth, pw - x);
             var height = Math.Min(DestHeight, ph - y);
             RenderChildren(args.Descend(new(x + px, y + py, width, height), args.ColorCorrection * OpacityMask));

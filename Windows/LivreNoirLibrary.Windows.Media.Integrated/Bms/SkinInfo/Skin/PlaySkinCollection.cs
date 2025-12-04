@@ -1,7 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using LivreNoirLibrary.Collections;
+﻿using LivreNoirLibrary.Collections;
 using LivreNoirLibrary.ObjectModel;
+using System;
+using System.Collections.Generic;
+using System.Windows.Input;
 
 namespace LivreNoirLibrary.Windows.Media.Bms.SkinInfo
 {
@@ -20,13 +21,14 @@ namespace LivreNoirLibrary.Windows.Media.Bms.SkinInfo
 
         public void Add(PlaySkin skin)
         {
+            _skins.GetOrAdd(0).Add(skin);
             foreach (var key in skin.KeyCount)
             {
                 _skins.GetOrAdd(key).Add(skin);
             }
         }
 
-        public IEnumerator<(int, IEnumerable<PlaySkin>)> GetEnumerator()
+        public IEnumerator<(int KeyCount, IEnumerable<PlaySkin> Skin)> GetEnumerator()
         {
             foreach (var (key, list) in _skins)
             {

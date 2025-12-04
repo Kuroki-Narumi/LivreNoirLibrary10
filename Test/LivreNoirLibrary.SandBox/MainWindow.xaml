@@ -39,6 +39,13 @@
                         <RowDefinition Height="*"/>
                     </Grid.RowDefinitions>
                     <WrapPanel Orientation="Horizontal">
+                        <ComboBox x:Name="ComboBox_Skin" SelectedItem="{Binding Screen.Skin, Mode=TwoWay}">
+                            <ComboBox.ItemTemplate>
+                                <DataTemplate DataType="cc:PlaySkin">
+                                    <TextBlock Text="{Binding DisplayName}"/>
+                                </DataTemplate>
+                            </ComboBox.ItemTemplate>
+                        </ComboBox>
                         <ct:Button Icon="{x:Static ct:Icons.Open}" Command="ApplicationCommands.Open"/>
                         <ct:Button Icon="{x:Static ct:Icons.Save}" Command="ApplicationCommands.Save"/>
                         <ct:Button Icon="{x:Static ct:Icons.Wave}" Click="OnClick_Assemble"/>

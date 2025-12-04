@@ -36,7 +36,7 @@ namespace LivreNoirLibrary.SandBox
         public AssembleOptions AssembleOptions { get; set => SetValue(ref field, value); } = new() { SetMarker = false, Gain = -3 };
 
         public Rational FrameRate { get; set => SetValue(ref field, value); } = FrameRates.Fps60;
-        public bool IsHevc { get; set => SetValue(ref field, value); } = true;
+        public bool IsHevc { get; set => SetValue(ref field, value); } = false;
         public int ApproximateKbps { get; set => SetValue(ref field, value); } = 10000;
         public double FadeinTime { get; set; } = 0;
         public double LoadTime { get; set; } = 0;

@@ -56,6 +56,8 @@ namespace LivreNoirLibrary.Windows.Controls.Bms
         private readonly MediaCache _mediaCache = new();
         private readonly NoteElementCollection _notes = new();
         private readonly BgaSource _bga = new();
+        private readonly JudgeInfo _judge = new();
+
         private DebugItem _debugRoot;
         private readonly Dictionary<object, DebugItem> _debugDic = [];
 
@@ -90,6 +92,7 @@ namespace LivreNoirLibrary.Windows.Controls.Bms
                     }
                 }
                 _debugRoot = new(value.Name ?? value.GetType().Name, 0, 0);
+                ExConsole.Write($"Skin \"{value.DisplayName}\" loaded");
             }
             else
             {
@@ -106,6 +109,8 @@ namespace LivreNoirLibrary.Windows.Controls.Bms
                 Image i => new ImageElement(i),
                 Bga b => new BgaElement(b),
                 NoteArea n => new NoteAreaElement(n),
+                Judge j => new JudgeElement(j),
+                Media.Bms.SkinInfo.Text t => new TextElement(t),
                 _ => null,
             };
             if (e is not null)
@@ -125,17 +130,6 @@ namespace LivreNoirLibrary.Windows.Controls.Bms
             }
         }
 
-        public void DetermineExpressions()
-        {
-            if (_skin is { } skin)
-            {
-                foreach (var element in _children.AsSpan())
-                {
-                    element.DetermineExpressions(skin, this);
-                }
-            }
-        }
-
         private void OnBmsPathChanged(string? value)
         {
             _mediaCache.Clear();
@@ -146,11 +140,9 @@ namespace LivreNoirLibrary.Windows.Controls.Bms
                 {
                     vm.Data = BmsData.Open(value);
                     var basePath = Directory!;
-                    var cache = _textureCache;
-                    cache.Set(Texture.Key_StageFile, vm.StageFile, basePath);
-                    cache.Set(Texture.Key_Banner, vm.Banner, basePath);
-                    cache.Set(Texture.Key_BackBmp, vm.BackBmp, basePath);
-                    cache.Set(Texture.Key_Bmp00, vm.GetDefValue(DefType.Bmp, 0), basePath);
+                    Options.SetBmsOptions(vm);
+                    Variables.SetBmsVariables(vm);
+                    _textureCache.SetBmsTexture(vm, basePath);
                     IsBmsReady = true;
                     return;
                 }
@@ -163,6 +155,17 @@ namespace LivreNoirLibrary.Windows.Controls.Bms
             IsBmsReady = false;
         }
 
+        public void DetermineExpressions()
+        {
+            if (_skin is { } skin)
+            {
+                foreach (var element in _children.AsSpan())
+                {
+                    element.DetermineExpressions(skin, this);
+                }
+            }
+        }
+
         public void SetupPlay(bool autoPlay)
         {
             var timer = _timer;
@@ -173,6 +176,7 @@ namespace LivreNoirLibrary.Windows.Controls.Bms
             timer.Remove(TimerId.Play_FullCombo);
             timer.Set(TimerId.Scene_Start, 0);
             _bga.Setup();
+            _judge.Clear();
             if (_isBmsReady)
             {
                 var timing = _timingList;
@@ -204,7 +208,7 @@ namespace LivreNoirLibrary.Windows.Controls.Bms
 
         public void Update(double time)
         {
-            UpdateArgs args = new(_timer, time, _timingList, _textureCache, _mediaCache, _notes, _bga, _highSpeed * _fixedHighSpeed);
+            UpdateArgs args = new(_timer, time, _timingList, _textureCache, _mediaCache, _notes, _bga, _judge, _highSpeed * _fixedHighSpeed);
             _notes.Update(args);
             _bga.Update(args);
             

@@ -7,12 +7,8 @@ namespace LivreNoirLibrary.Windows.Media.Bms.SkinInfo
     public sealed class Variable : SkinNode, IKeyNode
     {
         public string Key { get; set => SetValue(ref field, value); } = "";
-        public ValueExpression? Value { get; set => SetValue(ref field, value); }
+        public ValueExpression? Source { get; set => SetValue(ref field, value); }
+        public ValueExpression? DefaultValue { get; set => SetValue(ref field, value); }
         public ConvertCollection Converters { get; } = [];
-
-        public string? GetActualValue(string? value)
-        {
-            return value is not null && Converters.TryGetValue(value, out var result) ? result.To : value;
-        }
     }
 }

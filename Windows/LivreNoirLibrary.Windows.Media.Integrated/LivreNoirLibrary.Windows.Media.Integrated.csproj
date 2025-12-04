@@ -23,12 +23,17 @@
 
 	<ItemGroup>
 	  <Page Remove="Themes\BmsSkin\Default\7keys.xaml" />
+	  <Page Remove="Themes\BmsSkin\Default\BGA.xaml" />
 	</ItemGroup>
 
 	<ItemGroup>
 	  <None Include="Themes\BmsSkin\Default\7keys.xaml">
 	    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-	    <Generator>MSBuild:Compile</Generator>
+	    <Generator></Generator>
+	  </None>
+	  <None Include="Themes\BmsSkin\Default\BGA.xaml">
+	    <Generator></Generator>
+	    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 	  </None>
 	</ItemGroup>
 
@@ -54,13 +59,7 @@
 	  <None Update="Themes\BmsSkin\Default\bm_bomb.png">
 	    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 	  </None>
-	  <None Update="Themes\BmsSkin\Default\bm_frame_7.png">
-	    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-	  </None>
 	  <None Update="Themes\BmsSkin\Default\bm_judge.png">
-	    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-	  </None>
-	  <None Update="Themes\BmsSkin\Default\bm_obj.png">
 	    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 	  </None>
 	  <None Update="Themes\BmsSkin\Default\skin_bm.png">

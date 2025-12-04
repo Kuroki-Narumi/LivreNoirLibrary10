@@ -4,11 +4,11 @@ namespace LivreNoirLibrary.Windows.Media.Bms.SkinInfo
 {
     public partial class Texture : SkinNode, IKeyNode, IRectNode
     {
-        public const string Key_StageFile = "#STAGEFILE";
-        public const string Key_Banner = "#BANNER";
-        public const string Key_BackBmp = "#BACKBMP";
+        public const string Key_StageFile = Tags.StageFile;
+        public const string Key_Banner = Tags.Banner;
+        public const string Key_BackBmp = Tags.BackBmp;
         public const string Key_Bmp00 = "#BMP00";
-        public static bool IsReservedKey(string? key) => key is Key_StageFile or Key_Banner or Key_BackBmp;
+        public static bool IsReservedKey(string? key) => key is Key_StageFile or Key_Banner or Key_BackBmp or Key_Bmp00;
 
         public string Key { get; set => SetValue(ref field, value); } = "";
         public string? BasedOn { get; set => SetValue(ref field, value); }
