@@ -28,6 +28,7 @@ namespace LivreNoirLibrary.Media.Bms
         public double AverageTempo { get; private set; }
         public double MainTempo => _tempoList.Count is 0 ? -1 : SortedList.MaxKeyBy(_tempoList, _tempoInfoList, value => value.BeatLength);
         public double MainTimeTempo => _tempoList.Count is 0 ? -1 : SortedList.MaxKeyBy(_tempoList, _tempoInfoList, value => value.TimeLength);
+        public double LastTime { get; private set; }
 
         public virtual void Clear()
         {
@@ -144,7 +145,8 @@ namespace LivreNoirLibrary.Media.Bms
                 den += time;
             }
             AverageTempo = den is 0 ? 0 : (num / den).RoundToInt();
-            ExConsole.Write($"Min={MinTempo}bpm, Max={MaxTempo}bpm, Average={AverageTempo}bpm, Main={MainTempo}bpm, MainTime={MainTimeTempo}bpm");
+            LastTime = state.CurrentTime;
+            ExConsole.Write($"Min={MinTempo}bpm, Max={MaxTempo}bpm, Average={AverageTempo}bpm, Main={MainTempo}bpm, MainTime={MainTimeTempo}bpm, TotalTime={LastTime}");
         }
 
         public string GetTimingInfoText()

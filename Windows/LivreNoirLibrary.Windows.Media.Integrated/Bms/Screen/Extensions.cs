@@ -1,9 +1,11 @@
-﻿using LivreNoirLibrary.Media.Bms;
+﻿using LivreNoirLibrary.Collections;
+using LivreNoirLibrary.Media;
+using LivreNoirLibrary.Media.Bms;
+using LivreNoirLibrary.Text;
 using LivreNoirLibrary.Windows.Media;
 using LivreNoirLibrary.Windows.Media.Bms.SkinInfo;
 using System;
 using System.Collections.Generic;
-using System.Text;
 
 namespace LivreNoirLibrary.Windows.Controls.Bms
 {
@@ -34,6 +36,8 @@ namespace LivreNoirLibrary.Windows.Controls.Bms
             {
                 dict[key.ToString()] = viewModel.GetTextHeader(key, "");
             }
+
+            dict["TotalNotes"] = viewModel.CurrentTimeline.GetNoteCount().ToString();
         }
 
         public static void SetBmsTexture(this TextureCache cache, IBmsViewModel viewModel, string basePath)
@@ -59,5 +63,47 @@ namespace LivreNoirLibrary.Windows.Controls.Bms
             HeaderType.DefExRank,
             HeaderType.Comment,
         ];
+
+        public static void SetPlayInfos(this IDictionary<string, string> dict, ITimeCounter timingList)
+        {
+            dict["MinBpm"] = timingList.MinTempo.ToString();
+            dict["MaxBpm"] = timingList.MaxTempo.ToString();
+            dict["AverageBpm"] = timingList.AverageTempo.ToString();
+            dict["MainBpm"] = timingList.MainTempo.ToString();
+            dict["MainTimeBpm"] = timingList.MainTimeTempo.ToString();
+            dict["TotalTime"] = TimeSpan.FromSeconds(timingList.LastTime).ToString(@"mm\:ss");
+        }
+
+        public static void UpdateCurrentInfos(this IDictionary<string, string> dict, in UpdateArgs args)
+        {
+            var timer = args.Timer;
+            var absTime = args.AbsoluteTime;
+            var timings = args.Timings;
+
+            if (timer.TryGet(TimerId.Play_MusicStart, absTime, out var currentTime))
+            {
+                dict["CurrentTime"] = TimeSpan.FromSeconds(currentTime).ToString(@"mm\:ss");
+                dict["CurrentBpm"] = timings.Time2Tempo(currentTime).ToString();
+            }
+            else
+            {
+                dict["CurrentTime"] = "00:00";
+                dict["CurrentBpm"] = dict["Bpm"];
+            }
+            if (dict.TryGetValue("TotalTime", out var tt))
+            {
+                dict["FullTime"] = $"{dict["CurrentTime"]} / {tt}";
+            }
+            else
+            {
+                dict["FullTime"] = dict["CurrentTime"];
+            }
+
+                var score = args.Score;
+            dict["CurrentCombo"] = score.Combo.ToString();
+            dict["MaxCombo"] = score.MaxCombo.ToString();
+            dict["CurrentScore"] = score.Score.ToString();
+            dict["CurrentGage"] = score.Gage.ToString();
+        }
     }
 }

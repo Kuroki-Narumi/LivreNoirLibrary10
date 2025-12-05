@@ -22,22 +22,6 @@
 	</ItemGroup>
 
 	<ItemGroup>
-	  <Page Remove="Themes\BmsSkin\Default\7keys.xaml" />
-	  <Page Remove="Themes\BmsSkin\Default\BGA.xaml" />
-	</ItemGroup>
-
-	<ItemGroup>
-	  <None Include="Themes\BmsSkin\Default\7keys.xaml">
-	    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-	    <Generator></Generator>
-	  </None>
-	  <None Include="Themes\BmsSkin\Default\BGA.xaml">
-	    <Generator></Generator>
-	    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-	  </None>
-	</ItemGroup>
-
-	<ItemGroup>
     <ProjectReference Include="..\..\Media\LivreNoirLibrary.Media.Integrated\LivreNoirLibrary.Media.Integrated.csproj" />
     <ProjectReference Include="..\LivreNoirLibrary.Windows.Controls\LivreNoirLibrary.Windows.Controls.csproj" />
 		<ProjectReference Include="..\LivreNoirLibrary.Windows.SourceGenerator\LivreNoirLibrary.Windows.SourceGenerator.csproj">
@@ -53,6 +37,14 @@
 	</ItemGroup>
 
 	<ItemGroup>
+	  <None Update="Themes\BmsSkin\Default\7keys.xml">
+	    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+	    <Generator></Generator>
+	  </None>
+	  <None Update="Themes\BmsSkin\Default\BGA.xml">
+	    <Generator></Generator>
+	    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+	  </None>
 	  <None Update="Themes\BmsSkin\Default\bm_beam.png">
 	    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 	  </None>
@@ -60,6 +52,9 @@
 	    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 	  </None>
 	  <None Update="Themes\BmsSkin\Default\bm_judge.png">
+	    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+	  </None>
+	  <None Update="Themes\BmsSkin\Default\numbers.png">
 	    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 	  </None>
 	  <None Update="Themes\BmsSkin\Default\skin_bm.png">

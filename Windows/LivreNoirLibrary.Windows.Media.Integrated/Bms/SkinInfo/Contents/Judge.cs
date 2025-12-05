@@ -14,5 +14,6 @@ namespace LivreNoirLibrary.Windows.Media.Bms.SkinInfo
         public string? BadCombo { get; set => SetValue(ref field, value); }
         public string? Miss { get; set => SetValue(ref field, value); }
         public string? MissCombo { get; set => SetValue(ref field, value); }
+        public ValueExpression? Padding { get; set => SetValue(ref field, value); }
     }
 }

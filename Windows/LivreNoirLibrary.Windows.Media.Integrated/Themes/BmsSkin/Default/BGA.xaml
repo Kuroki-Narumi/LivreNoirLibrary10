@@ -1,5 +1,0 @@
-<PlaySkin DisplayName="BGA Only" KeyCount="5 7 10 14 9 18 24 48" Version="1.0" BaseSize="1280, 720" Background="#000">
-	<Bga>
-		<Destination Rect="280, 0, 720, 720"/>
-	</Bga>
-</PlaySkin>

@@ -18,7 +18,12 @@ namespace LivreNoirLibrary.Windows.Controls.Bms.Elements
         public const double DefaultStrokeThickness = 0;
 
         private readonly Media.Bms.SkinInfo.Text _source = source;
+        private string? _content;
+        private double _definedWidth;
+        private double _definedHeight;
+        private bool _needRefresh;
         private readonly FormattedTextOption _options = new();
+        private Pen? _pen;
         private readonly DrawingVisual _visual = new();
         private RenderTargetBitmap? _renderTarget;
         private readonly UIntBitmap _bitmap = new(0, 0);
@@ -26,57 +31,80 @@ namespace LivreNoirLibrary.Windows.Controls.Bms.Elements
         public override void DetermineExpressions(Skin skin, IVariableProvider? provider)
         {
             base.DetermineExpressions(skin, provider);
+            var op = _options;
             var source = _source;
-            if (IsValid = skin.TryResolveReflection(source.Content, provider, out var content))
+            if (source.FontFamily is { } font)
             {
-                var op = _options;
-                if (source.FontFamily is { } font)
-                {
-                    op.FontFamily = font;
-                }
-                op.FontStyle = source.FontStyle;
-                op.FontWeight = source.FontWeight;
-                op.FontStretch = source.FontStretch;
-                op.FontSize = skin.ResolveValue(source.FontSize, provider, DefaultFontSize);
-                op.Foreground = MediaUtils.GetBrush(source.Fill.ToColor());
-                var ft = MediaUtils.CreateFormattedText(content!, op);
-                using (var ctx = _visual.RenderOpen())
-                {
-                    var geometry = ft.BuildGeometry(new System.Windows.Point(0, 0));
-                    var pen = MediaUtils.GetPen(source.Stroke.ToColor(), skin.ResolveValue(source.StrokeThickness, provider, DefaultStrokeThickness));
-                    if (pen is not null)
-                    {
-                        ctx.DrawGeometry(null, pen, geometry);
-                    }
-                    ctx.DrawGeometry(op.Foreground, null, geometry);
-                }
-                var renderTarget = GetRenderTarget((int)Math.Ceiling(ft.Width), (int)Math.Ceiling(ft.Height));
-                renderTarget.Render(_visual);
-                _bitmap.Resize(renderTarget.PixelWidth, renderTarget.PixelHeight);
-                renderTarget.CopyPixels(_bitmap);
+                op.FontFamily = font;
             }
+            op.FontStyle = source.FontStyle;
+            op.FontWeight = source.FontWeight;
+            op.FontStretch = source.FontStretch;
+            op.FontSize = skin.ResolveValue(source.FontSize, provider, DefaultFontSize);
+            op.Foreground = MediaUtils.GetBrush(source.Fill.ToColor());
+            _pen = MediaUtils.GetPen(source.Stroke.ToColor(), skin.ResolveValue(source.StrokeThickness, provider, DefaultStrokeThickness));
+            _content = null;
+            UpdateContent(skin, provider);
         }
 
-        private RenderTargetBitmap GetRenderTarget(int width, int height)
+        public override void Update(in UpdateArgs args)
         {
-            if (_renderTarget is null || _renderTarget.PixelWidth < width || _renderTarget.PixelHeight < height)
+            base.Update(args);
+            UpdateContent(args.Skin, args.VariableProvider);
+            _definedWidth = DestWidth;
+            _definedHeight = DestHeight;
+        }
+
+        private void UpdateContent(Skin skin, IVariableProvider? provider)
+        {
+            if ((IsValid = skin.TryResolveReflection(_source.Content, provider, out var content)) && _content != content)
             {
-                _renderTarget = new RenderTargetBitmap(width, height, 96, 96, PixelFormats.Pbgra32);
+                _content = content;
+                _needRefresh = true;
             }
-            else
-            {
-                _renderTarget.Clear();
-            }
-            return _renderTarget;
         }
 
         protected override bool TryGetBitmap([MaybeNullWhen(false)] out IBitmap bitmap, out DrRect rect, FloatBitmap buffer)
         {
+            if (_needRefresh)
+            {
+                RefreshText();
+                _needRefresh = false;
+            }
             bitmap = _bitmap;
             rect = bitmap.Rect;
-            var w = rect.Width * DestHeight / rect.Height;
-            DestWidth = Math.Min(w, DestWidth);
+            DestHeight = Math.Min(_definedHeight, rect.Height);
+            DestWidth = Math.Min(_definedWidth, rect.Width * DestHeight / rect.Height);
             return true;
+        }
+
+        private void RefreshText()
+        {
+            var ft = MediaUtils.CreateFormattedText(_content!, _options);
+            using (var ctx = _visual.RenderOpen())
+            {
+                var geometry = ft.BuildGeometry(new System.Windows.Point(0, 0));
+                if (_pen is { } pen)
+                {
+                    ctx.DrawGeometry(null, pen, geometry);
+                }
+                ctx.DrawGeometry(_options.Foreground, null, geometry);
+            }
+            var renderTarget = _renderTarget;
+            var width = (int)Math.Ceiling(ft.Width);
+            var height = (int)Math.Ceiling(ft.Height);
+            if (renderTarget is null || renderTarget.PixelWidth < width || renderTarget.PixelHeight < height)
+            {
+                renderTarget = new RenderTargetBitmap(width, height, 96, 96, PixelFormats.Pbgra32);
+                _renderTarget = renderTarget;
+            }
+            else
+            {
+                renderTarget.Clear();
+            }
+            renderTarget.Render(_visual);
+            _bitmap.Resize(renderTarget.PixelWidth, renderTarget.PixelHeight);
+            renderTarget.CopyPixels(_bitmap);
         }
     }
 }

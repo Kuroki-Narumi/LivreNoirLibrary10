@@ -13,7 +13,6 @@ namespace LivreNoirLibrary.Windows.Media.Bms.SkinInfo
 {
     public partial class Skin : SkinContainer
     {
-        public string? DisplayName { get; set => SetValue(ref field, value); }
         [TypeConverter(typeof(VersionConverter))]
         public Version Version { get; set => SetValue(ref field, value); } = new(1, 0);
         public string? Author { get; set => SetValue(ref field, value); }

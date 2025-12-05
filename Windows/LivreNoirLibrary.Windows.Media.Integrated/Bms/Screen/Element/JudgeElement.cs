@@ -12,6 +12,7 @@ namespace LivreNoirLibrary.Windows.Controls.Bms.Elements
     {
         private readonly Judge _source = source;
         private readonly Dictionary<JudgeType, (TextureData Name, TextureData Combo)> _textures = [];
+        private double _padding;
         private UIntBitmap? _nameBitmap;
         private DrRect _nameRect;
         private UIntBitmap? _comboBitmap;
@@ -34,16 +35,18 @@ namespace LivreNoirLibrary.Windows.Controls.Bms.Elements
                 skin.TryGetTexture(combo, provider, out var comboData);
                 _textures[type] = (nameData, comboData);
             }
+
+            _padding = skin.ResolveValue(s.Padding, provider, 0d);
         }
 
         public override void Update(in UpdateArgs args)
         {
             base.Update(args);
-            var judge = args.Judge;
+            var judge = args.Score;
             var cache = args.Textures;
-            var relativeTime = args.AbsoluteTime - judge.LastTime;
+            var relativeTime = args.AbsoluteTime - judge.LastJudgeTime;
             if ((judge.IsActive || relativeTime < judge.DisplayTime) &&
-                _textures.TryGetValue(judge.Type, out var item))
+                _textures.TryGetValue(judge.JudgeType, out var item))
             {
                 var w = 0;
                 if (cache.TryGetTexture(item.Name, BmsTimer.GetFrameIndex(relativeTime, item.Name), out _nameBitmap, out _nameRect))
@@ -92,6 +95,10 @@ namespace LivreNoirLibrary.Windows.Controls.Bms.Elements
             }
             if (_comboBitmap is { } combo)
             {
+                if (_nameBitmap is not null)
+                {
+                    x += _padding;
+                }
                 foreach (var rect in _comboRects.AsSpan())
                 {
                     RenderSource(args, combo, rect, x, y, rect.Width, h, blend, color);

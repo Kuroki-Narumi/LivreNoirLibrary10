@@ -4,6 +4,7 @@ using LivreNoirLibrary.Media.Bms;
 using LivreNoirLibrary.Media.Wave;
 using LivreNoirLibrary.Windows;
 using LivreNoirLibrary.Windows.Controls;
+using LivreNoirLibrary.Windows.Controls.Bms;
 using LivreNoirLibrary.Windows.Media.Bms.SkinInfo;
 using System.IO;
 using System.Windows;
@@ -15,6 +16,12 @@ namespace LivreNoirLibrary.SandBox
     {
         private readonly BmsVideoCreator _creator;
         private readonly SkinCollection _skins;
+
+        public static readonly FixedHighSpeedMode[] FixedHighSpeedModeList =
+        [
+            FixedHighSpeedMode.None, FixedHighSpeedMode.Max, FixedHighSpeedMode.Min, FixedHighSpeedMode.Main, FixedHighSpeedMode.MainTime
+        ];
+
 
         private void OnDragOver_Bms(object sender, DragEventArgs e)
         {

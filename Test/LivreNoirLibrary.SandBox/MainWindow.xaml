@@ -7,6 +7,7 @@
         xmlns:ct="clr-namespace:LivreNoirLibrary.Windows.Controls;assembly=LivreNoirLibrary.Windows.Controls"
         xmlns:cc="clr-namespace:LivreNoirLibrary.Windows.Media.Bms.SkinInfo;assembly=LivreNoirLibrary.Windows.Media.Integrated"
         xmlns:media="clr-namespace:LivreNoirLibrary.Windows.Media;assembly=LivreNoirLibrary.Windows.Media"
+        xmlns:conv="clr-namespace:LivreNoirLibrary.Windows.Converters;assembly=LivreNoirLibrary.Windows.Controls"
         mc:Ignorable="d" d:DataContext="{d:DesignInstance Type=local:BmsVideoCreator}"
         Title="MainWindow" Height="450" Width="800">
     <Window.Resources>
@@ -39,16 +40,36 @@
                         <RowDefinition Height="*"/>
                     </Grid.RowDefinitions>
                     <WrapPanel Orientation="Horizontal">
+                        <WrapPanel.Resources>
+                            <Style TargetType="Border" x:Key="Separator">
+                                <Setter Property="Width" Value="1"/>
+                                <Setter Property="Margin" Value="2,4"/>
+                                <Setter Property="Background" Value="Gray"/>
+                            </Style>
+                            <Style TargetType="TextBlock">
+                                <Setter Property="VerticalAlignment" Value="Center"/>
+                                <Setter Property="Margin" Value="2,0"/>
+                            </Style>
+                            <conv:DoubleLinearConverter x:Key="HsConv" Slope="100" Rounding="Round"/>
+                        </WrapPanel.Resources>
                         <ComboBox x:Name="ComboBox_Skin" SelectedItem="{Binding Screen.Skin, Mode=TwoWay}">
                             <ComboBox.ItemTemplate>
                                 <DataTemplate DataType="cc:PlaySkin">
-                                    <TextBlock Text="{Binding DisplayName}"/>
+                                    <TextBlock Text="{Binding Name}"/>
                                 </DataTemplate>
                             </ComboBox.ItemTemplate>
                         </ComboBox>
                         <ct:Button Icon="{x:Static ct:Icons.Open}" Command="ApplicationCommands.Open"/>
                         <ct:Button Icon="{x:Static ct:Icons.Save}" Command="ApplicationCommands.Save"/>
                         <ct:Button Icon="{x:Static ct:Icons.Wave}" Click="OnClick_Assemble"/>
+                        
+                        <Border Style="{StaticResource Separator}"/>
+                        <TextBlock Text="HS"/>
+                        <ct:LabeledSlider SliderWidth="60" TextWidth="32" Minimum="1" Maximum="999" TickFrequency="10" Value="{Binding Screen.HighSpeed, Mode=TwoWay, Converter={StaticResource HsConv}}"/>
+                        <ComboBox ItemsSource="{x:Static local:MainWindow.FixedHighSpeedModeList}" SelectedItem="{Binding Screen.FixedHighSpeedMode, Mode=TwoWay}"/>
+
+                        <Border Style="{StaticResource Separator}"/>
+                        <TextBlock Text="FPS"/>
                         <ComboBox ItemsSource="{x:Static local:BmsVideoCreator.FpsList}" SelectedItem="{Binding FrameRate}"/>
                         <ct:Button Icon="{x:Static ct:Icons.Camera}" Click="OnClick_Video"/>
                     </WrapPanel>
@@ -58,7 +79,7 @@
                         </Rectangle.Fill>
                     </Rectangle>
                     <Border Grid.Row="1" Background="{ct:BrushProvider 8000}" HorizontalAlignment="Left" VerticalAlignment="Top" Padding="2">
-                        <TextBlock Text="{Binding Screen.DebugText}" Foreground="White"/>
+                        <TextBlock Text="{Binding Screen.DebugText}" Foreground="White" FontSize="12" FontFamily="Consolas"/>
                     </Border>
                 </Grid>
                 <ct:TaskProgressBar x:Name="TaskProgressBar"/>

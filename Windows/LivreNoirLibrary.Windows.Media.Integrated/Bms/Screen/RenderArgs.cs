@@ -35,7 +35,7 @@ namespace LivreNoirLibrary.Windows.Controls.Bms
         }
     }
 
-    public readonly record struct DebugItem(string Name, int Indent, double Time)
+    public readonly record struct DebugItem(string? Name, int Indent, double Time)
     {
         public DebugItem Reset() => new(Name, Indent, 0);
         public static DebugItem operator +(DebugItem left, double right) => new(left.Name, left.Indent, left.Time + right);

@@ -30,9 +30,9 @@ namespace LivreNoirLibrary.Windows.Controls.Bms
         [DependencyProperty(SetterScope = Scope.Private)]
         private bool _isBmsReady;
         [DependencyProperty]
-        private double _highSpeed = 1;
+        private double _highSpeed = 1.5;
         [DependencyProperty]
-        private FixedHighSpeedMode _fixedHighSpeedMode = FixedHighSpeedMode.MainTimeBpm;
+        private FixedHighSpeedMode _fixedHighSpeedMode = FixedHighSpeedMode.MainTime;
         [DependencyProperty(SetterScope = Scope.Private)]
         private double _fixedHighSpeed = 1.0;
         [DependencyProperty(SetterScope = Scope.Private)]
@@ -56,7 +56,7 @@ namespace LivreNoirLibrary.Windows.Controls.Bms
         private readonly MediaCache _mediaCache = new();
         private readonly NoteElementCollection _notes = new();
         private readonly BgaSource _bga = new();
-        private readonly JudgeInfo _judge = new();
+        private readonly ScoreInfo _judge = new();
 
         private DebugItem _debugRoot;
         private readonly Dictionary<object, DebugItem> _debugDic = [];
@@ -92,7 +92,7 @@ namespace LivreNoirLibrary.Windows.Controls.Bms
                     }
                 }
                 _debugRoot = new(value.Name ?? value.GetType().Name, 0, 0);
-                ExConsole.Write($"Skin \"{value.DisplayName}\" loaded");
+                ExConsole.Write($"Skin \"{value.Name}\" loaded");
             }
             else
             {
@@ -107,6 +107,7 @@ namespace LivreNoirLibrary.Windows.Controls.Bms
             {
                 Group g => new GroupElement(g),
                 Image i => new ImageElement(i),
+                Number n => new NumberElement(n),
                 Bga b => new BgaElement(b),
                 NoteArea n => new NoteAreaElement(n),
                 Judge j => new JudgeElement(j),
@@ -115,7 +116,7 @@ namespace LivreNoirLibrary.Windows.Controls.Bms
             };
             if (e is not null)
             {
-                _debugDic[e] = new(element.Name ?? element.GetType().Name, indent, 0);
+                _debugDic[e] = new(element.Name, indent, 0);
                 children.Add(e);
                 if (e is GroupElement g)
                 {
@@ -181,13 +182,14 @@ namespace LivreNoirLibrary.Windows.Controls.Bms
             {
                 var timing = _timingList;
                 timing.Load(ViewModel, Directory!, autoPlay);
+                Variables.SetPlayInfos(timing);
                 _notes.Setup(timing);
                 FixedHighSpeed = 240d / _fixedHighSpeedMode switch
                 {
-                    FixedHighSpeedMode.MinBpm => timing.MinTempo,
-                    FixedHighSpeedMode.MaxBpm => timing.MaxTempo,
-                    FixedHighSpeedMode.MainBpm => timing.MainTempo,
-                    FixedHighSpeedMode.MainTimeBpm => timing.MainTimeTempo,
+                    FixedHighSpeedMode.Min => timing.MinTempo,
+                    FixedHighSpeedMode.Max => timing.MaxTempo,
+                    FixedHighSpeedMode.Main => timing.MainTempo,
+                    FixedHighSpeedMode.MainTime => timing.MainTimeTempo,
                     _ => 60,
                 };
             }
@@ -208,16 +210,20 @@ namespace LivreNoirLibrary.Windows.Controls.Bms
 
         public void Update(double time)
         {
-            UpdateArgs args = new(_timer, time, _timingList, _textureCache, _mediaCache, _notes, _bga, _judge, _highSpeed * _fixedHighSpeed);
-            _notes.Update(args);
-            _bga.Update(args);
-            
-            foreach (var child in _children.AsSpan())
+            if (_skin is { } skin)
             {
-                child.Update(args);
+                UpdateArgs args = new(skin, this, _timer, time, _timingList, _textureCache, _mediaCache, _notes, _bga, _judge, _highSpeed * _fixedHighSpeed);
+                _notes.Update(args);
+                _bga.Update(args);
+                Variables.UpdateCurrentInfos(args);
+
+                foreach (var child in _children.AsSpan())
+                {
+                    child.Update(args);
+                }
+                _needRender = true;
+                InvalidateVisual();
             }
-            _needRender = true;
-            InvalidateVisual();
         }
 
         protected override void OnRender(DrawingContext drawingContext)
@@ -290,7 +296,7 @@ namespace LivreNoirLibrary.Windows.Controls.Bms
             AppendLine(_debugRoot, total);
             foreach (var (_, item) in _debugDic)
             {
-                if (item.Time is not 0)
+                if (!string.IsNullOrEmpty(item.Name) && item.Time is not 0)
                 {
                     _debugBuilder.AppendLine();
                     AppendLine(item, total);

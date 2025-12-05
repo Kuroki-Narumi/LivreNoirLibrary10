@@ -57,6 +57,36 @@ namespace LivreNoirLibrary.Windows.Media.Bms.SkinInfo
                 var ctx = _ctx;
                 Dictionary<string, SortingSkinNode?> sortingNodes = [];
                 Queue<SortingSkinNode> queue = [];
+                foreach (var path in Directory.EnumerateFiles(directory, "*.xml", SearchOption.AllDirectories))
+                {
+                    GetNode(path);
+                }
+                // 入り数0のノードが検出できなくなるまでループ
+                while (queue.Count is > 0)
+                {
+                    var current = queue.Dequeue();
+                    var skin = current.Skin;
+                    skins.Add(current.FullPath, skin);
+                    // 現在のノードの依存関係を解決
+                    skin.Refresh(current.Directory, skins);
+                    // このノードを参照するノードの入り数を減らす
+                    foreach (var neighbor in current.Outgoing)
+                    {
+                        neighbor.Indegree--;
+                        if (neighbor.Indegree is 0)
+                        {
+                            queue.Enqueue(neighbor);
+                        }
+                    }
+                    // スキン種別ごとのリストに追加
+                    switch (skin)
+                    {
+                        case PlaySkin p:
+                            playSkins.Add(p);
+                            break;
+                    }
+                }
+
                 SortingSkinNode? GetNode(string path)
                 {
                     if (!sortingNodes.TryGetValue(path, out var node))
@@ -88,35 +118,6 @@ namespace LivreNoirLibrary.Windows.Media.Bms.SkinInfo
                         sortingNodes.Add(path, null);
                     }
                     return node;
-                }
-                foreach (var path in Directory.EnumerateFiles(directory, "*.xaml", SearchOption.AllDirectories))
-                {
-                    GetNode(path);
-                }
-                // 入り数0のノードが検出できなくなるまでループ
-                while (queue.Count is > 0)
-                {
-                    var current = queue.Dequeue();
-                    var skin = current.Skin;
-                    skins.Add(current.FullPath, skin);
-                    // 現在のノードの依存関係を解決
-                    skin.Refresh(current.Directory, skins);
-                    // このノードを参照するノードの入り数を減らす
-                    foreach (var neighbor in current.Outgoing)
-                    {
-                        neighbor.Indegree--;
-                        if (neighbor.Indegree is 0)
-                        {
-                            queue.Enqueue(neighbor);
-                        }
-                    }
-                    // スキン種別ごとのリストに追加
-                    switch (skin)
-                    {
-                        case PlaySkin p:
-                            playSkins.Add(p);
-                            break;
-                    }
                 }
             }
         }

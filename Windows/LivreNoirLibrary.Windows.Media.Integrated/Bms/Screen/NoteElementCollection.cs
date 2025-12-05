@@ -43,7 +43,7 @@ namespace LivreNoirLibrary.Windows.Controls.Bms
                     if (isVisible)
                     {
                         timers.Add(id + TimerIdOffsets.Press, time);
-                        timers.Add(id + TimerIdOffsets.Bomb, end);
+                        timers.AddRelease(id + TimerIdOffsets.Bomb, id + TimerIdOffsets.LongBomb, end);
                     }
                     if (info.Length is > 0)
                     {
@@ -65,6 +65,10 @@ namespace LivreNoirLibrary.Windows.Controls.Bms
             bars.Sort(new BarLineInfoComparer());
         }
 
+        // kari
+        public static JudgeInfo Judge_Perfect { get; } = new(JudgeType.Perfect, ComboChange.Increase, 2, 1);
+        public static JudgeInfo Judge_LongEnd { get; } = new(JudgeType.Perfect, ComboChange.Continue, 0, 0);
+
         public void Update(in UpdateArgs args)
         {
             var timings = args.Timings;
@@ -72,7 +76,7 @@ namespace LivreNoirLibrary.Windows.Controls.Bms
             visible.Clear();
             var absTime = args.AbsoluteTime;
             var timer = args.Timer;
-            var judge = args.Judge;
+            var judge = args.Score;
             judge.IsActive = false;
             if (timer.TryGet(TimerId.Play_MusicStart, absTime, out var currentTime))
             {
@@ -85,7 +89,7 @@ namespace LivreNoirLibrary.Windows.Controls.Bms
                         child.IsActive = false;
                         if (!child.IsProcessed)
                         {
-                            judge.UpdateJudge(timer, absTime + child.EndTime - currentTime, JudgeType.Perfect, ComboChange.Increase);
+                            judge.UpdateJudge(timer, absTime + child.EndTime - currentTime, Judge_Perfect);
                             child.IsProcessed = true;
                         }
                         continue;
@@ -97,7 +101,7 @@ namespace LivreNoirLibrary.Windows.Controls.Bms
                         if (offset is <= 0)
                         {
                             child.IsActive = true;
-                            judge.UpdateJudge(timer, absTime + child.Time - currentTime, JudgeType.Perfect, ComboChange.Continue);
+                            judge.UpdateJudge(timer, absTime + child.Time - currentTime, Judge_LongEnd);
                             judge.IsActive = true;
                         }
                         visible.Add(child);

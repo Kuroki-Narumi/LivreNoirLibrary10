@@ -15,6 +15,11 @@ namespace LivreNoirLibrary.Media.Bms
         Play_Beat,
         Play_FullCombo,
 
+        Play_Gage_Gain,
+        Play_Gage_Low,
+        Play_Gage_High,
+        Play_Gage_Max,
+
         Play_Perfect = TimerIdOffsets.GeneralJudge + TimerIdOffsets.Perfect,
         Play_Great = TimerIdOffsets.GeneralJudge + TimerIdOffsets.Great,
         Play_Good = TimerIdOffsets.GeneralJudge + TimerIdOffsets.Good,
