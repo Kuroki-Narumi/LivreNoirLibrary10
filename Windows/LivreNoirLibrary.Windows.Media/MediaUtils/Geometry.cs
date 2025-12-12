@@ -8,7 +8,7 @@ namespace LivreNoirLibrary.Windows.Media
     {
         public static StreamGeometry CreateGeometry(string data)
         {
-            var g = (StreamGeometry)Geometry.Parse(data);
+            var g = (Geometry.Parse(data) as StreamGeometry)!;
             g.Freeze();
             return g;
         }

@@ -47,6 +47,43 @@ namespace LivreNoirLibrary.Media
             }
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static bool Adjust(ref Rectangle sourceRect, ref Point destLocation, int sourceWidth, int sourceHeight, int destWidth, int destHeight)
+        {
+            var (sx, sy, w, h) = sourceRect;
+            var (dx, dy) = destLocation;
+
+            // 実際のクリップ範囲
+            // [クリップ元 左上] と [クリップ有効範囲 左上] のうち、より右下にあるほう
+            var sourceLeft = Math.Max(sx, 0);
+            var sourceTop = Math.Max(sy, 0);
+            // [クリップ元 右下] と [クリップ有効範囲 右下] のうち、より左上にあるほう
+            var sourceRight = Math.Min(sx + w, sourceWidth);
+            var sourceBottom = Math.Min(sx + h, sourceHeight);
+
+            // 実際の貼り付け範囲
+            // [貼り付け先 左上] と [貼り付け有効範囲 左上] のうち、より右下にあるほう
+            var destLeft = Math.Max(dx, 0);
+            var destTop = Math.Max(dy, 0);
+            // [貼り付け先 右下] と [貼り付け有効範囲 右下] のうち、より左上にあるほう
+            var destRight = Math.Min(dx + w, destWidth);
+            var destBottom = Math.Min(dy + h, destHeight);
+
+            // [クリップ元 範囲] を [貼り付け先 範囲] に合わせる
+            sourceLeft = Math.Max(sourceLeft, sx + (destLeft - dx));
+            sourceTop = Math.Max(sourceTop, sy + (destTop - dy));
+            // [貼り付け先 範囲] を [クリップ元 範囲] に合わせる
+            destLeft = Math.Max(destLeft, dx + (sourceLeft - sx));
+            destTop = Math.Max(destTop, dy + (sourceTop - sy));
+            // 実際の貼り付けサイズ
+            w = Math.Min(sourceRight - sourceLeft, destRight - destLeft);
+            h = Math.Min(sourceBottom - sourceTop, destBottom - destTop);
+
+            sourceRect = new(sourceLeft, sourceTop, w, h);
+            destLocation = new(destLeft, destTop);
+            return w is > 0 && h is > 0;
+        }
+
         /// <summary>
         /// <paramref name="sourceValidRect"/>で規定された有効範囲から<paramref name="sourceRect"/>で指定された範囲を切り抜き、
         /// <paramref name="destValidRect"/>で規定された有効範囲内の<paramref name="destRect"/>で指定された範囲に貼り付けようとした際の、
@@ -61,7 +98,7 @@ namespace LivreNoirLibrary.Media
         /// <param name="actualDestRect">正規化された貼り付け先範囲</param>
         /// <returns><see langword="true"/> if both <paramref name="actualSourceRect"/> and <paramref name="actualDestRect"/> are valid; otherwise, <see langword="false"/>.</returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static bool Adjust(
+        public static bool AdjustStretch(
             in DoubleRect sourceValidRect, in DoubleRect sourceRect, 
             in DoubleRect destValidRect, in DoubleRect destRect, 
             out Rectangle actualSourceRect, out Rectangle actualDestRect)
@@ -83,31 +120,21 @@ namespace LivreNoirLibrary.Media
             var scaleX = destWidth / sourceWidth;
             var scaleY = destHeight / sourceHeight;
 
-            // 右下の座標
-            var sourceOrigRight = sourceOrigX + sourceOrigWidth;
-            var sourceOrigBottom = sourceOrigY + sourceOrigHeight;
-            var sourceRight = sourceX + sourceWidth;
-            var sourceBottom = sourceY + sourceHeight;
-            var destOrigRight = destOrigX + destOrigWidth;
-            var destOrigBottom = destOrigY + destOrigHeight;
-            var destRight = destX + destWidth;
-            var destBottom = destY + destHeight;
-
             // 実際のクリップ範囲
             // [クリップ元 左上] と [クリップ有効範囲 左上] のうち、より右下にあるほう
             var sourceLeft = Math.Max(sourceX, sourceOrigX);
             var sourceTop = Math.Max(sourceY, sourceOrigY);
             // [クリップ元 右下] と [クリップ有効範囲 右下] のうち、より左上にあるほう
-            sourceRight = Math.Min(sourceRight, sourceOrigRight);
-            sourceBottom = Math.Min(sourceBottom, sourceOrigBottom);
+            var sourceRight = Math.Min(sourceX + sourceWidth, sourceOrigX + sourceOrigWidth);
+            var sourceBottom = Math.Min(sourceY + sourceHeight, sourceOrigY + sourceOrigHeight);
 
             // 実際の貼り付け範囲
             // [貼り付け先 左上] と [貼り付け有効範囲 左上] のうち、より右下にあるほう
             var destLeft = Math.Max(destX, destOrigX);
             var destTop = Math.Max(destY, destOrigY);
             // [貼り付け先 右下] と [貼り付け有効範囲 右下] のうち、より左上にあるほう
-            destRight = Math.Min(destRight, destOrigRight);
-            destBottom = Math.Min(destBottom, destOrigBottom);
+            var destRight = Math.Min(destX + destWidth, destOrigX + destOrigWidth);
+            var destBottom = Math.Min(destY + destHeight, destOrigY + destOrigHeight);
 
             // [クリップ元 範囲] を [貼り付け先 範囲] に合わせる
             sourceLeft = Math.Max(sourceLeft, sourceX + (destLeft - destX) / scaleX);
@@ -121,7 +148,6 @@ namespace LivreNoirLibrary.Media
             destWidth = sourceWidth * scaleX;
             destHeight = sourceHeight * scaleY;
 
-            //actualSourceRect = new(sourceLeft.RoundToInt(), sourceTop.RoundToInt(), sourceWidth.RoundToInt(), sourceHeight.RoundToInt());
             actualSourceRect = new((int)sourceLeft, (int)sourceTop, (int)Math.Ceiling(sourceWidth), (int)Math.Ceiling(sourceHeight));
             actualDestRect = new(destLeft.RoundToInt(), destTop.RoundToInt(), destWidth.RoundToInt(), destHeight.RoundToInt());
 

@@ -1,10 +1,14 @@
-﻿using LivreNoirLibrary.IO;
+﻿using FFmpeg.AutoGen;
+using LivreNoirLibrary.IO;
 using LivreNoirLibrary.Media;
 using LivreNoirLibrary.Media.Bms;
+using LivreNoirLibrary.Media.Bms.Play;
 using LivreNoirLibrary.Media.Wave;
+using LivreNoirLibrary.Numerics;
 using LivreNoirLibrary.Windows;
 using LivreNoirLibrary.Windows.Controls;
 using LivreNoirLibrary.Windows.Controls.Bms;
+using LivreNoirLibrary.Windows.Media.Bms;
 using LivreNoirLibrary.Windows.Media.Bms.SkinInfo;
 using System.IO;
 using System.Windows;
@@ -14,14 +18,13 @@ namespace LivreNoirLibrary.SandBox
 {
     public partial class MainWindow
     {
-        private readonly BmsVideoCreator _creator;
-        private readonly SkinCollection _skins;
+        public BmsVideoCreateOptions BmsOptions { get; }
+        public BmsScreen BmsScreen { get; }
+        public BmsVideoCreator BmsVideoCreator { get; }
+        public SkinCollection BmsSkins { get; }
 
-        public static readonly FixedHighSpeedMode[] FixedHighSpeedModeList =
-        [
-            FixedHighSpeedMode.None, FixedHighSpeedMode.Max, FixedHighSpeedMode.Min, FixedHighSpeedMode.Main, FixedHighSpeedMode.MainTime
-        ];
-
+        public static HsCorrectionMode[] HsCorrectionModes => BmsExtensions.HsCorrectionModes;
+        public static readonly Rational[] FpsList = [FrameRates.Fps24, FrameRates.Fps30, FrameRates.Fps60, FrameRates.Fps120, FrameRates.Fps144];
 
         private void OnDragOver_Bms(object sender, DragEventArgs e)
         {
@@ -33,7 +36,7 @@ namespace LivreNoirLibrary.SandBox
         {
             foreach (var path in e.GetFileList())
             {
-                if (ExtRegs.BeMusic.IsMatch(path) && _creator.OpenBms(path))
+                if (ExtRegs.BeMusic.IsMatch(path) && BmsScreen.OpenBms(path))
                 {
                     e.Handled = true;
                     return;
@@ -52,16 +55,16 @@ namespace LivreNoirLibrary.SandBox
         private void OnExecuted_Open(object sender, ExecutedRoutedEventArgs e)
         {
             e.Handled = true;
-            if (this.OpenFileDialog(FileDialogOptions.WithInitialPath(_creator.Screen.BmsPath), Filters.Bms) is { } path)
+            if (this.OpenFileDialog(FileDialogOptions.WithInitialPath(BmsScreen.BmsPath), Filters.Bms) is { } path)
             {
-                _creator.OpenBms(path);
+                BmsScreen.OpenBms(path);
             }
         }
 
         private void OnExecuted_Save(object sender, ExecutedRoutedEventArgs e)
         {
-            if (_creator.Screen is { IsBmsReady: true, ViewModel.Data: BmsData data } &&
-                this.SaveFileDialog(FileDialogOptions.WithInitialPath(_creator.Screen.BmsPath), Filters.Bms_Save) is { } path)
+            if (BmsScreen is { IsBmsReady: true, ViewModel.Data: BmsData data } &&
+                this.SaveFileDialog(FileDialogOptions.WithInitialPath(BmsScreen.BmsPath), Filters.Bms_Save) is { } path)
             {
                 data.Save(path, false, true);
             }
@@ -69,33 +72,25 @@ namespace LivreNoirLibrary.SandBox
 
         private void OnClick_Assemble(object sender, RoutedEventArgs e)
         {
-            _creator.AssembleOptions.AdjustBeginning = true;
-            this.StartTask(_creator.Assemble, finished: Assemble_Finished);
-        }
-
-        private void Assemble_Finished(bool aborted)
-        {
-            var path = Path.ChangeExtension(_creator.Screen.BmsPath, Exts.Wav);
-            if (_creator.TryFlushAssembledData(out var data) &&
-                this.SaveFileDialog(FileDialogOptions.WithInitialPath(path), Filters.Wave) is { } savePath)
+            if (BmsScreen.IsBmsReady)
             {
-                data.Save(savePath);
+                var path = Path.ChangeExtension(BmsScreen.BmsPath, Exts.Wav);
+                if (this.SaveFileDialog(FileDialogOptions.WithInitialPath(path), Filters.Wave) is { } savePath)
+                {
+                    this.StartTask((p, c) => BmsVideoCreator.Assemble(savePath, p, c));
+                }
             }
         }
 
         private void OnClick_Video(object sender, RoutedEventArgs e)
         {
-            _creator.AssembleOptions.AdjustBeginning = false;
-            this.StartTask(_creator.Assemble, finished: Construct_Assemble_Finished);
-        }
-
-        private void Construct_Assemble_Finished(bool aborted)
-        {
-            var path = Path.ChangeExtension(_creator.Screen.BmsPath, Exts.MP4);
-            if (_creator.TryFlushAssembledData(out var waveData) &&
-                this.SaveFileDialog(FileDialogOptions.WithInitialPath(path), Filters.MP4) is { } savePath)
+            if (BmsScreen.IsBmsReady)
             {
-                this.StartTaskSynchronized((p, c) => _creator.CreateVideo(savePath, waveData, p, c));
+                var path = Path.ChangeExtension(BmsScreen.BmsPath, Exts.MP4);
+                if (this.SaveFileDialog(FileDialogOptions.WithInitialPath(path), Filters.MP4) is { } savePath)
+                {
+                    this.StartTaskSynchronized((p, c) => BmsVideoCreator.CreateVideo(savePath, p, c));
+                }
             }
         }
     }

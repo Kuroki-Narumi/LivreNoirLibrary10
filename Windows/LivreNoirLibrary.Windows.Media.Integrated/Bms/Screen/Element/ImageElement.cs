@@ -1,5 +1,5 @@
-﻿using LivreNoirLibrary.Collections;
-using LivreNoirLibrary.Media;
+﻿using LivreNoirLibrary.Media;
+using LivreNoirLibrary.Media.Bms;
 using LivreNoirLibrary.Windows.Media.Bms.SkinInfo;
 using System;
 using System.Diagnostics.CodeAnalysis;
@@ -7,7 +7,7 @@ using DrRect = System.Drawing.Rectangle;
 
 namespace LivreNoirLibrary.Windows.Controls.Bms.Elements
 {
-    public sealed class ImageElement(Image source) : SingleElement(source)
+    public sealed class ImageElement(Image source) : SingleTextureElement(source)
     {
         private readonly Image _source = source;
         private TextureData _textureData;
@@ -17,7 +17,8 @@ namespace LivreNoirLibrary.Windows.Controls.Bms.Elements
         public override void DetermineExpressions(Skin skin, IVariableProvider? provider)
         {
             base.DetermineExpressions(skin, provider);
-            IsValid = skin.TryGetTexture(_source.Texture, provider, out _textureData);
+            Stretch = _source.Stretch;
+            IsValid = skin.TryGetTextureData(_source.Texture, provider, out _textureData);
         }
 
         public override void Update(in UpdateArgs args)

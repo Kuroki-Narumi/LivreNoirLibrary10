@@ -48,7 +48,8 @@ namespace LivreNoirLibrary.Media.Bms.ViewModels
         public double MaxTempo => GetTimeCounter().MaxTempo;
         public double MainTempo => GetTimeCounter().MainTempo;
         public double MainTimeTempo => GetTimeCounter().MainTimeTempo;
-        public double LastTime => GetTimeCounter().LastTime;
+        public double FirstSoundTime => GetTimeCounter().FirstSoundTime;
+        public double LastSoundTime => GetTimeCounter().LastSoundTime;
         public double Beat2Time(double absolutePosition) => GetTimeCounter().Beat2Time(absolutePosition);
         public double Time2Beat(double time) => GetTimeCounter().Time2Beat(time);
         public double GetHighSpeed(double time) => GetTimeCounter().GetHighSpeed(time);

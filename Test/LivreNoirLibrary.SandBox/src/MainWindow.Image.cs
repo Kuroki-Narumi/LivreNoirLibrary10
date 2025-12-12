@@ -61,7 +61,7 @@ namespace LivreNoirLibrary.SandBox
                 using (var sourceBitmap = source.BeginRead())
                 {
                     destination.CopyPixels(targetBitmap);
-                    sourceBitmap.CopyTo(Image_Source.GetRect().ToDoubleRect(),
+                    sourceBitmap.BlendWithScale(Image_Source.GetRect().ToDoubleRect(),
                         targetBitmap, targetBitmap.DoubleRect, Image_Target.GetRect().ToDoubleRect(),
                         (BlendMode)ComboBox_BlendMode.SelectedItem, new FloatColor((float)Slider_Opacity.Value * 0.01f, 1, 1, 1), _buffer1, true);
                 }

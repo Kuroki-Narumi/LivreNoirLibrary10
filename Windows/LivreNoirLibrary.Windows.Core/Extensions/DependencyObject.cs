@@ -1,7 +1,9 @@
-﻿using System;
+﻿using LivreNoirLibrary.ObjectModel;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Windows;
+using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Media3D;
 using System.Windows.Threading;
@@ -15,122 +17,147 @@ namespace LivreNoirLibrary.Windows
             obj.Dispatcher.BeginInvoke(action, timing);
         }
 
-        public static bool IsLogicalAncestorOf(this DependencyObject ancestor, object? descendant)
+        public static DependencyObject? GetParent(this DependencyObject obj) => (obj is Visual or Visual3D ? VisualTreeHelper.GetParent(obj) : null) ?? LogicalTreeHelper.GetParent(obj);
+
+        public static bool IsAncestorOf(this DependencyObject? ancestor, object? descendant)
         {
-            if (descendant is DependencyObject obj)
+            for (var obj = descendant as DependencyObject; obj is not null;)
             {
-                var o = obj;
-                while (o is not null)
+                var parent = GetParent(obj);
+                if (parent == ancestor)
                 {
-                    if (o is Visual or Visual3D)
-                    {
-                        o = VisualTreeHelper.GetParent(obj);
-                    }
-                    else
-                    {
-                        o = null;
-                    }
-                    o ??= LogicalTreeHelper.GetParent(obj);
-                    obj = o;
-                    if (obj == ancestor)
-                    {
-                        return true;
-                    }
+                    return true;
                 }
+                obj = parent;
             }
             return false;
         }
 
-        public static bool TryGetAncestor<T>(this DependencyObject obj, [NotNullWhen(true)] out T? ancestor)
+        public static bool TryGetAncestor(this DependencyObject? obj, Predicate<DependencyObject> predicate, [MaybeNullWhen(false)] out DependencyObject ancestor)
+        {
+            while (obj is not null)
+            {
+                var parent = GetParent(obj);
+                if (parent is not null && predicate(parent))
+                {
+                    ancestor = parent;
+                    return true;
+                }
+                obj = parent;
+            }
+            ancestor = null;
+            return false;
+        }
+
+        public static bool TryGetAncestor<T>(this DependencyObject? obj, [NotNullWhen(true)] out T? ancestor)
             where T : DependencyObject
         {
-            var o = obj;
-            while (o is not null)
+            while (obj is not null)
             {
-                if (o is Visual or Visual3D)
-                {
-                    o = VisualTreeHelper.GetParent(obj);
-                }
-                else
-                {
-                    o = null;
-                }
-                o ??= LogicalTreeHelper.GetParent(obj);
-                obj = o;
-                if (obj is T target)
+                var parent = GetParent(obj);
+                if (parent is T target)
                 {
                     ancestor = target;
                     return true;
                 }
+                obj = parent;
             }
             ancestor = null;
             return false;
         }
 
-        public static bool TryGetAncestor(this DependencyObject obj, Predicate<DependencyObject> predicate, [MaybeNullWhen(false)] out DependencyObject ancestor)
-        {
-            var o = obj;
-            while (o is not null)
-            {
-                if (o is Visual or Visual3D)
-                {
-                    o = VisualTreeHelper.GetParent(obj);
-                }
-                else
-                {
-                    o = null;
-                }
-                o ??= LogicalTreeHelper.GetParent(obj);
-                obj = o;
-                if (predicate(obj))
-                {
-                    ancestor = obj;
-                    return true;
-                }
-            }
-            ancestor = null;
-            return false;
-        }
-
-        public static bool TryGetFirstDescendant<T>(this DependencyObject obj, [NotNullWhen(true)] out T? descendant)
+        public static bool TryGetAncestor<T>(this DependencyObject? obj, Predicate<T> predicate, [MaybeNullWhen(false)] out T ancestor)
             where T : DependencyObject
         {
-            Queue<DependencyObject> que = new([obj]);
-            while (que.Count > 0)
+            while (obj is not null)
             {
-                var o = que.Dequeue();
-                var count = VisualTreeHelper.GetChildrenCount(o);
-                for (int i = 0; i < count; i++)
+                var parent = GetParent(obj);
+                if (parent is T target && predicate(target))
                 {
-                    var child = VisualTreeHelper.GetChild(o, i);
-                    if (child is T target)
+                    ancestor = target;
+                    return true;
+                }
+                obj = parent;
+            }
+            ancestor = null;
+            return false;
+        }
+
+        public static IEnumerable<DependencyObject> EnumerateDescendantsByQueue(this DependencyObject obj)
+        {
+            var queue = ObjectPool.Rent<Queue<DependencyObject>>();
+            try
+            {
+                queue.Enqueue(obj);
+                while (queue.TryDequeue(out var o))
+                {
+                    var count = VisualTreeHelper.GetChildrenCount(o);
+                    for (var i = 0; i < count; i++)
                     {
-                        descendant = target;
-                        return true;
+                        var child = VisualTreeHelper.GetChild(o, i);
+                        if (child is not null)
+                        {
+                            yield return child;
+                            queue.Enqueue(child);
+                        }
                     }
-                    que.Enqueue(child);
+                }
+            }
+            finally
+            {
+                ObjectPool.Return(queue);
+            }
+        }
+
+        public static IEnumerable<DependencyObject> EnumerateDescendantsByStack(this DependencyObject obj)
+        {
+            var stack = ObjectPool.Rent<Stack<DependencyObject>>();
+            try
+            {
+                stack.Push(obj);
+                while (stack.TryPop(out var o))
+                {
+                    var count = VisualTreeHelper.GetChildrenCount(o);
+                    for (var i = 0; i < count; i++)
+                    {
+                        var child = VisualTreeHelper.GetChild(o, i);
+                        if (child is not null)
+                        {
+                            yield return child;
+                            stack.Push(child);
+                        }
+                    }
+                }
+            }
+            finally
+            {
+                ObjectPool.Return(stack);
+            }
+        }
+
+        public static bool TryGetFirstDescendant(this DependencyObject obj, Predicate<DependencyObject> predicate, [NotNullWhen(true)] out DependencyObject? descendant)
+        {
+            foreach (var child in EnumerateDescendantsByQueue(obj))
+            {
+                if (child is not null && predicate(child))
+                {
+                    descendant = child;
+                    return true;
                 }
             }
             descendant = null;
             return false;
         }
 
-        public static bool TryGetFirstDescendant(this DependencyObject obj, Predicate<DependencyObject> predicate, [MaybeNullWhen(false)] out DependencyObject descendant)
+        public static bool TryGetFirstDescendant<T>(this DependencyObject obj, [NotNullWhen(true)] out T? descendant)
+            where T : DependencyObject
         {
-            Queue<DependencyObject> que = new([obj]);
-            while (que.Count > 0)
+            foreach (var child in EnumerateDescendantsByQueue(obj))
             {
-                var o = que.Dequeue();
-                var count = VisualTreeHelper.GetChildrenCount(o);
-                for (int i = 0; i < count; i++)
+                if (child is T target)
                 {
-                    var child = VisualTreeHelper.GetChild(o, i);
-                    if (predicate(child))
-                    {
-                        descendant = child;
-                        return true;
-                    }
-                    que.Enqueue(child);
+                    descendant = target;
+                    return true;
                 }
             }
             descendant = null;
@@ -140,20 +167,12 @@ namespace LivreNoirLibrary.Windows
         public static bool TryGetFirstDescendant<T>(this DependencyObject obj, Predicate<T> predicate, [NotNullWhen(true)] out T? descendant)
             where T : DependencyObject
         {
-            Queue<DependencyObject> que = new([obj]);
-            while (que.Count > 0)
+            foreach (var child in EnumerateDescendantsByQueue(obj))
             {
-                var o = que.Dequeue();
-                var count = VisualTreeHelper.GetChildrenCount(o);
-                for (int i = 0; i < count; i++)
+                if (child is T target && predicate(target))
                 {
-                    var child = VisualTreeHelper.GetChild(o, i);
-                    if (child is T c && predicate(c))
-                    {
-                        descendant = c;
-                        return true;
-                    }
-                    que.Enqueue(child);
+                    descendant = target;
+                    return true;
                 }
             }
             descendant = null;

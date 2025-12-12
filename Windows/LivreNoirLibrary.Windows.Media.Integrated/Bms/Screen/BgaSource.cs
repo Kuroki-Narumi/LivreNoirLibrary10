@@ -1,6 +1,7 @@
 ﻿using LivreNoirLibrary.Collections;
 using LivreNoirLibrary.Media;
 using LivreNoirLibrary.Media.Bms;
+using LivreNoirLibrary.Media.Bms.Play;
 using LivreNoirLibrary.Numerics;
 using LivreNoirLibrary.ObjectModel;
 using LivreNoirLibrary.Windows.Media;
@@ -10,42 +11,17 @@ using System.Windows;
 
 namespace LivreNoirLibrary.Windows.Controls.Bms
 {
-    public class BgaSource : ObservableObjectBase
+    public class BgaSource(IBgaVisibilityProvider provider) : ObservableObjectBase
     {
+        public IBgaVisibilityProvider Provider { get; set => SetValue(ref field, value); } = provider;
+
         public LnColor Background { get; set => SetValue(ref field, value); } = LnColor.FromRgb(0, 0, 0);
         public LnColor Transparent { get; set => SetValue(ref field, value); } = LnColor.FromRgb(0, 0, 0);
-
-        public BgaShowFlags ShowFlags
-        {
-            get;
-            set => SetValue(ref field, value, [nameof(ShowBaseLayer), nameof(ShowLayer1), nameof(ShowLayer2), nameof(ShowMissLayer), nameof(HideOnMiss)]);
-        } = BgaShowFlags.Default;
-
-        public bool ShowBaseLayer { get => GetShowFlag(BgaShowFlags.Base); set => SetShowFlag(BgaShowFlags.Base, value); }
-        public bool ShowLayer1 { get => GetShowFlag(BgaShowFlags.Layer1); set => SetShowFlag(BgaShowFlags.Layer1, value); }
-        public bool ShowLayer2 { get => GetShowFlag(BgaShowFlags.Layer2); set => SetShowFlag(BgaShowFlags.Layer2, value); }
-        public bool ShowMissLayer { get => GetShowFlag(BgaShowFlags.Miss); set => SetShowFlag(BgaShowFlags.Miss, value); }
-        public bool HideOnMiss { get => GetShowFlag(BgaShowFlags.HideOnMiss); set => SetShowFlag(BgaShowFlags.HideOnMiss, value); }
-
-        public double MissLayerDisplayTime { get; set => SetValue(ref field, value); } = 0.5;
 
         private readonly LayerState _base = new(Channel.Bga_Base);
         private readonly LayerState _layer1 = new(Channel.Bga_Layer1);
         private readonly LayerState _layer2 = new(Channel.Bga_Layer2);
         private readonly LayerState _poor = new(Channel.Bga_Poor);
-
-        private bool GetShowFlag(BgaShowFlags flag) => (ShowFlags & flag) is not 0;
-        private void SetShowFlag(BgaShowFlags flags, bool value)
-        {
-            if (value)
-            {
-                ShowFlags |= flags;
-            }
-            else
-            {
-                ShowFlags &= ~flags;
-            }
-        }
 
         public void Setup()
         {
@@ -57,17 +33,18 @@ namespace LivreNoirLibrary.Windows.Controls.Bms
             var timings = args.Timings;
             if (args.Timer.TryGet(TimerId.Play_MusicStart, args.AbsoluteTime, out var currentTime))
             {
+                var p = Provider;
                 var tp = Transparent;
-                if (_poor.CheckPoorState(ShowMissLayer, timings, args, currentTime, MissLayerDisplayTime, tp) && HideOnMiss)
+                if (_poor.CheckPoorState(p.ShowBgaMissLayer, timings, args, currentTime, p.MissLayerDisplayTime, tp) && p.HideBgaOnMiss)
                 {
                     _base.IsVisible = _layer1.IsVisible = _layer2.IsVisible = false;
                 }
                 else
                 {
                     var cache = args.Media;
-                    _base.CheckState(ShowBaseLayer, timings, cache, currentTime, tp);
-                    _layer1.CheckState(ShowLayer1, timings, cache, currentTime, tp);
-                    _layer2.CheckState(ShowLayer2, timings, cache, currentTime, tp);
+                    _base.CheckState(p.ShowBgaBase, timings, cache, currentTime, tp);
+                    _layer1.CheckState(p.ShowBgaLayer, timings, cache, currentTime, tp);
+                    _layer2.CheckState(p.ShowBgaLayer2, timings, cache, currentTime, tp);
                 }
             }
             else
@@ -164,7 +141,7 @@ namespace LivreNoirLibrary.Windows.Controls.Bms
                     destWidth = (originalWidth * scale).RoundToInt();
                     destHeight = (originalHeight * scale).RoundToInt();
 
-                    _bitmap.CopyTo(_bitmap.Rect, target, parentRect, new(destX, destY, destWidth, destHeight), BlendMode.Alpha, _colorCorrection * colorCorrection, buffer);
+                    _bitmap.BlendWithScale(_bitmap.Rect, target, parentRect, new(destX, destY, destWidth, destHeight), BlendMode.Alpha, _colorCorrection * colorCorrection, buffer);
                 }
             }
         }

@@ -36,7 +36,7 @@ namespace LivreNoirLibrary.Windows.Controls
 
         private static void OnMouseButtonUp(object sender, MouseButtonEventArgs e)
         {
-            if (sender is DropDownBase s && Mouse.Captured != s && s.IsDropDownOpen && !s.IsLogicalAncestorOf(Mouse.Captured))
+            if (sender is DropDownBase s && Mouse.Captured != s && s.IsDropDownOpen && !s.IsAncestorOf(Mouse.Captured))
             {
                 s.Capture();
                 e.Handled = true;
@@ -120,13 +120,13 @@ namespace LivreNoirLibrary.Windows.Controls
                 {
                     if (original == this)
                     {
-                        if (captured is null || !this.IsLogicalAncestorOf(captured))
+                        if (captured is null || !this.IsAncestorOf(captured))
                         {
                             IsDropDownOpen = false;
                             return;
                         }
                     }
-                    else if (this.IsLogicalAncestorOf(original) && IsDropDownOpen && captured is null)
+                    else if (this.IsAncestorOf(original) && IsDropDownOpen && captured is null)
                     {
                         Mouse.Capture(this, CaptureMode.SubTree);
                         e.Handled = true;
@@ -164,7 +164,7 @@ namespace LivreNoirLibrary.Windows.Controls
         protected override void OnMouseLeave(MouseEventArgs e)
         {
             base.OnMouseLeave(e);
-            if (AutoOpen && !this.IsLogicalAncestorOf(Mouse.DirectlyOver))
+            if (AutoOpen && !this.IsAncestorOf(Mouse.DirectlyOver))
             {
                 IsDropDownOpen = false;
             }

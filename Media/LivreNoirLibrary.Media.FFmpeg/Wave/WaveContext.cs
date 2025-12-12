@@ -1,7 +1,4 @@
 ﻿using System;
-using System.Buffers;
-using System.Collections.Generic;
-using System.IO;
 using System.Runtime.CompilerServices;
 using LivreNoirLibrary.Collections;
 using LivreNoirLibrary.Media.FFmpeg;
@@ -9,7 +6,7 @@ using LivreNoirLibrary.ObjectModel;
 
 namespace LivreNoirLibrary.Media.Wave
 {
-    public abstract unsafe partial class WaveContext : DisposableBase, IAudioContext, ISwrContext
+    public abstract unsafe partial class WaveContext : DisposableBase, IAudioContext, ISwrContext, IWaveMetaData
     {
         public const AVSampleFormat InternalSampleFormat = AVSampleFormat.AV_SAMPLE_FMT_FLT;
         public const int BufferSize = 32768;
@@ -25,29 +22,29 @@ namespace LivreNoirLibrary.Media.Wave
         protected FormatChunk _format;
         protected readonly List<RiffChunk> _chunks = [];
 
-        protected int _in_rate;
-        protected int _in_channels;
-        protected int _out_rate;
-        protected int _out_channels;
-        protected SwrContext* _swr_context;
-        private readonly UnmanagedArray<float> _buffer = new();
+        protected readonly UnmanagedArray<float> _buffer = new();
+        protected SwrContext* _swrContext;
 
         public Stream BaseStream => _stream!;
-        public int InputSampleRate => _in_rate;
-        public int InputChannels => _in_channels;
-        public int OutputSampleRate => _out_rate;
-        public int OutputChannels => _out_channels;
+        public int InputSampleRate { get; protected set; }
+        public int InputChannels { get; protected set; }
+        public AVSampleFormat InputSampleFormat { get; } = InternalSampleFormat;
+        public int OutputSampleRate { get; protected set; }
+        public int OutputChannels { get; protected set; }
+        public AVSampleFormat OutputSampleFormat { get; } = InternalSampleFormat;
 
-        internal Span<float> Buffer => _buffer;
-        SwrContext* ISwrContext.SwrContext { get => _swr_context; set => _swr_context = value; }
+        public FormatChunk Format => _format;
+        public List<RiffChunk> Chunks => _chunks;
+
+        SwrContext* ISwrContext.SwrContext { get => _swrContext; set => _swrContext = value; }
+        float* ISwrContext.GetConvertBuffer(int samplePerChannel) => EnsureBufferSize(samplePerChannel * OutputChannels);
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        protected Span<float> EnsureBufferSize(int size)
+        protected float* EnsureBufferSize(int size)
         {
             _buffer.EnsureSize(size);
-            return _buffer;
+            return _buffer.Pointer;
         }
-        Span<float> ISwrContext.GetConvertBuffer(int samplePerChannel) => EnsureBufferSize(samplePerChannel * _out_channels);
 
         protected void SetStream(Stream? stream, bool leaveOpen)
         {
@@ -69,11 +66,11 @@ namespace LivreNoirLibrary.Media.Wave
         {
             base.DisposeManaged();
             DisposeStream();
+            _buffer.Dispose();
         }
 
         protected override void DisposeUnmanaged()
         {
-            _buffer.Dispose();
             this.DisposeSwrContext();
             base.DisposeUnmanaged();
         }

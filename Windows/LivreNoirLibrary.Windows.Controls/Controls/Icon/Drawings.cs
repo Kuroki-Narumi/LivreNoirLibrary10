@@ -72,6 +72,12 @@ namespace LivreNoirLibrary.Windows.Controls.IconContent
         public static GD Gear_Outer { get; } = Get(Geometries.Gear, Brushes.Gray_3);
         public static GD Gear_Inner { get; } = Get(Geometries.Gear_S, Brushes.BlueGreen_b98, Outline);
 
+        public static GD Volume_0 { get; } = Get(Geometries.Volume_0, Brushes.Gray_3);
+        public static GD Volume_1 { get; } = Get(Geometries.Volume_1, Brushes.Gray_3);
+        public static GD Volume_2 { get; } = Get(Geometries.Volume_2, Brushes.Gray_3);
+        public static GD Volume_3 { get; } = Get(Geometries.Volume_3, Brushes.Gray_3);
+        public static GD Volume_Mute { get; } = Get(Geometries.Volume_Mute, Brushes.Gray_3);
+
         public static GD Hamburger { get; } = Get(Geometries.Hamburger, Brushes.Gray_6);
 
         public static GD Update_Outer { get; } = Get(Geometries.Update, Brushes.Green_40);

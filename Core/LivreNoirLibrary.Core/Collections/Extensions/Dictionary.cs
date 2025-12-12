@@ -10,6 +10,46 @@ namespace LivreNoirLibrary.Collections
     public static partial class CollectionExtensions
     {
         /// <summary>
+        /// Removes all elements with specified keys.
+        /// </summary>
+        /// <param name="keys">The keys to remove.</param>
+        /// <returns>The number of elements removed from the <see cref="IDictionary{TKey, TValue}"/></returns>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static int RemoveRange<TKey, TValue>(this IDictionary<TKey, TValue> dic, IEnumerable<TKey> keys)
+            where TKey : notnull
+        {
+            var count = 0;
+            foreach (var key in keys)
+            {
+                if (dic.Remove(key))
+                {
+                    count++;
+                }
+            }
+            return count;
+        }
+
+        /// <summary>
+        /// Removes all elements with specified keys.
+        /// </summary>
+        /// <param name="keys">The keys to remove.</param>
+        /// <returns>The number of elements removed from the <see cref="IDictionary{TKey, TValue}"/></returns>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static int RemoveRange<TKey, TValue>(this IDictionary<TKey, TValue> dic, ReadOnlySpan<TKey> keys)
+            where TKey : notnull
+        {
+            var count = 0;
+            foreach (var key in keys)
+            {
+                if (dic.Remove(key))
+                {
+                    count++;
+                }
+            }
+            return count;
+        }
+        
+        /// <summary>
         /// Removes all the elements that match the conditions defined by the specified predicate.
         /// </summary>
         /// <param name="match">The delegate that defined the conditions of the elements to remove. </param>

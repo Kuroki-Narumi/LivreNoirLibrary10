@@ -1,6 +1,7 @@
 ﻿using LivreNoirLibrary.Collections;
 using LivreNoirLibrary.Media;
 using LivreNoirLibrary.Media.Bms;
+using LivreNoirLibrary.Media.Bms.Play;
 using LivreNoirLibrary.Text;
 using LivreNoirLibrary.Windows.Media;
 using LivreNoirLibrary.Windows.Media.Bms.SkinInfo;
@@ -71,7 +72,7 @@ namespace LivreNoirLibrary.Windows.Controls.Bms
             dict["AverageBpm"] = timingList.AverageTempo.ToString();
             dict["MainBpm"] = timingList.MainTempo.ToString();
             dict["MainTimeBpm"] = timingList.MainTimeTempo.ToString();
-            dict["TotalTime"] = TimeSpan.FromSeconds(timingList.LastTime).ToString(@"mm\:ss");
+            dict["TotalTime"] = TimeSpan.FromSeconds(timingList.LastSoundTime).ToString(@"mm\:ss");
         }
 
         public static void UpdateCurrentInfos(this IDictionary<string, string> dict, in UpdateArgs args)
@@ -99,11 +100,11 @@ namespace LivreNoirLibrary.Windows.Controls.Bms
                 dict["FullTime"] = dict["CurrentTime"];
             }
 
-                var score = args.Score;
+            var score = args.ScoreManager;
             dict["CurrentCombo"] = score.Combo.ToString();
             dict["MaxCombo"] = score.MaxCombo.ToString();
             dict["CurrentScore"] = score.Score.ToString();
-            dict["CurrentGage"] = score.Gage.ToString();
+            dict["CurrentGauge"] = score.Gauge.ToString();
         }
     }
 }

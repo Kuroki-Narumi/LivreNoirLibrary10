@@ -8,21 +8,23 @@
         xmlns:cc="clr-namespace:LivreNoirLibrary.Windows.Media.Bms.SkinInfo;assembly=LivreNoirLibrary.Windows.Media.Integrated"
         xmlns:media="clr-namespace:LivreNoirLibrary.Windows.Media;assembly=LivreNoirLibrary.Windows.Media"
         xmlns:conv="clr-namespace:LivreNoirLibrary.Windows.Converters;assembly=LivreNoirLibrary.Windows.Controls"
-        mc:Ignorable="d" d:DataContext="{d:DesignInstance Type=local:BmsVideoCreator}"
-        Title="MainWindow" Height="450" Width="800">
+        mc:Ignorable="d" d:DataContext="{d:DesignInstance Type=local:MainWindow}"
+        Title="MainWindow" Height="540" Width="880">
     <Window.Resources>
         <Style TargetType="ct:Button">
             <Setter Property="Margin" Value="4"/>
         </Style>
         <Style TargetType="ComboBox" BasedOn="{StaticResource ComboBoxBase}">
             <Setter Property="Margin" Value="4"/>
+            <Setter Property="AlternationCount" Value="2"/>
+            <Setter Property="ItemContainerStyle" Value="{StaticResource Alt2ListBoxItemContainerStyle}"/>
             <EventSetter Event="PreviewMouseWheel" Handler="ComboBox_PreviewMouseWheel"/>
         </Style>
     </Window.Resources>
-    <TabControl>
+    <TabControl MouseWheel="TabControl_PreviewMouseWheel">
         <TabItem Header="BMS">
             <Grid AllowDrop="True" DragOver="OnDragOver_Bms" Drop="OnDrop_Bms">
-                <Grid x:Name="MainUI">
+                <Grid x:Name="MainUI" RowDefinitions="Auto, *">
                     <Grid.Resources>
                         <Style TargetType="ct:LabeledSlider">
                             <Setter Property="Margin" Value="4"/>
@@ -34,12 +36,13 @@
                             <Setter Property="TickFrequency" Value="16"/>
                             <EventSetter Event="PreviewMouseWheel" Handler="LabeledSlider_PreviewMouseWheel"/>
                         </Style>
+                        <Style TargetType="ct:Button">
+                            <Setter Property="Margin" Value="0"/>
+                            <Setter Property="BorderThickness" Value="0"/>
+                            <Setter Property="CornerRadius" Value="0"/>
+                        </Style>
                     </Grid.Resources>
-                    <Grid.RowDefinitions>
-                        <RowDefinition Height="Auto"/>
-                        <RowDefinition Height="*"/>
-                    </Grid.RowDefinitions>
-                    <WrapPanel Orientation="Horizontal">
+                    <WrapPanel Orientation="Horizontal" UseLayoutRounding="True">
                         <WrapPanel.Resources>
                             <Style TargetType="Border" x:Key="Separator">
                                 <Setter Property="Width" Value="1"/>
@@ -48,52 +51,129 @@
                             </Style>
                             <Style TargetType="TextBlock">
                                 <Setter Property="VerticalAlignment" Value="Center"/>
+                                <Setter Property="Margin" Value="4,0,2,0"/>
+                            </Style>
+                            <Style x:Key="Header" TargetType="TextBlock">
+                                <Setter Property="HorizontalAlignment" Value="Right"/>
+                                <Setter Property="VerticalAlignment" Value="Center"/>
                                 <Setter Property="Margin" Value="2,0"/>
                             </Style>
-                            <conv:DoubleLinearConverter x:Key="HsConv" Slope="100" Rounding="Round"/>
+                            <Style x:Key="Top" TargetType="TextBlock">
+                                <Setter Property="Grid.ColumnSpan" Value="2"/>
+                                <Setter Property="HorizontalAlignment" Value="Center"/>
+                                <Setter Property="VerticalAlignment" Value="Center"/>
+                                <Setter Property="Margin" Value="4,2"/>
+                            </Style>
+                            <conv:DoubleLinearConverter x:Key="PercentConv" Slope="100" Rounding="Round"/>
+                            <conv:DoubleLinearConverter x:Key="MsConv" Slope="1000" Rounding="Round"/>
+                            <Style x:Key="SliderBase" TargetType="ct:LabeledSlider">
+                                <Setter Property="Grid.Column" Value="1"/>
+                                <Setter Property="Margin" Value="0,2,4,2"/>
+                                <Setter Property="MinWidth" Value="100"/>
+                                <Setter Property="TextWidth" Value="36"/>
+                                <Setter Property="IsSnapToTickEnabled" Value="True"/>
+                                <Setter Property="IsTextEditable" Value="True"/>
+                            </Style>
+                            <Style x:Key="VolumeSlider" TargetType="ct:LabeledSlider" BasedOn="{StaticResource SliderBase}">
+                                <Setter Property="Minimum" Value="0"/>
+                                <Setter Property="Maximum" Value="100"/>
+                                <Setter Property="TickFrequency" Value="5"/>
+                            </Style>
+                            <Style x:Key="MsSlider" TargetType="ct:LabeledSlider" BasedOn="{StaticResource SliderBase}">
+                                <Setter Property="Minimum" Value="0"/>
+                                <Setter Property="Maximum" Value="9750"/>
+                                <Setter Property="TickFrequency" Value="250"/>
+                            </Style>
                         </WrapPanel.Resources>
-                        <ComboBox x:Name="ComboBox_Skin" SelectedItem="{Binding Screen.Skin, Mode=TwoWay}">
+                        <TextBlock Text="Skin"/>
+                        <ComboBox x:Name="ComboBox_Skin" SelectedItem="{Binding BmsScreen.Skin, Mode=TwoWay}">
                             <ComboBox.ItemTemplate>
                                 <DataTemplate DataType="cc:PlaySkin">
                                     <TextBlock Text="{Binding Name}"/>
                                 </DataTemplate>
                             </ComboBox.ItemTemplate>
                         </ComboBox>
-                        <ct:Button Icon="{x:Static ct:Icons.Open}" Command="ApplicationCommands.Open"/>
-                        <ct:Button Icon="{x:Static ct:Icons.Save}" Command="ApplicationCommands.Save"/>
-                        <ct:Button Icon="{x:Static ct:Icons.Wave}" Click="OnClick_Assemble"/>
-                        
-                        <Border Style="{StaticResource Separator}"/>
-                        <TextBlock Text="HS"/>
-                        <ct:LabeledSlider SliderWidth="60" TextWidth="32" Minimum="1" Maximum="999" TickFrequency="10" Value="{Binding Screen.HighSpeed, Mode=TwoWay, Converter={StaticResource HsConv}}"/>
-                        <ComboBox ItemsSource="{x:Static local:MainWindow.FixedHighSpeedModeList}" SelectedItem="{Binding Screen.FixedHighSpeedMode, Mode=TwoWay}"/>
+                        <ct:Button Icon="{x:Static ct:Icons.Open}" ToolTip="Open" Command="ApplicationCommands.Open"/>
+                        <ct:Button Icon="{x:Static ct:Icons.Save}" ToolTip="Save" Command="ApplicationCommands.Save"/>
 
                         <Border Style="{StaticResource Separator}"/>
+                        <ct:DropDownMenuButton AutoOpen="True">
+                            <ct:IconPresenter Width="16" Source="{x:Static ct:Icons.Volume_3}"/>
+                            <ct:DropDownMenuButton.DropDownContent>
+                                <Grid ColumnDefinitions="Auto, *" RowDefinitions="Auto, Auto, Auto, Auto">
+                                    <TextBlock Style="{StaticResource Top}" Text="Volume"/>
+                                    <TextBlock Grid.Row="1" Style="{StaticResource Header}" Text="Master"/>
+                                    <TextBlock Grid.Row="2" Style="{StaticResource Header}" Text="Key"/>
+                                    <TextBlock Grid.Row="3" Style="{StaticResource Header}" Text="Bgm"/>
+                                    <ct:LabeledSlider Grid.Row="1" Style="{StaticResource VolumeSlider}" Value="{Binding BmsOptions.MasterVolume, Converter={StaticResource PercentConv}}"/>
+                                    <ct:LabeledSlider Grid.Row="2" Style="{StaticResource VolumeSlider}" Value="{Binding BmsOptions.KeyVolume, Converter={StaticResource PercentConv}}"/>
+                                    <ct:LabeledSlider Grid.Row="3" Style="{StaticResource VolumeSlider}" Value="{Binding BmsOptions.BgmVolume, Converter={StaticResource PercentConv}}"/>
+                                </Grid>
+                            </ct:DropDownMenuButton.DropDownContent>
+                        </ct:DropDownMenuButton>
+                        <ct:DropDownMenuButton AutoOpen="True">
+                            <ct:IconPresenter Width="16" Source="{x:Static ct:Icons.Download}"/>
+                            <ct:DropDownMenuButton.DropDownContent>
+                                <StackPanel>
+                                    <TextBlock Style="{StaticResource Top}" Text="HighSpeed"/>
+                                    <ct:LabeledSlider Style="{StaticResource SliderBase}" TickFrequency="10" Minimum="1" Maximum="990" Value="{Binding BmsOptions.HighSpeed, Converter={StaticResource PercentConv}}"/>
+                                    <ComboBox ItemsSource="{x:Static local:MainWindow.HsCorrectionModes}" SelectedItem="{Binding BmsOptions.HsCorrectionMode}"/>
+                                </StackPanel>
+                            </ct:DropDownMenuButton.DropDownContent>
+                        </ct:DropDownMenuButton>
+                        <ct:DropDownMenuButton AutoOpen="True">
+                            <ct:IconPresenter Source="{x:Static ct:Icons.Clock}" Width="16"/>
+                            <ct:DropDownMenuButton.DropDownContent>
+                                <Grid ColumnDefinitions="Auto, *" RowDefinitions="Auto, Auto, Auto, Auto, Auto, Auto">
+                                    <TextBlock Style="{StaticResource Top}" Text="Duration"/>
+                                    <TextBlock Grid.Row="1" Style="{StaticResource Header}" Text="Fade In"/>
+                                    <TextBlock Grid.Row="2" Style="{StaticResource Header}" Text="Load"/>
+                                    <TextBlock Grid.Row="3" Style="{StaticResource Header}" Text="Ready"/>
+                                    <TextBlock Grid.Row="4" Style="{StaticResource Header}" Text="Rear"/>
+                                    <TextBlock Grid.Row="5" Style="{StaticResource Header}" Text="Fade Out"/>
+                                    <ct:LabeledSlider Grid.Row="1" Style="{StaticResource MsSlider}" Value="{Binding BmsOptions.FadeInDuration, Converter={StaticResource MsConv}}"/>
+                                    <ct:LabeledSlider Grid.Row="2" Style="{StaticResource MsSlider}" Value="{Binding BmsOptions.LoadDuration, Converter={StaticResource MsConv}}"/>
+                                    <ct:LabeledSlider Grid.Row="3" Style="{StaticResource MsSlider}" Value="{Binding BmsOptions.ReadyDuration, Converter={StaticResource MsConv}}"/>
+                                    <ct:LabeledSlider Grid.Row="4" Style="{StaticResource MsSlider}" Value="{Binding BmsOptions.AfterMargin, Converter={StaticResource MsConv}}"/>
+                                    <ct:LabeledSlider Grid.Row="5" Style="{StaticResource MsSlider}" Value="{Binding BmsOptions.FadeOutDuration, Converter={StaticResource MsConv}}"/>
+                                </Grid>
+                            </ct:DropDownMenuButton.DropDownContent>
+                        </ct:DropDownMenuButton>
+
+                        <Border Style="{StaticResource Separator}"/>
+                        <ct:Button Icon="{x:Static ct:Icons.Wave}" ToolTip="Assemble" Click="OnClick_Assemble" IsEnabled="{Binding BmsScreen.IsBmsReady, Mode=OneWay}"/>
+
+                        <Border Style="{StaticResource Separator}"/>
+
                         <TextBlock Text="FPS"/>
-                        <ComboBox ItemsSource="{x:Static local:BmsVideoCreator.FpsList}" SelectedItem="{Binding FrameRate}"/>
-                        <ct:Button Icon="{x:Static ct:Icons.Camera}" Click="OnClick_Video"/>
+                        <ComboBox ItemsSource="{x:Static local:MainWindow.FpsList}" SelectedItem="{Binding BmsOptions.FrameRate}"/>
+                        <StackPanel Background="Transparent" PreviewMouseWheel="RadioContainer_MouseWheel" Orientation="Horizontal">
+                            <StackPanel.Resources>
+                                <Style TargetType="RadioButton">
+                                    <Setter Property="Margin" Value="2,0"/>
+                                    <Setter Property="GroupName" Value="IsHevc"/>
+                                    <Setter Property="VerticalContentAlignment" Value="Center"/>
+                                </Style>
+                            </StackPanel.Resources>
+                            <RadioButton Content="H264" IsChecked="{Binding BmsOptions.IsHevc, Converter={StaticResource InvertConverter}}"/>
+                            <RadioButton Content="HEVC" IsChecked="{Binding BmsOptions.IsHevc}"/>
+                        </StackPanel>
+                        <ct:Button Icon="{x:Static ct:Icons.Camera}" ToolTip="Save Video" Click="OnClick_Video" IsEnabled="{Binding BmsScreen.IsBmsReady, Mode=OneWay}"/>
                     </WrapPanel>
                     <Rectangle Grid.Row="1">
                         <Rectangle.Fill>
-                            <VisualBrush Visual="{Binding Screen}" Stretch="Uniform"/>
+                            <VisualBrush Visual="{Binding BmsScreen}" Stretch="Uniform"/>
                         </Rectangle.Fill>
                     </Rectangle>
                     <Border Grid.Row="1" Background="{ct:BrushProvider 8000}" HorizontalAlignment="Left" VerticalAlignment="Top" Padding="2">
-                        <TextBlock Text="{Binding Screen.DebugText}" Foreground="White" FontSize="12" FontFamily="Consolas"/>
+                        <TextBlock Text="{Binding BmsScreen.DebugText}" Foreground="White" FontSize="12" FontFamily="Consolas"/>
                     </Border>
                 </Grid>
                 <ct:TaskProgressBar x:Name="TaskProgressBar"/>
             </Grid>
         </TabItem>
         <TabItem Header="Picture">
-            <Grid Margin="4">
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="*"/>
-                    <ColumnDefinition Width="4"/>
-                    <ColumnDefinition Width="*"/>
-                    <ColumnDefinition Width="4"/>
-                    <ColumnDefinition Width="*"/>
-                </Grid.ColumnDefinitions>
+            <Grid Margin="4" ColumnDefinitions="*, 4, *, 4, *">
                 <Grid.Resources>
                     <Style TargetType="TextBlock">
                     </Style>
@@ -108,33 +188,21 @@
                         <Setter Property="Fill" Value="{x:Static media:MediaUtils.TransparentCheckerBrush}"/>
                     </Style>
                 </Grid.Resources>
-                <Grid Grid.Column="0">
-                    <Grid.RowDefinitions>
-                        <RowDefinition Height="Auto"/>
-                        <RowDefinition Height="*"/>
-                    </Grid.RowDefinitions>
+                <Grid Grid.Column="0" RowDefinitions="Auto, *">
                     <TextBlock Text="Source"/>
                     <Grid Style="{StaticResource MainGrid}">
                         <Rectangle Width="{Binding ActualWidth, ElementName=Image_Source}" Height="{Binding ActualHeight, ElementName=Image_Source}"/>
                         <ct:ImageRectSelectorView x:Name="Image_Source"/>
                     </Grid>
                 </Grid>
-                <Grid Grid.Column="2">
-                    <Grid.RowDefinitions>
-                        <RowDefinition Height="Auto"/>
-                        <RowDefinition Height="*"/>
-                    </Grid.RowDefinitions>
+                <Grid Grid.Column="2" RowDefinitions="Auto, *">
                     <TextBlock Text="Target" />
                     <Grid Style="{StaticResource MainGrid}">
                         <Rectangle Width="{Binding ActualWidth, ElementName=Image_Target}" Height="{Binding ActualHeight, ElementName=Image_Target}"/>
                         <ct:ImageRectSelectorView x:Name="Image_Target"/>
                     </Grid>
                 </Grid>
-                <Grid Grid.Column="4">
-                    <Grid.RowDefinitions>
-                        <RowDefinition Height="Auto"/>
-                        <RowDefinition Height="*"/>
-                    </Grid.RowDefinitions>
+                <Grid Grid.Column="4" RowDefinitions="Auto, *">
                     <StackPanel Orientation="Horizontal">
                         <TextBlock Text="Result" VerticalAlignment="Bottom"/>
                         <ComboBox Name="ComboBox_BlendMode" ItemsSource="{x:Static local:MainWindow.BlendModes}" SelectedIndex="0"/>

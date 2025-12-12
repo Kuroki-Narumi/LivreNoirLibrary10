@@ -275,7 +275,7 @@ namespace LivreNoirLibrary.Media.Wave
 
         public const double PI2 = 2 * Math.PI;
         public const double InvSqrt2 = 0.70710678118654752440084436210485; // 1 / sqrt(2)
-        public const double HalfLog2 = 0.34657359027997265470861606072909;    // ln(2) / 2
+        public const double HalfLog2 = 0.34657359027997265470861606072909; // ln(2) / 2
 
         private static double Alpha(double sin, double qualityFactor) => sin * 0.5f / qualityFactor;
         private static double Alpha2(double omega, double sin, double qualityFactor) => sin * Math.Sinh(HalfLog2 * qualityFactor * omega / sin);

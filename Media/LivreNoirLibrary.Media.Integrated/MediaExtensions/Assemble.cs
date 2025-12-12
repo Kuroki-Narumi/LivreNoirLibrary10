@@ -23,7 +23,7 @@ namespace LivreNoirLibrary.Media.Integrated
         }
 
         public static AssembleResult Assemble<T>(
-            this IBmsViewModel vm, IWaveBufferProvider provider, T options,
+            this IBmsViewModel vm, IWaveBufferProvider<string> provider, T options,
             ProgressReporter? reporter = null, CancellationToken c = default)
             where T : IAssemblePlaysLongEndOptions, IConvertTargetOptions, IAdjustOptions
         {
@@ -36,13 +36,16 @@ namespace LivreNoirLibrary.Media.Integrated
                 _ => n => n.IsMainSound(includeLongEnd),
             };
             var list = SoundTimingList.Create(vm, selector);
-            options.Offset = options.AdjustBeginning ? list.FirstTime : 0;
+            if (options.AdjustBeginning)
+            {
+                options.Offset = list.FirstTime;
+            }
             options.Length = 0;
             return Assemble(vm, provider, list, options, reporter, c);
         }
 
         public static AssembleResult AssembleSelection<T>(
-            this IBmsViewModel vm, IWaveBufferProvider provider, T options, 
+            this IBmsViewModel vm, IWaveBufferProvider<string> provider, T options, 
             Selection selection, ProgressReporter? reporter = null, CancellationToken c = default)
             where T : IAssemblePlaysLongEndOptions
         {
@@ -54,7 +57,7 @@ namespace LivreNoirLibrary.Media.Integrated
         }
 
         public static AssembleResult AssembleForPreview<T>(
-            this IBmsViewModel vm, IWaveBufferProvider provider, T options, 
+            this IBmsViewModel vm, IWaveBufferProvider<string> provider, T options, 
             ProgressReporter? reporter = null, CancellationToken c = default)
             where T : IAssemblePreviewOptions
         {
@@ -90,7 +93,7 @@ namespace LivreNoirLibrary.Media.Integrated
         }
 
         public static AssembleResult Assemble<T>(this IBmsViewModel vm, 
-            IWaveBufferProvider provider, ISoundList soundList, T options, 
+            IWaveBufferProvider<string> provider, ISoundList soundList, T options, 
             ProgressReporter? p = null, CancellationToken c = default)
             where T : IAssembleCoreOptions
         {

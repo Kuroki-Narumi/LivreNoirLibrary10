@@ -85,6 +85,11 @@ namespace LivreNoirLibrary.Windows.Controls
         public static DG Caution { get; } = Get(Dr.Caution_Outer, Dr.Caution_Inner);
         public static DG Attention { get; } = Get(Dr.Attention_Outer, Dr.Caution_Inner);
         public static DG Config { get; } = Get(Dr.Gear_Outer, Dr.Gear_Inner);
+        public static DG Volume_0 { get; } = Get(Dr.Volume_0);
+        public static DG Volume_1 { get; } = Get(Dr.Volume_1);
+        public static DG Volume_2 { get; } = Get(Dr.Volume_2);
+        public static DG Volume_3 { get; } = Get(Dr.Volume_3);
+        public static DG Volume_Mute { get; } = Get(Dr.Volume_Mute);
         public static DG Hamburger { get; } = Get(Dr.Hamburger);
         public static DG Update { get; } = Get(Dr.Update_Outer, Dr.Update_Inner);
         public static DG Update_Disabled { get; } = Get(Dr.Update_D_Outer, Dr.Update_D_Inner, Dr.Cross_Red);

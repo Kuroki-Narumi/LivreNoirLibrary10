@@ -1,5 +1,6 @@
 using System;
 using LivreNoirLibrary.Collections;
+using LivreNoirLibrary.Numerics;
 
 namespace LivreNoirLibrary.Media.Bms
 {
@@ -11,6 +12,8 @@ namespace LivreNoirLibrary.Media.Bms
         {
             BeginInit(initialTempo);
             TimingInfoState state = new(initialTempo);
+            var firstSound = double.NaN;
+            var lastSound = 0d;
             foreach (var (pos, list) in timeline.EnumerateList())
             {
                 // ÉeÉìÉ|Ç™ê≥Ç≈Ç»Ç¢èÍçáÇÕèIóπ
@@ -19,12 +22,28 @@ namespace LivreNoirLibrary.Media.Bms
                     break;
                 }
                 state.Setup(provider.GetAbsolutePosition(pos));
+                var containsNote = false;
                 foreach (var note in list.AsSpan())
                 {
-                    state.Update(note);
+                    if (!state.Update(note) && note.IsMainSound(false))
+                    {
+                        containsNote = true;
+                    }
+
+                }
+                if (containsNote)
+                {
+                    var time = state.CurrentTime;
+                    if (double.IsNaN(firstSound))
+                    {
+                        firstSound = time;
+                    }
+                    lastSound = time;
                 }
                 ApplyTimeInfo(ref state);
             }
+            FirstSoundTime = firstSound.Validate(0);
+            LastSoundTime = lastSound;
             EndInit(ref state);
         }
     }

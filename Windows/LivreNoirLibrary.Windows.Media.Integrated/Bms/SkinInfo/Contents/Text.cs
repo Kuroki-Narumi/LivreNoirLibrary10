@@ -16,5 +16,6 @@ namespace LivreNoirLibrary.Windows.Media.Bms.SkinInfo
         public LnColor Fill { get; set => SetValue(ref field, value); } = LnColor.FromRgb(255, 255, 255);
         public LnColor Stroke { get; set => SetValue(ref field, value); } = LnColor.FromRgb(0, 0, 0);
         public ValueExpression? StrokeThickness { get; set => SetValue(ref field, value); }
+        public Stretch Stretch { get; set; } = Stretch.Uniform;
     }
 }

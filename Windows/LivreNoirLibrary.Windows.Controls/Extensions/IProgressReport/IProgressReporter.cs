@@ -96,7 +96,10 @@ namespace LivreNoirLibrary.Windows.Controls
                 task.Wait();
             }
             PrepareTask(ip, initialReport, isAbortable);
-            ProgressReporter progress = new(ip.ProgressBar.OnProgressChanged);
+            ProgressReporter progress = new(ip.ProgressBar.OnProgressChanged)
+            {
+                IsSynchronized = true
+            };
             var aborted = false;
             var c = ip.ProgressBar.CreateCancellationTokenSource();
             var token = c.Token;

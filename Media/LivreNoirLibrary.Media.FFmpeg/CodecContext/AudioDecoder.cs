@@ -8,7 +8,7 @@ namespace LivreNoirLibrary.Media.FFmpeg
 {
     public unsafe class AudioDecoder : AudioContext, IAudioDecodeContext, IAudioBufferDecoder
     {
-        /// <inheritdoc cref="IAudioDecoder.SampleLength"/>
+        /// <inheritdoc cref="IAudioDecodeContext.SampleLength"/>
         private long _out_length;
         /// <inheritdoc cref="IAudioBufferDecoder.BufferHead"/>
         private long _buffer_head;
@@ -24,14 +24,14 @@ namespace LivreNoirLibrary.Media.FFmpeg
         public long SampleLength => _out_length;
         public Rational Duration { get; private set; }
 
-        Span<float> IAudioBufferInternal.Buffer => Buffer;
+        float* IAudioBufferInternal.BufferPointer => _buffer.Pointer;
         long IAudioBufferDecoder.BufferHead => _buffer_head;
         int IAudioBufferInternal.BufferLength => _buffer_length;
         int IAudioBufferInternal.BufferIndex { get => _buffer_read; set => _buffer_read = value; }
 
         public long SamplePosition
         {
-            get => _buffer_head - _pts_offset + _buffer_read / _out_channels;
+            get => _buffer_head - _pts_offset + _buffer_read / OutputChannels;
             set => this.SampleSeekCore(value);
         }
 
@@ -40,7 +40,7 @@ namespace LivreNoirLibrary.Media.FFmpeg
         /// </summary>
         public Rational Position
         {
-            get => new(SamplePosition, _out_rate);
+            get => new(SamplePosition, OutputSampleRate);
             set => this.SeekCore(value);
         }
 
@@ -74,32 +74,39 @@ namespace LivreNoirLibrary.Media.FFmpeg
             FFmpegUtils.SetupDecoder(avs, false, out var context);
             _stream = avs;
             _codec_context = context;
-            // サンプルレートとチャンネル数
-            var inSampleRate = _in_rate = context->sample_rate;
+
+            // サンプルレート
+            var inSampleRate = InputSampleRate = context->sample_rate;
             if (outSampleRate is <= 0)
             {
                 outSampleRate = inSampleRate;
             }
-            var inChannel = context->ch_layout;
-            _in_channels = inChannel.nb_channels;
+            OutputSampleRate = outSampleRate;
+            // チャンネル数
+            var inChannels = InputChannels = context->ch_layout.nb_channels;
             if (outChannels is <= 0)
             {
-                outChannels = _in_channels;
+                outChannels = inChannels;
             }
-            _out_rate = outSampleRate;
-            _out_channels = outChannels;
+            OutputChannels = outChannels;
+            // サンプルフォーマット
+            var inFormat = InputSampleFormat = context->sample_fmt;
+            var outFormat = OutputSampleFormat = InternalSampleFormat;
+            // サンプル変換コンテキスト
+            _swrContext = FFmpegUtils.CreateSwrContext(
+                FFmpegUtils.CreateChannelLayout(outChannels), outFormat, outSampleRate,
+                context->ch_layout, inFormat, inSampleRate
+                );
+
             Duration = FFmpegUtils.GetDuration(avs, _base_context._format_context);
-            _out_length = Duration.Ceiling(_out_rate);
+            _out_length = Duration.Ceiling(OutputSampleRate);
             _buffer_head = 0;
             _buffer_length = 0;
-            // サンプル変換コンテキスト
-            AVChannelLayout dstChannel = default;
-            ffmpeg.av_channel_layout_default(&dstChannel, outChannels);
-            this.AllocSwrContext(dstChannel, InternalSampleFormat, outSampleRate, inChannel, context->sample_fmt, inSampleRate);
-            UpdateBuffer();
             _pts_offset = _buffer_head;
+            UpdateBuffer();
             return true;
         }
+
         bool IAudioBufferDecoder.Setup(Stream stream, bool leaveOpen, int streamIndex, int outSampleRate, int outChannels) => Setup(stream, leaveOpen, streamIndex, outSampleRate, outChannels);
 
         public void SampleSeek(long position) => this.SampleSeekCore(position);
@@ -107,8 +114,8 @@ namespace LivreNoirLibrary.Media.FFmpeg
 
         private void UnsafeSampleSeekCore(long position)
         {
-            FFmpegUtils.Seek(_stream, _base_context._format_context, position, _out_rate);
-            ffmpeg.swr_init(_swr_context).CheckError(FFmpegUtils.ThrowInvalidOperationException);
+            FFmpegUtils.Seek(_stream, _base_context._format_context, position, OutputSampleRate);
+            ffmpeg.swr_init(_swrContext).CheckError(FFmpegUtils.ThrowInvalidOperationException);
             ffmpeg.avcodec_flush_buffers(_codec_context);
         }
 
@@ -117,7 +124,7 @@ namespace LivreNoirLibrary.Media.FFmpeg
             lock (_lock)
             {
                 position += _pts_offset;
-                var channels = _out_channels;
+                var channels = OutputChannels;
                 UnsafeSampleSeekCore(position);
                 UpdateBuffer(position);
                 _buffer_read = (int)(position - _buffer_head) * channels;
@@ -133,10 +140,11 @@ namespace LivreNoirLibrary.Media.FFmpeg
             {
                 var last_a = -1L;
                 var codecContext = _codec_context;
-                var swrContext = _swr_context;
-                var channels = _out_channels;
+                var swrContext = _swrContext;
+                var rate = OutputSampleRate;
+                var channels = OutputChannels;
                 var timeBase = _stream->time_base;
-                var needConvert = timeBase.den != _out_rate;
+                var needConvert = timeBase.den != OutputSampleRate;
                 var frame = GetFrame();
                 frame->nb_samples = 0;
                 var srcBuffer = stackalloc byte*[8];
@@ -153,10 +161,10 @@ namespace LivreNoirLibrary.Media.FFmpeg
                             srcBuffer[i] = frame->data[i];
                         }
                         _buffer_length = this.SwrConvertToRead(srcBuffer, srcSamples);
-                        _buffer_head = needConvert ? frame->pts * _out_rate * timeBase.num / timeBase.den : frame->pts;
+                        _buffer_head = needConvert ? frame->pts * rate * timeBase.num / timeBase.den : frame->pts;
                         if (a is >= 0)
                         {
-                            var duration = needConvert ? frame->duration * _out_rate * timeBase.num / timeBase.den : frame->duration;
+                            var duration = needConvert ? frame->duration * rate * timeBase.num / timeBase.den : frame->duration;
                             if (_buffer_head > a)
                             {
                                 if (last_a != a)

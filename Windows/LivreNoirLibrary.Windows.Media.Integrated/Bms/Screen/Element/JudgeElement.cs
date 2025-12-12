@@ -1,6 +1,7 @@
 ﻿using LivreNoirLibrary.Collections;
 using LivreNoirLibrary.Media;
 using LivreNoirLibrary.Media.Bms;
+using LivreNoirLibrary.Media.Bms.Play;
 using LivreNoirLibrary.Windows.Media.Bms.SkinInfo;
 using System;
 using System.Collections.Generic;
@@ -27,12 +28,13 @@ namespace LivreNoirLibrary.Windows.Controls.Bms.Elements
             Add(JudgeType.Great, s.Great, s.GreatCombo);
             Add(JudgeType.Good, s.Good, s.GoodCombo);
             Add(JudgeType.Bad, s.Bad, s.BadCombo);
-            Add(JudgeType.Miss, s.Miss, s.MissCombo);
+            Add(JudgeType.Through, s.Through, s.ThroughCombo);
+            Add(JudgeType.BlankShot, s.BlankShot, s.BlankShotCombo);
 
             void Add(JudgeType type, string? name, string? combo)
             {
-                skin.TryGetTexture(name, provider, out var nameData);
-                skin.TryGetTexture(combo, provider, out var comboData);
+                skin.TryGetTextureData(name, provider, out var nameData);
+                skin.TryGetTextureData(combo, provider, out var comboData);
                 _textures[type] = (nameData, comboData);
             }
 
@@ -42,16 +44,18 @@ namespace LivreNoirLibrary.Windows.Controls.Bms.Elements
         public override void Update(in UpdateArgs args)
         {
             base.Update(args);
-            var judge = args.Score;
+            var displayTime = args.Options.JudgeDisplayTime;
+            var judge = args.ScoreManager;
             var cache = args.Textures;
             var relativeTime = args.AbsoluteTime - judge.LastJudgeTime;
-            if ((judge.IsActive || relativeTime < judge.DisplayTime) &&
+            if ((judge.IsJudgeActive || relativeTime < displayTime) &&
                 _textures.TryGetValue(judge.JudgeType, out var item))
             {
                 var w = 0;
                 if (cache.TryGetTexture(item.Name, BmsTimer.GetFrameIndex(relativeTime, item.Name), out _nameBitmap, out _nameRect))
                 {
                     w += _nameRect.Width;
+                    DestHeight = Math.Max(DestHeight, _nameRect.Height);
                 }
                 var combo = judge.Combo;
                 if (combo is > 1 &&
@@ -67,6 +71,7 @@ namespace LivreNoirLibrary.Windows.Controls.Bms.Elements
                         rects.Add(new(rx + cw * index, ry, cw, rh));
                         w += cw;
                     }
+                    DestHeight = Math.Max(DestHeight, rect.Height);
                 }
                 else
                 {

@@ -14,8 +14,8 @@ namespace LivreNoirLibrary.Media
         public nint Pointer => (nint)_buffer.Pointer;
         public int Width { get; private set; }
         public int Height { get; private set; }
-        public virtual int ElementsPerPixel => 1;
-        public virtual bool IsFloat => false;
+        public abstract int ElementsPerPixel { get; }
+        public abstract bool IsFloat{ get; }
 
         public UnmanagedBitmap(int width, int height)
         {

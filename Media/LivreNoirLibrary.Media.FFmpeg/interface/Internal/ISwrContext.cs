@@ -5,6 +5,8 @@ namespace LivreNoirLibrary.Media.FFmpeg
     internal unsafe interface ISwrContext
     {
         SwrContext* SwrContext { get; set; }
-        Span<float> GetConvertBuffer(int samplesPerChannel);
+        AVSampleFormat InputSampleFormat { get; }
+        AVSampleFormat OutputSampleFormat { get; }
+        float* GetConvertBuffer(int samplesPerChannel);
     }
 }

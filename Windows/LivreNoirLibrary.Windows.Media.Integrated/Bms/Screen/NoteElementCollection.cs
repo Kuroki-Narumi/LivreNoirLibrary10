@@ -1,6 +1,7 @@
 ﻿using LivreNoirLibrary.Collections;
 using LivreNoirLibrary.Media;
 using LivreNoirLibrary.Media.Bms;
+using LivreNoirLibrary.Media.Bms.Play;
 using LivreNoirLibrary.ObjectModel;
 using System;
 using System.Collections.Generic;
@@ -66,8 +67,8 @@ namespace LivreNoirLibrary.Windows.Controls.Bms
         }
 
         // kari
-        public static JudgeInfo Judge_Perfect { get; } = new(JudgeType.Perfect, ComboChange.Increase, 2, 1);
-        public static JudgeInfo Judge_LongEnd { get; } = new(JudgeType.Perfect, ComboChange.Continue, 0, 0);
+        public static JudgeInfo Judge_Perfect { get; } = new(JudgeType.Perfect, ComboChange.Increase, false, 0, 2, 1);
+        public static JudgeInfo Judge_LongEnd { get; } = new(JudgeType.Perfect, ComboChange.Continue, false, 0, 0, 0);
 
         public void Update(in UpdateArgs args)
         {
@@ -76,8 +77,8 @@ namespace LivreNoirLibrary.Windows.Controls.Bms
             visible.Clear();
             var absTime = args.AbsoluteTime;
             var timer = args.Timer;
-            var judge = args.Score;
-            judge.IsActive = false;
+            var judge = args.ScoreManager;
+            judge.IsJudgeActive = false;
             if (timer.TryGet(TimerId.Play_MusicStart, absTime, out var currentTime))
             {
                 var start = timings.Time2Position(currentTime);
@@ -102,7 +103,7 @@ namespace LivreNoirLibrary.Windows.Controls.Bms
                         {
                             child.IsActive = true;
                             judge.UpdateJudge(timer, absTime + child.Time - currentTime, Judge_LongEnd);
-                            judge.IsActive = true;
+                            judge.IsJudgeActive = true;
                         }
                         visible.Add(child);
                     }

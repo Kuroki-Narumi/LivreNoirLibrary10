@@ -18,10 +18,7 @@ namespace LivreNoirLibrary.Media.FFmpeg
         /// <inheritdoc cref="IAudioBufferInternal.BufferIndex"/>
         private int _buffer_wrote;
 
-        /// <inheritdoc cref="AVCodecContext.frame_size"/>
-        public int FrameSize => _buffer_length;
-
-        Span<float> IAudioBufferInternal.Buffer => Buffer;
+        float* IAudioBufferInternal.BufferPointer => _buffer.Pointer;
         int IAudioBufferInternal.BufferLength => _buffer_length;
         int IAudioBufferInternal.BufferIndex { get => _buffer_wrote; set => _buffer_wrote = value; }
 
@@ -33,17 +30,19 @@ namespace LivreNoirLibrary.Media.FFmpeg
             _options = options;
 
             this.SetupEncoder(codec, null, out _stream, out _codec_context);
+            var inCh = InputChannels;
+            var inRate = InputSampleRate;
             // 変換コンテキスト
             var codecContext = _codec_context;
-            AVChannelLayout inLayout = default;
-            ffmpeg.av_channel_layout_default(&inLayout, _in_channels);
-            this.AllocSwrContext(codecContext->ch_layout, codecContext->sample_fmt, codecContext->sample_rate, inLayout, InternalSampleFormat, _in_rate);
+            _swrContext = FFmpegUtils.CreateSwrContext(
+                codecContext->ch_layout, codecContext->sample_fmt, codecContext->sample_rate,
+                FFmpegUtils.CreateChannelLayout(inCh), InputSampleFormat, inRate
+                );
             // フレーム
             var outFrameSize = codecContext->frame_size;
-            var inFrameSize = (int)ffmpeg.av_rescale_rnd(outFrameSize, _in_rate, _out_rate, AVRounding.AV_ROUND_UP);
-            EnsureBufferSize(inFrameSize * _in_channels);
+            EnsureBufferSize(outFrameSize * inCh);
             _buffer_head = 0;
-            _buffer_length = inFrameSize;
+            _buffer_length = outFrameSize;
             _buffer_wrote = 0;
             var frame = GetFrame();
             frame->nb_samples = outFrameSize;
@@ -59,7 +58,7 @@ namespace LivreNoirLibrary.Media.FFmpeg
 
         void IFmEncoder.SetupEncoder(AVCodec* codec, AVCodecContext* codecContext)
         {
-            (_in_rate, _in_channels, var rate, var ch, var bitRate) = _options;
+            (InputSampleRate, InputChannels, var rate, var ch, var bitRate) = _options;
             void* out_configs = null;
             int out_num_configs = 0;
 
@@ -84,7 +83,7 @@ namespace LivreNoirLibrary.Media.FFmpeg
                     rate = rateList[minIndex];
                 }
             }
-            codecContext->sample_rate = _out_rate = rate;
+            codecContext->sample_rate = OutputSampleRate = rate;
             codecContext->time_base = new() { num = 1, den = rate };
 
             // チャンネルレイアウト
@@ -107,10 +106,10 @@ namespace LivreNoirLibrary.Media.FFmpeg
             {
                 ffmpeg.av_channel_layout_default(&codecContext->ch_layout, ch);
             }
-            _out_channels = ch;
+            OutputChannels = ch;
 
             // サンプルフォーマット
-            codecContext->sample_fmt = InternalSampleFormat;
+            codecContext->sample_fmt = InputSampleFormat = InternalSampleFormat;
             if (ffmpeg.avcodec_get_supported_config(codecContext, codec, AVCodecConfig.AV_CODEC_CONFIG_SAMPLE_FORMAT, 0, &out_configs, &out_num_configs) is >= 0)
             {
                 found = out_num_configs is <= 0;
@@ -129,6 +128,7 @@ namespace LivreNoirLibrary.Media.FFmpeg
                     codecContext->sample_fmt = formatList[0];
                 }
             }
+            OutputSampleFormat = codecContext->sample_fmt;
 
             if (bitRate is <= 0)
             {
@@ -151,14 +151,14 @@ namespace LivreNoirLibrary.Media.FFmpeg
             {
                 var frame = GetFrame();
                 var codecContext = _codec_context;
+                frame->nb_samples = codecContext->frame_size;
                 var outBuffer = stackalloc byte*[8];
                 for (var i = 0u; i < 8u; i++)
                 {
                     outBuffer[i] = frame->data[i];
                 }
-                var inSpan = Buffer[.._buffer_wrote];
-                var inSamples = _buffer_wrote / _in_channels;
-                var outSamples = this.SwrConvertToWrite(inSpan, inSamples, outBuffer, codecContext->frame_size);
+                var inSamples = _buffer_wrote / InputChannels;
+                var outSamples = this.SwrConvertToWrite(_buffer.Pointer, inSamples, outBuffer, codecContext->frame_size);
                 if (outSamples is <= 0 && _sent_any_frame)
                 {
                     return false;

@@ -21,8 +21,8 @@ namespace LivreNoirLibrary.Media
 
             public nint Offset(int x, int y) => bitmap.Pointer + (x + y * bitmap.Width) * bitmap.BytesPerPixel;
             public nint Offset(int y) => bitmap.Pointer + y * bitmap.Stride;
-
-            public bool Adjust(ref Rectangle rect) => bitmap.Pointer is not 0 && Structs.Adjust(ref rect, bitmap.Width, bitmap.Height);
+            public nint Offset(in Rectangle rect) => bitmap.Offset(rect.X, rect.Y);
+            public nint Offset(in Point location) => bitmap.Offset(location.X, location.Y);
 
             public LineEnumerator<T> EnumerateLines() => new(bitmap, bitmap.Rect);
             public LineEnumerator<T> EnumerateLines(in Rectangle rect) => new(bitmap, rect);
@@ -113,7 +113,15 @@ namespace LivreNoirLibrary.Media
             {
                 System.Diagnostics.Debug.Assert(bitmap.IsFloat == isFloat, $"This method is only valid for instances where IBitmap.IsFloat is {isFloat}.");
             }
+
+            public bool Adjust(ref Rectangle rect) => bitmap.Pointer is not 0 && Structs.Adjust(ref rect, bitmap.Width, bitmap.Height);
         }
+
+        public static bool Adjust<T1, T2>(T1 source, ref Rectangle sourceRect, T2 destination, ref Point destLocation)
+            where T1 : IBitmap
+            where T2 : IBitmap
+            => source.Pointer is not 0 && destination.Pointer is not 0 && 
+            Structs.Adjust(ref sourceRect, ref destLocation, source.Width, source.Height, destination.Width, destination.Height);
 
         public static bool Adjust<T1, T2>(
             T1 source, in DoubleRect sourceRect,
@@ -125,7 +133,7 @@ namespace LivreNoirLibrary.Media
             actualSourceRect = default;
             actualDestRect = default;
             return source.Pointer is not 0 && destination.Pointer is not 0 &&
-                Structs.Adjust(source.DoubleRect, sourceRect, destValidRect, destRect, out actualSourceRect, out actualDestRect);
+                Structs.AdjustStretch(source.DoubleRect, sourceRect, destValidRect, destRect, out actualSourceRect, out actualDestRect);
         }
 
         private delegate bool CheckLine<T>(T* p, out int left, out int right) where T : unmanaged;
@@ -180,7 +188,7 @@ namespace LivreNoirLibrary.Media
                     _stride = bitmap.Stride;
                     _bytes = rect.Width * bitmap.BytesPerPixel;
                     _height = rect.Height;
-                    _pointer = bitmap.Offset(rect.X, rect.Y) - _stride;
+                    _pointer = bitmap.Offset(rect) - _stride;
                 }
                 else
                 {

@@ -5,6 +5,9 @@ namespace LivreNoirLibrary.Media
 {
     public class UIntBitmap : UnmanagedBitmap<uint>
     {
+        public override int ElementsPerPixel => 1;
+        public override bool IsFloat => false;
+
         public UIntBitmap(int width, int height) : base(width, height) { }
         public UIntBitmap(UnmanagedArray<uint>? buffer, int width, int height, bool clear = true) : base(buffer, width, height, clear) { }
 

@@ -9,16 +9,16 @@ namespace LivreNoirLibrary.Windows.Controls.Bms
         FloatBitmap buffer,
         DoubleRect rect,
         FloatColor colorCorrection,
-        Dictionary<object, DebugItem> totalTimes)
+        Dictionary<object, DebugItem>? totalTimes = null)
     {
         public readonly IBitmap RenderTarget = target;
         public readonly FloatBitmap Buffer = buffer;
         public readonly DoubleRect Rect = rect;
         public readonly FloatColor ColorCorrection = colorCorrection;
-        public readonly Dictionary<object, DebugItem> TotalTimes = totalTimes;
+        public readonly Dictionary<object, DebugItem>? TotalTimes = totalTimes;
 
         public RenderArgs(IBitmap target, FloatBitmap buffer, Dictionary<object, DebugItem>? totalTimes = null) :
-            this(target, buffer, new(0, 0, target.Width, target.Height), FloatColor.White, totalTimes ?? [])
+            this(target, buffer, new(0, 0, target.Width, target.Height), FloatColor.White, totalTimes)
         { }
 
         public RenderArgs Descend(DoubleRect newRect, FloatColor colorCorrection)

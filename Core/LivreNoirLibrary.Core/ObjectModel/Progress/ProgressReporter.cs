@@ -4,6 +4,8 @@ namespace LivreNoirLibrary.ObjectModel
 {
     public sealed class ProgressReporter(Action<ProgressReport> handler) : Progress<ProgressReport>(handler)
     {
+        public bool IsSynchronized { get; set; }
+
         public void Report(string? caption, string? message, double value, double max) => OnReport(new(caption, message, value, max));
 
         public void Report(string? message) => Report(null, message, -1, -1);

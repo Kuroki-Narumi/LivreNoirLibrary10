@@ -5,6 +5,34 @@ namespace LivreNoirLibrary.Media.FFmpeg
 {
     public static unsafe partial class FFmpegUtils
     {
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static AVChannelLayout CreateChannelLayout(int channels)
+        {
+            AVChannelLayout layout = default;
+            ffmpeg.av_channel_layout_default(&layout, channels);
+            return layout;
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static SwrContext* CreateSwrContext(
+            int dstChannel, AVSampleFormat dstFormat, int dstSampleRate,
+            int srcChannel, AVSampleFormat srcFormat, int srcSampleRate)
+            => CreateSwrContext(CreateChannelLayout(dstChannel), dstFormat, dstSampleRate, CreateChannelLayout(srcChannel), srcFormat, srcSampleRate);
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static SwrContext* CreateSwrContext(
+            AVChannelLayout dstChannel, AVSampleFormat dstFormat, int dstSampleRate,
+            AVChannelLayout srcChannel, AVSampleFormat srcFormat, int srcSampleRate)
+        {
+            SwrContext* ctx;
+            ffmpeg.swr_alloc_set_opts2(&ctx,
+                &dstChannel, dstFormat, dstSampleRate,
+                &srcChannel, srcFormat, srcSampleRate,
+                0, null).CheckError(ThrowInvalidOperationException);
+            ffmpeg.swr_init(ctx).CheckError(ThrowInvalidOperationException);
+            return ctx;
+        }
+
         internal static void DisposeSwrContext<T>(this T obj)
             where T : ISwrContext
         {
@@ -17,19 +45,17 @@ namespace LivreNoirLibrary.Media.FFmpeg
             }
         }
 
-        internal static void AllocSwrContext<T>(this T obj,
-            AVChannelLayout dstChannel, AVSampleFormat dstFormat, int dstSampleRate, 
-            AVChannelLayout srcChannel, AVSampleFormat srcFormat, int srcSampleRate)
-            where T : ISwrContext
+        internal static SwrContext* EnsureSwrContext<T>(this T obj)
+            where T : ISwrContext, IAudioContext
         {
-            DisposeSwrContext(obj);
-            SwrContext* swrContext;
-            ffmpeg.swr_alloc_set_opts2(&swrContext,
-                &dstChannel, dstFormat, dstSampleRate,
-                &srcChannel, srcFormat, srcSampleRate,
-                0, null).CheckError(ThrowInvalidOperationException);
-            ffmpeg.swr_init(swrContext).CheckError(ThrowInvalidOperationException);
-            obj.SwrContext = swrContext;
+            var ctx = obj.SwrContext;
+            if (ctx is null)
+            {
+                obj.SwrContext = ctx = CreateSwrContext(
+                    obj.OutputChannels, obj.OutputSampleFormat, obj.OutputSampleRate, 
+                    obj.InputChannels, obj.InputSampleFormat, obj.InputSampleRate);
+            }
+            return ctx;
         }
 
         /// <inheritdoc cref="ffmpeg.swr_convert"/>
@@ -37,21 +63,17 @@ namespace LivreNoirLibrary.Media.FFmpeg
         /// <param name="srcSamples">number of input samples available in one channel</param>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         internal static int SwrConvertToRead<T>(this T obj, byte** srcBuffer, int srcSamples)
-            where T : ISwrContext
+            where T : ISwrContext, IAudioContext
         {
-            var swr = obj.SwrContext;
+            var swr = obj.EnsureSwrContext();
             var dstSamples = ffmpeg.swr_get_out_samples(swr, srcSamples);
             if (dstSamples is <= 0)
             {
                 return 0;
             }
-            var dstBuffer = obj.GetConvertBuffer(dstSamples);
-            fixed (float* bufferPtr = dstBuffer)
-            {
-                var bytePtr = (byte*)bufferPtr;
-                var outSamples = ffmpeg.swr_convert(swr, &bytePtr, dstSamples, srcBuffer, srcSamples).CheckError(ThrowInvalidDataException);
-                return outSamples;
-            }
+            var dstBuffer = (byte*)obj.GetConvertBuffer(dstSamples);
+            var outSamples = ffmpeg.swr_convert(swr, &dstBuffer, dstSamples, srcBuffer, srcSamples).CheckError(ThrowInvalidDataException);
+            return outSamples;
         }
 
         /// <inheritdoc cref="ffmpeg.swr_convert"/>
@@ -59,17 +81,14 @@ namespace LivreNoirLibrary.Media.FFmpeg
         /// 
         /// <param name="srcSamples">number of input samples available in one channel</param>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        internal static int SwrConvertToWrite<T>(this T obj, Span<float> src, int srcSamples, byte** dstBuffer, int dstCapacity)
-            where T : ISwrContext
+        internal static int SwrConvertToWrite<T>(this T obj, float* bufferPtr, int srcSamples, byte** dstBuffer, int dstCapacity)
+            where T : ISwrContext, IAudioContext
         {
-            var swr = obj.SwrContext;
-            fixed(float* bufferPtr = src)
-            {
-                var bytePtr = (byte*)bufferPtr;
-                var bytePtrPtr = srcSamples is 0 ? null : &bytePtr;
-                var outSamples = ffmpeg.swr_convert(swr, dstBuffer, dstCapacity, bytePtrPtr, srcSamples).CheckError(ThrowInvalidDataException);
-                return outSamples;
-            }
+            var swr = obj.EnsureSwrContext();
+            var bytePtr = (byte*)bufferPtr;
+            var bytePtrPtr = srcSamples is 0 ? null : &bytePtr;
+            var outSamples = ffmpeg.swr_convert(swr, dstBuffer, dstCapacity, bytePtrPtr, srcSamples).CheckError(ThrowInvalidDataException);
+            return outSamples;
         }
     }
 }

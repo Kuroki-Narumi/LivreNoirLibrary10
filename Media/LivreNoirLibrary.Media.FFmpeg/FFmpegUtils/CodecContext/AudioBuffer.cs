@@ -7,7 +7,7 @@ using LivreNoirLibrary.Debug;
 
 namespace LivreNoirLibrary.Media.FFmpeg
 {
-    public static partial class FFmpegUtils
+    public static unsafe partial class FFmpegUtils
     {
         /// <inheritdoc cref="IInternalAudioDecoder.Setup(Stream, bool, int, int, int)"/>
         /// <param name="decoder">Decoder to setup.</param>
@@ -46,27 +46,27 @@ namespace LivreNoirLibrary.Media.FFmpeg
             var dstIndex = 0;
             var dstSize = buffer.Length;
             var bufferRead = decoder.BufferIndex;
-            while (dstSize is > 0)
+            fixed (float* bufferPtr = buffer)
             {
-                // バッファから読み出せる残りの量
-                var remain = decoder.BufferLength * channels - bufferRead;
-                if (remain is <= 0)
+                while (dstSize is > 0)
                 {
-                    bufferRead = 0;
-                    if (decoder.UpdateBuffer())
+                    // バッファから読み出せる残りの量
+                    var remain = decoder.BufferLength * channels - bufferRead;
+                    if (remain is <= 0)
                     {
-                        break;
+                        bufferRead = 0;
+                        if (decoder.UpdateBuffer())
+                        {
+                            break;
+                        }
+                        remain = decoder.BufferLength * channels;
                     }
-                    remain = decoder.BufferLength * channels;
+                    remain = Math.Min(remain, dstSize);
+                    SimdOperations.CopyFrom(bufferPtr + dstIndex, decoder.BufferPointer + bufferRead, remain);
+                    dstIndex += remain;   // 書き込み位置(読み出されたサンプル数)
+                    dstSize -= remain;    // 要求読み出しサンプル数
+                    bufferRead += remain; // バッファの読み出し位置
                 }
-                if (dstSize <= remain)
-                {
-                    remain = dstSize;
-                }
-                decoder.Buffer.Slice(bufferRead, remain).CopyTo(buffer[dstIndex..]);
-                dstIndex += remain;   // 書き込み位置(読み出されたサンプル数)
-                dstSize -= remain;    // 要求読み出しサンプル数
-                bufferRead += remain; // バッファの読み出し位置
             }
             decoder.BufferIndex = bufferRead;
             return dstIndex;
@@ -80,25 +80,25 @@ namespace LivreNoirLibrary.Media.FFmpeg
             var channels = encoder.InputChannels;
             var srcIndex = 0;
             var srcSize = buffer.Length;
-            while (srcSize is > 0)
+            fixed (float* bufferPtr = buffer)
             {
-                var bufferWrote = encoder.BufferIndex;
-                // バッファに書き込める残りの量
-                var remain = encoder.BufferLength * channels - bufferWrote;
-                if (remain is <= 0)
+                while (srcSize is > 0)
                 {
-                    encoder.EncodeBuffer();
-                    bufferWrote = 0;
-                    remain = encoder.BufferLength * channels;
+                    var bufferWrote = encoder.BufferIndex;
+                    // バッファに書き込める残りの量
+                    var remain = encoder.BufferLength * channels - bufferWrote;
+                    if (remain is <= 0)
+                    {
+                        encoder.EncodeBuffer();
+                        bufferWrote = 0;
+                        remain = encoder.BufferLength * channels;
+                    }
+                    remain = Math.Min(remain, srcSize);
+                    SimdOperations.CopyFrom(encoder.BufferPointer + bufferWrote, bufferPtr + srcIndex, remain);
+                    srcIndex += remain; // 読み込み位置(書き込まれたサンプル数)
+                    srcSize -= remain;  // 要求書き込みサンプル数
+                    encoder.BufferIndex = bufferWrote + remain; // バッファの書き込み位置
                 }
-                if (srcSize <= remain)
-                {
-                    remain = srcSize;
-                }
-                buffer.Slice(srcIndex, remain).CopyTo(encoder.Buffer[bufferWrote..]);
-                srcIndex += remain; // 読み込み位置(書き込まれたサンプル数)
-                srcSize -= remain;  // 要求書き込みサンプル数
-                encoder.BufferIndex = bufferWrote + remain; // バッファの書き込み位置
             }
         }
 

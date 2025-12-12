@@ -4,7 +4,7 @@ namespace LivreNoirLibrary.Media.FFmpeg
     public unsafe sealed partial class HevcEncodeOptions : Mpeg4EncodeOptions, ICodecOptions
     {
         public HevcProfile Profile { get; set => SetValue(ref field, value); } = HevcProfile.Main;
-        public HevcLevel Level { get; set => SetValue(ref field, value); } = HevcLevel.L6_1;
+        public HevcLevel Level { get; set => SetValue(ref field, value); } = HevcLevel.L5_1;
         public HevcTune Tune { get; set => SetValue(ref field, value); } = HevcTune.None;
         public int[]? Pools { get; set => SetValue(ref field, value); }
 

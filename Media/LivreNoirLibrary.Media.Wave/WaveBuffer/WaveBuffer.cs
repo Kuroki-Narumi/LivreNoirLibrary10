@@ -15,24 +15,18 @@ namespace LivreNoirLibrary.Media.Wave
         public static WaveBuffer Empty() => new();
 
         private readonly UnmanagedArray<float> _data = [];
-        private int _data_length;
-        private int _sample_rate = DefaultSampleRate;
-        private int _channels = DefaultChannels;
         protected readonly MarkerCollection _markers = [];
 
-        public Span<float> Data => _data.Slice(0, _data_length);
-        public int SampleRate => _sample_rate;
-        public int Channels => _channels;
-        public int TotalSample => _data_length;
+        public Span<float> Data => _data.Slice(0, TotalSample);
+        public int SampleRate { get; private set; } = DefaultSampleRate;
+        public int Channels { get; private set; } = DefaultChannels;
+        public int TotalSample { get; private set; }
 
         int IMarkerContainer.Length => this.SampleLength;
 
         public MarkerCollection Markers => _markers;
 
-        public WaveBuffer(int sampleRate, int channels) : this()
-        {
-            SetLayout(sampleRate, channels);
-        }
+        public static WaveBuffer CreateUnsafe(int sampleRate, int channels) => new() { SampleRate = sampleRate, Channels = channels };
 
         protected override void DisposeUnmanaged()
         {
@@ -42,21 +36,21 @@ namespace LivreNoirLibrary.Media.Wave
 
         public virtual void Clear()
         {
-            _data_length = 0;
+            TotalSample = 0;
             _markers.Clear();
         }
 
         public void SetTotalSample(int size, bool clear = true)
         {
-            if (_data_length < size)
+            if (TotalSample < size)
             {
                 _data.EnsureSize(size, false);
                 if (clear)
                 {
-                    _data.Clear(_data_length);
+                    _data.Clear(TotalSample);
                 }
             }
-            _data_length = size;
+            TotalSample = size;
         }
 
         public void Load(ReadOnlySpan<float> source, int sampleRate = 0, int channels = 0)
@@ -111,10 +105,10 @@ namespace LivreNoirLibrary.Media.Wave
         {
             if (updateLayout)
             {
-                _sample_rate = 0;
-                _channels = 0;
+                SampleRate = 0;
+                Channels = 0;
             }
-            using AudioDecoder decoder = new(path, new(_sample_rate, _channels));
+            using AudioDecoder decoder = new(path, new(SampleRate, Channels));
             Load(decoder);
         }
 
@@ -122,10 +116,10 @@ namespace LivreNoirLibrary.Media.Wave
         {
             if (updateLayout)
             {
-                _sample_rate = 0;
-                _channels = 0;
+                SampleRate = 0;
+                Channels = 0;
             }
-            using WaveDecoder decoder = new(path, _sample_rate, _channels);
+            using WaveDecoder decoder = new(path, SampleRate, Channels);
             Load(decoder);
         }
 
@@ -136,7 +130,7 @@ namespace LivreNoirLibrary.Media.Wave
             var channels = decoder.OutputChannels;
             SetLayout(rate, channels);
             SetTotalSample((int)decoder.TotalSample, false);
-            _data_length = decoder.Read(_data);
+            TotalSample = decoder.Read(_data);
             LoadMetaData(decoder);
         }
 
@@ -156,8 +150,8 @@ namespace LivreNoirLibrary.Media.Wave
 
         public void SetLayout(int sampleRate, int channels)
         {
-            var rate = _sample_rate;
-            var ch = _channels;
+            var rate = SampleRate;
+            var ch = Channels;
             if (sampleRate is <= 0)
             {
                 sampleRate = rate;
@@ -169,8 +163,8 @@ namespace LivreNoirLibrary.Media.Wave
             CheckLayout(sampleRate, channels);
             if (rate != sampleRate || ch != channels)
             {
-                _sample_rate = sampleRate;
-                _channels = channels;
+                SampleRate = sampleRate;
+                Channels = channels;
                 OnLayoutChanged(rate, sampleRate, ch, channels);
             }
         }

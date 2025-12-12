@@ -9,7 +9,8 @@ namespace LivreNoirLibrary.Media.Bms
         double AverageTempo => (MinTempo + MaxTempo) / 2;
         double MainTempo { get; }
         double MainTimeTempo { get; }
-        double LastTime { get; }
+        double FirstSoundTime { get; }
+        double LastSoundTime { get; }
 
         double Beat2Time(double absolutePosition);
         double Time2Beat(double time);

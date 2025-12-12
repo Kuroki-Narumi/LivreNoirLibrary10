@@ -1,6 +1,7 @@
 ﻿using LivreNoirLibrary.Collections;
 using LivreNoirLibrary.Media;
 using LivreNoirLibrary.Media.Bms;
+using LivreNoirLibrary.Media.Bms.Play;
 using LivreNoirLibrary.Numerics;
 using LivreNoirLibrary.Windows.Media.Bms.SkinInfo;
 using System;
@@ -50,6 +51,8 @@ namespace LivreNoirLibrary.Windows.Controls.Bms.Elements
         private readonly DestinationTimeline _dest_angle = new(0);
         private readonly DestinationTimeline _dest_aox = new(0.5);
         private readonly DestinationTimeline _dest_aoy = new(0.5);
+
+        public bool IsConstantDestination { get; private set; }
 
         public void ClearTimeline()
         {
@@ -121,6 +124,7 @@ namespace LivreNoirLibrary.Windows.Controls.Bms.Elements
             LoopStart = Resolve(element.DestLoopStart);
             LoopInterval = needUpdateEnd ? 0 : loopEnd - LoopStart;
             BlendMode = element.Blend;
+            IsConstantDestination = slopes.Count is <= 1;
         }
 
         public virtual void Update(in UpdateArgs args)
@@ -178,7 +182,7 @@ namespace LivreNoirLibrary.Windows.Controls.Bms.Elements
                 var t0 = System.Diagnostics.Stopwatch.GetTimestamp();
                 RenderCore(args);
                 var time = TimeUtils.Ticks2Milliseconds(System.Diagnostics.Stopwatch.GetTimestamp() - t0);
-                args.TotalTimes[this] += time;
+                args.TotalTimes?[this] += time;
             }
         }
 
@@ -189,7 +193,7 @@ namespace LivreNoirLibrary.Windows.Controls.Bms.Elements
             BlendMode blendMode, FloatColor colorCorrection)
         {
             var (target, buffer1, parentRect, _) = args;
-            source.CopyTo(sourceRect, target, parentRect, new(destX + parentRect.X, destY + parentRect.Y, destWidth, destHeight), blendMode, colorCorrection, buffer1);
+            source.BlendWithScale(sourceRect, target, parentRect, new(destX + parentRect.X, destY + parentRect.Y, destWidth, destHeight), blendMode, colorCorrection, buffer1);
         }
     }
 }

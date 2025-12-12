@@ -15,33 +15,78 @@ namespace LivreNoirLibrary.Media
             public void Blend(Rectangle rect, BlendMode blend, LnColor color) => Blend(bitmap, rect, blend, color.ToFloatColor());
             public void Blend(BlendMode blend, LnColor color) => Blend(bitmap, bitmap.Rect, blend, color.ToFloatColor());
             public void Blend(BlendMode blend, FloatColor color) => Blend(bitmap, bitmap.Rect, blend, color);
+
+            public void Blend(Rectangle rect, BlendMode blend, FloatColor color)
+            {
+                if (!Adjust(bitmap, ref rect) || !ColorBlend.TryGetBlendFunc(blend, out var func))
+                {
+                    return;
+                }
+                BlendCore(bitmap.Offset(rect), bitmap.Stride, bitmap.IsFloat, rect.Width, rect.Height, func, color);
+            }
         }
 
-        public static void Blend<T>(this T bitmap, Rectangle rect, BlendMode blend, FloatColor color)
-            where T : IBitmap
+        /// <inheritdoc cref="BlendTo{TSource, TDest}(TSource, Rectangle, TDest, Point, BlendMode, FloatColor)"/>
+        public static void BlendTo<TSource, TDest>(
+            this TSource source, TDest destination,
+            BlendMode blend, FloatColor colorCorrection)
+            where TSource : IBitmap
+            where TDest : IBitmap
+            => BlendTo(source, source.Rect, destination, new(0, 0), blend, colorCorrection);
+
+        /// <summary>
+        /// <paramref name="source"/>から指定された矩形範囲を切り抜き、<paramref name="destination"/>へとコピーする。
+        /// </summary>
+        /// <param name="source">the bitmap object to copy from.</param>
+        /// <param name="sourceRect">a rectangle that specified the area to crop from the <paramref name="source"/>.</param>
+        /// <param name="destination">the bitmap object to copy to.</param>
+        /// <param name="blend">the blending mode.</param>
+        /// <param name="colorCorrection">the color correction applied to the source before blending.</param>
+        public static void BlendTo<TSource, TDest>(
+            this TSource source, Rectangle sourceRect, 
+            TDest destination, Point destLocation, 
+            BlendMode blend, FloatColor colorCorrection)
+            where TSource : IBitmap
+            where TDest : IBitmap
         {
-            if (!Adjust(bitmap, ref rect) || !ColorBlend.TryGetBlendFunc(blend, out var func))
+            if (
+                // 色補正のアルファが 0 (=完全な透明)の場合は何もしない
+                colorCorrection.A is 0 ||
+                // 範囲チェック
+                !Adjust(source, ref sourceRect, destination, ref destLocation) 
+                )
             {
                 return;
             }
-            if (bitmap.IsFloat)
-            {
-                ColorBlend.BlendFloat((float*)bitmap.Offset(rect.X, rect.Y), bitmap.Width, rect.Width, rect.Height, func, color);
-            }
-            else
-            {
-                ColorBlend.BlendUInt((uint*)bitmap.Offset(rect.X, rect.Y), bitmap.Width, rect.Width, rect.Height, func, color);
-            }
+            var (srcX, srcY, srcW, srcH) = sourceRect;
+            var (destX, destY) = destLocation;
+            BlendToWithoutScale(source, srcX, srcY, destination, destX, destY, srcW, srcH, blend, colorCorrection);
         }
 
-        /// <inheritdoc cref="CopyTo{TSource, TDest}(TSource, DoubleRect, TDest, DoubleRect, DoubleRect, BlendMode, FloatColor, FloatBitmap?, bool)"/>
-        public static void CopyTo<TSource, TDest>(
+        /// <inheritdoc cref="BlendWithScale{TSource, TDest}(TSource, DoubleRect, TDest, DoubleRect, DoubleRect, BlendMode, FloatColor, FloatBitmap?, bool)"/>
+        public static void BlendWithScale<TSource, TDest>(
             this TSource source, TDest destination,
             BlendMode blend, FloatColor colorCorrection,
             FloatBitmap? buffer = null, bool tweet = false)
             where TSource : IBitmap
             where TDest : IBitmap
-            => CopyTo(source, source.DoubleRect, destination, destination.DoubleRect, destination.DoubleRect, blend, colorCorrection, buffer, tweet);
+        {
+            var destRect = destination.DoubleRect;
+            BlendWithScale(source, source.DoubleRect, destination, destRect, destRect, blend, colorCorrection, buffer, tweet);
+        }
+
+        /// <inheritdoc cref="BlendWithScale{TSource, TDest}(TSource, DoubleRect, TDest, DoubleRect, DoubleRect, BlendMode, FloatColor, FloatBitmap?, bool)"/>
+        public static void BlendWithScale<TSource, TDest>(
+            this TSource source, DoubleRect sourceRect, 
+            TDest destination,
+            BlendMode blend, FloatColor colorCorrection,
+            FloatBitmap? buffer = null, bool tweet = false)
+            where TSource : IBitmap
+            where TDest : IBitmap
+        {
+            var destRect = destination.DoubleRect;
+            BlendWithScale(source, sourceRect, destination, destRect, destRect, blend, colorCorrection, buffer, tweet);
+        }
 
         /// <summary>
         /// <paramref name="source"/>から指定された矩形範囲を切り抜き、<paramref name="destination"/>へとコピーする。
@@ -55,7 +100,7 @@ namespace LivreNoirLibrary.Media
         /// <param name="blend">the blending mode.</param>
         /// <param name="colorCorrection">the color correction applied to the source before blending.</param>
         /// <param name="buffer">a bitmap object used to store the intermediate stretch copy result.</param>
-        public static void CopyTo<TSource, TDest>(
+        public static void BlendWithScale<TSource, TDest>(
             this TSource source, DoubleRect sourceRect,
             TDest destination, DoubleRect destValidRect, DoubleRect destRect,
             BlendMode blend, FloatColor colorCorrection,
@@ -65,7 +110,7 @@ namespace LivreNoirLibrary.Media
         {
             if (tweet)
             {
-                Console.WriteLine(nameof(CopyTo));
+                Console.WriteLine(nameof(BlendTo));
                 Console.WriteLine($"  src valid={source.Rect}, src rect={sourceRect}");
                 Console.WriteLine($"  dst valid={destValidRect}, dst rect={destRect}");
             }
@@ -88,7 +133,7 @@ namespace LivreNoirLibrary.Media
             // 拡縮の必要無し
             if (srcW == destW && srcH == destH)
             {
-                BlendTo(source, srcX, srcY, destination, destX, destY, destW, destH, blend, colorCorrection);
+                BlendToWithoutScale(source, srcX, srcY, destination, destX, destY, destW, destH, blend, colorCorrection);
                 return;
             }
 
@@ -107,7 +152,7 @@ namespace LivreNoirLibrary.Media
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        static void BlendTo<TSource, TDest>(
+        static void BlendToWithoutScale<TSource, TDest>(
             TSource source, int sourceX, int sourceY,
             TDest destination, int destX, int destY,
             int width, int height,
@@ -117,60 +162,225 @@ namespace LivreNoirLibrary.Media
             where TDest : IBitmap
         {
             var sourceP = source.Offset(sourceX, sourceY);
-            var sourceWidth = source.Width;
             var destP = destination.Offset(destX, destY);
-            var destWidth = destination.Width;
             // ブレンドメソッドが見つかった場合
             if (ColorBlend.TryGetBlendFunc(blend, out var func))
             {
-                if (source.IsFloat)
-                {
-                    if (destination.IsFloat)
-                    {
-                        ColorBlend.BlendFloatToFloat((float*)sourceP, sourceWidth, (float*)destP, destWidth, width, height, func, colorCorrection);
-                    }
-                    else
-                    {
-                        ColorBlend.BlendFloatToUInt((float*)sourceP, sourceWidth, (uint*)destP, destWidth, width, height, func, colorCorrection);
-                    }
-                }
-                else
-                {
-                    if (destination.IsFloat)
-                    {
-                        ColorBlend.BlendUIntToFloat((uint*)sourceP, sourceWidth, (float*)destP, destWidth, width, height, func, colorCorrection);
-                    }
-                    else
-                    {
-                        ColorBlend.BlendUIntToUInt((uint*)sourceP, sourceWidth, (uint*)destP, destWidth, width, height, func, colorCorrection);
-                    }
-                }
+                BlendToWithoutScaleCore(
+                    source.Offset(sourceX, sourceY), source.Stride, source.IsFloat,
+                    destination.Offset(destX, destY), destination.Stride, destination.IsFloat,
+                    width, height, func, colorCorrection
+                    );
             }
             // 見つからなかった場合は全ピクセルを上書きする
             else
             {
-                if (source.IsFloat)
+                CopyToCore(
+                    source.Offset(sourceX, sourceY), source.Stride, source.IsFloat,
+                    destination.Offset(destX, destY), destination.Stride, destination.IsFloat,
+                    width, height, colorCorrection
+                    );
+            }
+        }
+
+        static void BlendCore(nint bitmap, int stride, bool isFloat, int width, int height, BlendFunc blend, Vector<float> color)
+        {
+            var count = Vector<float>.Count;
+            var frontAlpha = FloatColor.FillAlphaToAll(color);
+            width *= 4;
+            if (isFloat)
+            {
+                Parallel.For(0, height, y =>
                 {
-                    if (destination.IsFloat)
+                    var w = width;
+                    var backP = (Vector<float>*)(bitmap + y * stride);
+                    for (; w >= count; w -= count, backP++)
                     {
-                        CopyFloatToFloat((float*)sourceP, sourceWidth, (float*)destP, destWidth, width, height, colorCorrection);
+                        var back = *backP;
+                        ColorBlend.Blend(ref back, FloatColor.FillAlphaToAll(back), color, frontAlpha, blend);
+                        *backP = back;
                     }
-                    else
+                    if (w is > 0)
                     {
-                        CopyFloatToUInt((float*)sourceP, sourceWidth, (uint*)destP, destWidth, width, height, colorCorrection);
+                        var back = FillRemain(backP, w);
+                        ColorBlend.Blend(ref back, FloatColor.FillAlphaToAll(back), color, frontAlpha, blend);
+                        VectorToFloat(backP, back, w);
                     }
+                });
+            }
+            else
+            {
+                Parallel.For(0, height, y =>
+                {
+                    var w = width;
+                    // byteの各要素をfloatへ変換するために、ポインタをbyte*に変換
+                    var backP = (byte*)(bitmap + y * stride);
+                    // float変換用の作業バッファ
+                    var backBuffer = stackalloc float[count];
+                    for (; w >= count; w -= count)
+                    {
+                        Process(backBuffer, count);
+                    }
+                    if (w is > 0)
+                    {
+                        Process(backBuffer, w);
+                    }
+
+                    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+                    void Process(float* backBuffer, int count)
+                    {
+                        // 背景を正規化してベクトル化
+                        ByteToBuffer(ref backP, backBuffer, count, true);
+                        // ブレンド
+                        var back = *(Vector<float>*)backBuffer;
+                        ColorBlend.Blend(ref back, FloatColor.FillAlphaToAll(back), color, frontAlpha, blend);
+                        // バッファへ書き戻す
+                        *(Vector<float>*)backBuffer = back;
+                        BufferToByte(ref backP, backBuffer, count);
+                    }
+                });
+            }
+        }
+
+        static void BlendToWithoutScaleCore(
+            nint source, int sourceStride, bool sourceIsFloat, 
+            nint destination, int destStride, bool destIsFloat, 
+            int width, int height, BlendFunc blend, Vector<float> colorCorrection)
+        {
+            var count = Vector<float>.Count;
+            width *= 4;
+            if (sourceIsFloat)
+            {
+                if (destIsFloat)
+                {
+                    Parallel.For(0, height, y =>
+                    {
+                        var w = width;
+                        var backP = (Vector<float>*)(destination + y * destStride);
+                        var frontP = (Vector<float>*)(source + y * sourceStride);
+                        for (; w >= count; w -= count, backP++, frontP++)
+                        {
+                            var back = *backP;
+                            var front = *frontP * colorCorrection;
+                            ColorBlend.Blend(ref back, FloatColor.FillAlphaToAll(back), front, FloatColor.FillAlphaToAll(front), blend);
+                            *backP = back;
+                        }
+                        if (w is > 0)
+                        {
+                            var back = FillRemain(backP, w);
+                            var front = FillRemain(frontP, w) * colorCorrection;
+                            ColorBlend.Blend(ref back, FloatColor.FillAlphaToAll(back), front, FloatColor.FillAlphaToAll(front), blend);
+                            VectorToFloat(backP, back, w);
+                        }
+                    });
                 }
                 else
                 {
-                    if (destination.IsFloat)
+                    Parallel.For(0, height, y =>
                     {
-                        CopyUIntToFloat((uint*)sourceP, sourceWidth, (float*)destP, destWidth, width, height, colorCorrection);
-                    }
-                    else
-                    {
-                        CopyUIntToUInt((uint*)sourceP, sourceWidth, (uint*)destP, destWidth, width, height, colorCorrection);
-                    }
+                        var w = width;
+                        // byteの各要素をfloatへ変換するために、ポインタをbyte*に変換
+                        var backP = (byte*)(destination + y * destStride);
+                        var frontP = (Vector<float>*)(source + y * sourceStride);
+                        // float変換用の作業バッファ
+                        var backBuffer = stackalloc float[count];
+
+                        for (; w >= count; w -= count, frontP++)
+                        {
+                            var front = *frontP * colorCorrection;
+                            Process(backBuffer, front, count);
+                        }
+                        if (w is > 0)
+                        {
+                            var front = FillRemain(frontP, w) * colorCorrection;
+                            Process(backBuffer, front, w);
+                        }
+
+                        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+                        void Process(float* backBuffer, Vector<float> front, int count)
+                        {
+                            // 背景を正規化してベクトル化
+                            ByteToBuffer(ref backP, backBuffer, count, true);
+                            // ブレンド
+                            var back = *(Vector<float>*)backBuffer;
+                            ColorBlend.Blend(ref back, FloatColor.FillAlphaToAll(back), front, FloatColor.FillAlphaToAll(front), blend);
+                            // バッファへ書き戻す
+                            *(Vector<float>*)backBuffer = back;
+                            BufferToByte(ref backP, backBuffer, count);
+                        }
+                    });
                 }
+            }
+            else if (destIsFloat)
+            {
+                Parallel.For(0, height, y =>
+                {
+                    var w = width;
+                    var backP = (Vector<float>*)(destination + y * destStride);
+                    var frontP = (byte*)(source + y * sourceStride);
+                    // float変換用の作業バッファ
+                    var frontBuffer = stackalloc float[count];
+
+                    for (; w >= count; w -= count, backP++)
+                    {
+                        var back = *backP;
+                        Process(ref back, frontBuffer, count);
+                        *backP = back;
+                    }
+                    if (w is > 0)
+                    {
+                        var back = FillRemain(backP, w);
+                        Process(ref back, frontBuffer, w);
+                        VectorToFloat(backP, back, w);
+                    }
+
+                    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+                    void Process(ref Vector<float> back, float* frontBuffer, int count)
+                    {
+                        // 背景を正規化してベクトル化
+                        ByteToBuffer(ref frontP, frontBuffer, count);
+                        // ブレンド
+                        var front = *(Vector<float>*)frontBuffer * colorCorrection;
+                        ColorBlend.Blend(ref back, FloatColor.FillAlphaToAll(back), front, FloatColor.FillAlphaToAll(front), blend);
+                    }
+                });
+            }
+            else
+            {
+                Parallel.For(0, height, y =>
+                {
+                    var w = width;
+                    // byteの各要素をfloatへ変換するために、ポインタをbyte*に変換
+                    var backP = (byte*)(destination + y * destStride);
+                    var frontP = (byte*)(source + y * sourceStride);
+                    // float変換用の作業バッファ
+                    var backBuffer = stackalloc float[count];
+                    var frontBuffer = stackalloc float[count];
+
+                    for (; w >= count; w -= count)
+                    {
+                        Process(backBuffer, frontBuffer, count);
+                    }
+                    if (w is > 0)
+                    {
+                        Process(backBuffer, frontBuffer, w);
+                    }
+
+                    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+                    void Process(float* backBuffer, float* frontBuffer, int count)
+                    {
+                        // 背景を正規化してベクトル化
+                        ByteToBuffer(ref backP, backBuffer, count, true);
+                        ByteToBuffer(ref frontP, frontBuffer, count);
+                        // ブレンド
+                        var back = *(Vector<float>*)backBuffer;
+                        var front = *(Vector<float>*)frontBuffer * colorCorrection;
+                        ColorBlend.Blend(ref back, FloatColor.FillAlphaToAll(back), front, FloatColor.FillAlphaToAll(front), blend);
+                        // バッファへ書き戻す
+                        *(Vector<float>*)backBuffer = back;
+                        BufferToByte(ref backP, backBuffer, count);
+                    }
+                });
             }
         }
 
@@ -214,92 +424,6 @@ namespace LivreNoirLibrary.Media
             return y0 + (y1 - y0) * (x - index);
         }
         #endregion
-
-        static void CopyFloatToFloat(float* source, int sourceWidth, float* destination, int destWidth, int width, int height, Vector<float> colorCorrection)
-        {
-            Parallel.For(0, height, y =>
-            {
-                SimdOperations.CopyFrom(destination + y * destWidth * 4, source + y * sourceWidth * 4, colorCorrection, width * 4);
-            });
-        }
-
-        static void CopyFloatToUInt(float* source, int sourceWidth, uint* destination, int destWidth, int width, int height, Vector<float> colorCorrection)
-        {
-            var count = Vector<float>.Count;
-            Parallel.For(0, height, y =>
-            {
-                var w = width * 4;
-                var srcP = (Vector<float>*)(source + y * sourceWidth);
-                var dstP = (byte*)(destination + y * destWidth);
-                var buffer = stackalloc float[count];
-                for (; w >= count; w -= count)
-                {
-                    *(Vector<float>*)buffer = *srcP++ * colorCorrection;
-                    BufferToByte(ref dstP, buffer, count);
-                }
-                if (w is > 0)
-                {
-                    *(Vector<float>*)buffer = FillRemain(srcP, w) * colorCorrection;
-                    BufferToByte(ref dstP, buffer, w);
-                }
-            });
-        }
-
-        static void CopyUIntToFloat(uint* source, int sourceWidth, float* destination, int destWidth, int width, int height, Vector<float> colorCorrection)
-        {
-            var count = Vector<float>.Count;
-            Parallel.For(0, height, y =>
-            {
-                var w = width * 4;
-                var srcP = (byte*)(source + y * sourceWidth);
-                var dstP = (Vector<float>*)(destination + y * destWidth);
-                var buffer = stackalloc float[count];
-                for (; w >= count; w -= count)
-                {
-                    ByteToBuffer(ref srcP, buffer, count);
-                    *dstP++ = *(Vector<float>*)buffer * colorCorrection;
-                }
-                if (w is > 0)
-                {
-                    ByteToBuffer(ref srcP, buffer, count);
-                    VectorToFloat(dstP, *(Vector<float>*)buffer * colorCorrection, w);
-                }
-            });
-        }
-
-        static void CopyUIntToUInt(uint* source, int sourceWidth, uint* destination, int destWidth, int width, int height, Vector<float> colorCorrection)
-        {
-            if (colorCorrection == Vector<float>.One)
-            {
-                Parallel.For(0, height, y =>
-                {
-                    SimdOperations.CopyFrom(destination + y * destWidth, source + y * sourceWidth, width);
-                });
-            }
-            else
-            {
-                var count = Vector<float>.Count;
-                Parallel.For(0, height, y =>
-                {
-                    var w = width * 4;
-                    var srcP = (byte*)(source + y * sourceWidth);
-                    var dstP = (byte*)(destination + y * destWidth);
-                    var buffer = stackalloc float[count];
-                    for (; w >= count; w -= count)
-                    {
-                        ByteToBuffer(ref srcP, buffer, count);
-                        *(Vector<float>*)buffer *= colorCorrection;
-                        BufferToByte(ref dstP, buffer, count);
-                    }
-                    if (w is > 0)
-                    {
-                        ByteToBuffer(ref srcP, buffer, w);
-                        *(Vector<float>*)buffer *= colorCorrection;
-                        BufferToByte(ref dstP, buffer, w);
-                    }
-                });
-            }
-        }
 
         static void StretchCopy_Horizontal<T>(T source, int srcX, int srcY, int srcW, int srcH, FloatBitmap destination, int destW)
             where T : IBitmap
@@ -476,7 +600,7 @@ namespace LivreNoirLibrary.Media
                 front = Vector.Clamp(front * colorCorrection, Vector<float>.Zero, Vector<float>.One);
                 if (func is not null)
                 {
-                    ColorBlend.BlendCore(ref back, FloatColor.FillAlphaToAll(back), front, FloatColor.FillAlphaToAll(front), func);
+                    ColorBlend.Blend(ref back, FloatColor.FillAlphaToAll(back), front, FloatColor.FillAlphaToAll(front), func);
                 }
                 else
                 {

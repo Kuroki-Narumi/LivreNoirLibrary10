@@ -174,7 +174,7 @@ namespace LivreNoirLibrary.Windows.Media.Bms.SkinInfo
             return defaultValue;
         }
 
-        public bool TryGetTexture(string? key, IVariableProvider? provider, out TextureData data)
+        public bool TryGetTextureData(string? key, IVariableProvider? provider, out TextureData data)
         {
             data = default;
             if (string.IsNullOrEmpty(key))

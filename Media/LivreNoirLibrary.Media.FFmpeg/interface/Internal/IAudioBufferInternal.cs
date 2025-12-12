@@ -2,9 +2,9 @@
 
 namespace LivreNoirLibrary.Media
 {
-    internal interface IAudioBufferInternal : IAudioContext
+    internal unsafe interface IAudioBufferInternal : IAudioContext
     {
-        Span<float> Buffer { get; }
+        float* BufferPointer { get; }
         /// <summary>
         /// Current buffer size(samples per channel).
         /// </summary>

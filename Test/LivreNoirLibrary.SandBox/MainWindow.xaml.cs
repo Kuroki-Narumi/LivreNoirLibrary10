@@ -1,20 +1,13 @@
-﻿using LivreNoirLibrary.Collections;
-using LivreNoirLibrary.IO;
+﻿using LivreNoirLibrary.IO;
 using LivreNoirLibrary.Media;
 using LivreNoirLibrary.Media.Bms;
-using LivreNoirLibrary.Media.Integrated;
 using LivreNoirLibrary.Media.Wave;
-using LivreNoirLibrary.ObjectModel;
-using LivreNoirLibrary.Text;
-using LivreNoirLibrary.Windows;
 using LivreNoirLibrary.Windows.Controls;
-using LivreNoirLibrary.Windows.Media.Bms.SkinInfo;
 using System.IO;
 using System.Text;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
-using System.Windows.Media;
 
 namespace LivreNoirLibrary.SandBox
 {
@@ -31,15 +24,17 @@ namespace LivreNoirLibrary.SandBox
 
         public MainWindow()
         {
-            _creator = new();
-            DataContext = _creator;
+            BmsOptions = new();
+            BmsScreen = new(BmsOptions);
+            BmsVideoCreator = new(BmsScreen, BmsOptions);
+            DataContext = this;
             InitializeComponent();
             this.RegisterCommand(ApplicationCommands.Open, OnExecuted_Open);
             this.RegisterCommand(ApplicationCommands.Save, OnExecuted_Save);
 
-            _skins = new();
-            _skins.Load(Path.GetFullPath(@"Themes\BmsSkin\Default\", IO.General.GetAssemblyDir()));
-            ComboBox_Skin.ItemsSource = _skins.PlaySkins[0];
+            BmsSkins = new();
+            BmsSkins.Load(Path.GetFullPath(@"Themes\BmsSkin\Default\", General.GetAssemblyDir()));
+            ComboBox_Skin.ItemsSource = BmsSkins.PlaySkins[0];
             ComboBox_Skin.SelectedIndex = 0;
         }
 
@@ -59,6 +54,11 @@ namespace LivreNoirLibrary.SandBox
             }
         }
 
+        private void TabControl_PreviewMouseWheel(object sender, MouseWheelEventArgs e)
+        {
+            (sender as TabControl)?.ChangeByWheel(e);
+        }
+
         private void LabeledSlider_PreviewMouseWheel(object sender, MouseWheelEventArgs e)
         {
             (sender as Slider)?.ChangeByWheel(e);
@@ -67,6 +67,11 @@ namespace LivreNoirLibrary.SandBox
         private void ComboBox_PreviewMouseWheel(object sender, MouseWheelEventArgs e)
         {
             (sender as ComboBox)?.ChangeByWheel(e);
+        }
+
+        private void RadioContainer_MouseWheel(object sender, MouseWheelEventArgs e)
+        {
+            (sender as Panel)?.ChangeRadioButtonByWheel(e);
         }
     }
 }

@@ -15,6 +15,8 @@ using System.Text;
 using System.Windows;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
+using LivreNoirLibrary.Media.Bms.Play;
+using LivreNoirLibrary.Media.Wave;
 
 namespace LivreNoirLibrary.Windows.Controls.Bms
 {
@@ -29,19 +31,21 @@ namespace LivreNoirLibrary.Windows.Controls.Bms
         private string? _bmsPath;
         [DependencyProperty(SetterScope = Scope.Private)]
         private bool _isBmsReady;
-        [DependencyProperty]
-        private double _highSpeed = 1.5;
-        [DependencyProperty]
-        private FixedHighSpeedMode _fixedHighSpeedMode = FixedHighSpeedMode.MainTime;
-        [DependencyProperty(SetterScope = Scope.Private)]
-        private double _fixedHighSpeed = 1.0;
         [DependencyProperty(SetterScope = Scope.Private)]
         private string? _debugText;
+        [DependencyProperty]
+        private double _fadeOpacity;
 
         public string? Directory => Path.GetDirectoryName(_bmsPath);
         public SimpleBmsViewModel ViewModel { get; } = new();
-        public Dictionary<string, string> Options { get; } = [];
+        public BmsPlayOptions PlayOptions { get; }
+        public BmsTimer Timer { get; } = new();
+        public ScoreManager ScoreManager { get; }
+        public Dictionary<string, string> SkinOptions { get; } = [];
         public Dictionary<string, string> Variables { get; } = [];
+        public AudioComposer<string> AudioComposer { get; }
+        public double FirstSoundTime => _timingList.FirstSoundTime;
+        public double LastSoundTime => _timingList.LastSoundTime;
 
         private WriteableBitmap _bitmap;
         private Rect _bitmapRect;
@@ -50,25 +54,28 @@ namespace LivreNoirLibrary.Windows.Controls.Bms
         private readonly FloatBitmap _buffer = new(0, 0);
 
         private readonly List<ScreenElement> _children = [];
-        private readonly BmsTimer _timer = new();
+        private readonly CachedWaveBufferProvider _waveProvider = new();
         private readonly TimingList _timingList = new();
         private readonly TextureCache _textureCache = new();
         private readonly MediaCache _mediaCache = new();
         private readonly NoteElementCollection _notes = new();
-        private readonly BgaSource _bga = new();
-        private readonly ScoreInfo _judge = new();
+        private readonly BgaSource _bga;
 
         private DebugItem _debugRoot;
         private readonly Dictionary<object, DebugItem> _debugDic = [];
 
-        public BmsScreen()
+        public BmsScreen(BmsPlayOptions options)
         {
+            PlayOptions = options;
             _bitmap = CreateBitmap(DefaultWidth, DefaultHeight);
             _needEnsureBitmap = true;
             ClipToBounds = true;
+            ScoreManager = new(PlayOptions);
+            _bga = new(PlayOptions);
+            AudioComposer = new(_waveProvider, _timingList);
         }
 
-        public bool TryGetOption(string key, [MaybeNullWhen(false)] out string value) => Options.TryGetValue(key, out value);
+        public bool TryGetOption(string key, [MaybeNullWhen(false)] out string value) => SkinOptions.TryGetValue(key, out value);
         public bool TryGetVariable(string key, [MaybeNullWhen(false)] out string value) => Variables.TryGetValue(key, out value);
 
         private void OnSkinChanged(Skin? value)
@@ -131,17 +138,27 @@ namespace LivreNoirLibrary.Windows.Controls.Bms
             }
         }
 
-        private void OnBmsPathChanged(string? value)
+        public bool OpenBms(string path)
+        {
+            BmsPath = path;
+            return IsBmsReady;
+        }
+
+        private void OnBmsPathChanged(string? oldValue, string? newValue)
         {
             _mediaCache.Clear();
-            if (File.Exists(value))
+            if (File.Exists(newValue))
             {
+                if (Path.GetDirectoryName(oldValue) != Path.GetDirectoryName(newValue))
+                {
+                    _waveProvider.Clear();
+                }
                 var vm = ViewModel;
                 try
                 {
-                    vm.Data = BmsData.Open(value);
+                    vm.Data = BmsData.Open(newValue);
                     var basePath = Directory!;
-                    Options.SetBmsOptions(vm);
+                    SkinOptions.SetBmsOptions(vm);
                     Variables.SetBmsVariables(vm);
                     _textureCache.SetBmsTexture(vm, basePath);
                     IsBmsReady = true;
@@ -167,32 +184,34 @@ namespace LivreNoirLibrary.Windows.Controls.Bms
             }
         }
 
-        public void SetupPlay(bool autoPlay)
+        public void SetupAudio(bool autoPlay)
         {
-            var timer = _timer;
-            timer.Remove(TimerId.Play_LoadingStart);
-            timer.Remove(TimerId.Play_LoadingFinished);
-            timer.Remove(TimerId.Play_MusicStart);
-            timer.Remove(TimerId.Play_Miss);
-            timer.Remove(TimerId.Play_FullCombo);
-            timer.Set(TimerId.Scene_Start, 0);
-            _bga.Setup();
-            _judge.Clear();
+            var op = PlayOptions;
+            AudioComposer.SetVolume(op.MasterVolume, (TimingList.Tag_KeySound, op.KeyVolume), (TimingList.Tag_BgmSound, op.BgmVolume));
             if (_isBmsReady)
             {
                 var timing = _timingList;
                 timing.Load(ViewModel, Directory!, autoPlay);
                 Variables.SetPlayInfos(timing);
                 _notes.Setup(timing);
-                FixedHighSpeed = 240d / _fixedHighSpeedMode switch
-                {
-                    FixedHighSpeedMode.Min => timing.MinTempo,
-                    FixedHighSpeedMode.Max => timing.MaxTempo,
-                    FixedHighSpeedMode.Main => timing.MainTempo,
-                    FixedHighSpeedMode.MainTime => timing.MainTimeTempo,
-                    _ => 60,
-                };
+                op.UpdateHsCorrection(timing);
+                op.GaugeGainBase = ViewModel.Total / timing.NoteCount;
             }
+        }
+
+        public void SetupPlay(bool autoPlay)
+        {
+            var timer = Timer;
+            timer.Remove(TimerId.Play_LoadingStart);
+            timer.Remove(TimerId.Play_LoadingFinish);
+            timer.Remove(TimerId.Play_MusicStart);
+            timer.Remove(TimerId.Play_Miss);
+            timer.Remove(TimerId.Play_FullCombo);
+            timer.Set(TimerId.Scene_Start, 0);
+            _bga.Setup();
+            ScoreManager.Clear();
+
+            SetupAudio(autoPlay);
 
             _debugRoot = _debugRoot.Reset();
             var debug = _debugDic;
@@ -204,15 +223,18 @@ namespace LivreNoirLibrary.Windows.Controls.Bms
             DebugText = null;
         }
 
-        public void StartLoading(double time) => _timer.Set(TimerId.Play_LoadingStart, time);
-        public void FinishLoading(double time) => _timer.Set(TimerId.Play_LoadingFinished, time);
-        public void StartMusic(double time) => _timer.Set(TimerId.Play_MusicStart, time);
+        public void FinishLoading(double time)
+        {
+            Timer.Remove(TimerId.Play_LoadingStart);
+            Timer.Set(TimerId.Play_LoadingFinish, time);
+        }
 
         public void Update(double time)
         {
             if (_skin is { } skin)
             {
-                UpdateArgs args = new(skin, this, _timer, time, _timingList, _textureCache, _mediaCache, _notes, _bga, _judge, _highSpeed * _fixedHighSpeed);
+                var options = PlayOptions;
+                UpdateArgs args = new(skin, this, options, Timer, time, _timingList, _textureCache, _mediaCache, _notes, _bga, ScoreManager);
                 _notes.Update(args);
                 _bga.Update(args);
                 Variables.UpdateCurrentInfos(args);
@@ -268,6 +290,11 @@ namespace LivreNoirLibrary.Windows.Controls.Bms
                     foreach (var child in _children.AsSpan())
                     {
                         child.Render(args);
+                    }
+                    if (FadeOpacity is not 0)
+                    {
+                        var color = new LnColor(ColorUtils.GetByte((float)FadeOpacity), 0, 0, 0);
+                        p.Blend(BlendMode.Alpha, color);
                     }
                 }
                 var time = TimeUtils.Ticks2Milliseconds(System.Diagnostics.Stopwatch.GetTimestamp() - t0);

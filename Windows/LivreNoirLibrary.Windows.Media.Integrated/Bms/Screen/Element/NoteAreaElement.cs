@@ -2,13 +2,12 @@
 using LivreNoirLibrary.Debug;
 using LivreNoirLibrary.Media;
 using LivreNoirLibrary.Media.Bms;
+using LivreNoirLibrary.Media.Bms.Play;
 using LivreNoirLibrary.Windows.Media;
 using LivreNoirLibrary.Windows.Media.Bms.SkinInfo;
 using System;
 using System.Collections.Generic;
 using System.Windows;
-using System.Numerics;
-using LivreNoirLibrary.Numerics;
 
 namespace LivreNoirLibrary.Windows.Controls.Bms.Elements
 {
@@ -56,7 +55,7 @@ namespace LivreNoirLibrary.Windows.Controls.Bms.Elements
 
             TextureData GetTexture(string? texture)
             {
-                skin.TryGetTexture(texture, provider, out var data);
+                skin.TryGetTextureData(texture, provider, out var data);
                 return data;
             }
         }
@@ -65,23 +64,27 @@ namespace LivreNoirLibrary.Windows.Controls.Bms.Elements
         {
             base.Update(args);
             var timer = args.Timer;
-            if (timer.TryGet(TimerId.Play_MusicStart, args.AbsoluteTime, out var relativeTime))
+            var relativeTime = timer.Get(TimerId.Play_MusicStart, args.AbsoluteTime);
+            var texture = args.Textures;
+            var notes = args.Notes;
+            var highSpeed = args.HighSpeed;
+            var children = _children;
+            children.Clear();
+            var lanes = _lanes;
+            var areaHeight = DestHeight;
+            var barTexture = _barLine;
+            var width = DestWidth;
+            var baseHeight = _baseHeight;
+            if (relativeTime is >= 0)
             {
-                var texture = args.Textures;
-                var notes = args.Notes;
-                var highSpeed = args.HighSpeed;
-                var children = _children;
-                children.Clear();
-                var lanes = _lanes;
-                var areaHeight = DestHeight;
-                var barTexture = _barLine;
-                var width = DestWidth;
-                var baseHeight = _baseHeight;
                 foreach (var bar in notes.BarLines)
                 {
                     AddChild(barTexture, 0, width, bar.RelativePosition);
                 }
-                AddChild(_judgeLine, 0, width, 0, -1);
+            }
+            AddChild(_judgeLine, 0, width, 0, -1);
+            if (relativeTime is >= 0)
+            {
                 foreach (var child in notes.VisibleChildren)
                 {
                     if (lanes.TryGetValue(child.Lane, out var laneInfo))
@@ -101,20 +104,20 @@ namespace LivreNoirLibrary.Windows.Controls.Bms.Elements
                         AddChild(textureData, laneInfo.X, laneInfo.Width, child.CurrentOffset);
                     }
                 }
+            }
 
-                void AddChild(TextureData data, double x, double width, double offset, double height = 0, double finalOffset = 0)
+            void AddChild(TextureData data, double x, double width, double offset, double height = 0, double finalOffset = 0)
+            {
+                if (texture.TryGetTexture(data, BmsTimer.GetFrameIndex(relativeTime, data), out var bitmap, out var sourceRect))
                 {
-                    if (texture.TryGetTexture(data, BmsTimer.GetFrameIndex(relativeTime, data), out var bitmap, out var sourceRect))
+                    var h = height switch
                     {
-                        var h = height switch
-                        {
-                            0 => sourceRect.Height,
-                            > 0 => height * areaHeight * highSpeed,
-                            _ => baseHeight,
-                        };
-                        var y = areaHeight - areaHeight * offset * highSpeed - h - finalOffset;
-                        children.Add((bitmap, sourceRect, new(x, y, width, h)));
-                    }
+                        0 => sourceRect.Height,
+                        > 0 => height * areaHeight * highSpeed,
+                        _ => baseHeight,
+                    };
+                    var y = areaHeight - areaHeight * offset * highSpeed - h - finalOffset;
+                    children.Add((bitmap, sourceRect, new(x, y, width, h)));
                 }
             }
         }

@@ -1,11 +1,11 @@
 ﻿using LivreNoirLibrary.Collections;
 using LivreNoirLibrary.Media;
 using LivreNoirLibrary.Media.Bms;
+using LivreNoirLibrary.Media.Bms.Play;
 using LivreNoirLibrary.Windows.Media.Bms.SkinInfo;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
-using System.Windows;
 using DrRect = System.Drawing.Rectangle;
 
 namespace LivreNoirLibrary.Windows.Controls.Bms.Elements
@@ -19,7 +19,6 @@ namespace LivreNoirLibrary.Windows.Controls.Bms.Elements
         private TextureData _separator;
         private int _minDigits;
 
-        private string? _value;
         private readonly List<(UIntBitmap, DrRect)> _bitmaps = [];
 
         public override void DetermineExpressions(Skin skin, IVariableProvider? provider)
@@ -27,12 +26,11 @@ namespace LivreNoirLibrary.Windows.Controls.Bms.Elements
             base.DetermineExpressions(skin, provider);
 
             var s = _source;
-            skin.TryGetTexture(s.Digits, provider, out _digits);
-            skin.TryGetTexture(s.Padding, provider, out _padding);
-            skin.TryGetTexture(s.Point, provider, out _point);
-            skin.TryGetTexture(s.Separator, provider, out _separator);
+            skin.TryGetTextureData(s.Digits, provider, out _digits);
+            skin.TryGetTextureData(s.Padding, provider, out _padding);
+            skin.TryGetTextureData(s.Point, provider, out _point);
+            skin.TryGetTextureData(s.Separator, provider, out _separator);
             _minDigits = skin.ResolveValue(s.MinDigits, provider, 0);
-            _value = null;
         }
 
         public override void Update(in UpdateArgs args)

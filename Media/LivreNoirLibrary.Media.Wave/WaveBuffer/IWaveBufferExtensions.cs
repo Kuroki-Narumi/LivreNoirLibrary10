@@ -32,7 +32,7 @@ namespace LivreNoirLibrary.Media.Wave
         public static void GetChannelComplex<T>(this T buffer, Span<float> target, int channel, int sampleOffset = 0) where T : IWaveBuffer
             => WaveBuffer.GetChannelComplex(buffer.Data, target, channel, sampleOffset, buffer.Channels);
 
-        public static void InsertSilence<T>(T buffer, int sampleOffset, int sampleCount)
+        public static void InsertSilence<T>(this T buffer, int sampleOffset, int sampleCount)
             where T : IWaveBuffer
         {
             if (sampleCount is <= 0)
@@ -53,7 +53,7 @@ namespace LivreNoirLibrary.Media.Wave
             }
         }
 
-        public static void RemoveRange<T>(T buffer, int sampleOffset, int sampleCount = 0)
+        public static void RemoveRange<T>(this T buffer, int sampleOffset, int sampleCount = 0)
             where T : IWaveBuffer
         {
             var ch = buffer.Channels;
@@ -74,7 +74,7 @@ namespace LivreNoirLibrary.Media.Wave
             buffer.SetTotalSample(current - count, false);
         }
 
-        public static void Splice<T>(T buffer, int sampleOffset, int sampleCount = 0)
+        public static void Splice<T>(this T buffer, int sampleOffset, int sampleCount = 0)
             where T : IWaveBuffer
         {
             var ch = buffer.Channels;
@@ -89,8 +89,8 @@ namespace LivreNoirLibrary.Media.Wave
             buffer.SetTotalSample(count, false);
         }
 
-        public static void RemoveBefore<T>(T buffer, int sampleOffset) where T : IWaveBuffer => Splice(buffer, sampleOffset, 0);
-        public static void RemoveAfter<T>(T buffer, int sampleOffset) where T : IWaveBuffer => Splice(buffer, 0, sampleOffset);
+        public static void RemoveBefore<T>(this T buffer, int sampleOffset) where T : IWaveBuffer => Splice(buffer, sampleOffset, 0);
+        public static void RemoveAfter<T>(this T buffer, int sampleOffset) where T : IWaveBuffer => Splice(buffer, 0, sampleOffset);
 
         public static void ChangeLayout<T>(this T buffer, int sampleRate, int channels)
             where T : IWaveBuffer
@@ -100,7 +100,6 @@ namespace LivreNoirLibrary.Media.Wave
             if (WaveBuffer.ChangeLayoutCore(buffer.Data, inRate, inCh, sampleRate, channels, out var convertBuffer, out var outTotalSample))
             {
                 buffer.SetTotalSample(outTotalSample, false);
-                //convertBuffer.AsSpan(0, outTotalSample).CopyTo(buffer.Data);
                 buffer.Data.CopyFrom(convertBuffer, 0, 0, outTotalSample);
                 buffer.SetLayout(sampleRate, channels);
                 ArrayPool<float>.Shared.Return(convertBuffer);

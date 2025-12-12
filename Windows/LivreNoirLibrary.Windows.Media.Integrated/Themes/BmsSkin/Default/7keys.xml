@@ -53,10 +53,13 @@
 		<Texture Key="judge" Source="bm_judge.png"/>
 		<Texture Key="number" Source="numbers.png"/>
 		
-		<Texture Key="background_1p" BasedOn="skin_bm" Rect="0, 0, 320, 32"/>
-		<Texture Key="background_2p" BasedOn="skin_bm" Rect="0, 32, 320, 32"/>
+		<Texture Key="background_1p" BasedOn="skin_bm" Rect="320, 0, 320, 512"/>
+		<Texture Key="background_2p" BasedOn="skin_bm" Rect="640, 0, 320, 512"/>
 		<Texture Key="barline" BasedOn="skin_bm" Rect="296, 66, 24, 1"/>
 		<Texture Key="judgeline" BasedOn="skin_bm" Rect="296, 69, 24, 2"/>
+
+		<Texture Key="ready1" BasedOn="skin_bm" Rect="0,128,144,40" />
+		<Texture Key="ready2" BasedOn="skin_bm" Rect="0,168,144,40" />
 		
 		<Texture Key="note_red" BasedOn="skin_bm" Rect="0, 64, 60, 8"/>
 		<Texture Key="note_red_long_head" BasedOn="skin_bm" Rect="0, 93, 60, 12"/>
@@ -83,11 +86,11 @@
 		<Texture Key="beam_white" BasedOn="beam" Rect="0, 0, 25, 321"/>
 		<Texture Key="beam_blue" BasedOn="beam" Rect="27, 0, 21, 321"/>
 
-		<Texture Key="bomb_1" BasedOn="bomb" Rect="0,   0, 2896, 192" DivX="16" LoopPeriod="0.25"/>
-		<Texture Key="bomb_2" BasedOn="bomb" Rect="0, 192, 1448, 192" DivX="8" LoopPeriod="0.125"/>
+		<Texture Key="bomb_1" BasedOn="bomb" Rect="0,   0, 4480, 224" DivX="16" LoopPeriod="0.25"/>
+		<Texture Key="bomb_2" BasedOn="bomb" Rect="0, 224, 2240, 224" DivX="8" LoopPeriod="0.125"/>
 		
-		<Texture Key="bomb_3" BasedOn="bomb" Rect="0, 384, 2896, 192" DivX="16" LoopPeriod="0.25"/>
-		<Texture Key="bomb_4" BasedOn="bomb" Rect="0, 576, 2896, 192" DivX="16" LoopPeriod="0.25"/>
+		<Texture Key="bomb_3" BasedOn="bomb" Rect="0, 448, 4480, 224" DivX="16" LoopPeriod="0.25"/>
+		<Texture Key="bomb_4" BasedOn="bomb" Rect="0, 672, 4480, 224" DivX="16" LoopPeriod="0.25"/>
 
 		<Texture Key="judge_perfect" BasedOn="judge" Rect="0, 0, 120, 144" DivY="3" LoopPeriod="0.125"/>
 		<Texture Key="judge_great" BasedOn="judge" Rect="0, 144, 120, 96" DivY="2" LoopPeriod="0.125"/>
@@ -137,7 +140,7 @@
 		
 		<Texture Key="number_rank" BasedOn="number" X="0" Y="$Variables.rank_number_y" Width="128" Height="32"/>
 	</Skin.Textures>
-	
+
 	<Bga Name="BGA">
 		<Destination X="$Variables.layout_bga" Y="0" Width="512" Height="512" Opacity="$Options.Bga Opacity"/>
 	</Bga>
@@ -355,10 +358,23 @@
 			   Great="judge_great" GreatCombo="judge_number"
 			   Good="judge_good" GoodCombo="judge_number"
 			   Bad="judge_bad"
-			   Miss="judge_poor"
+			   Through="judge_poor"
+			   BlankShot="judge_poor" BlankShotCombo="judge_number"
 			   >
-			<Destination X="192" Y="384" Height="48" Origin="0.5, 1"/>
+			<Destination X="192" Y="360" Origin="0.5, 0.5"/>
 		</Judge>
+
+		<Image Texture="ready2" DestTimer="Play_LoadingFinish" DestLoopStart="-1">
+			<Destination X="192" Y="360" Origin="0.5, 0.5" Opacity="1"/>
+			<Destination Time="1" Opacity="1"/>
+			<Destination Time="1.5" Opacity="0"/>
+		</Image>
+
+		<Image Texture="ready1" DestTimer="Play_LoadingFinish" DestLoopStart="-1">
+			<Destination X="192" Y="360" Origin="0.5, 0.5" Opacity="0"/>
+			<Destination Time="0.1" Opacity="1"/>
+			<Destination Time="0.3" Opacity="0"/>
+		</Image>
 	</Group>
 
 	<Group Name="2P Area">
@@ -370,7 +386,7 @@
 
 		<Group Name="Beam">
 			<Destination Rect="32, 0, 320, 512" Opacity="$Options.Beam Opacity"/>
-			
+
 			<Image Texture="beam_white" DestTimer="Play_Button1_Press">
 				<Destination Rect="21, 512, 38, 0" Origin="0.5, 1"/>
 				<Destination Time="0.05" Height="$Options.Beam Height"/>
@@ -379,7 +395,7 @@
 				<Destination X="21" Y="512" Width="38" Height="$Options.Beam Height" Origin="0.5, 1" Opacity="1"/>
 				<Destination Time="0.1" Width="0" Opacity="0"/>
 			</Image>
-			
+
 			<Image Texture="beam_blue" DestTimer="Play_Button2_Press">
 				<Destination Rect="57, 512, 30, 0" Origin="0.5, 1"/>
 				<Destination Time="0.06" Height="$Options.Beam Height"/>
@@ -388,7 +404,7 @@
 				<Destination X="57" Y="512" Width="30" Height="$Options.Beam Height" Origin="0.5, 1" Opacity="1"/>
 				<Destination Time="0.1" Width="0" Opacity="0"/>
 			</Image>
-			
+
 			<Image Texture="beam_white" DestTimer="Play_Button3_Press">
 				<Destination Rect="93, 512, 38, 0" Origin="0.5, 1"/>
 				<Destination Time="0.07" Height="$Options.Beam Height"/>
@@ -397,7 +413,7 @@
 				<Destination X="93" Y="512" Width="38" Height="$Options.Beam Height" Origin="0.5, 1" Opacity="1"/>
 				<Destination Time="0.1" Width="0" Opacity="0"/>
 			</Image>
-			
+
 			<Image Texture="beam_blue" DestTimer="Play_Button4_Press">
 				<Destination Rect="129, 512, 30, 0" Origin="0.5, 1"/>
 				<Destination Time="0.08" Height="$Options.Beam Height"/>
@@ -406,7 +422,7 @@
 				<Destination X="129" Y="512" Width="30" Height="$Options.Beam Height" Origin="0.5, 1" Opacity="1"/>
 				<Destination Time="0.1" Width="0" Opacity="0"/>
 			</Image>
-			
+
 			<Image Texture="beam_white" DestTimer="Play_Button5_Press">
 				<Destination Rect="165, 512, 38, 0" Origin="0.5, 1"/>
 				<Destination Time="0.09" Height="$Options.Beam Height"/>
@@ -415,7 +431,7 @@
 				<Destination X="165" Y="512" Width="38" Height="$Options.Beam Height" Origin="0.5, 1" Opacity="1"/>
 				<Destination Time="0.1" Width="0" Opacity="0"/>
 			</Image>
-			
+
 			<Image Texture="beam_blue" DestTimer="Play_Button8_Press">
 				<Destination Rect="201, 512, 30, 0" Origin="0.5, 1"/>
 				<Destination Time="0.10" Height="$Options.Beam Height"/>
@@ -424,7 +440,7 @@
 				<Destination X="201" Y="512" Width="30" Height="$Options.Beam Height" Origin="0.5, 1" Opacity="1"/>
 				<Destination Time="0.1" Width="0" Opacity="0"/>
 			</Image>
-			
+
 			<Image Texture="beam_white" DestTimer="Play_Button9_Press">
 				<Destination Rect="237, 512, 38, 0" Origin="0.5, 1"/>
 				<Destination Time="0.11" Height="$Options.Beam Height"/>
@@ -433,7 +449,7 @@
 				<Destination X="237" Y="512" Width="38" Height="$Options.Beam Height" Origin="0.5, 1" Opacity="1"/>
 				<Destination Time="0.1" Width="0" Opacity="0"/>
 			</Image>
-			
+
 			<Image Texture="beam_red" DestTimer="Play_Button6_Press">
 				<Destination Rect="288, 512, 60, 0" Origin="0.5, 1"/>
 				<Destination Time="0.12" Height="$Options.Beam Height"/>
@@ -446,7 +462,7 @@
 
 		<NoteArea Name="Notes" BarLine="barline" JudgeLine="judgeline" BaseHeight="8">
 			<Destination Rect="32, 0, 320, 512"/>
-			
+
 			<NoteLane Lane="1" X="2" Width="38"
 					  Note="note_white"
 					  LongHead="note_white_long_head"
@@ -574,10 +590,23 @@
 			   Great="judge_great" GreatCombo="judge_number"
 			   Good="judge_good" GoodCombo="judge_number"
 			   Bad="judge_bad"
-			   Miss="judge_poor"
+		       Through="judge_poor"
+		       BlankShot="judge_poor" BlankShotCombo="judge_number"
 			   >
-			<Destination X="192" Y="384" Height="48" Origin="0.5, 1"/>
+			<Destination X="192" Y="360" Origin="0.5, 0.5"/>
 		</Judge>
+
+		<Image Texture="ready2" DestTimer="Play_LoadingFinish" DestLoopStart="-1">
+			<Destination X="192" Y="360" Origin="0.5, 0.5" Opacity="1"/>
+			<Destination Time="1" Opacity="1"/>
+			<Destination Time="1.5" Opacity="0"/>
+		</Image>
+
+		<Image Texture="ready1" DestTimer="Play_LoadingFinish" DestLoopStart="-1">
+			<Destination X="192" Y="360" Origin="0.5, 0.5" Opacity="0"/>
+			<Destination Time="0.1" Opacity="1"/>
+			<Destination Time="0.3" Opacity="0"/>
+		</Image>
 	</Group>
 
 	<Group Name="BPM">
@@ -590,53 +619,66 @@
 		</Number>
 	</Group>
 
+	<Group Name="LoadingTitle">
+		<Destination X="$Variables.layout_bga" Y="32" Width="512" Height="480"/>
+		<Image Texture="#BACKBMP" Blend="Add" DestTimer="Play_LoadingStart" DestLoopStart="0.5">
+			<Destination X="240" Y="256" Height="480" Origin="0.5, 0.5" Opacity="0"/>
+			<Destination Time="0.5" Opacity="1"/>
+		</Image>
+		<Image Texture="#BACKBMP" Blend="Add" DestTimer="Play_LoadingFinish" DestLoopStart="-1">
+			<Destination X="240" Y="256" Height="480" Origin="0.5, 0.5" Opacity="1"/>
+			<Destination Time="0.5" Opacity="0"/>
+		</Image>
+	</Group>
+
 	<Image Name="StageFile" Texture="#STAGEFILE">
-		<Destination Rect="0, 540, 240, 180"/>
+		<Destination Rect="0, 720, 240, 0" OriginY="1"/>
 	</Image>
 	
 	<Group Name="Basic Info">
 		<Destination X="$Variables.title_position" Y="560" Width="$Variables.title_width" Height="160"/>
 
-		<Text FontFamily="VL PGothic" FontSize="32" FontWeight="Bold" Content="$Variables.Genre" StrokeThickness="4">
-			<Destination Y="4" Width="$Variables.title_width" Height="32"/>
+		<Text FontFamily="VL PGothic" FontSize="28" FontWeight="Bold" Content="$Variables.Genre" StrokeThickness="4">
+			<Destination Y="36" OriginY="1"/>
 		</Text>
-		<Text FontFamily="VL PGothic" FontSize="48" FontWeight="Bold" Content="$Variables.FullTitle" StrokeThickness="6">
-			<Destination Y="36" Width="$Variables.title_width" Height="48"/>
+		<Text FontFamily="VL PGothic" FontSize="44" FontWeight="Bold" Content="$Variables.FullTitle" StrokeThickness="6">
+			<Destination Y="84" OriginY="1"/>
 		</Text>
-		<Text FontFamily="VL PGothic" FontSize="32" FontWeight="Bold" Content="$Variables.FullArtist" StrokeThickness="4">
-			<Destination Y="84" Width="$Variables.title_width" Height="32"/>
+		<Text FontFamily="VL PGothic" FontSize="28" FontWeight="Bold" Content="$Variables.FullArtist" StrokeThickness="4">
+			<Destination Y="116" OriginY="1"/>
 		</Text>
 		
-		<Text FontFamily="VL PGothic" FontSize="36" FontWeight="Bold" StrokeThickness="4" Content="Lv">
-			<Destination Rect="32, 152, 32, 32" Origin="1, 1"/>
+		<Text FontFamily="VL PGothic" FontSize="28" FontWeight="Bold" StrokeThickness="4" Content="Lv">
+			<Destination X="32" Y="156" Origin="1, 1"/>
 		</Text>
 		<Number Value="$Variables.PlayLevel" MinDigits="2" Digits="number_level">
 			<Destination Rect="36, 152, 96, 32" OriginY="1"/>
 		</Number>
 		
-		<Text FontFamily="VL PGothic" FontSize="36" FontWeight="Bold" StrokeThickness="4" Content="Rank">
-			<Destination Rect="196, 152, 64, 32" Origin="1, 1"/>
+		<Text FontFamily="VL PGothic" FontSize="28" FontWeight="Bold" StrokeThickness="4" Content="Rank">
+			<Destination X="196" Y="156" Origin="1, 1"/>
 		</Text>
 		<Image Texture="number_rank">
 			<Destination Rect="200, 152, 128, 32" OriginY="1"/>
 		</Image>
 
-		<Text FontFamily="VL PGothic" FontSize="36" FontWeight="Bold" StrokeThickness="4" Content="Notes">
-			<Destination Rect="392, 152, 64, 32" Origin="1, 1"/>
+		<Text FontFamily="VL PGothic" FontSize="28" FontWeight="Bold" StrokeThickness="4" Content="Notes">
+			<Destination X="392" Y="156" Origin="1, 1"/>
 		</Text>
 		<Number Value="$Variables.TotalNotes" MinDigits="3" Digits="number_white" Point="number_white_point">
 			<Destination Rect="396, 152, 192, 32" OriginY="1"/>
 		</Number>
 
-		<Text FontFamily="VL PGothic" FontSize="36" FontWeight="Bold" StrokeThickness="4" Content="Total">
-			<Destination Rect="652, 152, 64, 32" Origin="1, 1"/>
+		<Text FontFamily="VL PGothic" FontSize="28" FontWeight="Bold" StrokeThickness="4" Content="Total">
+			<Destination X="652" Y="156" Origin="1, 1"/>
 		</Text>
 		<Number Value="$Variables.Total" MinDigits="3" Digits="number_white" Point="number_white_point">
 			<Destination Rect="656, 152, 320, 32" OriginY="1"/>
 		</Number>
 		
-		<Text FontFamily="VL PGothic" FontSize="36" FontWeight="Bold" StrokeThickness="4" Content="$Variables.FullTime">
-			<Destination X="$Variables.title_width" Y="152" Width="$Variables.title_width" Height="32" Origin="1,1"/>
+		<Text FontFamily="VL PGothic" FontSize="28" FontWeight="Bold" StrokeThickness="4" Content="$Variables.FullTime">
+			<Destination X="$Variables.title_width" Y="156" Origin="1,1"/>
 		</Text>
 	</Group>
+
 </PlaySkin>

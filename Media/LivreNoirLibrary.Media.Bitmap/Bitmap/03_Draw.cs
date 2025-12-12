@@ -12,7 +12,29 @@ namespace LivreNoirLibrary.Media
     {
         extension<T> (T bitmap) where T : IBitmap
         {
-            public void Fill<TElement>(params ReadOnlySpan<TElement> value)
+            public void Fill<TElement>(TElement value)
+                where TElement: unmanaged
+            {
+                if (bitmap.IsValid)
+                {
+                    FillCore(bitmap.Pointer, bitmap.Height * bitmap.Stride, Vector.Create(value));
+                }
+            }
+
+            public void Fill<TElement>(Rectangle rect, TElement value)
+                where TElement : unmanaged
+            {
+                if (bitmap.Adjust(ref rect))
+                {
+                    var vector = Vector.Create(value);
+                    foreach (var (p, stride) in bitmap.EnumerateLines(rect))
+                    {
+                        FillCore(p, stride, vector);
+                    }
+                }
+            }
+            
+            public void Fill<TElement>(ReadOnlySpan<TElement> value)
                 where TElement: unmanaged
             {
                 if (bitmap.IsValid)
@@ -21,7 +43,7 @@ namespace LivreNoirLibrary.Media
                 }
             }
 
-            public void Fill<TElement>(Rectangle rect, params ReadOnlySpan<TElement> value)
+            public void Fill<TElement>(Rectangle rect, ReadOnlySpan<TElement> value)
                 where TElement : unmanaged
             {
                 if (bitmap.Adjust(ref rect))
@@ -308,7 +330,7 @@ namespace LivreNoirLibrary.Media
 
                 if (keepSource)
                 {
-                    ColorBlend.BlendUIntToUInt(bufferPtr, width, pointer, width, width, height, ColorBlend.Alpha, Vector<float>.One);
+                    BlendCore((nint)bufferPtr, width * 4, false, width, height, ColorBlend.Alpha, Vector<float>.One);
                 }
                 SimdOperations.CopyFrom(pointer, buffer.Pointer, width * height);
 

@@ -1,17 +1,8 @@
-﻿using System;
-using System.Buffers;
-using System.Collections.Concurrent;
-using System.Diagnostics;
-using System.Diagnostics.CodeAnalysis;
-using System.IO;
-using System.Windows;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using DrSize = System.Drawing.Size;
-using LivreNoirLibrary.Collections;
+﻿using LivreNoirLibrary.Collections;
 using LivreNoirLibrary.Debug;
 using LivreNoirLibrary.Media;
 using LivreNoirLibrary.Media.Bms;
+using LivreNoirLibrary.Media.Bms.Play;
 using LivreNoirLibrary.Media.FFmpeg;
 using LivreNoirLibrary.Media.Integrated;
 using LivreNoirLibrary.Media.Wave;
@@ -21,171 +12,209 @@ using LivreNoirLibrary.Windows;
 using LivreNoirLibrary.Windows.Controls.Bms;
 using LivreNoirLibrary.Windows.Media;
 using LivreNoirLibrary.Windows.Media.Bms;
-using LivreNoirLibrary.Windows.Media.Bms.SkinInfo;
-using System.Text.Json.Serialization;
+using System;
+using System.Buffers;
+using System.Diagnostics;
 
 namespace LivreNoirLibrary.SandBox
 {
-    public class BmsVideoCreator : ObservableObjectBase
+    public class BmsVideoCreator(BmsScreen screen, BmsVideoCreateOptions options) : ObservableObjectBase
     {
-        public static readonly DrSize[] SizeList = [new(640, 480), new(1280, 720), new(1920, 1080)];
-        public static readonly Rational[] FpsList = [FrameRates.Fps24, FrameRates.Fps30, FrameRates.Fps50, FrameRates.Fps60, FrameRates.Fps120, FrameRates.Fps240];
+        public const double QpMinimum = HardwareOptionsBase.QP_Min;
+        public const double QpMaximum = HardwareOptionsBase.QP_Max;
 
-        [JsonIgnore]
-        public BmsScreen Screen { get; } = new();
-        public AssembleOptions AssembleOptions { get; set => SetValue(ref field, value); } = new() { SetMarker = false, Gain = -3 };
+        public BmsScreen Screen { get; } = screen;
+        public BmsVideoCreateOptions Options { get; } = options;
 
-        public Rational FrameRate { get; set => SetValue(ref field, value); } = FrameRates.Fps60;
-        public bool IsHevc { get; set => SetValue(ref field, value); } = false;
-        public int ApproximateKbps { get; set => SetValue(ref field, value); } = 10000;
-        public double FadeinTime { get; set; } = 0;
-        public double LoadTime { get; set; } = 0;
-        public double LoadCompleteTime { get; set; } = 0;
-        public double FadeoutTime { get; set; } = 1;
-
-        public void LoadSkin(Skin? skin) => Screen.Skin = skin;
-        public bool OpenBms(string path)
+        private double InitializeAudio(int sampleRate, int channels, double delay, ProgressReporter? p, CancellationToken c)
         {
-            Screen.BmsPath = path;
-            return Screen.IsBmsReady;
+            var screen = Screen;
+            // 演奏時間の算出
+            var composer = screen.AudioComposer;
+            composer.Setup(sampleRate, channels, delay);
+            var provider = composer.Provider;
+            var musicLength = 0d;
+            var i = 0;
+            var count = composer.Timeline.AudioItemCount;
+
+            var isSynchronized = p is not null && p.IsSynchronized;
+            p?.Report("Initializing Audio");
+            foreach (var (wp, time, length, _) in composer.Timeline.Range(0, double.PositiveInfinity))
+            {
+                if (provider.TryGetWaveBuffer(wp, out var buffer))
+                {
+                    musicLength = Math.Max(musicLength, time + buffer.TotalSeconds);
+                    if (isSynchronized)
+                    {
+                        // 画面更新を待つ(フリーズ対策)
+                        DependencyObjectExtensions.WaitForUpdate();
+                    }
+                }
+                i++;
+                p?.Report($"Initializing Audio({i}/{count})", i, count);
+                c.ThrowIfCancellationRequested();
+            }
+            return musicLength;
         }
 
-        private WaveData? _assembledData;
-
-        public void Assemble(ProgressReporter p, CancellationToken c)
+        public void Assemble(string path, ProgressReporter? p = null, CancellationToken c = default)
         {
-            _assembledData = null;
-            if (Screen.IsBmsReady)
+            var screen = Screen;
+            if (screen.IsBmsReady)
             {
                 try
                 {
-                    p.Report("Assembling...", null);
-                    AssembleOptions.RootDirectory = Screen.Directory!;
-                    (_assembledData, _) = Screen.ViewModel.Assemble(WaveBufferProvider.Default, AssembleOptions, p, c);
+                    const int rate = 48000;
+                    var isSynchronized = p is not null && p.IsSynchronized;
+
+                    screen.SetupAudio(true);
+
+                    var composer = screen.AudioComposer;
+                    var offset = screen.FirstSoundTime;
+                    var duration = InitializeAudio(rate, 2, -offset, p, c) - offset;
+
+                    var bufferSize = rate * 2;
+                    var audioBuffer = ArrayPool<float>.Shared.Rent(bufferSize);
+                    using WaveEncoder encoder = new(path, new(rate, 2, SampleFormat.Int16));
+                    var totalSample = (int)Math.Ceiling(duration * rate) * 2;
+
+                    for (var time = 0; totalSample is > 0; time += 1, totalSample -= bufferSize)
+                    {
+                        var span = audioBuffer.AsSpan(0, Math.Min(bufferSize, totalSample));
+                        // 音声バッファを取得
+                        composer.Read(span);
+                        span.Clamp(-1, 1);
+                        // 音声フレームの書き込み
+                        encoder.Write(span);
+
+                        var report = $"Assembling {time}/{duration:F2}";
+                        p?.Report(report, time, duration);
+                        if (isSynchronized)
+                        {
+                            // 画面更新を待つ(フリーズ対策)
+                            DependencyObjectExtensions.WaitForUpdate();
+                        }
+                        c.ThrowIfCancellationRequested();
+                    }
                 }
-                catch (OperationCanceledException)
+                catch(Exception e)
                 {
-                    _assembledData = null;
-                    throw;
+                    ExConsole.Write(e);
                 }
             }
         }
 
-        public bool TryFlushAssembledData([MaybeNullWhen(false)]out WaveData data)
-        {
-            if (_assembledData is { } wav)
-            {
-                data = wav;
-                _assembledData = null;
-                return true;
-            }
-            else
-            {
-                data = null;
-                return false;
-            }
-        }
-
-        public void CreateVideo(string path, WaveData waveBuffer, ProgressReporter p, CancellationToken c)
+        public void CreateVideo(string path, ProgressReporter? p = null, CancellationToken c = default)
         {
             var screen = Screen;
             if (screen.Skin is { } skin && screen.IsBmsReady)
             {
+                var isSynchronized = p is not null && p.IsSynchronized;
+
+                const int rate = 48000;
                 screen.DetermineExpressions();
                 screen.SetupPlay(true);
+                var options = Options;
+
+                // タイマー
+                var fadeInDuration = options.FadeInDuration;
+                var loadingFinish = options.LoadDuration;
+                var musicStart = loadingFinish + options.ReadyDuration;
+                var musicLength = InitializeAudio(rate, 2, musicStart, p, c);
+                // タイマー
+                var totalTime = musicStart + Math.Max(musicLength, screen.LastSoundTime + options.AfterMargin);
+                var fadeOutDuration = options.FadeOutDuration;
+                var fadeOutStart = totalTime - fadeOutDuration;
+                var needLoadingFinish = true;
+                var timer = screen.Timer;
+                timer.Set(TimerId.Scene_Start, 0);
+                timer.Set(TimerId.Play_LoadingStart, 0);
+                timer.Set(TimerId.Play_MusicStart, musicStart);
+                timer.Set(TimerId.Scene_Terminate, fadeOutStart);
+
+                // 音声
+                var audioBuffer = ArrayPool<float>.Shared.Rent(rate * 2);
+                var composer = screen.AudioComposer;
+
                 var (width, height) = skin.BaseSize;
                 // エンコーダー
                 using FFmpegEncoder encoder = new(path);
-                var fps = FrameRate;
+                var fps = options.FrameRate;
+                var fps_inv = 1d / fps;
                 var (fps_num, fps_den) = fps;
-                ICodecOptions codecOptions = IsHevc ? new HevcEncodeOptions() : new H264EncodeOptions();
-                IHardwareEncodeOptions? hardwareOptions = new NvencEncodeOptions();
-                VideoEncodeOptions videoOptions = new(width, height, fps, ApproximateKbps * 1000, codecOptions, hardwareOptions);
-                var video = encoder.CreateVideoStream(videoOptions);
-                var audio = encoder.CreateAudioStream(new AudioEncodeOptions(waveBuffer.SampleRate, waveBuffer.Channels));
-                // 読み書きバッファ
+                ICodecOptions codecOptions = options.IsHevc ? new HevcEncodeOptions() : new H264EncodeOptions();
+                IHardwareEncodeOptions? hardwareOptions = new NvencEncodeOptions() { QP = options.QP };
+                VideoEncodeOptions videoOptions = new(width, height, fps, options.ApproximateKbps * 1000, codecOptions, hardwareOptions);
+                encoder.CreateVideoStream(videoOptions);
+                encoder.CreateAudioStream(new AudioEncodeOptions(rate, 2));
+                // 映像バッファ
                 var size = width * height * 4;
                 var videoBuffer = ArrayPool<byte>.Shared.Rent(size);
                 var videoSpan = videoBuffer.AsSpan(0, size);
-                var renderTarget = new RenderTargetBitmap(width, height, 96, 96, PixelFormats.Pbgra32);
-                var videoBufferStride = width * 4;
-                // 音声
-                var audioIndex = 0;
-                var audioUnit = waveBuffer.SampleRate * waveBuffer.Channels;
-                var audioBuffer = ArrayPool<float>.Shared.Rent(audioUnit);
-                var audioSpan = audioBuffer.AsSpan();
-
-                // タイマー
-                var fadeinFinish = FadeinTime;
-                var loadingFinish = fadeinFinish + LoadTime;
-                var musicStart = loadingFinish + LoadCompleteTime;
-                var fadeoutStart = musicStart + waveBuffer.TotalSeconds;
-                var totalTime = fadeoutStart + FadeoutTime;
-                screen.StartLoading(0);
-                screen.FinishLoading(loadingFinish);
-                screen.StartMusic(musicStart);
 
                 // デバッグ用
                 var t0 = Stopwatch.GetTimestamp();
-                var fps_threshold = fps_den * fps_num;
-                var fps_total = 0L;
-                var totalFrame = (int)(totalTime * fps);
+                var totalFrameUnit = (long)Math.Ceiling(totalTime * fps_num);
 
-                p.Report("Encoding...", null);
+                p?.Report("Encoding...", null);
                 try
                 {
-                    screen.StartLoading(0);
-                    for (var frame = 0; frame < totalFrame; frame++)
+                    for (var frame = 0L; frame < totalFrameUnit; )
                     {
-                        var time = (double)frame * fps_den / fps_num;
-                        c.ThrowIfCancellationRequested();
-                        var report = $"Write frame {frame}/{totalFrame}({frame / Stopwatch.GetElapsedTime(t0).TotalSeconds:0.000}fps)";
-                        p.Report(report, frame, totalFrame);
-
-                        screen.Update(time);
-                        // 画面更新を待つ
-                        screen.CopyPixels(videoSpan, width);
-                        DependencyObjectExtensions.WaitForUpdate();
-                        // 映像フレームの書き込み
-                        encoder.WritePixels(videoSpan);
-                        c.ThrowIfCancellationRequested();
-
-                        // 1秒に1回音声フレームを書き込む
-                        fps_total += fps_den;
-                        if (fps_total >= fps_threshold)
+                        var frameMax = Math.Min(totalFrameUnit, frame + fps_num);
+                        var frameUnit = frameMax - frame;
+                        // 映像
+                        for (; frame < frameMax; frame += fps_den)
                         {
-                            WriteAudio();
+                            var time = (double)frame / fps_num;
+
+                            screen.FadeOpacity = 
+                                time <= fadeInDuration ? 1 - time / fadeInDuration
+                                : time >= fadeOutStart ? (time - fadeOutStart - fps_inv) / fadeOutDuration 
+                                : 0;
+
+                            // ロード画面を消す処理
+                            if (needLoadingFinish && time >= loadingFinish)
+                            {
+                                screen.FinishLoading(loadingFinish);
+                                needLoadingFinish = false;
+                            }
+
+                            var report = $"Write frame {time:F2}/{totalTime:F2}({frame / Stopwatch.GetElapsedTime(t0).TotalSeconds / fps_den:0.000}fps)";
+                            p?.Report(report, time, totalTime);
+
+                            // 映像バッファの更新
+                            screen.Update(time);
+                            screen.CopyPixels(videoSpan, width);
+                            // 映像フレームの書き込み
+                            encoder.WritePixels(videoSpan);
+
                             c.ThrowIfCancellationRequested();
-                            fps_total -= fps_threshold;
+
+                            if (isSynchronized)
+                            {
+                                // 画面更新を待つ(フリーズ対策)
+                                DependencyObjectExtensions.WaitForUpdate();
+                            }
                         }
 
-                    }
-                    while (WriteAudio())
-                    {
+                        // 音声は1秒ごとに書き込む
+                        var totalSample = (int)(frameUnit * rate * 2 / fps_num);
+                        var span = audioBuffer.AsSpan(0, totalSample);
+                        // 音声バッファを取得
+                        composer.Read(span);
+                        span.Clamp(-1, 1);
+                        // 音声フレームの書き込み
+                        encoder.WriteSamples(span);
+
                         c.ThrowIfCancellationRequested();
                     }
-                    p.Report("Finalizing...");
 
-                    bool WriteAudio()
-                    {
-                        if (audioUnit is > 0)
-                        {
-                            var source = waveBuffer.Data;
-                            var audioSpan = source.Slice(audioIndex, audioUnit);
-                            audioSpan.Clamp(-1, 1);
-                            encoder.WriteSamples(audioSpan);
-                            audioIndex += audioSpan.Length;
-                            audioUnit = Math.Min(audioUnit, source.Length - audioIndex);
-                            return true;
-                        }
-                        else
-                        {
-                            return false;
-                        }
-                    }
+                    p?.Report("Finalizing...");
                 }
                 finally
                 {
+                    ArrayPool<float>.Shared.Return(audioBuffer);
                     ArrayPool<byte>.Shared.Return(videoBuffer);
                 }
             }

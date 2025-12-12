@@ -24,9 +24,9 @@ namespace LivreNoirLibrary.Media.Wave
         private int _buffer_read;
 
         public long SampleLength => _out_length;
-        public Rational Duration => new(_out_length, _out_rate);
+        public Rational Duration => new(_out_length, OutputSampleRate);
 
-        Span<float> IAudioBufferInternal.Buffer => Buffer;
+        float* IAudioBufferInternal.BufferPointer => _buffer.Pointer;
         long IAudioBufferDecoder.BufferHead => _buffer_head;
         int IAudioBufferInternal.BufferLength => _buffer_length;
         int IAudioBufferInternal.BufferIndex { get => _buffer_read; set => _buffer_read = value; }
@@ -35,13 +35,13 @@ namespace LivreNoirLibrary.Media.Wave
 
         public long SamplePosition
         {
-            get => _buffer_head + _buffer_read / _out_channels;
+            get => _buffer_head + _buffer_read / OutputChannels;
             set => this.SampleSeekCore(value);
         }
 
         public Rational Position
         {
-            get => new(SamplePosition, _out_rate);
+            get => new(SamplePosition, OutputSampleRate);
             set => this.SeekCore(value);
         }
 
@@ -69,8 +69,8 @@ namespace LivreNoirLibrary.Media.Wave
                 FFmpegUtils.ThrowNotSupportedException("Sample converter not found.");
                 return false;
             }
-            var inSampleRate = _in_rate;
-            var inChannels = _in_channels;
+            var inSampleRate = InputSampleRate;
+            var inChannels = InputChannels;
             if (outSampleRate is <= 0)
             {
                 outSampleRate = inSampleRate;
@@ -79,8 +79,8 @@ namespace LivreNoirLibrary.Media.Wave
             {
                 outChannels = inChannels;
             }
-            _out_rate = outSampleRate;
-            _out_channels = outChannels;
+            OutputSampleRate = outSampleRate;
+            OutputChannels = outChannels;
             _out_length = _data_length / _format.BlockAlign;
             SetStream(stream, leaveOpen);
             stream.Position = _data_position;
@@ -88,12 +88,14 @@ namespace LivreNoirLibrary.Media.Wave
             _buffer_length = 0;
             if (outSampleRate != inSampleRate || outChannels != inChannels)
             {
-                AVChannelLayout inCh = default;
-                AVChannelLayout outCh = default;
-                ffmpeg.av_channel_layout_default(&inCh, inChannels);
-                ffmpeg.av_channel_layout_default(&outCh, outChannels);
-                this.AllocSwrContext(outCh, InternalSampleFormat, outSampleRate, inCh, InternalSampleFormat, inSampleRate);
+                _swrContext = FFmpegUtils.CreateSwrContext(
+                    outChannels, OutputSampleFormat, inSampleRate,
+                    inChannels, InputSampleFormat, outSampleRate);
                 _out_length = ffmpeg.av_rescale_rnd(_out_length, outSampleRate, inSampleRate, AVRounding.AV_ROUND_UP);
+            }
+            else
+            {
+                this.DisposeSwrContext();
             }
             EnsureBufferSize(BufferSize / _converter.BytesPerSample * outChannels / inChannels * outSampleRate / inSampleRate);
             return true;
@@ -106,8 +108,8 @@ namespace LivreNoirLibrary.Media.Wave
             _data_position = info.DataPosition;
             _data_length = info.DataLength;
             var format = info.Format;
-            _in_rate = (int)format.SampleRate;
-            _in_channels = format.Channels;
+            InputSampleRate = (int)format.SampleRate;
+            InputChannels = format.Channels;
             _format = format;
             _converter = format.TryGetSampleFormat(out var fmt) ? IWaveSampleConverter.GetConverter(fmt) : null;
             _chunks.Clear();
@@ -123,11 +125,11 @@ namespace LivreNoirLibrary.Media.Wave
             {
                 return;
             }
-            var index = position * _in_rate / _out_rate * _format.BlockAlign;
+            var index = position * InputSampleRate / OutputSampleRate * _format.BlockAlign;
             stream.Position = _data_position + index;
-            if (_swr_context is not null)
+            if (_swrContext is not null)
             {
-                ffmpeg.swr_init(_swr_context);
+                ffmpeg.swr_init(_swrContext);
             }
             _buffer_head = position;
             _buffer_length = 0;
@@ -145,7 +147,7 @@ namespace LivreNoirLibrary.Media.Wave
             }
             var streamIndex = stream.Position - _data_position;
             var streamRemain = (int)(_data_length - streamIndex);
-            return _swr_context is not null ? UpdateBuffer_SwrConvert(converter, stream, streamIndex, streamRemain)
+            return _swrContext is not null ? UpdateBuffer_SwrConvert(converter, stream, streamIndex, streamRemain)
                                             : UpdateBuffer_NoConvert(converter, stream, streamIndex, streamRemain);
         }
         bool IAudioBufferDecoder.UpdateBuffer() => UpdateBuffer();
@@ -169,10 +171,10 @@ namespace LivreNoirLibrary.Media.Wave
                 {
                     return true;
                 }
+                var destPtr = _buffer.Pointer;
                 fixed (byte* srcPtr = streamBuffer)
-                fixed (float* dstPtr = Buffer)
                 {
-                    converter.ConvertRead(srcPtr, dstPtr, bytesToRead);
+                    converter.ConvertRead(srcPtr, destPtr, bytesToRead);
                 }
                 _buffer_length = bytesToRead / block;
                 return false;

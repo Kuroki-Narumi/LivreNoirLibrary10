@@ -24,7 +24,7 @@ namespace LivreNoirLibrary.Media.Wave
         /// <inheritdoc cref="IAudioBufferInternal.BufferIndex"/>
         private int _buffer_wrote;
 
-        Span<float> IAudioBufferInternal.Buffer => Buffer;
+        float* IAudioBufferInternal.BufferPointer => _buffer.Pointer;
         int IAudioBufferInternal.BufferLength => _buffer_length;
         int IAudioBufferInternal.BufferIndex { get => _buffer_wrote; set => _buffer_wrote = value; }
 
@@ -41,10 +41,10 @@ namespace LivreNoirLibrary.Media.Wave
             options.Validate();
             _writer = new(stream, Encoding.UTF8, true);
             var (inRate, inChannels, outRate, outChannels, format) = options;
-            _in_rate = inRate;
-            _in_channels = inChannels;
-            _out_rate = outRate;
-            _out_channels = outChannels;
+            InputSampleRate = inRate;
+            InputChannels = inChannels;
+            OutputSampleRate = outRate;
+            OutputChannels = outChannels;
             _format = FormatChunk.Create(outRate, outChannels, format);
             var inFrameSize = BufferSize / FormatChunk.CalculateBlockAlign(inChannels, SampleFormat.Float32);
             EnsureBufferSize(inFrameSize * inChannels);
@@ -52,11 +52,13 @@ namespace LivreNoirLibrary.Media.Wave
             _buffer_wrote = 0;
             if (outRate != inRate || outChannels != inChannels)
             {
-                AVChannelLayout inCh = default;
-                AVChannelLayout outCh = default;
-                ffmpeg.av_channel_layout_default(&inCh, inChannels);
-                ffmpeg.av_channel_layout_default(&outCh, outChannels);
-                this.AllocSwrContext(outCh, InternalSampleFormat, outRate, inCh, InternalSampleFormat, inRate);
+                _swrContext = FFmpegUtils.CreateSwrContext(
+                    outChannels, OutputSampleFormat, inRate,
+                    inChannels, InputSampleFormat, outRate);
+            }
+            else
+            {
+                this.DisposeSwrContext();
             }
             _converter = IWaveSampleConverter.GetConverter(format);
         }
@@ -148,7 +150,7 @@ namespace LivreNoirLibrary.Media.Wave
             {
                 return false;
             }
-            return _swr_context is not null ? EncodeBuffer_SwrConvert(converter, stream)
+            return _swrContext is not null ? EncodeBuffer_SwrConvert(converter, stream)
                                             : EncodeBuffer_NoConvert(converter, stream);
         }
         bool IAudioBufferEncoder.EncodeBuffer() => EncodeBuffer();
@@ -165,8 +167,8 @@ namespace LivreNoirLibrary.Media.Wave
             var streamBuffer = ArrayPool<byte>.Shared.Rent(bytesToWrite);
             try
             {
+                var srcPtr = _buffer.Pointer;
                 fixed (byte* dstPtr = streamBuffer)
-                fixed (float* srcPtr = Buffer)
                 {
                     converter.ConvertWrite(srcPtr, dstPtr, totalSamples);
                 }
@@ -183,23 +185,23 @@ namespace LivreNoirLibrary.Media.Wave
         /// <inheritdoc cref="IAudioBufferEncoder.EncodeBuffer"/>
         private bool EncodeBuffer_SwrConvert(IWaveSampleConverter converter, Stream stream)
         {
-            var convertSize = _buffer_length * _out_rate / _in_rate + 1;
+            var outCh = OutputChannels;
+            var convertSize = _buffer_length * OutputSampleRate / InputSampleRate + 1;
             var streamBuffer = ArrayPool<byte>.Shared.Rent(BufferSize);
-            var convertBuffer = ArrayPool<float>.Shared.Rent(convertSize * _out_channels);
+            var convertBuffer = ArrayPool<float>.Shared.Rent(convertSize * outCh);
             try
             {
                 fixed (byte* dstPtr = streamBuffer)
                 fixed (float* convPtr = convertBuffer)
                 {
                     var convBytePtr = (byte*)convPtr;
-                    var span = Buffer[.._buffer_wrote];
-                    var samples = _buffer_wrote / _in_channels;
-                    var outSamples = this.SwrConvertToWrite(span, samples, &convBytePtr, convertSize);
+                    var samples = _buffer_wrote / InputChannels;
+                    var outSamples = this.SwrConvertToWrite(_buffer.Pointer, samples, &convBytePtr, convertSize);
                     if (outSamples is <= 0)
                     {
                         return false;
                     }
-                    var totalSamples = outSamples * _out_channels;
+                    var totalSamples = outSamples * outCh;
                     converter.ConvertWrite(convPtr, dstPtr, totalSamples);
                     stream.Write(streamBuffer, 0, totalSamples * converter.BytesPerSample);
                     return true;

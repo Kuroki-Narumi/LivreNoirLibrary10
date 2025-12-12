@@ -1,11 +1,17 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Windows;
 using System.Windows.Input;
 using System.Windows.Controls;
+using RButton = System.Windows.Controls.RadioButton;
 using LivreNoirLibrary.Numerics;
+using LivreNoirLibrary.Collections;
+using LivreNoirLibrary.ObjectModel;
+using LivreNoirLibrary.Debug;
 
 namespace LivreNoirLibrary.Windows.Controls
 {
+
     public static partial class ControlExtensions
     {
         public static void ChangeByWheel(this ComboBox control, MouseWheelEventArgs e, bool wrap = false)
@@ -85,8 +91,8 @@ namespace LivreNoirLibrary.Windows.Controls
         public static void SelectNextTab(this TabControl control, bool wrap)
         {
             var max = control.Items.Count;
-            var init = control.SelectedIndex;
-            var index = init;
+            var initial = control.SelectedIndex;
+            var index = initial;
             do
             {
                 index++;
@@ -106,15 +112,15 @@ namespace LivreNoirLibrary.Windows.Controls
                 {
                     break;
                 }
-            } while (index != init);
+            } while (index != initial);
             control.SelectedIndex = index;
         }
 
         public static void SelectPreviousTab(this TabControl control, bool wrap)
         {
             var max = control.Items.Count;
-            var init = control.SelectedIndex;
-            var index = init;
+            var initial = control.SelectedIndex;
+            var index = initial;
             do
             {
                 index--;
@@ -134,7 +140,7 @@ namespace LivreNoirLibrary.Windows.Controls
                 {
                     break;
                 }
-            } while (index != init);
+            } while (index != initial);
             control.SelectedIndex = index;
         }
 
@@ -150,6 +156,60 @@ namespace LivreNoirLibrary.Windows.Controls
                     }
                     col.Width = double.NaN;
                 }
+            }
+        }
+
+        public static void ChangeRadioButtonByWheel(this Panel panel, MouseWheelEventArgs e, bool wrap = true)
+        {
+            var cache = ObjectPool.Rent<List<RButton>>();
+            try
+            {
+                var checkedIndex = 0;
+                var delta = e.Delta is > 0;
+                foreach (var child in panel.EnumerateDescendantsByStack())
+                {
+                    if (child is RButton button)
+                    {
+                        if (button.IsChecked is true)
+                        {
+                            checkedIndex = cache.Count;
+                        }
+                        cache.Add(button);
+                    }
+                }
+                switch (cache.Count)
+                {
+                    case 0: // ラジオボタンが一つも見つからなかった
+                        break;
+                    case 1: // ラジオボタンが一つしかなかった
+                        cache[0].IsChecked = true;
+                        break;
+                    default: // 複数のラジオボタンが見つかった
+                        checkedIndex = checkedIndex + (e.Delta is > 0 ? -1 : 1);
+                        if (checkedIndex is < 0)
+                        {
+                            if (wrap)
+                            {
+                                cache[^1].IsChecked = true;
+                            }
+                        }
+                        else if (checkedIndex >= cache.Count)
+                        {
+                            if (wrap)
+                            {
+                                cache[0].IsChecked = true;
+                            }
+                        }
+                        else
+                        {
+                            cache[checkedIndex].IsChecked = true;
+                        }
+                        break;
+                }
+            }
+            finally
+            {
+                ObjectPool.Return(cache);
             }
         }
     }

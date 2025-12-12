@@ -12,15 +12,13 @@ using DrRect = System.Drawing.Rectangle;
 
 namespace LivreNoirLibrary.Windows.Controls.Bms.Elements
 {
-    public class TextElement(Media.Bms.SkinInfo.Text source) : SingleElement(source)
+    public class TextElement(Media.Bms.SkinInfo.Text source) : SingleTextureElement(source)
     {
         public const double DefaultFontSize = 12;
         public const double DefaultStrokeThickness = 0;
 
         private readonly Media.Bms.SkinInfo.Text _source = source;
         private string? _content;
-        private double _definedWidth;
-        private double _definedHeight;
         private bool _needRefresh;
         private readonly FormattedTextOption _options = new();
         private Pen? _pen;
@@ -42,6 +40,7 @@ namespace LivreNoirLibrary.Windows.Controls.Bms.Elements
             op.FontStretch = source.FontStretch;
             op.FontSize = skin.ResolveValue(source.FontSize, provider, DefaultFontSize);
             op.Foreground = MediaUtils.GetBrush(source.Fill.ToColor());
+            Stretch = source.Stretch;
             _pen = MediaUtils.GetPen(source.Stroke.ToColor(), skin.ResolveValue(source.StrokeThickness, provider, DefaultStrokeThickness));
             _content = null;
             UpdateContent(skin, provider);
@@ -51,8 +50,6 @@ namespace LivreNoirLibrary.Windows.Controls.Bms.Elements
         {
             base.Update(args);
             UpdateContent(args.Skin, args.VariableProvider);
-            _definedWidth = DestWidth;
-            _definedHeight = DestHeight;
         }
 
         private void UpdateContent(Skin skin, IVariableProvider? provider)
@@ -73,8 +70,6 @@ namespace LivreNoirLibrary.Windows.Controls.Bms.Elements
             }
             bitmap = _bitmap;
             rect = bitmap.Rect;
-            DestHeight = Math.Min(_definedHeight, rect.Height);
-            DestWidth = Math.Min(_definedWidth, rect.Width * DestHeight / rect.Height);
             return true;
         }
 

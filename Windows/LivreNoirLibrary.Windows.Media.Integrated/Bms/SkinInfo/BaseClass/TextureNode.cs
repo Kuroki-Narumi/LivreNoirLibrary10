@@ -1,4 +1,4 @@
-﻿using LivreNoirLibrary.Media.Bms;
+﻿using LivreNoirLibrary.Media.Bms.Play;
 
 namespace LivreNoirLibrary.Windows.Media.Bms.SkinInfo
 {
