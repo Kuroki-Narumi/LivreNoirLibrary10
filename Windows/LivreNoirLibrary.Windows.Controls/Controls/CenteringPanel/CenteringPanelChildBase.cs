@@ -96,6 +96,8 @@ namespace LivreNoirLibrary.Windows.Controls
             ProcessCancel();
         }
 
+        public void Open() => _parent?.Open(this);
+
         public void Close() => _parent?.Close();
 
         protected virtual void ProcessDecide() => Close();

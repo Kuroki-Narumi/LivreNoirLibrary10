@@ -31,7 +31,7 @@ namespace LivreNoirLibrary.Windows.Controls.Bms.Elements
             Add(JudgeType.Through, s.Through, s.ThroughCombo);
             Add(JudgeType.BlankShot, s.BlankShot, s.BlankShotCombo);
 
-            void Add(JudgeType type, string? name, string? combo)
+            void Add(JudgeType type, ValueExpression? name, ValueExpression? combo)
             {
                 skin.TryGetTextureData(name, provider, out var nameData);
                 skin.TryGetTextureData(combo, provider, out var comboData);

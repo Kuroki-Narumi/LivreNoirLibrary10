@@ -1,13 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Diagnostics.CodeAnalysis;
-using System.IO;
-using LivreNoirLibrary.Collections;
+﻿using LivreNoirLibrary.Collections;
 using LivreNoirLibrary.Debug;
 using LivreNoirLibrary.IO;
 using LivreNoirLibrary.Media;
 using LivreNoirLibrary.ObjectModel;
+using System;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Diagnostics.CodeAnalysis;
+using System.IO;
 
 namespace LivreNoirLibrary.Windows.Media.Bms.SkinInfo
 {
@@ -18,15 +18,17 @@ namespace LivreNoirLibrary.Windows.Media.Bms.SkinInfo
         public string? Author { get; set => SetValue(ref field, value); }
         public System.Drawing.Size BaseSize { get; set => SetValue(ref field, value); }
         public LnColor Background { get; set => SetValue(ref field, value); } = LnColor.FromRgb(0, 0, 0);
+        public ValueExpression FadeInTime { get; set => SetValue(ref field, value); } = 0.5;
+        public ValueExpression FadeOutTime { get; set => SetValue(ref field, value); } = 1;
 
-        public ObservableList<string> Includes { get; } = [];
+        public IncludeCollection Includes { get; } = [];
         public OptionCollection Options { get; } = [];
         public VariableCollection Variables { get; } = [];
         public TextureCollection Textures { get; } = [];
 
         private string? _directory;
 
-        internal void Refresh(string directory, Dictionary<string, Skin> skins)
+        internal void Refresh(string directory, SkinRefreshArgs args)
         {
             if (_directory is not null)
             {
@@ -42,28 +44,24 @@ namespace LivreNoirLibrary.Windows.Media.Bms.SkinInfo
             if (includes.Count is > 0)
             {
                 // このスキンでの設定値を保存
-                OptionBase[] optionBuffer = [.. options];
-                Variable[] variableBuffer = [.. variables];
-                Texture[] textureBuffer = [.. textures];
-                var childIndex = 0;
-                foreach (var include in includes.AsSpan())
+                args.BeginResolveInclude(options, variables, textures);
+                foreach (var include in includes)
                 {
-                    if (skins.TryGetValue(Path.GetFullPath(include, directory), out var parent))
+                    if (args.TryGetIncludeSource(directory, include, out var parent))
                     {
                         options.AddRange(parent.Options);
                         variables.AddRange(parent.Variables);
                         textures.AddRange(parent.Textures);
-                        children.InsertRange(childIndex, parent.Children);
-                        childIndex += parent.Children.Count;
                     }
                 }
                 // このスキンでの設定値で上書きしなおす
-                options.AddRange(optionBuffer);
-                variables.AddRange(variableBuffer);
-                textures.AddRange(textureBuffer);
+                args.RestoreSkinInfo(options, variables, textures);
+                // スキン要素のインクルード解決
+                ApplyInclude(this, args);
+                args.FinishResolveInclude();
             }
             // texture inheritance
-            foreach (var texture in textures.AsSpan())
+            foreach (var texture in textures)
             {
                 texture._baseDirectory ??= directory;
                 var baseKey = texture.BasedOn;
@@ -75,6 +73,37 @@ namespace LivreNoirLibrary.Windows.Media.Bms.SkinInfo
             if (textures.Find(t => t.IsCircularReference()) is { } t)
             {
                 throw new StackOverflowException($"a circular reference detected: \"{t.Key}\" based on \"{t.BasedOn}\"");
+            }
+        }
+
+        private static void ApplyInclude(SkinContainer container, SkinRefreshArgs args)
+        {
+            var children = container.Children;
+            for (var i = 0; i < children.Count;)
+            {
+                switch (children[i])
+                {
+                    case SkinContainer c:
+                        ApplyInclude(c, args);
+                        break;
+                    case Include include:
+                        // <Include/>要素をインクルード元のスキン要素で置き換えるイメージ
+                        children.RemoveAt(i);
+                        if (args.TryGetIncludeSource(include.Key, out var skin))
+                        {
+                            // この時点で参照されるインクルード元のスキンは、既にインクルードを解決済みである
+                            foreach (var item in skin.Children.AsSpan())
+                            {
+                                if (item is SkinElement element)
+                                {
+                                    children.Insert(i, element);
+                                    i++;
+                                }
+                            }
+                        }
+                        continue;
+                }
+                i++;
             }
         }
 
@@ -174,10 +203,10 @@ namespace LivreNoirLibrary.Windows.Media.Bms.SkinInfo
             return defaultValue;
         }
 
-        public bool TryGetTextureData(string? key, IVariableProvider? provider, out TextureData data)
+        public bool TryGetTextureData(ValueExpression? expr, IVariableProvider? provider, out TextureData data)
         {
             data = default;
-            if (string.IsNullOrEmpty(key))
+            if (!TryResolveReflection(expr, provider, out var key) || string.IsNullOrEmpty(key))
             {
                 return false;
             }
@@ -186,6 +215,7 @@ namespace LivreNoirLibrary.Windows.Media.Bms.SkinInfo
                 data = new(key, 0, 0, 0, 0, 1, 1, 0);
                 return true;
             }
+
             if (Textures.TryGetValue(key, out var texture) && TryResolveReflection(texture.Source, provider, out var source))
             {
                 source = Path.GetFullPath(source, texture._baseDirectory ?? _directory ?? General.GetAssemblyDir());

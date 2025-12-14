@@ -56,6 +56,7 @@ namespace LivreNoirLibrary.Media.Wave
                         data = WaveBuffer.CreateUnsafe(OutputSampleRate, OutputChannels);
                         data.AutoDecode(path, false);
                         _buffers.Add(path, data);
+                        //ExConsole.Write($"decoded \"{path}\"");
                     }
                     catch (Exception ex)
                     {

@@ -39,6 +39,23 @@ namespace LivreNoirLibrary.Media.Bms
                     }
                 }
             }
+
+            public void PrepareToPlay()
+            {
+                obj.Clear();
+                obj.Set(TimerId.Scene_Start, 0);
+            }
+
+            public void SetBeatTimer(double time, ITimeCounter timeCounter, IBarPositionProvider<double> provider)
+            {
+                if (obj.TryGet(TimerId.Play_MusicStart, time, out var musicTime))
+                {
+                    var beat = timeCounter.Time2Beat(musicTime);
+                    var pos = provider.GetBarPosition(beat);
+                    var inBeat = (((double)pos.Offset * provider.GetBarLength(pos.Bar)) * 4) % 1;
+                    obj.Set(TimerId.Play_Beat, time - inBeat);
+                }
+            }
         }
 
         extension(IBgaVisibilityProvider obj)

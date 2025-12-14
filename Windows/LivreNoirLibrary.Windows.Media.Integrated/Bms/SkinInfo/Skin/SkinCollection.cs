@@ -1,9 +1,11 @@
-﻿using System;
+﻿using LivreNoirLibrary.Collections;
+using LivreNoirLibrary.Debug;
+using LivreNoirLibrary.IO;
+using LivreNoirLibrary.ObjectModel;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Windows.Markup;
-using LivreNoirLibrary.Collections;
-using LivreNoirLibrary.ObjectModel;
 
 namespace LivreNoirLibrary.Windows.Media.Bms.SkinInfo
 {
@@ -23,7 +25,7 @@ namespace LivreNoirLibrary.Windows.Media.Bms.SkinInfo
         }
 
         private string _directory = "";
-        private readonly Dictionary<string, Skin> _skins = [];
+        private readonly SkinRefreshArgs _refreshArgs = new();
 
         public string RootDirectory
         {
@@ -41,14 +43,14 @@ namespace LivreNoirLibrary.Windows.Media.Bms.SkinInfo
 
         public void Clear()
         {
-            _skins.Clear();
+            _refreshArgs.Clear();
             PlaySkins.Clear();
         }
 
         public void Load(string directory)
         {
             Clear();
-            var skins = _skins;
+            var args = _refreshArgs;
             var playSkins = PlaySkins;
             _directory = directory;
             SendPropertyChanged(nameof(RootDirectory));
@@ -66,9 +68,9 @@ namespace LivreNoirLibrary.Windows.Media.Bms.SkinInfo
                 {
                     var current = queue.Dequeue();
                     var skin = current.Skin;
-                    skins.Add(current.FullPath, skin);
+                    args.RegisterSkin(current.FullPath, skin);
                     // 現在のノードの依存関係を解決
-                    skin.Refresh(current.Directory, skins);
+                    skin.Refresh(current.Directory, args);
                     // このノードを参照するノードの入り数を減らす
                     foreach (var neighbor in current.Outgoing)
                     {
@@ -89,22 +91,44 @@ namespace LivreNoirLibrary.Windows.Media.Bms.SkinInfo
 
                 SortingSkinNode? GetNode(string path)
                 {
+                    if (!path.EndsWith(Exts.Xml, StringComparison.OrdinalIgnoreCase))
+                    {
+                        path = Path.ChangeExtension(path, Exts.Xml);
+                    }
                     if (!sortingNodes.TryGetValue(path, out var node))
                     {
-                        try
+                        if (File.Exists(path))
                         {
                             using var file = File.OpenRead(path);
-                            if (XamlReader.Load(file, ctx) is Skin skin)
+                            Skin? skin = null;
+                            try
+                            {
+                                skin = XamlReader.Load(file, ctx) as Skin;
+                            }
+                            catch (Exception e)
+                            {
+                                ExConsole.Write(e);
+                            }
+                            if (skin is not null)
                             {
                                 var dir = Path.GetDirectoryName(path)!;
                                 node = new(skin, dir, path);
                                 sortingNodes.Add(path, node);
                                 // 依存関係の整理
-                                foreach (var refer in skin.Includes.AsSpan())
+                                foreach (var refer in skin.Includes)
                                 {
-                                    var refPath = Path.GetFullPath(refer, dir);
-                                    var refNode = GetNode(refPath);
-                                    refNode?.Outgoing.Add(node);
+                                    if (refer.Source is { } includePath)
+                                    {
+                                        var refPath = Path.GetFullPath(includePath, dir);
+                                        if (GetNode(refPath) is { } refNode)
+                                        {
+                                            refNode.Outgoing.Add(node);
+                                        }
+                                        else
+                                        {
+                                            node.Indegree--;
+                                        }
+                                    }
                                 }
                                 // 何にも依存しないノードはキューに追加しておく
                                 if (node.Indegree is 0)
@@ -114,7 +138,7 @@ namespace LivreNoirLibrary.Windows.Media.Bms.SkinInfo
                                 return node;
                             }
                         }
-                        catch { }
+                        ExConsole.Write($"error: \"{path}\" is not found.");
                         sortingNodes.Add(path, null);
                     }
                     return node;

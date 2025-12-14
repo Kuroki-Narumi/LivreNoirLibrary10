@@ -89,15 +89,15 @@ namespace LivreNoirLibrary.Media.Wave
             if (outSampleRate != inSampleRate || outChannels != inChannels)
             {
                 _swrContext = FFmpegUtils.CreateSwrContext(
-                    outChannels, OutputSampleFormat, inSampleRate,
-                    inChannels, InputSampleFormat, outSampleRate);
+                    outChannels, OutputSampleFormat, outSampleRate,
+                    inChannels, InputSampleFormat, inSampleRate);
                 _out_length = ffmpeg.av_rescale_rnd(_out_length, outSampleRate, inSampleRate, AVRounding.AV_ROUND_UP);
             }
             else
             {
                 this.DisposeSwrContext();
             }
-            EnsureBufferSize(BufferSize / _converter.BytesPerSample * outChannels / inChannels * outSampleRate / inSampleRate);
+            EnsureBufferSize((int)((long)BufferSize / _converter.BytesPerSample * outChannels / inChannels * outSampleRate / inSampleRate));
             return true;
         }
         bool IAudioBufferDecoder.Setup(Stream stream, bool leaveOpen, int streamIndex, int outSampleRate, int outChannels) => Setup(stream, leaveOpen, outSampleRate, outChannels);

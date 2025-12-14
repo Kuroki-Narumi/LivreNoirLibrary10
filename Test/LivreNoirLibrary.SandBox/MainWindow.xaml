@@ -5,7 +5,8 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:LivreNoirLibrary.SandBox"
         xmlns:ct="clr-namespace:LivreNoirLibrary.Windows.Controls;assembly=LivreNoirLibrary.Windows.Controls"
-        xmlns:cc="clr-namespace:LivreNoirLibrary.Windows.Media.Bms.SkinInfo;assembly=LivreNoirLibrary.Windows.Media.Integrated"
+        xmlns:ctBms="clr-namespace:LivreNoirLibrary.Windows.Controls.Bms;assembly=LivreNoirLibrary.Windows.Media.Integrated"
+        xmlns:skinInfo="clr-namespace:LivreNoirLibrary.Windows.Media.Bms.SkinInfo;assembly=LivreNoirLibrary.Windows.Media.Integrated"
         xmlns:media="clr-namespace:LivreNoirLibrary.Windows.Media;assembly=LivreNoirLibrary.Windows.Media"
         xmlns:conv="clr-namespace:LivreNoirLibrary.Windows.Converters;assembly=LivreNoirLibrary.Windows.Controls"
         mc:Ignorable="d" d:DataContext="{d:DesignInstance Type=local:MainWindow}"
@@ -74,6 +75,11 @@
                                 <Setter Property="IsSnapToTickEnabled" Value="True"/>
                                 <Setter Property="IsTextEditable" Value="True"/>
                             </Style>
+                            <Style x:Key="HsSlider" TargetType="ct:LabeledSlider" BasedOn="{StaticResource SliderBase}">
+                                <Setter Property="Minimum" Value="10"/>
+                                <Setter Property="Maximum" Value="990"/>
+                                <Setter Property="TickFrequency" Value="10"/>
+                            </Style>
                             <Style x:Key="VolumeSlider" TargetType="ct:LabeledSlider" BasedOn="{StaticResource SliderBase}">
                                 <Setter Property="Minimum" Value="0"/>
                                 <Setter Property="Maximum" Value="100"/>
@@ -84,16 +90,28 @@
                                 <Setter Property="Maximum" Value="9750"/>
                                 <Setter Property="TickFrequency" Value="250"/>
                             </Style>
+                            <Style x:Key="KbpsSlider" TargetType="ct:LabeledSlider">
+                                <Setter Property="Margin" Value="4,2,0,2"/>
+                                <Setter Property="Minimum" Value="1000"/>
+                                <Setter Property="Maximum" Value="50000"/>
+                                <Setter Property="TickFrequency" Value="500"/>
+                                <Setter Property="TextWidth" Value="48"/>
+                                <Setter Property="IsSnapToTickEnabled" Value="True"/>
+                                <Setter Property="IsTextEditable" Value="True"/>
+                            </Style>
                         </WrapPanel.Resources>
                         <TextBlock Text="Skin"/>
                         <ComboBox x:Name="ComboBox_Skin" SelectedItem="{Binding BmsScreen.Skin, Mode=TwoWay}">
                             <ComboBox.ItemTemplate>
-                                <DataTemplate DataType="cc:PlaySkin">
+                                <DataTemplate DataType="skinInfo:PlaySkin">
                                     <TextBlock Text="{Binding Name}"/>
                                 </DataTemplate>
                             </ComboBox.ItemTemplate>
                         </ComboBox>
-                        <ct:Button Icon="{x:Static ct:Icons.Open}" ToolTip="Open" Command="ApplicationCommands.Open"/>
+                        <ct:Button Icon="{x:Static ct:Icons.Config}" ToolTip="Skin Optins" Click="OnClick_SkinOptions" IsEnabled="{Binding BmsScreen.HasSkinOptions}"/>
+
+                        <Border Style="{StaticResource Separator}"/>
+                        <ct:Button Icon="{x:Static ct:Icons.Open}" Content="{Binding BmsScreen.BmsBaseName}" ToolTip="Open" Command="ApplicationCommands.Open"/>
                         <ct:Button Icon="{x:Static ct:Icons.Save}" ToolTip="Save" Command="ApplicationCommands.Save"/>
 
                         <Border Style="{StaticResource Separator}"/>
@@ -116,27 +134,9 @@
                             <ct:DropDownMenuButton.DropDownContent>
                                 <StackPanel>
                                     <TextBlock Style="{StaticResource Top}" Text="HighSpeed"/>
-                                    <ct:LabeledSlider Style="{StaticResource SliderBase}" TickFrequency="10" Minimum="1" Maximum="990" Value="{Binding BmsOptions.HighSpeed, Converter={StaticResource PercentConv}}"/>
+                                    <ct:LabeledSlider Style="{StaticResource HsSlider}" Value="{Binding BmsOptions.HighSpeed, Converter={StaticResource PercentConv}}"/>
                                     <ComboBox ItemsSource="{x:Static local:MainWindow.HsCorrectionModes}" SelectedItem="{Binding BmsOptions.HsCorrectionMode}"/>
                                 </StackPanel>
-                            </ct:DropDownMenuButton.DropDownContent>
-                        </ct:DropDownMenuButton>
-                        <ct:DropDownMenuButton AutoOpen="True">
-                            <ct:IconPresenter Source="{x:Static ct:Icons.Clock}" Width="16"/>
-                            <ct:DropDownMenuButton.DropDownContent>
-                                <Grid ColumnDefinitions="Auto, *" RowDefinitions="Auto, Auto, Auto, Auto, Auto, Auto">
-                                    <TextBlock Style="{StaticResource Top}" Text="Duration"/>
-                                    <TextBlock Grid.Row="1" Style="{StaticResource Header}" Text="Fade In"/>
-                                    <TextBlock Grid.Row="2" Style="{StaticResource Header}" Text="Load"/>
-                                    <TextBlock Grid.Row="3" Style="{StaticResource Header}" Text="Ready"/>
-                                    <TextBlock Grid.Row="4" Style="{StaticResource Header}" Text="Rear"/>
-                                    <TextBlock Grid.Row="5" Style="{StaticResource Header}" Text="Fade Out"/>
-                                    <ct:LabeledSlider Grid.Row="1" Style="{StaticResource MsSlider}" Value="{Binding BmsOptions.FadeInDuration, Converter={StaticResource MsConv}}"/>
-                                    <ct:LabeledSlider Grid.Row="2" Style="{StaticResource MsSlider}" Value="{Binding BmsOptions.LoadDuration, Converter={StaticResource MsConv}}"/>
-                                    <ct:LabeledSlider Grid.Row="3" Style="{StaticResource MsSlider}" Value="{Binding BmsOptions.ReadyDuration, Converter={StaticResource MsConv}}"/>
-                                    <ct:LabeledSlider Grid.Row="4" Style="{StaticResource MsSlider}" Value="{Binding BmsOptions.AfterMargin, Converter={StaticResource MsConv}}"/>
-                                    <ct:LabeledSlider Grid.Row="5" Style="{StaticResource MsSlider}" Value="{Binding BmsOptions.FadeOutDuration, Converter={StaticResource MsConv}}"/>
-                                </Grid>
                             </ct:DropDownMenuButton.DropDownContent>
                         </ct:DropDownMenuButton>
 
@@ -145,19 +145,33 @@
 
                         <Border Style="{StaticResource Separator}"/>
 
-                        <TextBlock Text="FPS"/>
-                        <ComboBox ItemsSource="{x:Static local:MainWindow.FpsList}" SelectedItem="{Binding BmsOptions.FrameRate}"/>
-                        <StackPanel Background="Transparent" PreviewMouseWheel="RadioContainer_MouseWheel" Orientation="Horizontal">
-                            <StackPanel.Resources>
-                                <Style TargetType="RadioButton">
-                                    <Setter Property="Margin" Value="2,0"/>
-                                    <Setter Property="GroupName" Value="IsHevc"/>
-                                    <Setter Property="VerticalContentAlignment" Value="Center"/>
-                                </Style>
-                            </StackPanel.Resources>
-                            <RadioButton Content="H264" IsChecked="{Binding BmsOptions.IsHevc, Converter={StaticResource InvertConverter}}"/>
-                            <RadioButton Content="HEVC" IsChecked="{Binding BmsOptions.IsHevc}"/>
-                        </StackPanel>
+                        <ct:DropDownMenuButton AutoOpen="True">
+                            <ct:IconPresenter Source="{x:Static ct:Icons.Config}" Width="16"/>
+                            <ct:DropDownMenuButton.DropDownContent>
+                                <StackPanel>
+                                    <TextBlock Style="{StaticResource Top}" Text="Video"/>
+                                    <StackPanel Orientation="Horizontal">
+                                        <ComboBox ItemsSource="{x:Static local:MainWindow.FpsList}" SelectedItem="{Binding BmsOptions.FrameRate}"/>
+                                        <TextBlock Margin="0,2,4,2" Text="FPS"/>
+                                        <StackPanel Background="Transparent" PreviewMouseWheel="RadioContainer_MouseWheel" Orientation="Horizontal" Margin="4,0">
+                                            <StackPanel.Resources>
+                                                <Style TargetType="RadioButton">
+                                                    <Setter Property="Margin" Value="2,0"/>
+                                                    <Setter Property="GroupName" Value="IsHevc"/>
+                                                    <Setter Property="VerticalContentAlignment" Value="Center"/>
+                                                </Style>
+                                            </StackPanel.Resources>
+                                            <RadioButton Content="H264" IsChecked="{Binding BmsOptions.IsHevc, Converter={StaticResource InvertConverter}}"/>
+                                            <RadioButton Content="HEVC" IsChecked="{Binding BmsOptions.IsHevc}"/>
+                                        </StackPanel>
+                                    </StackPanel>
+                                    <Grid ColumnDefinitions="*, Auto">
+                                        <ct:LabeledSlider Style="{StaticResource KbpsSlider}" Value="{Binding BmsOptions.ApproximateKbps}"/>
+                                        <TextBlock Grid.Column="1" Margin="4,2,4,2" Text="Kbps"/>
+                                    </Grid>
+                                </StackPanel>
+                            </ct:DropDownMenuButton.DropDownContent>
+                        </ct:DropDownMenuButton>
                         <ct:Button Icon="{x:Static ct:Icons.Camera}" ToolTip="Save Video" Click="OnClick_Video" IsEnabled="{Binding BmsScreen.IsBmsReady, Mode=OneWay}"/>
                     </WrapPanel>
                     <Rectangle Grid.Row="1">
@@ -169,6 +183,9 @@
                         <TextBlock Text="{Binding BmsScreen.DebugText}" Foreground="White" FontSize="12" FontFamily="Consolas"/>
                     </Border>
                 </Grid>
+                <ct:CenteringPanel>
+                    <ctBms:SkinOptionView x:Name="SkinOptionView"/>
+                </ct:CenteringPanel>
                 <ct:TaskProgressBar x:Name="TaskProgressBar"/>
             </Grid>
         </TabItem>

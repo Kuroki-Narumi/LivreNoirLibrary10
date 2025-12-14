@@ -23,7 +23,7 @@ namespace LivreNoirLibrary.Windows.Controls.Bms
         private readonly LayerState _layer2 = new(Channel.Bga_Layer2);
         private readonly LayerState _poor = new(Channel.Bga_Poor);
 
-        public void Setup()
+        public void Clear()
         {
             _base.IsVisible = _layer1.IsVisible = _layer2.IsVisible = _poor.IsVisible = false;
         }

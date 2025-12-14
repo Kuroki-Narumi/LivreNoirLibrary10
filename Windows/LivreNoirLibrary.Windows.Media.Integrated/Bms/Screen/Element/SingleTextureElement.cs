@@ -11,7 +11,20 @@ namespace LivreNoirLibrary.Windows.Controls.Bms.Elements
 {
     public abstract class SingleTextureElement(SkinElement source) : ScreenElement(source)
     {
-        public Stretch Stretch { get; protected set; }
+        public Stretch Stretch { get; private set; }
+        public double MaxWidth { get; private set;  } = double.MaxValue;
+        public double MaxHeight { get; private set; } = double.MaxValue;
+
+        public override void DetermineExpressions(Skin skin, IVariableProvider? provider)
+        {
+            base.DetermineExpressions(skin, provider);
+            if (Source is IStretchElement source)
+            {
+                Stretch = source.Stretch;
+                MaxWidth = skin.TryResolveValue(source.MaxWidth, provider, out double value) ? value : double.MaxValue;
+                MaxHeight = skin.TryResolveValue(source.MaxHeight, provider, out value) ? value : double.MaxValue;
+            }
+        }
 
         protected override void RenderCore(in RenderArgs args)
         {
@@ -34,19 +47,19 @@ namespace LivreNoirLibrary.Windows.Controls.Bms.Elements
                 {
                     if (dh is <= 0)
                     {
-                        dw = sw;
-                        dh = sh;
+                        dw = Math.Min(sw, MaxWidth);
+                        dh = Math.Min(sh, MaxHeight);
                     }
                     else
                     {
-                        dw = sw * dh / sh;
+                        dw = Math.Min(sw * dh / sh, MaxWidth);
                     }
                 }
                 else if (dh is <= 0)
                 {
-                    dh = sh * dw / sw;
+                    dh = Math.Min(sh * dw / sw, MaxHeight);
                 }
-                else if (strecth is Stretch.Uniform)
+                if (strecth is Stretch.Uniform)
                 {
                     var scale = Math.Min(dw / sw, dh / sh);
                     dw = sw * scale;

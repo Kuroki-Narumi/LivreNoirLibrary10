@@ -40,7 +40,6 @@ namespace LivreNoirLibrary.Windows.Controls.Bms.Elements
             op.FontStretch = source.FontStretch;
             op.FontSize = skin.ResolveValue(source.FontSize, provider, DefaultFontSize);
             op.Foreground = MediaUtils.GetBrush(source.Fill.ToColor());
-            Stretch = source.Stretch;
             _pen = MediaUtils.GetPen(source.Stroke.ToColor(), skin.ResolveValue(source.StrokeThickness, provider, DefaultStrokeThickness));
             _content = null;
             UpdateContent(skin, provider);
@@ -90,7 +89,7 @@ namespace LivreNoirLibrary.Windows.Controls.Bms.Elements
             var height = (int)Math.Ceiling(ft.Height);
             if (renderTarget is null || renderTarget.PixelWidth < width || renderTarget.PixelHeight < height)
             {
-                renderTarget = new RenderTargetBitmap(width, height, 96, 96, PixelFormats.Pbgra32);
+                renderTarget = new RenderTargetBitmap(Math.Max(width, 1), Math.Max(height, 1), 96, 96, PixelFormats.Pbgra32);
                 _renderTarget = renderTarget;
             }
             else

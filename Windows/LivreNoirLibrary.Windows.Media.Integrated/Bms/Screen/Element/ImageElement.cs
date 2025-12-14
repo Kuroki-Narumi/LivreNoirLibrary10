@@ -17,7 +17,6 @@ namespace LivreNoirLibrary.Windows.Controls.Bms.Elements
         public override void DetermineExpressions(Skin skin, IVariableProvider? provider)
         {
             base.DetermineExpressions(skin, provider);
-            Stretch = _source.Stretch;
             IsValid = skin.TryGetTextureData(_source.Texture, provider, out _textureData);
         }
 

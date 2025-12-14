@@ -5,7 +5,7 @@ using System.Windows.Media;
 
 namespace LivreNoirLibrary.Windows.Media.Bms.SkinInfo
 {
-    public partial class Text : SkinElement
+    public partial class Text : SkinElement, IStretchElement
     {
         public FontFamily? FontFamily { get; set => SetValue(ref field, value); }
         public ValueExpression? FontSize { get => field; set => SetValue(ref field, value); }
@@ -17,5 +17,7 @@ namespace LivreNoirLibrary.Windows.Media.Bms.SkinInfo
         public LnColor Stroke { get; set => SetValue(ref field, value); } = LnColor.FromRgb(0, 0, 0);
         public ValueExpression? StrokeThickness { get; set => SetValue(ref field, value); }
         public Stretch Stretch { get; set; } = Stretch.Uniform;
+        public ValueExpression? MaxWidth { get; set; }
+        public ValueExpression? MaxHeight { get; set; }
     }
 }

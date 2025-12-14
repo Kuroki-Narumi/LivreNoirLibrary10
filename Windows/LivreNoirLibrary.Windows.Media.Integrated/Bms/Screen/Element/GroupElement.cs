@@ -1,6 +1,7 @@
 ﻿using LivreNoirLibrary.Collections;
 using LivreNoirLibrary.Media;
 using LivreNoirLibrary.Windows.Media.Bms.SkinInfo;
+using System;
 using System.Collections.Generic;
 
 namespace LivreNoirLibrary.Windows.Controls.Bms.Elements
@@ -23,9 +24,12 @@ namespace LivreNoirLibrary.Windows.Controls.Bms.Elements
         public override void Update(in UpdateArgs args)
         {
             base.Update(args);
-            foreach (var child in Children.AsSpan())
+            if (IsVisible)
             {
-                child.Update(args);
+                foreach (var child in Children.AsSpan())
+                {
+                    child.Update(args);
+                }
             }
         }
 

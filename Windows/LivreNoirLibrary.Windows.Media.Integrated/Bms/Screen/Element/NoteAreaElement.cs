@@ -53,7 +53,7 @@ namespace LivreNoirLibrary.Windows.Controls.Bms.Elements
                 child.Mine = GetTexture(source.Mine);
             }
 
-            TextureData GetTexture(string? texture)
+            TextureData GetTexture(ValueExpression? texture)
             {
                 skin.TryGetTextureData(texture, provider, out var data);
                 return data;
@@ -101,7 +101,7 @@ namespace LivreNoirLibrary.Windows.Controls.Bms.Elements
                             child.IsMine ? laneInfo.Mine :
                             (child.VisualLength is > 0) ? laneInfo.LongHead :
                             laneInfo.Note;
-                        AddChild(textureData, laneInfo.X, laneInfo.Width, child.CurrentOffset);
+                        AddChild(textureData, laneInfo.X, laneInfo.Width, Math.Max(child.CurrentOffset, 0));
                     }
                 }
             }

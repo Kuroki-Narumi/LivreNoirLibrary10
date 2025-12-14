@@ -1,0 +1,106 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<IncludeSkin BaseSize="1280, 208">
+	<Skin.Includes>
+		<IncludeSource Key="common_textures_number" Source="common_textures_number"/>
+	</Skin.Includes>
+	<Skin.Variables>
+		<Variable Key="title_x" Source="$Options.StageFile Defined" DefaultValue="24">
+			<Convert From="True" To="244"/>
+		</Variable>
+		
+		<Variable Key="title_width" Source="$Options.StageFile Defined" DefaultValue="1252">
+			<Convert From="True" To="1032"/>
+		</Variable>
+
+		<Variable Key="level_number_y" Source="$Variables.Difficulty" DefaultValue="0">
+			<Convert From="1" To="96"/>
+			<Convert From="2" To="128"/>
+			<Convert From="3" To="64"/>
+			<Convert From="4" To="32"/>
+			<Convert From="5" To="160"/>
+		</Variable>
+
+		<Variable Key="rank_number_y" Source="$Variables.Rank" DefaultValue="352">
+			<Convert From="3" To="224"/>
+			<Convert From="2" To="256"/>
+			<Convert From="1" To="288"/>
+			<Convert From="0" To="320"/>
+		</Variable>
+	</Skin.Variables>
+	<Skin.Textures>
+		<Texture Key="number_level" BasedOn="number" X="0" Y="$Variables.level_number_y" Width="320" Height="32"/>
+		<Texture Key="number_rank" BasedOn="number" X="0" Y="$Variables.rank_number_y" Width="128" Height="32"/>
+	</Skin.Textures>
+
+	<Group Name="BPM">
+		<Destination X="384" Y="0" Width="512" Height="48"/>
+		<Image Texture="letter_bpm">
+			<Destination Rect="148, 6, 56, 32"/>
+		</Image>
+		<Number Value="$Variables.CurrentBpm" MinDigits="3" Digits="number_blue" Point="number_blue_point">
+			<Destination Rect="208, 6, 304, 32"/>
+		</Number>
+	</Group>
+
+	<Image Name="StageFile" Texture="#STAGEFILE">
+		<Destination Rect="0, 28, 0, 180"/>
+	</Image>
+
+	<Group Name="Text Info">
+		<Destination X="$Variables.title_x" Y="48" Width="$Variables.title_width" Height="160"/>
+
+		<Text FontFamily="VL PGothic" FontSize="28" FontWeight="Bold" Content="$Variables.Genre" StrokeThickness="4" MaxWidth="$Variables.title_width">
+			<Destination Y="16" OriginY="0.5"/>
+		</Text>
+		<Text FontFamily="VL PGothic" FontSize="44" FontWeight="Bold" Content="$Variables.FullTitle" StrokeThickness="6" MaxWidth="$Variables.title_width">
+			<Destination Y="56" OriginY="0.5"/>
+		</Text>
+		<Text FontFamily="VL PGothic" FontSize="28" FontWeight="Bold" Content="$Variables.FullArtist" StrokeThickness="4" MaxWidth="$Variables.title_width">
+			<Destination Y="100" OriginY="0.5"/>
+		</Text>
+<!--
+		<Text FontFamily="VL PGothic" FontSize="28" FontWeight="Bold" StrokeThickness="4" Content="Lv">
+			<Destination X="32" Y="156" Origin="1, 1"/>
+		</Text>
+		<Text FontFamily="VL PGothic" FontSize="28" FontWeight="Bold" StrokeThickness="4" Content="Rank">
+			<Destination X="196" Y="156" Origin="1, 1"/>
+		</Text>
+		<Text FontFamily="VL PGothic" FontSize="28" FontWeight="Bold" StrokeThickness="4" Content="Notes">
+			<Destination X="392" Y="156" Origin="1, 1"/>
+		</Text>
+		<Text FontFamily="VL PGothic" FontSize="28" FontWeight="Bold" StrokeThickness="4" Content="Total">
+			<Destination X="652" Y="156" Origin="1, 1"/>
+		</Text>
+-->
+
+		<Image Texture="letter_lv">
+			<Destination X="36" Y="152" Origin="1, 1"/>
+		</Image>
+		<Image Texture="letter_rank">
+			<Destination X="200" Y="152" Origin="1, 1"/>
+		</Image>
+		<Image Texture="letter_notes">
+			<Destination X="396" Y="152" Origin="1, 1"/>
+		</Image>
+		<Image Texture="letter_total">
+			<Destination X="656" Y="152" Origin="1, 1"/>
+		</Image>
+
+		<Number Value="$Variables.PlayLevel" MinDigits="2" Digits="number_level">
+			<Destination Rect="36, 152, 96, 32" OriginY="1"/>
+		</Number>
+		<Image Texture="number_rank">
+			<Destination Rect="200, 152, 128, 32" OriginY="1"/>
+		</Image>
+		<Number Value="$Variables.TotalNotes" MinDigits="3" Digits="number_white" Point="number_white_point">
+			<Destination Rect="396, 152, 192, 32" OriginY="1"/>
+		</Number>
+		<Number Value="$Variables.Total" MinDigits="3" Digits="number_white" Point="number_white_point">
+			<Destination Rect="656, 152, 320, 32" OriginY="1"/>
+		</Number>
+
+		<Text FontFamily="VL PGothic" FontSize="28" FontWeight="Bold" StrokeThickness="4" Content="$Variables.FullTime">
+			<Destination X="$Variables.title_width" Y="156" Origin="1,1"/>
+		</Text>
+	</Group>
+</IncludeSkin>

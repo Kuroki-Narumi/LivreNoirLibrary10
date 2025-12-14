@@ -168,7 +168,7 @@ namespace LivreNoirLibrary.Windows.Controls.Bms.Elements
                     Angle = a;
                     RotateOriginX = aox;
                     RotateOriginY = aoy;
-                    IsVisible = true;
+                    IsVisible = op is > 0;
                     return;
                 }
             }

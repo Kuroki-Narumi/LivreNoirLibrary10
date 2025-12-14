@@ -1,4 +1,6 @@
-<PlaySkin Name="BGA Only" KeyCount="5 7 10 14 9 18 24 48" Version="1.0" BaseSize="1280, 720" Background="#000">
+<PlaySkin Name="BGA Only" 
+		  KeyCount="5 7 10 14 9 18 24 48" Version="1.0" BaseSize="1280, 720" Background="#000"
+		  FadeInTime="0" FadeOutTime="0" LoadTime="0" ReadyTime="0" MarginTime="0">
 	<Bga Name="BGA">
 		<Destination Rect="0, 0, 1280, 720"/>
 	</Bga>

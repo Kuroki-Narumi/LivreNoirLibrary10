@@ -21,6 +21,8 @@ namespace LivreNoirLibrary.Windows.Media.Bms.SkinInfo
         public ValueExpression? DivY { get => field ?? _base?.DivY; set => SetValue(ref field, value, [nameof(Division)]); }
         public ValueExpression? LoopPeriod { get => field ?? _base?.LoopPeriod; set => SetValue(ref field, value); }
 
+        public override string ToString() => $"{nameof(Texture)}{{Key={Key}, {(string.IsNullOrEmpty(BasedOn) ? "" : $"BasedOn={BasedOn}, ")}Source={Source}, Rect=({X}, {Y}, {Width}, {Height}), Div=({DivX}, {DivY}), LoopPeriod={LoopPeriod}}}";
+
         public string Rect { get => this.GetRectText(); set => this.SetRectText(value); }
 
         public string Division

@@ -10,5 +10,7 @@ namespace LivreNoirLibrary.Windows.Media.Bms.SkinInfo
         public ValueExpression? Source { get; set => SetValue(ref field, value); }
         public ValueExpression? DefaultValue { get; set => SetValue(ref field, value); }
         public ConvertCollection Converters { get; } = [];
+
+        public override string ToString() => $"{nameof(Variable)}{{Key={Key}, Source={Source}, DefaultValue={DefaultValue}}}";
     }
 }

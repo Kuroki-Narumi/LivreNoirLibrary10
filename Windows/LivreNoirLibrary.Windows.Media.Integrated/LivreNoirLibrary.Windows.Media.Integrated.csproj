@@ -45,19 +45,34 @@
 	    <Generator></Generator>
 	    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 	  </None>
-	  <None Update="Themes\BmsSkin\Default\bm_beam.png">
+	  <None Update="Themes\BmsSkin\Default\Images\bm_beam.png">
 	    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 	  </None>
-	  <None Update="Themes\BmsSkin\Default\bm_bomb.png">
+	  <None Update="Themes\BmsSkin\Default\Images\bm_bomb.png">
 	    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 	  </None>
-	  <None Update="Themes\BmsSkin\Default\bm_judge.png">
+	  <None Update="Themes\BmsSkin\Default\Includes\common_textures_bm.xml">
 	    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 	  </None>
-	  <None Update="Themes\BmsSkin\Default\numbers.png">
+	  <None Update="Themes\BmsSkin\Default\Images\bm_judge.png">
 	    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 	  </None>
-	  <None Update="Themes\BmsSkin\Default\skin_bm.png">
+	  <None Update="Themes\BmsSkin\Default\Includes\common_textures_number.xml">
+	    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+	  </None>
+	  <None Update="Themes\BmsSkin\Default\Includes\include_7key_1p_right.xml">
+	    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+	  </None>
+	  <None Update="Themes\BmsSkin\Default\Includes\include_7key_1p_left.xml">
+	    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+	  </None>
+	  <None Update="Themes\BmsSkin\Default\Images\numbers.png">
+	    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+	  </None>
+	  <None Update="Themes\BmsSkin\Default\Images\skin_bm.png">
+	    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+	  </None>
+	  <None Update="Themes\BmsSkin\Default\Includes\include_info.xml">
 	    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 	  </None>
 	</ItemGroup>

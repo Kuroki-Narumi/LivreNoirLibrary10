@@ -10,6 +10,22 @@ namespace LivreNoirLibrary.Windows.Media.Bms.SkinInfo
 
         public double Value { get; set => SetValue(ref field, double.IsNaN(value) ? value : Math.Clamp(value, Minimum, Maximum)); } = double.NaN;
 
+        public double TickFrequency { get; set => SetValue(ref field, value); }
+        public string? StringFormat { get; set => SetValue(ref field, value); }
+
         public override string? SelectedValue => $"{(double.IsNaN(Value) ? DefaultValue : Value)}";
+
+        public void ValidateValue()
+        {
+            if (double.IsNaN(Value))
+            {
+                Value = DefaultValue;
+            }
+        }
+
+        public override void SetDefaultValue()
+        {
+            Value = DefaultValue;
+        }
     }
 }

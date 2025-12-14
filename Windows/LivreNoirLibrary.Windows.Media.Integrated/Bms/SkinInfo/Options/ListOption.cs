@@ -7,6 +7,8 @@ namespace LivreNoirLibrary.Windows.Media.Bms.SkinInfo
     [ContentProperty(nameof(Items))]
     public sealed class ListOption : OptionBase
     {
+        private int _defaultIndex = -1;
+
         public int SelectedIndex
         {
             get;
@@ -57,8 +59,13 @@ namespace LivreNoirLibrary.Windows.Media.Bms.SkinInfo
         {
             if (SelectedIndex is < 0 && e.NewItems is not null && e.NewItems[0] is Option { IsDefault: true })
             {
-                SelectedIndex = e.NewStartingIndex;
+                SelectedIndex = _defaultIndex = e.NewStartingIndex;
             }
+        }
+
+        public override void SetDefaultValue()
+        {
+            SelectedIndex = _defaultIndex;
         }
     }
 

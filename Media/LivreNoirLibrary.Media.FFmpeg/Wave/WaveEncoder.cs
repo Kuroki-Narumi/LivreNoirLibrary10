@@ -53,8 +53,8 @@ namespace LivreNoirLibrary.Media.Wave
             if (outRate != inRate || outChannels != inChannels)
             {
                 _swrContext = FFmpegUtils.CreateSwrContext(
-                    outChannels, OutputSampleFormat, inRate,
-                    inChannels, InputSampleFormat, outRate);
+                    outChannels, OutputSampleFormat, outRate,
+                    inChannels, InputSampleFormat, inRate);
             }
             else
             {

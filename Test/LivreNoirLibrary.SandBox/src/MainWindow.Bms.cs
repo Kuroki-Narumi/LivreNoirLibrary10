@@ -24,7 +24,12 @@ namespace LivreNoirLibrary.SandBox
         public SkinCollection BmsSkins { get; }
 
         public static HsCorrectionMode[] HsCorrectionModes => BmsExtensions.HsCorrectionModes;
-        public static readonly Rational[] FpsList = [FrameRates.Fps24, FrameRates.Fps30, FrameRates.Fps60, FrameRates.Fps120, FrameRates.Fps144];
+        public static Rational[] FpsList { get; } = [FrameRates.Fps24, FrameRates.Fps30, FrameRates.Fps60, FrameRates.Fps120, FrameRates.Fps144];
+
+        private void OnClick_SkinOptions(object sender, RoutedEventArgs e)
+        {
+            SkinOptionView.Open(BmsScreen.Skin!);
+        }
 
         private void OnDragOver_Bms(object sender, DragEventArgs e)
         {

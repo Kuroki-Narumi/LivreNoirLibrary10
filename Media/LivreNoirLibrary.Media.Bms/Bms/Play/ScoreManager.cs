@@ -11,6 +11,8 @@ namespace LivreNoirLibrary.Media.Bms.Play
 
         public IJudgeProvider JudgeProvider { get; set => SetValue(ref field, value); } = judgeProvider;
 
+        public int MaxNoteCount { get; set => SetValue(ref field, value); }
+        public int CurrentNoteCount { get; private set => SetValue(ref field, value); }
         public int Combo { get; set => SetValue(ref field, value); }
         public int MaxCombo { get; set => SetValue(ref field, value); }
         public JudgeType JudgeType { get; set => SetValue(ref field, value); }
@@ -23,6 +25,8 @@ namespace LivreNoirLibrary.Media.Bms.Play
 
         public void Clear()
         {
+            MaxNoteCount = 0;
+            CurrentNoteCount = 0;
             Combo = 0;
             MaxCombo = 0;
             JudgeType = 0;
@@ -39,6 +43,10 @@ namespace LivreNoirLibrary.Media.Bms.Play
                 case ComboChange.Increase:
                     Combo++;
                     MaxCombo = Math.Max(MaxCombo, Combo);
+                    if (++CurrentNoteCount == MaxNoteCount)
+                    {
+                        timer.Set(TimerId.Play_FullCombo, absoluteTime);
+                    }
                     break;
                 case ComboChange.Reset:
                     Combo = 0;

@@ -10,24 +10,26 @@ namespace LivreNoirLibrary.Windows.Controls.Bms
 {
     public class NoteElementCollection : ObservableObjectBase
     {
-        private readonly List<NoteInfo> _children = [];
+        private readonly List<NoteInfo> _notes = [];
         private readonly List<BarLineInfo> _barLines = [];
         private readonly List<NoteInfo> _visible = [];
-        private readonly TimerInfoList _timers = [];
+        private readonly TimerInfoList _timers = new();
         private int _barStart;
         private int _barLength;
 
+        public int NoteCount { get; private set; }
         public ReadOnlySpan<NoteInfo> VisibleChildren => _visible.AsSpan();
         public ReadOnlySpan<BarLineInfo> BarLines => _barLines.AsSpan().Slice(_barStart, _barLength);
 
         public void Setup(TimingList timings)
         {
             var bars = _barLines;
-            var children = _children;
+            var notes = _notes;
             var timers = _timers;
             bars.Clear();
-            children.Clear();
+            notes.Clear();
             timers.Clear();
+            var noteCount = 0;
             foreach (var (channel, time, info) in timings.KeyInfos)
             {
                 var startPos = (double)timings.Time2Position(time);
@@ -49,21 +51,24 @@ namespace LivreNoirLibrary.Windows.Controls.Bms
                     if (info.Length is > 0)
                     {
                         var endPos = (double)timings.Time2Position(end);
-                        children.Add(new(lane, time, end, startPos, endPos - startPos, info.IsMine));
+                        notes.Add(new(lane, time, end, startPos, endPos - startPos, info.IsMine));
                         timers.AddRelease(id + TimerIdOffsets.Release, id + TimerIdOffsets.Press, end);
                         timers.Add(id + TimerIdOffsets.LongBomb, time);
+                        noteCount++;
                     }
                     else
                     {
-                        children.Add(new(lane, time, time, startPos, 0, info.IsMine));
+                        notes.Add(new(lane, time, time, startPos, 0, info.IsMine));
                         if (isVisible)
                         {
                             timers.AddRelease(id + TimerIdOffsets.Release, id + TimerIdOffsets.Press, time + 0.01);
+                            noteCount++;
                         }
                     }
                 }
             }
-            bars.Sort(new BarLineInfoComparer());
+            NoteCount = noteCount;
+            bars.Sort(BarLineInfoComparer.Instance);
         }
 
         // kari
@@ -83,7 +88,7 @@ namespace LivreNoirLibrary.Windows.Controls.Bms
             {
                 var start = timings.Time2Position(currentTime);
                 var end = start + 1 / args.HighSpeed;
-                foreach (var child in _children.AsSpan())
+                foreach (var child in _notes.AsSpan())
                 {
                     if (child.EndTime < currentTime)
                     {
@@ -125,37 +130,59 @@ namespace LivreNoirLibrary.Windows.Controls.Bms
             public bool IsProcessed { get; set; }
         }
 
-        public class TimerInfoList : Dictionary<TimerId, TimerInfo>
+        public class TimerInfoList
         {
-            public void Add(TimerId id, double value) => this.GetOrAdd(id).Add(value);
+            private readonly Dictionary<TimerId, TimerInfo> _dic = [];
+
+            public void Clear()
+            {
+                foreach (var (_, list) in _dic)
+                {
+                    list.Clear();
+                }
+            }
+
+            public void Add(TimerId id, double value) => _dic.GetOrAdd(id).Add(value);
 
             public void AddRelease(TimerId releaseId, TimerId pressId, double value)
             {
-                var list = this.GetOrAdd(releaseId);
+                var list = _dic.GetOrAdd(releaseId);
                 list.Add(value);
                 list.ConflictId = pressId;
             }
 
             public void Advance(BmsTimer timer, double relativeTime, double offset)
             {
-                foreach (var (id, list) in this)
+                foreach (var (id, list) in _dic)
                 {
                     list.Advance(timer, id, relativeTime, offset);
                 }
             }
         }
 
-        public class TimerInfo : List<double>
+        public class TimerInfo
         {
+            private readonly List<double> _list = [];
+
             public TimerId ConflictId { get; set; }
             private int _index = 0;
+
+            public void Clear()
+            {
+                _list.Clear();
+                _index = 0;
+            }
+
+            public void Add(double value) => _list.Add(value);
 
             public void Advance(BmsTimer timer, TimerId id, double relativeTime, double offset)
             {
                 var index = _index;
-                for (; index < Count; index++)
+                var list = _list;
+                var count = list.Count;
+                for (; index < count; index++)
                 {
-                    if (this[index] <= relativeTime)
+                    if (list[index] <= relativeTime)
                     {
                         timer.Set(id, relativeTime + offset);
                         if (ConflictId is not 0)
@@ -177,8 +204,12 @@ namespace LivreNoirLibrary.Windows.Controls.Bms
             public double RelativePosition { get; set; }
         }
 
-        private readonly struct BarLineInfoComparer : IComparer<BarLineInfo>, IComparer<BarLineInfo, double>
+        private class BarLineInfoComparer : IComparer<BarLineInfo>, IComparer<BarLineInfo, double>
         {
+            public static BarLineInfoComparer Instance { get; } = new();
+
+            private BarLineInfoComparer() { }
+
             public int Compare(BarLineInfo? x, BarLineInfo? y) => x!.Position.CompareTo(y!.Position);
             public static int Compare(BarLineInfo x, double y) => x.Position.CompareTo(y);
             public static bool IsXCloserThanY(BarLineInfo x, BarLineInfo y, double z) => x.Position + y.Position < z * 2;

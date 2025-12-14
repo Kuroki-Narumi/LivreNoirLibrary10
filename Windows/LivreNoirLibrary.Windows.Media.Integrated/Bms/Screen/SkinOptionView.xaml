@@ -1,0 +1,79 @@
+﻿<ct:CenteringPanelChildBase x:Class="LivreNoirLibrary.Windows.Controls.Bms.SkinOptionView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:ct="clr-namespace:LivreNoirLibrary.Windows.Controls;assembly=LivreNoirLibrary.Windows.Controls"
+             xmlns:input="clr-namespace:LivreNoirLibrary.Windows.Input;assembly=LivreNoirLibrary.Windows.Core"
+             xmlns:skin="clr-namespace:LivreNoirLibrary.Windows.Media.Bms.SkinInfo"
+             mc:Ignorable="d" FontSize="14" UseLayoutRounding="True">
+    <Control.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="pack://application:,,,/LivreNoirLibrary.Windows.Controls;component/Themes/Generic.xaml"/>
+            </ResourceDictionary.MergedDictionaries>
+            <Style TargetType="TextBlock" x:Key="Header">
+                <Setter Property="Margin" Value="0,4,4,4"/>
+                <Setter Property="VerticalAlignment" Value="Center"/>
+                <Setter Property="HorizontalAlignment" Value="Right"/>
+                <Style.Triggers>
+                    <Trigger Property="Text" Value="">
+                        <Setter Property="Visibility" Value="Collapsed"/>
+                    </Trigger>
+                </Style.Triggers>
+            </Style>
+            <Style TargetType="TextBlock" x:Key="Suffix">
+                <Setter Property="Margin" Value="0"/>
+                <Setter Property="VerticalAlignment" Value="Center"/>
+                <Setter Property="HorizontalAlignment" Value="Left"/>
+                <Setter Property="Grid.Column" Value="2"/>
+                <Style.Triggers>
+                    <Trigger Property="Text" Value="">
+                        <Setter Property="Visibility" Value="Collapsed"/>
+                    </Trigger>
+                </Style.Triggers>
+            </Style>
+            <Style TargetType="ComboBox" x:Key="ListOption" BasedOn="{StaticResource ComboBoxBase}">
+                <Setter Property="AlternationCount" Value="2"/>
+                <Setter Property="Margin" Value="0,2,4,2"/>
+                <Setter Property="Grid.Column" Value="1"/>
+                <Setter Property="HorizontalAlignment" Value="Stretch"/>
+                <Setter Property="ItemContainerStyle" Value="{StaticResource Alt2ListBoxItemContainerStyle}"/>
+                <Setter Property="ItemTemplate">
+                    <Setter.Value>
+                        <DataTemplate DataType="skin:Option">
+                            <TextBlock Text="{Binding Value}"/>
+                        </DataTemplate>
+                    </Setter.Value>
+                </Setter>
+                <EventSetter Event="PreviewMouseWheel" Handler="OnPreviewMouseWheel_ComboBox"/>
+            </Style>
+            <Style TargetType="ct:LabeledSlider" x:Key="RangeOption">
+                <Setter Property="Margin" Value="0,2,4,2"/>
+                <Setter Property="Grid.Column" Value="1"/>
+                <Setter Property="SliderWidth" Value="100"/>
+                <Setter Property="IsTextEditable" Value="True"/>
+                <Setter Property="TextWidth" Value="48"/>
+            </Style>
+            <Style TargetType="Border" x:Key="Separator">
+                <Setter Property="Margin" Value="4,2"/>
+                <Setter Property="Height" Value="1"/>
+                <Setter Property="Background" Value="Gray"/>
+                <Setter Property="BorderThickness" Value="0"/>
+                <Setter Property="Grid.ColumnSpan" Value="3"/>
+                <Setter Property="Opacity" Value="0.5"/>
+            </Style>
+        </ResourceDictionary>
+    </Control.Resources>
+    <Grid RowDefinitions="Auto, Auto, *" Background="White">
+        <Grid Margin="4,4,4,2" ColumnDefinitions="*, Auto">
+            <TextBlock Text="Skin Options" Margin="4,0" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+            <ct:Button Grid.Column="1" Icon="{x:Static ct:Icons.Update_Mono}" Content="Default" Click="OnClick_Default"/>
+        </Grid>
+        <Border Grid.Row="1" Style="{StaticResource Separator}"/>
+        <ScrollViewer Padding="4,2,4,4" Grid.Row="2" HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto">
+            <StackPanel x:Name="MainPanel" Grid.IsSharedSizeScope="True">
+            </StackPanel>
+        </ScrollViewer>
+    </Grid>
+</ct:CenteringPanelChildBase>

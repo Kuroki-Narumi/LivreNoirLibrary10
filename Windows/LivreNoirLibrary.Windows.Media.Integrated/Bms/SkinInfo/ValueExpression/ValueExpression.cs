@@ -13,6 +13,11 @@ namespace LivreNoirLibrary.Windows.Media.Bms.SkinInfo
 
         public ValueExpression() { }
 
+        public ValueExpression(double value)
+        {
+            Value = value.ToString();
+        }
+
         public ValueExpression(string text)
         {
             var match = GR_Parser.Match(text);
@@ -34,6 +39,8 @@ namespace LivreNoirLibrary.Windows.Media.Bms.SkinInfo
                 Value = text;
             }
         }
+
+        public static implicit operator ValueExpression(double value) => new(value);
 
         public override string ToString() => Type is 0 ? $"{Value}" : $"${Type}.{Key}";
 

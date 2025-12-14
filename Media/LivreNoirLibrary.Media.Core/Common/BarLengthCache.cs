@@ -77,11 +77,10 @@ namespace LivreNoirLibrary.Media
                 return new(index + 1, 0);
             }
             // 指定値より値の大きい最初の要素のインデックス(存在しない場合はリストの長さに等しい)
-            index = ~index;
-            // 実際の小節番号
-            var number = index - 1;
+            // = 指定値の直後の小節番号 - 1 = 指定値の直前の小節番号
+            var number = ~index;
             // 指定値の直前の小節線の絶対時刻
-            var total = index is 0 ? T.Zero : cache[number];
+            var total = number is 0 ? T.Zero : cache[number - 1];
             absolutePosition -= total;
             var length = provider.GetBarLength(number);
             // 指定値の残り部分が小節長以上である限り
