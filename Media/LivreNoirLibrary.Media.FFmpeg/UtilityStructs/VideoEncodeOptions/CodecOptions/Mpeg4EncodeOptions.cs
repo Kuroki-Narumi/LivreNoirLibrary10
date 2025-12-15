@@ -6,7 +6,7 @@ namespace LivreNoirLibrary.Media.FFmpeg
         public const int DefaultMaxBFrames = 3;
         public const int MaxBFrames_Min = 0;
         public const int MaxBFrames_Max = 16;
-        public const Mpeg4Preset DefaultPreset = Mpeg4Preset.medium;
+        public const Mpeg4Preset DefaultPreset = Mpeg4Preset.slow;
 
         public const int DefaultCrf = 26;
         public const int Crf_Min = -1;
@@ -36,5 +36,7 @@ namespace LivreNoirLibrary.Media.FFmpeg
                 dic["vbv-bufsize"] = VbvBufferSize.ToString();
             }
         }
+
+        public abstract bool EnsureLevel(int width, int height, double fps, int kbps);
     }
 }

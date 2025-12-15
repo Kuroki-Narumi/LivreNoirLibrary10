@@ -21,7 +21,7 @@
 		<Texture Key="judgeline" BasedOn="skin_bm" Rect="296, 69, 24, 2"/>
 
 		<Texture Key="ready1" BasedOn="skin_bm" Rect="0,128,144,40" />
-		<Texture Key="ready2" BasedOn="skin_bm" Rect="0,168,144,40" />
+		<Texture Key="ready2" BasedOn="skin_bm" Rect="144,128,144,40" />
 		<Texture Key="notes_beat" BasedOn="skin_bm" Rect="0, 208, 320, 48"/>
 
 		<Texture Key="note_red" BasedOn="skin_bm" Rect="0, 64, 60, 8"/>
@@ -63,5 +63,8 @@
 
 		<Texture Key="judge_number_perfect" BasedOn="judge" Rect="120, 0, 240, 144" DivY="3" LoopPeriod="0.125"/>
 		<Texture Key="judge_number" BasedOn="judge" Rect="120, 144, 240, 96" DivY="2" LoopPeriod="0.125"/>
+		
+		<Texture Key="fullcombo_text" BasedOn="skin_bm" Rect="0,168,256,32" />
+		<Texture Key="fullcombo_effect" BasedOn="skin_bm" Rect="0,256,320,256" />
 	</Skin.Textures>
 </IncludeSkin>

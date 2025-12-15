@@ -23,6 +23,10 @@ namespace LivreNoirLibrary.Media.FFmpeg
         L4_2,
         L5,
         L5_1,
+        L5_2,
+        L6,
+        L6_1,
+        L6_2,
     }
 
     public static partial class FFmpegUtils
@@ -45,6 +49,10 @@ namespace LivreNoirLibrary.Media.FFmpeg
             { H264Level.L4_2, "4.1" },
             { H264Level.L5, "5" },
             { H264Level.L5_1, "5.1" },
+            { H264Level.L5_2, "5.1" },
+            { H264Level.L6, "6" },
+            { H264Level.L6_1, "6.1" },
+            { H264Level.L6_2, "6.2" },
         };
 
         public static bool TryToString(this H264Level value, [MaybeNullWhen(false)] out string name) => _h264_level.TryGetValue(value, out name);

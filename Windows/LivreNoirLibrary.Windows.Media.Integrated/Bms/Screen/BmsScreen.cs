@@ -241,12 +241,6 @@ namespace LivreNoirLibrary.Windows.Controls.Bms
             DebugText = null;
         }
 
-        public void FinishLoading(double time)
-        {
-            Timer.Remove(TimerId.Play_LoadingStart);
-            Timer.Set(TimerId.Play_LoadingFinish, time);
-        }
-
         public void Update(double time)
         {
             if (_skin is { } skin)

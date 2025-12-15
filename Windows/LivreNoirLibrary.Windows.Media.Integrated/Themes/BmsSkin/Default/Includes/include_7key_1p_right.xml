@@ -2,6 +2,7 @@
 <IncludeSkin>
 	<Skin.Includes>
 		<IncludeSource Key="common_textures_bm" Source="common_textures_bm"/>
+		<IncludeSource Key="include_7key_effect" Source="include_7key_effect"/>
 	</Skin.Includes>
 	<Image Name="Background" Texture="background_2p">
 		<Destination Rect="32, 0, 320, 512"/>
@@ -223,15 +224,5 @@
 		<Destination X="192" Y="360" Origin="0.5, 0.5"/>
 	</Judge>
 
-	<Image Texture="ready2" DestTimer="Play_LoadingFinish" DestLoopStart="-1">
-		<Destination X="192" Y="360" Origin="0.5, 0.5" Opacity="1"/>
-		<Destination Time="1" Opacity="1"/>
-		<Destination Time="1.5" Opacity="0"/>
-	</Image>
-
-	<Image Texture="ready1" DestTimer="Play_LoadingFinish" DestLoopStart="-1">
-		<Destination X="192" Y="360" Origin="0.5, 0.5" Opacity="0"/>
-		<Destination Time="0.1" Opacity="1"/>
-		<Destination Time="0.3" Opacity="0"/>
-	</Image>
+	<Include Key="include_7key_effect" />
 </IncludeSkin>

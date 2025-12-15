@@ -74,16 +74,6 @@ namespace LivreNoirLibrary.Media.Bms
             }
         }
 
-        public static readonly HsCorrectionMode[] HsCorrectionModes =
-        [
-            HsCorrectionMode.None,
-            HsCorrectionMode.MaxBpm,
-            HsCorrectionMode.MinBpm,
-            HsCorrectionMode.AverageBpm,
-            HsCorrectionMode.MainBpm,
-            HsCorrectionMode.MainTimeBpm,
-        ];
-
         extension(IHighSpeedProvider obj)
         {
             public double ActualHighSpeed => obj.HighSpeed * obj.HighSpeedCorrection;

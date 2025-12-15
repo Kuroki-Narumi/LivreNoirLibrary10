@@ -51,6 +51,9 @@
 	  <None Update="Themes\BmsSkin\Default\Images\bm_bomb.png">
 	    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 	  </None>
+	  <None Update="Themes\BmsSkin\Default\Includes\include_7key_effect.xml">
+	    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+	  </None>
 	  <None Update="Themes\BmsSkin\Default\Includes\common_textures_bm.xml">
 	    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 	  </None>

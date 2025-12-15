@@ -2,10 +2,8 @@
 using LivreNoirLibrary.Media;
 using LivreNoirLibrary.Media.Bms;
 using LivreNoirLibrary.Media.Bms.Play;
-using LivreNoirLibrary.Numerics;
 using LivreNoirLibrary.Windows.Media.Bms.SkinInfo;
 using System;
-using System.Numerics;
 using DrRect = System.Drawing.Rectangle;
 
 namespace LivreNoirLibrary.Windows.Controls.Bms.Elements

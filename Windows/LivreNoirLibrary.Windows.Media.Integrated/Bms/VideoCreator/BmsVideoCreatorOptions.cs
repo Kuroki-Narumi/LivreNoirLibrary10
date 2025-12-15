@@ -7,7 +7,7 @@ using System;
 
 namespace LivreNoirLibrary.Windows.Media.Bms
 {
-    public class BmsVideoCreateOptions : BmsPlayOptions
+    public class BmsVideoCreatorOptions : BmsPlayOptions, IBmsVideoCreatorOptions
     {
         public Rational FrameRate { get; set => SetValue(ref field, value); } = FrameRates.Fps60;
         public bool IsHevc { get; set => SetValue(ref field, value); } = false;

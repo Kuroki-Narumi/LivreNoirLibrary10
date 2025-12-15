@@ -58,43 +58,31 @@
 		<Text FontFamily="VL PGothic" FontSize="28" FontWeight="Bold" Content="$Variables.FullArtist" StrokeThickness="4" MaxWidth="$Variables.title_width">
 			<Destination Y="100" OriginY="0.5"/>
 		</Text>
-<!--
-		<Text FontFamily="VL PGothic" FontSize="28" FontWeight="Bold" StrokeThickness="4" Content="Lv">
-			<Destination X="32" Y="156" Origin="1, 1"/>
-		</Text>
-		<Text FontFamily="VL PGothic" FontSize="28" FontWeight="Bold" StrokeThickness="4" Content="Rank">
-			<Destination X="196" Y="156" Origin="1, 1"/>
-		</Text>
-		<Text FontFamily="VL PGothic" FontSize="28" FontWeight="Bold" StrokeThickness="4" Content="Notes">
-			<Destination X="392" Y="156" Origin="1, 1"/>
-		</Text>
-		<Text FontFamily="VL PGothic" FontSize="28" FontWeight="Bold" StrokeThickness="4" Content="Total">
-			<Destination X="652" Y="156" Origin="1, 1"/>
-		</Text>
--->
-
+		
 		<Image Texture="letter_lv">
 			<Destination X="36" Y="152" Origin="1, 1"/>
 		</Image>
-		<Image Texture="letter_rank">
-			<Destination X="200" Y="152" Origin="1, 1"/>
-		</Image>
-		<Image Texture="letter_notes">
-			<Destination X="396" Y="152" Origin="1, 1"/>
-		</Image>
-		<Image Texture="letter_total">
-			<Destination X="656" Y="152" Origin="1, 1"/>
-		</Image>
-
 		<Number Value="$Variables.PlayLevel" MinDigits="2" Digits="number_level">
 			<Destination Rect="36, 152, 96, 32" OriginY="1"/>
 		</Number>
+		
+		<Image Texture="letter_rank">
+			<Destination X="200" Y="152" Origin="1, 1"/>
+		</Image>
 		<Image Texture="number_rank">
 			<Destination Rect="200, 152, 128, 32" OriginY="1"/>
+		</Image>
+		
+		<Image Texture="letter_notes">
+			<Destination X="396" Y="152" Origin="1, 1"/>
 		</Image>
 		<Number Value="$Variables.TotalNotes" MinDigits="3" Digits="number_white" Point="number_white_point">
 			<Destination Rect="396, 152, 192, 32" OriginY="1"/>
 		</Number>
+		
+		<Image Texture="letter_total">
+			<Destination X="656" Y="152" Origin="1, 1"/>
+		</Image>
 		<Number Value="$Variables.Total" MinDigits="3" Digits="number_white" Point="number_white_point">
 			<Destination Rect="656, 152, 320, 32" OriginY="1"/>
 		</Number>

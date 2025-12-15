@@ -4,49 +4,27 @@ using LivreNoirLibrary.Media;
 using LivreNoirLibrary.Media.Bms;
 using LivreNoirLibrary.Media.Bms.Play;
 using LivreNoirLibrary.Media.FFmpeg;
-using LivreNoirLibrary.Media.Integrated;
 using LivreNoirLibrary.Media.Wave;
 using LivreNoirLibrary.Numerics;
 using LivreNoirLibrary.ObjectModel;
 using LivreNoirLibrary.Windows;
+using LivreNoirLibrary.Windows.Controls;
 using LivreNoirLibrary.Windows.Controls.Bms;
 using LivreNoirLibrary.Windows.Controls.Bms.Elements;
 using LivreNoirLibrary.Windows.Media;
-using LivreNoirLibrary.Windows.Media.Bms;
-using LivreNoirLibrary.Windows.Media.Bms.SkinInfo;
 using System;
 using System.Buffers;
 using System.Diagnostics;
+using System.Threading;
 
-namespace LivreNoirLibrary.SandBox
+namespace LivreNoirLibrary.Windows.Media.Bms
 {
-    public class BmsVideoCreator(BmsScreen screen, BmsVideoCreateOptions options) : ObservableObjectBase
+    public class BmsVideoCreator(BmsScreen screen, IBmsVideoCreatorOptions options) : ObservableObjectBase
     {
-        public const double QpMinimum = HardwareOptionsBase.QP_Min;
-        public const double QpMaximum = HardwareOptionsBase.QP_Max;
-
         public BmsScreen Screen { get; } = screen;
-        public BmsVideoCreateOptions Options { get; } = options;
+        public IBmsVideoCreatorOptions Options { get; } = options;
 
-        private struct AntiFreeze(ProgressReporter? p)
-        {
-            const long UpdateThreshold = TimeSpan.TicksPerSecond / 30;
-            private readonly bool _isSynchronized = p is not null && p.IsSynchronized;
-            private long _t0 = Stopwatch.GetTimestamp();
-
-            public void WaitForUpdate()
-            {
-                long t1;
-                if (_isSynchronized && (t1 = Stopwatch.GetTimestamp()) - _t0 is >= UpdateThreshold)
-                {
-                    // 画面更新を待つ(フリーズ対策)
-                    DependencyObjectExtensions.WaitForUpdate();
-                    _t0 = t1;
-                }
-            }
-        }
-
-        private double InitializeAudio(int sampleRate, int channels, double delay, ProgressReporter? p, CancellationToken c)
+        private double InitializeAudio(int sampleRate, int channels, double delay, ref AntiFreezeUpdater f, ProgressReporter? p, CancellationToken c)
         {
             var screen = Screen;
             // 演奏時間の算出
@@ -57,7 +35,6 @@ namespace LivreNoirLibrary.SandBox
             var i = 0;
             var count = composer.Timeline.AudioItemCount;
 
-            AntiFreeze f = new(p);
             p?.Report("Initializing Audio");
             foreach (var (wp, time, length, _) in composer.Timeline.Range(0, double.PositiveInfinity))
             {
@@ -80,6 +57,7 @@ namespace LivreNoirLibrary.SandBox
             {
                 try
                 {
+                    var f = new AntiFreezeUpdater();
                     const int rate = 48000;
                     const int ch = 2;
 
@@ -87,14 +65,13 @@ namespace LivreNoirLibrary.SandBox
 
                     var composer = screen.AudioComposer;
                     var offset = screen.FirstSoundTime;
-                    var duration = InitializeAudio(rate, ch, -offset, p, c) - offset;
+                    var duration = InitializeAudio(rate, ch, -offset, ref f, p, c) - offset;
 
                     var bufferSize = rate * ch;
                     var audioBuffer = ArrayPool<float>.Shared.Rent(bufferSize);
                     using WaveEncoder encoder = new(path, new(rate, ch, SampleFormat.Int16));
                     var totalSample = (int)Math.Ceiling(duration * rate) * ch;
 
-                    AntiFreeze f = new(p);
                     for (var time = 0; totalSample is > 0; time += 1, totalSample -= bufferSize)
                     {
                         var span = audioBuffer.AsSpan(0, Math.Min(bufferSize, totalSample));
@@ -121,6 +98,7 @@ namespace LivreNoirLibrary.SandBox
             var screen = Screen;
             if (screen.SkinRoot is PlaySkinRoot skin && screen.IsBmsReady)
             {
+                var f = new AntiFreezeUpdater();
                 const int rate = 48000;
                 const int ch = 2;
 
@@ -132,8 +110,8 @@ namespace LivreNoirLibrary.SandBox
                 var fadeInDuration = skin.FadeInTime.Validate(0);
                 var loadingFinish = skin.LoadTime.Validate(0);
                 var musicStart = loadingFinish + skin.ReadyTime.Validate(0);
-                var musicLength = InitializeAudio(rate, ch, musicStart, p, c);
-                // タイマー
+                var musicLength = InitializeAudio(rate, ch, musicStart, ref f, p, c);
+
                 var totalTime = musicStart + Math.Max(musicLength, screen.LastSoundTime + skin.MarginTime.Validate(0));
                 var fadeOutDuration = skin.FadeOutTime.Validate(0);
                 var fadeOutStart = totalTime - fadeOutDuration;
@@ -150,12 +128,18 @@ namespace LivreNoirLibrary.SandBox
 
                 // エンコーダー
                 var (width, height) = skin.BaseSize;
-                using FFmpegEncoder encoder = new(path);
                 var fps = options.FrameRate;
                 var (fps_num, fps_den) = fps;
-                ICodecOptions codecOptions = options.IsHevc ? new HevcEncodeOptions() : new H264EncodeOptions();
+                var kbps = options.ApproximateKbps;
+                Mpeg4EncodeOptions codecOptions = options.IsHevc ? new HevcEncodeOptions() : new H264EncodeOptions();
+                if (!codecOptions.EnsureLevel(width, height, (double)fps, kbps))
+                {
+                    ExConsole.Write($"!ERROR: video size is too large ({width}x{height} {(double)fps}fps {kbps}kbps)");
+                    return;
+                }
+                using FFmpegEncoder encoder = new(path);
                 IHardwareEncodeOptions? hardwareOptions = new NvencEncodeOptions() { QP = options.QP };
-                VideoEncodeOptions videoOptions = new(width, height, fps, options.ApproximateKbps * 1000, codecOptions, hardwareOptions);
+                VideoEncodeOptions videoOptions = new(width, height, fps, kbps * 1000, codecOptions, hardwareOptions);
                 encoder.CreateVideoStream(videoOptions);
                 encoder.CreateAudioStream(new AudioEncodeOptions(rate, 2));
 
@@ -169,8 +153,7 @@ namespace LivreNoirLibrary.SandBox
                 {
                     // デバッグ用
                     var t0 = Stopwatch.GetTimestamp();
-                    var totalFrameUnit = (long)Math.Ceiling(totalTime * fps_num);
-                    AntiFreeze f = new(p);
+                    var totalFrameUnit = (long)Math.Ceiling(totalTime * fps_num) + fps_den;
                     for (var frame = 0L; frame < totalFrameUnit; )
                     {
                         var frameMax = Math.Min(totalFrameUnit, frame + fps_num);
@@ -179,16 +162,16 @@ namespace LivreNoirLibrary.SandBox
                         for (; frame < frameMax; frame += fps_den)
                         {
                             var time = (double)frame / fps_num;
-
+                            // フェード処理
                             screen.FadeOpacity = 
                                 time <= fadeInDuration ? 1 - time / fadeInDuration
                                 : time >= fadeOutStart ? (time - fadeOutStart) / fadeOutDuration 
                                 : 0;
-
                             // ロード画面を消す処理
                             if (needLoadingFinish && time >= loadingFinish)
                             {
-                                screen.FinishLoading(loadingFinish);
+                                timer.Remove(TimerId.Play_LoadingStart);
+                                timer.Set(TimerId.Play_LoadingFinish, time);
                                 needLoadingFinish = false;
                             }
 

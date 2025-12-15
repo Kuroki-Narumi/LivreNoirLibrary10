@@ -18,13 +18,22 @@ namespace LivreNoirLibrary.SandBox
 {
     public partial class MainWindow
     {
-        public BmsVideoCreateOptions BmsOptions { get; }
+        public BmsVideoCreatorOptions BmsOptions { get; }
         public BmsScreen BmsScreen { get; }
         public BmsVideoCreator BmsVideoCreator { get; }
         public SkinCollection BmsSkins { get; }
 
-        public static HsCorrectionMode[] HsCorrectionModes => BmsExtensions.HsCorrectionModes;
-        public static Rational[] FpsList { get; } = [FrameRates.Fps24, FrameRates.Fps30, FrameRates.Fps60, FrameRates.Fps120, FrameRates.Fps144];
+        public static HsCorrectionMode[] HsCorrectionModes { get; } =
+        [
+            HsCorrectionMode.None,
+            HsCorrectionMode.MaxBpm,
+            HsCorrectionMode.MinBpm,
+            HsCorrectionMode.AverageBpm,
+            HsCorrectionMode.MainBpm,
+            HsCorrectionMode.MainTimeBpm,
+        ];
+
+        public static Rational[] FpsList { get; } = [FrameRates.Fps24, FrameRates.Fps30, FrameRates.Fps60, FrameRates.Fps120];
 
         private void OnClick_SkinOptions(object sender, RoutedEventArgs e)
         {

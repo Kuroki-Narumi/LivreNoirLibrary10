@@ -33,7 +33,7 @@ namespace LivreNoirLibrary.SandBox
             this.RegisterCommand(ApplicationCommands.Save, OnExecuted_Save);
 
             BmsSkins = new();
-            BmsSkins.Load(Path.GetFullPath(@"Themes\BmsSkin\Default\", General.GetAssemblyDir()));
+            BmsSkins.Load(Path.GetFullPath(@"Themes\BmsSkin\", General.GetAssemblyDir()));
             ComboBox_Skin.ItemsSource = BmsSkins.PlaySkins[0];
             ComboBox_Skin.SelectedIndex = 0;
         }
