@@ -60,7 +60,7 @@ namespace LivreNoirLibrary.Media.Wave
             var chunk = T.LoadContents(reader, ref size);
             if (size % 2 is 1)
             {
-                _ = reader.ReadByte();
+                _ = reader.BaseStream.ReadByte();
             }
             return chunk;
         }

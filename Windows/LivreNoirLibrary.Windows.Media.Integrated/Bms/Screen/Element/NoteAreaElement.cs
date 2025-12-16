@@ -7,6 +7,7 @@ using LivreNoirLibrary.Windows.Media;
 using LivreNoirLibrary.Windows.Media.Bms.SkinInfo;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Windows;
 
 namespace LivreNoirLibrary.Windows.Controls.Bms.Elements

@@ -4,6 +4,7 @@ using System.Runtime.CompilerServices;
 using LivreNoirLibrary.Collections;
 using LivreNoirLibrary.Numerics;
 using LivreNoirLibrary.Debug;
+using System.Diagnostics;
 
 namespace LivreNoirLibrary.Media.FFmpeg
 {

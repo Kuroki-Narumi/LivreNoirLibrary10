@@ -1,9 +1,10 @@
-﻿using System;
+﻿using LivreNoirLibrary.Collections;
+using LivreNoirLibrary.IO;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
 using System.Text.Json;
-using LivreNoirLibrary.Collections;
 
 namespace LivreNoirLibrary.Media.Wave.Chunks
 {
@@ -64,7 +65,7 @@ namespace LivreNoirLibrary.Media.Wave.Chunks
             SMPTEFormat = reader.ReadUInt32();
             reader.Read(SMPTEOffset, 0, 4);
             var dataCount = (int)reader.ReadUInt32();
-            var samplerLength = (int)reader.ReadUInt32();
+            var samplerLength = reader.ReadUInt32();
             var list = DataList;
             for (var i = 0; i < dataCount; i++)
             {
@@ -72,7 +73,7 @@ namespace LivreNoirLibrary.Media.Wave.Chunks
             }
             if (samplerLength > 0)
             {
-                SamplerData = reader.ReadBytes(samplerLength);
+                SamplerData = reader.ReadBytesSafe(samplerLength);
             }
         }
 

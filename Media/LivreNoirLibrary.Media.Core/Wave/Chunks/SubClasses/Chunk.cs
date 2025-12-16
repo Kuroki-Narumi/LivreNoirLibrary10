@@ -1,4 +1,5 @@
-﻿using System.IO;
+﻿using LivreNoirLibrary.IO;
+using System.IO;
 using System.Text.Json;
 
 namespace LivreNoirLibrary.Media.Wave.Chunks
@@ -17,10 +18,10 @@ namespace LivreNoirLibrary.Media.Wave.Chunks
         internal static Chunk Load(string chid, BinaryReader reader)
         {
             var size = reader.ReadUInt32();
-            var data = reader.ReadBytes((int)size);
+            var data = reader.ReadBytesSafe(size);
             if (size % 2 is 1)
             {
-                reader.ReadByte();
+                _ = reader.BaseStream.ReadByte();
             }
             return new(chid, data);
         }

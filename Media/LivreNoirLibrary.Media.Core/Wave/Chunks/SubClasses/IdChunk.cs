@@ -1,4 +1,5 @@
-﻿using System;
+﻿using LivreNoirLibrary.IO;
+using System;
 using System.IO;
 using System.Text.Json;
 
@@ -20,12 +21,12 @@ namespace LivreNoirLibrary.Media.Wave.Chunks
 
         internal static IdChunk Load(string chid, BinaryReader reader)
         {
-            var size = (int)reader.ReadUInt32();
+            var size = reader.ReadUInt32();
             var id = reader.ReadInt32();
-            var data = reader.ReadBytes(size - sizeof(int));
+            var data = reader.ReadBytesSafe(size - sizeof(int));
             if (size % 2 is 1)
             {
-                reader.ReadByte();
+                _ = reader.BaseStream.ReadByte();
             }
             return new(chid, id, data);
         }

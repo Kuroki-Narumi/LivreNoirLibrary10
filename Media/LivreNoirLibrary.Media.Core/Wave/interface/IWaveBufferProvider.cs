@@ -6,9 +6,9 @@ namespace LivreNoirLibrary.Media.Wave
 {
     public interface IWaveBufferProvider<TKey> : IClear
     {
-        public int OutputSampleRate { get; set; }
-        public int OutputChannels { get; set; }
+        int OutputSampleRate { get; set; }
+        int OutputChannels { get; set; }
 
-        public bool TryGetWaveBuffer(TKey key, [MaybeNullWhen(false)] out IWaveBuffer waveBuffer);
+        bool TryGetWaveBuffer(TKey key, [MaybeNullWhen(false)] out IWaveBuffer waveBuffer);
     }
 }

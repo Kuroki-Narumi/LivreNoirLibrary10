@@ -1,8 +1,9 @@
-﻿using System;
+﻿using LivreNoirLibrary.IO;
+using LivreNoirLibrary.Text;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Text.Json;
-using LivreNoirLibrary.Text;
 
 namespace LivreNoirLibrary.Media.Wave.Chunks
 {
@@ -58,7 +59,7 @@ namespace LivreNoirLibrary.Media.Wave.Chunks
             CodePage = reader.ReadInt16();
             if (length > BaseSize)
             {
-                Data = reader.ReadBytes((int)(length - BaseSize));
+                Data = reader.ReadBytesSafe(length - BaseSize);
             }
         }
 

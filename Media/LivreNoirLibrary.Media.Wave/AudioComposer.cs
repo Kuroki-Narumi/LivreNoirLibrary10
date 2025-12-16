@@ -1,4 +1,5 @@
 ﻿using LivreNoirLibrary.Collections;
+using LivreNoirLibrary.Debug;
 using System;
 using System.Collections.Generic;
 
@@ -25,6 +26,7 @@ namespace LivreNoirLibrary.Media.Wave
         {
             _currentSeconds = 0;
             _composeTarget.Clear();
+            Timeline.Rewind();
         }
 
         public void SetLayout(int sampleRate, int channels)
@@ -36,10 +38,14 @@ namespace LivreNoirLibrary.Media.Wave
 
         public bool SetLayoutByFirstItem()
         {
-            if (Timeline.TryGetFirstItem(out var item) && Provider.TryGetWaveBuffer(item.Key, out var buffer))
+            var provider = Provider;
+            foreach (var list in Timeline)
             {
-                SetLayout(buffer.SampleRate, buffer.Channels);
-                return true;
+                if (provider.TryGetWaveBuffer(list.Key, out var buffer))
+                {
+                    SetLayout(buffer.SampleRate, buffer.Channels);
+                    return true;
+                }
             }
             return false;
         }
@@ -74,32 +80,37 @@ namespace LivreNoirLibrary.Media.Wave
             var notIgnore = !IgnoreItemDuration;
             var masterVolume = MasterVolume;
             var tagToVolume = TagToVolume;
-            foreach (var (key, itemTime, itemDuration, tag) in Timeline.Range(currentSeconds, requiredSeconds))
+            var until = currentSeconds + requiredSeconds;
+            foreach (var list in Timeline)
             {
-                if (provider.TryGetWaveBuffer(key, out var source))
+                if (provider.TryGetWaveBuffer(list.Key, out var source))
                 {
-                    var offset = itemTime - currentSeconds;
-                    var sourceSeconds = source.TotalSeconds;
-                    var actualSourceSeconds = (notIgnore && itemDuration is >= 0) ? Math.Min(itemDuration, sourceSeconds) : sourceSeconds;
-                    var sourceOffsetSeconds = 0d;
-                    if (offset is < 0)
+                    var rate = source.SampleRate;
+                    var sourceSamples = source.SampleLength;
+                    foreach (var (itemTime, itemDuration, tag) in list.Advance(until))
                     {
-                        actualSourceSeconds += offset;
-                        sourceOffsetSeconds = -offset;
-                        offset = 0;
-                    }
-                    if (actualSourceSeconds is > 0)
-                    {
-                        var rate = source.SampleRate;
-                        var destOffset = (int)(offset * bufferSampleRate);
-                        var sourceOffset = (int)(sourceOffsetSeconds * rate);
-                        var sourceLength = (int)(actualSourceSeconds * rate);
-                        var volume = masterVolume * (tagToVolume.TryGetValue(tag, out var value) ? value : 1);
-                        buffer.Append(source, destOffset, sourceOffset, sourceLength, volume);
+                        if (notIgnore && itemDuration is >= 0)
+                        {
+                            sourceSamples = Math.Min((int)Math.Ceiling(itemDuration * rate), sourceSamples);
+                        }
+                        var offset = itemTime - currentSeconds;
+                        var sourceOffset = 0;
+                        if (offset is < 0)
+                        {
+                            sourceOffset = -(int)(offset * rate);
+                            sourceSamples -= sourceOffset;
+                            offset = 0;
+                        }
+                        if (sourceSamples is > 0)
+                        {
+                            var destOffset = (int)(offset * bufferSampleRate);
+                            var volume = masterVolume * (tagToVolume.TryGetValue(tag, out var value) ? value : 1);
+                            buffer.Append(source, destOffset, sourceOffset, sourceSamples, volume);
+                        }
                     }
                 }
             }
-            _currentSeconds = currentSeconds + requiredSeconds;
+            _currentSeconds = until;
             var sampleCount = Math.Min(buffer.SampleLength, requiredSampleCount);
             var totalSample = sampleCount * bufferChannels;
             if (totalSample is > 0)

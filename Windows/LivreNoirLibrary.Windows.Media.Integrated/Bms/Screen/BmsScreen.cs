@@ -82,7 +82,7 @@ namespace LivreNoirLibrary.Windows.Controls.Bms
             ClipToBounds = true;
             ScoreManager = new(PlayOptions);
             _bga = new(PlayOptions);
-            AudioComposer = new(_waveProvider, _timingList);
+            AudioComposer = new(_waveProvider, _timingList.BgmTimeline);
         }
 
         public bool TryGetOption(string key, [MaybeNullWhen(false)] out string value) => SkinOptions.TryGetValue(key, out value) || BmsOptions.TryGetValue(key, out value);
@@ -211,7 +211,7 @@ namespace LivreNoirLibrary.Windows.Controls.Bms
         {
             var op = PlayOptions;
             ScoreManager.Clear();
-            AudioComposer.SetVolume(op.MasterVolume, (TimingList.Tag_KeySound, op.KeyVolume), (TimingList.Tag_BgmSound, op.BgmVolume));
+            AudioComposer.SetVolume(op.MasterVolume, (BgmTimeline.Tag_KeySound, op.KeyVolume), (BgmTimeline.Tag_BgmSound, op.BgmVolume));
             if (_isBmsReady)
             {
                 var timing = _timingList;

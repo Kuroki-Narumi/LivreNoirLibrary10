@@ -1,8 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using LivreNoirLibrary.IO;
+using LivreNoirLibrary.Text;
+using System;
 using System.IO;
 using System.Text.Json;
-using LivreNoirLibrary.Text;
 
 namespace LivreNoirLibrary.Media.Wave.Chunks
 {
@@ -76,7 +76,7 @@ namespace LivreNoirLibrary.Media.Wave.Chunks
             Read(Reserved);
             if (length > BaseSize)
             {
-                _history = reader.ReadBytes((int)(length - BaseSize));
+                _history = reader.ReadBytesSafe(length - BaseSize);
             }
         }
 

@@ -1,4 +1,5 @@
-﻿using System.IO;
+﻿using LivreNoirLibrary.IO;
+using System.IO;
 using System.Text.Json;
 
 namespace LivreNoirLibrary.Media.Wave.Chunks
@@ -34,7 +35,7 @@ namespace LivreNoirLibrary.Media.Wave.Chunks
             MediaType = reader.ReadUInt32();
             if (length > BaseSize)
             {
-                Data = reader.ReadBytes((int)(length - BaseSize));
+                Data = reader.ReadBytesSafe(length - BaseSize);
             }
         }
 

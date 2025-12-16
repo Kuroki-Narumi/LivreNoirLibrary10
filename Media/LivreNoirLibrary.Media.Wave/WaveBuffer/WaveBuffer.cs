@@ -1,9 +1,11 @@
-﻿using System;
-using System.Text.Json;
-using LivreNoirLibrary.Text;
+﻿using LivreNoirLibrary.Collections;
+using LivreNoirLibrary.Debug;
 using LivreNoirLibrary.Media.FFmpeg;
-using LivreNoirLibrary.Collections;
 using LivreNoirLibrary.ObjectModel;
+using LivreNoirLibrary.Text;
+using System;
+using System.Diagnostics;
+using System.Text.Json;
 
 namespace LivreNoirLibrary.Media.Wave
 {

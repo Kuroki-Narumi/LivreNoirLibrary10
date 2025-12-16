@@ -12,27 +12,23 @@ using LivreNoirLibrary.Debug;
 
 namespace LivreNoirLibrary.Media.Bms
 {
-    public class TimingList : TimeCounterBase, IAudioTimeline<string>
+    public class TimingList : TimeCounterBase
     {
-        public const int Tag_KeySound = 0;
-        public const int Tag_BgmSound = 1;
-
-        private readonly DoubleMultiTimeline<SoundInfo> _bgm = [];
         private readonly DoubleKeyTimeline<Channel, KeyInfo> _key = [];
         private readonly Dictionary<Channel, BgaInfo> _bga = [];
         private readonly Dictionary<Channel, DoubleMultiTimeline<int>> _meta = [];
 
         public string Directory { get; private set; } = "";
         public bool AutoPlay { get; private set; }
+        public BgmTimeline BgmTimeline { get; } = [];
         public IEnumerable<(Channel, double, KeyInfo)> KeyInfos => _key;
         public int NoteCount { get; private set; }
-        public int AudioItemCount => _bgm.Count;
 
         public override void Clear()
         {
             base.Clear();
+            BgmTimeline.Clear();
             _key.Clear();
-            _bgm.Clear();
             _bga.Clear();
             _meta.Clear();
             NoteCount = 0;
@@ -48,7 +44,7 @@ namespace LivreNoirLibrary.Media.Bms
             BeginInit(initialTempo);
             TimingInfoState state = new(initialTempo);
             var keyList = _key;
-            var bgmList = _bgm;
+            var bgmList = BgmTimeline;
             var bgaList = _bga;
             var metaList = _meta;
             var lastBgmNotes = ObjectPool.Rent<Dictionary<int, SoundInfo>>();
@@ -56,6 +52,8 @@ namespace LivreNoirLibrary.Media.Bms
             var wavFilenames = ObjectPool.Rent<Dictionary<int, string>>();
             var bgaFilenames = ObjectPool.Rent<Dictionary<int, string>>();
             var count = 0;
+            var firstPos = double.NaN;
+            var lastPos = double.NaN;
             try
             {
                 foreach (var (pos, list) in source.CurrentTimeline.EnumerateList())
@@ -90,9 +88,17 @@ namespace LivreNoirLibrary.Media.Bms
                                     {
                                         previous.Length = time - previous.Time;
                                     }
-                                    SoundInfo soundInfo = new(time, channel, path);
+                                    SoundInfo soundInfo = new(time, channel);
                                     lastBgmNotes[value] = soundInfo;
-                                    bgmList.Add(time, soundInfo);
+                                    if (!string.IsNullOrEmpty(path))
+                                    {
+                                        if (double.IsNaN(firstPos))
+                                        {
+                                            firstPos = time;
+                                        }
+                                        lastPos = time;
+                                        bgmList.Add(path, soundInfo);
+                                    }
                                     if (channel.IsKey())
                                     {
                                         if (!keyList.TryGetValue(channel, time, SearchMode.Equal, out _, out var keyInfo))
@@ -102,7 +108,6 @@ namespace LivreNoirLibrary.Media.Bms
                                             lastNoteLane[channel] = keyInfo;
                                             count++;
                                         }
-                                        keyInfo.Sounds.Add(soundInfo);
                                     }
                                     break;
                                 case NoteType.Mine:
@@ -149,8 +154,8 @@ namespace LivreNoirLibrary.Media.Bms
                     }
                     ApplyTimeInfo(ref state);
                 }
-                FirstSoundTime = bgmList.FirstPosition;
-                LastSoundTime = bgmList.LastPosition;
+                FirstSoundTime = firstPos;
+                LastSoundTime = lastPos;
                 EndInit(ref state);
                 // 小節線
                 foreach (var (_, head, length) in source.EnumerateBars())
@@ -167,14 +172,6 @@ namespace LivreNoirLibrary.Media.Bms
                 ObjectPool.Return(lastNoteLane);
                 ObjectPool.Return(wavFilenames);
                 ObjectPool.Return(bgaFilenames);
-            }
-        }
-
-        public IEnumerable<TimelineItem<string>> Range(double time, double duration)
-        {
-            foreach (var (pos, item) in _bgm.Range(RangeUtils.Get(time, time + duration)))
-            {
-                yield return new(item.Path, pos, item.Length, item.IsKey ? Tag_KeySound : Tag_BgmSound);
             }
         }
 
@@ -203,24 +200,6 @@ namespace LivreNoirLibrary.Media.Bms
             vector = default;
             return false;
         }
-
-        public class SoundInfo(double time, Channel channel, string path)
-        {
-            public double Time { get; } = time;
-            public double Length { get; internal set; } = -1;
-            public Channel Channel { get; } = channel;
-            public string Path { get; } = path;
-            public bool IsKey => Channel.IsKey();
-        }
-
-        public class KeyInfo(double time, bool isMine = false)
-        {
-            public double Time { get; } = time;
-            public double Length { get; internal set; }
-            public bool IsMine { get; } = isMine;
-            public List<SoundInfo> Sounds { get; } = [];
-        }
-
         private class BgaInfo
         {
             public DoubleTimeline<string> Layer { get; } = [];
@@ -229,5 +208,18 @@ namespace LivreNoirLibrary.Media.Bms
         }
 
         private readonly record struct Rgb(float R, float G, float B);
+    }
+
+    public record SoundInfo(double Time, Channel Channel)
+    {
+        public double Length { get; internal set; } = -1;
+        public bool IsKey => Channel.IsKey();
+    }
+
+    public class KeyInfo(double time, bool isMine = false)
+    {
+        public double Time { get; } = time;
+        public double Length { get; internal set; }
+        public bool IsMine { get; } = isMine;
     }
 }

@@ -33,14 +33,18 @@ namespace LivreNoirLibrary.Windows.Media.Bms
             var provider = composer.Provider;
             var musicLength = 0d;
             var i = 0;
-            var count = composer.Timeline.AudioItemCount;
+            var count = composer.Timeline.KeyCount;
 
             p?.Report("Initializing Audio");
-            foreach (var (wp, time, length, _) in composer.Timeline.Range(0, double.PositiveInfinity))
+            var notIgnore = !composer.IgnoreItemDuration;
+            foreach (var list in composer.Timeline)
             {
-                if (provider.TryGetWaveBuffer(wp, out var buffer))
+                if (provider.TryGetWaveBuffer(list.Key, out var buffer))
                 {
-                    musicLength = Math.Max(musicLength, time + buffer.TotalSeconds);
+                    var (time, len, _) = list.LastItem;
+                    var total = buffer.TotalSeconds;
+                    total = (notIgnore && len is >= 0) ? Math.Min(len, total) : total;
+                    musicLength = Math.Max(musicLength, time + total);
                 }
                 i++;
                 p?.Report($"Initializing Audio({i}/{count})", i, count);
@@ -58,7 +62,7 @@ namespace LivreNoirLibrary.Windows.Media.Bms
                 try
                 {
                     var f = new AntiFreezeUpdater();
-                    const int rate = 48000;
+                    var rate = Options.AudioSampleRate;
                     const int ch = 2;
 
                     screen.SetupAudio(true);
@@ -99,18 +103,18 @@ namespace LivreNoirLibrary.Windows.Media.Bms
             if (screen.SkinRoot is PlaySkinRoot skin && screen.IsBmsReady)
             {
                 var f = new AntiFreezeUpdater();
-                const int rate = 48000;
                 const int ch = 2;
 
                 screen.DetermineExpressions();
                 screen.SetupPlay(true);
                 var options = Options;
+                var rate = options.AudioSampleRate;
 
                 // タイマー
                 var fadeInDuration = skin.FadeInTime.Validate(0);
                 var loadingFinish = skin.LoadTime.Validate(0);
                 var musicStart = loadingFinish + skin.ReadyTime.Validate(0);
-                var musicLength = InitializeAudio(rate, ch, musicStart, ref f, p, c);
+                var musicLength = InitializeAudio(rate, ch, musicStart + options.AudioDelay, ref f, p, c);
 
                 var totalTime = musicStart + Math.Max(musicLength, screen.LastSoundTime + skin.MarginTime.Validate(0));
                 var fadeOutDuration = skin.FadeOutTime.Validate(0);

@@ -1,10 +1,12 @@
 ﻿using LivreNoirLibrary.Collections;
+using LivreNoirLibrary.Debug;
 using LivreNoirLibrary.Media;
 using LivreNoirLibrary.Media.Bms;
 using LivreNoirLibrary.Media.Bms.Play;
 using LivreNoirLibrary.ObjectModel;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 
 namespace LivreNoirLibrary.Windows.Controls.Bms
 {

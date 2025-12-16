@@ -1,4 +1,5 @@
-﻿using System;
+﻿using LivreNoirLibrary.Debug;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
@@ -25,26 +26,19 @@ namespace LivreNoirLibrary.Media.Wave
             list.Clear();
             while (stream.Position < endPos)
             {
-                try
+                var chid = FourLetterHeader.Read(reader);
+                if (chid is ChunkIds.Data)
                 {
-                    var chid = FourLetterHeader.Read(reader);
-                    if (chid is ChunkIds.Data)
-                    {
-                        result.Data = reader.ReadRiffChunk<DataChunk>();
-                    }
-                    else if (chid is ChunkIds.Format)
-                    {
-                        result.Format = reader.ReadRiffChunk<FormatChunk>();
-                    }
-                    else
-                    {
-                        var chunk = RiffChunk.Create(chid, reader);
-                        list.Add(chunk);
-                    }
+                    result.Data = reader.ReadRiffChunk<DataChunk>();
                 }
-                catch (EndOfStreamException)
+                else if (chid is ChunkIds.Format)
                 {
-                    break;
+                    result.Format = reader.ReadRiffChunk<FormatChunk>();
+                }
+                else
+                {
+                    var chunk = RiffChunk.Create(chid, reader);
+                    list.Add(chunk);
                 }
             }
             return result;
@@ -75,21 +69,14 @@ namespace LivreNoirLibrary.Media.Wave
                 }
                 while (stream.Position < endPos)
                 {
-                    try
+                    var chid = FourLetterHeader.Read(reader);
+                    if (chid is ChunkIds.Format)
                     {
-                        var chid = FourLetterHeader.Read(reader);
-                        if (chid is ChunkIds.Format)
-                        {
-                            var format = reader.ReadRiffChunk<FormatChunk>();
-                            return format.TryGetSampleFormat(out _);
-                        }
-                        length = reader.ReadUInt32();
-                        stream.Position += length + (length % 2 is 1 ? 1 : 0);
+                        var format = reader.ReadRiffChunk<FormatChunk>();
+                        return format.TryGetSampleFormat(out _);
                     }
-                    catch (EndOfStreamException)
-                    {
-                        break;
-                    }
+                    length = reader.ReadUInt32();
+                    stream.Position += length + (length % 2 is 1 ? 1 : 0);
                 }
                 return false;
             }

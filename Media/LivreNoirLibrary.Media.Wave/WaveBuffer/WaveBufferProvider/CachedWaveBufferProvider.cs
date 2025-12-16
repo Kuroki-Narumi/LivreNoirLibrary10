@@ -2,6 +2,7 @@
 using LivreNoirLibrary.Debug;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
 
@@ -9,7 +10,7 @@ namespace LivreNoirLibrary.Media.Wave
 {
     public class CachedWaveBufferProvider : IWaveBufferProvider<string>
     {
-        private readonly Dictionary<string, WaveBuffer> _buffers = [];
+        private readonly Dictionary<string, WaveBuffer?> _buffers = [];
 
         public int OutputSampleRate { get; set => ChangeLayout(ref field, value); }
         public int OutputChannels { get; set => ChangeLayout(ref field, value); }
@@ -32,7 +33,7 @@ namespace LivreNoirLibrary.Media.Wave
         {
             foreach (var (_, buffer) in _buffers)
             {
-                buffer.Dispose();
+                buffer?.Dispose();
             }
             _buffers.Clear();
         }
@@ -45,26 +46,25 @@ namespace LivreNoirLibrary.Media.Wave
         {
             if (!_buffers.TryGetValue(path, out var data))
             {
-                if (!File.Exists(path))
-                {
-                    ExConsole.Write($"file \"{path}\" is not found.");
-                }
-                else
+                if (File.Exists(path))
                 {
                     try
                     {
                         data = WaveBuffer.CreateUnsafe(OutputSampleRate, OutputChannels);
                         data.AutoDecode(path, false);
-                        _buffers.Add(path, data);
-                        //ExConsole.Write($"decoded \"{path}\"");
                     }
                     catch (Exception ex)
                     {
+                        data = null;
                         ExConsole.Write($"failed to decode \"{path}\":");
                         ExConsole.Write(ex);
-                        data = null;
                     }
                 }
+                else
+                {
+                    //ExConsole.Write($"file \"{path}\" is not found.");
+                }
+                _buffers.Add(path, data);
             }
             waveBuffer = data;
             return data is not null;

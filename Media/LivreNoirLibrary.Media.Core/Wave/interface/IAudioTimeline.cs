@@ -1,29 +1,25 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 
 namespace LivreNoirLibrary.Media.Wave
 {
-    public readonly record struct TimelineItem<TKey>(TKey Key, double Time, double Duration = 0, int Tag = -1);
-
-    public interface IAudioTimeline<TKey>
+    public interface IAudioTimeline<TKey> : IEnumerable<IAudioList<TKey>>
     {
-        public int AudioItemCount { get; }
-        IEnumerable<TimelineItem<TKey>> Range(double time, double duration);
+        int KeyCount { get; }
+        IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
     }
 
     public static class IAudioTimelineExtensions
     {
-        extension<T>(IAudioTimeline<T> obj)
+        extension<TKey>(IAudioTimeline<TKey> obj)
         {
-            public bool TryGetFirstItem(out TimelineItem<T> item)
+            public void Rewind()
             {
-                foreach (var i in obj.Range(0, double.PositiveInfinity))
+                foreach (var list in obj)
                 {
-                    item = i;
-                    return true;
+                    list.Rewind();
                 }
-                item = default;
-                return false;
             }
         }
     }

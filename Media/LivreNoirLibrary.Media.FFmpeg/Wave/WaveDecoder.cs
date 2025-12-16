@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Buffers;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Text;
+using LivreNoirLibrary.Debug;
 using LivreNoirLibrary.Media.FFmpeg;
 using LivreNoirLibrary.Numerics;
 
@@ -92,10 +94,6 @@ namespace LivreNoirLibrary.Media.Wave
                     outChannels, OutputSampleFormat, outSampleRate,
                     inChannels, InputSampleFormat, inSampleRate);
                 _out_length = ffmpeg.av_rescale_rnd(_out_length, outSampleRate, inSampleRate, AVRounding.AV_ROUND_UP);
-            }
-            else
-            {
-                this.DisposeSwrContext();
             }
             EnsureBufferSize((int)((long)BufferSize / _converter.BytesPerSample * outChannels / inChannels * outSampleRate / inSampleRate));
             return true;

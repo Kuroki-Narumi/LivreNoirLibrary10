@@ -8,5 +8,7 @@ namespace LivreNoirLibrary.Windows.Media.Bms
         bool IsHevc { get; }
         int QP { get; }
         int ApproximateKbps { get; }
+        int AudioSampleRate { get; }
+        double AudioDelay { get; }
     }
 }

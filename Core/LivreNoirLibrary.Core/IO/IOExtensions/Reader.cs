@@ -13,6 +13,13 @@ namespace LivreNoirLibrary.IO
     {
         public const int ChidLength = 6;
 
+        public static byte[] ReadBytesSafe(this BinaryReader reader, long count)
+        {
+            var stream = reader.BaseStream;
+            count = Math.Min(count, stream.Length - stream.Position);
+            return reader.ReadBytes((int)count);
+        }
+
         public static string ReadASCII(this Stream stream, int length)
         {
             var buffer = ArrayPool<byte>.Shared.Rent(length);
