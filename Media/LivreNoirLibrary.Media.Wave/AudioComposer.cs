@@ -86,13 +86,10 @@ namespace LivreNoirLibrary.Media.Wave
                 if (provider.TryGetWaveBuffer(list.Key, out var source))
                 {
                     var rate = source.SampleRate;
-                    var sourceSamples = source.SampleLength;
+                    var sourceLength = source.SampleLength;
                     foreach (var (itemTime, itemDuration, tag) in list.Advance(until))
                     {
-                        if (notIgnore && itemDuration is >= 0)
-                        {
-                            sourceSamples = Math.Min((int)Math.Ceiling(itemDuration * rate), sourceSamples);
-                        }
+                        var sourceSamples = (notIgnore && itemDuration is >= 0) ? Math.Min((int)Math.Ceiling(itemDuration * rate), sourceLength) : sourceLength;
                         var offset = itemTime - currentSeconds;
                         var sourceOffset = 0;
                         if (offset is < 0)

@@ -18,5 +18,20 @@ namespace LivreNoirLibrary.Media
         public static double Ticks2Milliseconds(long value) => value * MillisecondsPerTickD;
         public static decimal Ticks2MillisecondsM(long value) => value * MillisecondsPerTickM;
         public static string Ticks2MsText(long value) => $"{Ticks2Milliseconds(value):F4}ms";
+
+        public static string AutoFormat(this TimeSpan time) => time.Ticks switch
+            {
+                >= TimeSpan.TicksPerDay => time.ToString(@"d\d\ h\:mm\:ss"),
+                >= TimeSpan.TicksPerHour => time.ToString(@"h\:mm\:ss\.f"),
+                >= TimeSpan.TicksPerMinute => time.ToString(@"m\:ss\.ff"),
+                _ => time.ToString(@"s\.ffff"),
+            };
+
+        public static string AutoFormat_Minutes(this TimeSpan time) => time.Ticks switch
+            {
+                >= TimeSpan.TicksPerDay => time.ToString(@"d\d\ h\:mm\:ss"),
+                >= TimeSpan.TicksPerHour => time.ToString(@"h\:mm\:ss"),
+                _ => time.ToString(@"m\:ss"),
+            };
     }
 }

@@ -4,7 +4,7 @@ using System.Drawing;
 
 namespace LivreNoirLibrary.Windows.Controls.Bms.Elements
 {
-    public class SkinRoot(Skin skin)
+    public class SkinRoot(Skin skin) : ISkinRoot
     {
         public static SkinRoot Default { get; } = new(new());
 

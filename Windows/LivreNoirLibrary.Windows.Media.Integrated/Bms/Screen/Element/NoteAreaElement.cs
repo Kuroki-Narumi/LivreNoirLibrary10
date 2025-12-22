@@ -8,6 +8,8 @@ using LivreNoirLibrary.Windows.Media.Bms.SkinInfo;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
+using System.Drawing;
 using System.Windows;
 
 namespace LivreNoirLibrary.Windows.Controls.Bms.Elements
@@ -18,10 +20,11 @@ namespace LivreNoirLibrary.Windows.Controls.Bms.Elements
 
         private readonly NoteArea _source;
         private readonly Dictionary<int, NoteLaneInfo> _lanes = [];
-        private readonly List<(UIntBitmap Source, System.Drawing.Rectangle SourceRect, Rect DestRect)> _children = [];
         private TextureData _barLine;
         private TextureData _judgeLine;
         private double _baseHeight;
+        private readonly List<(UIntBitmap Source, Rectangle SourceRect, Rect DestRect)> _children = [];
+        private readonly Dictionary<int, double> _lastNotes = [];
 
         public NoteAreaElement(NoteArea source) : base(source)
         {
@@ -71,53 +74,68 @@ namespace LivreNoirLibrary.Windows.Controls.Bms.Elements
             var highSpeed = args.HighSpeed;
             var children = _children;
             children.Clear();
+            var lastNotes = _lastNotes;
+            lastNotes.Clear();
             var lanes = _lanes;
             var areaHeight = DestHeight;
             var barTexture = _barLine;
             var width = DestWidth;
             var baseHeight = _baseHeight;
-            if (relativeTime is >= 0)
+            if (relativeTime is >= 0 && TryGetTexture(barTexture, out var source, out var sourceRect))
             {
+                var h = (double)sourceRect.Height;
+                Rect destRect = new(0, 0, width, h);
                 foreach (var bar in notes.BarLines)
                 {
-                    AddChild(barTexture, 0, width, bar.RelativePosition);
+                    destRect.Y = areaHeight - areaHeight * bar.RelativePosition * highSpeed - h;
+                    children.Add((source, sourceRect, destRect));
                 }
             }
-            AddChild(_judgeLine, 0, width, 0, -1);
+            if (TryGetTexture(_judgeLine, out source, out sourceRect))
+            {
+                children.Add((source, sourceRect, new(0, areaHeight - baseHeight, width, baseHeight)));
+            }
             if (relativeTime is >= 0)
             {
                 foreach (var child in notes.VisibleChildren)
                 {
-                    if (lanes.TryGetValue(child.Lane, out var laneInfo))
+                    var lane = child.Lane;
+                    if (lanes.TryGetValue(lane, out var laneInfo))
                     {
                         var visualLength = child.VisualLength;
                         TextureData textureData;
                         if (visualLength is > 0)
                         {
-                            AddChild(child.IsActive ? laneInfo.ActiveLongBody : laneInfo.LongBody, laneInfo.X, laneInfo.Width, child.CurrentOffset, visualLength);
+                            AddChild(-1, child.IsActive ? laneInfo.ActiveLongBody : laneInfo.LongBody, laneInfo.X, laneInfo.Width, child.CurrentOffset, visualLength);
                             textureData = laneInfo.LongTail;
-                            AddChild(textureData, laneInfo.X, laneInfo.Width, child.CurrentOffset + visualLength, 0, laneInfo.Note.Height - textureData.Height);
+                            AddChild(lane + 1000, textureData, laneInfo.X, laneInfo.Width, child.CurrentOffset + visualLength, 0, laneInfo.Note.Height - textureData.Height);
                         }
                         textureData =
                             child.IsMine ? laneInfo.Mine :
                             (child.VisualLength is > 0) ? laneInfo.LongHead :
                             laneInfo.Note;
-                        AddChild(textureData, laneInfo.X, laneInfo.Width, Math.Max(child.CurrentOffset, 0));
+                        AddChild(lane, textureData, laneInfo.X, laneInfo.Width, Math.Max(child.CurrentOffset, 0), 0);
                     }
                 }
             }
 
-            void AddChild(TextureData data, double x, double width, double offset, double height = 0, double finalOffset = 0)
+            bool TryGetTexture(in TextureData data, [MaybeNullWhen(false)] out UIntBitmap bitmap, out Rectangle sourceRect)
+                => texture.TryGetTexture(data, BmsTimer.GetFrameIndex(relativeTime, data), out bitmap, out sourceRect);
+
+            void AddChild(int lane, TextureData data, double x, double width, double visualOffset, double visualHeight, double finalOffset = 0)
             {
                 if (texture.TryGetTexture(data, BmsTimer.GetFrameIndex(relativeTime, data), out var bitmap, out var sourceRect))
                 {
-                    var h = height switch
+                    var h = visualHeight is > 0 ? visualHeight * areaHeight * highSpeed : sourceRect.Height;
+                    var y = areaHeight - areaHeight * visualOffset * highSpeed - h - finalOffset;
+                    if (lane is not -1)
                     {
-                        0 => sourceRect.Height,
-                        > 0 => height * areaHeight * highSpeed,
-                        _ => baseHeight,
-                    };
-                    var y = areaHeight - areaHeight * offset * highSpeed - h - finalOffset;
+                        if (lastNotes.TryGetValue(lane, out var previous) && previous - y is < 0.5)
+                        {
+                            return;
+                        }
+                        lastNotes[lane] = y;
+                    }
                     children.Add((bitmap, sourceRect, new(x, y, width, h)));
                 }
             }

@@ -12,7 +12,7 @@ namespace LivreNoirLibrary.Numerics
 
         private static void ThrowFormatException(string message = "") => throw new FormatException(message);
 
-        private static int ThrowIncomparableException(object? obj) => throw new ArgumentException($"cannot compare to {(obj is null ? "null" : obj.GetType())}");
+        public static int ThrowIncomparableException(object? obj) => throw new ArgumentException($"cannot compare to {(obj is null ? "null" : obj.GetType())}");
 
     }
 }

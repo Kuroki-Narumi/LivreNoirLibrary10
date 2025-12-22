@@ -82,18 +82,6 @@ namespace LivreNoirLibrary.Media.Bms
                     _beatItemList.Add(info);
                 }
 
-                // time to info
-                var time = info.Time;
-                if (time is 0)
-                {
-                    _timeItemList[0] = info;
-                }
-                else
-                {
-                    _timeList.Add(time);
-                    _timeItemList.Add(info);
-                }
-
                 // position to info
                 var position = info.Position;
                 if (position is 0)
@@ -105,16 +93,31 @@ namespace LivreNoirLibrary.Media.Bms
                     SortedList.GetOrAdd(_positionList, _positionItemList, position).Add(info);
                 }
 
-                var tempo = (int)state.CurrentTempo;
-                _lastTempoInfo?.Add(beat, time);
-                _lastTempoInfo = SortedList.GetOrAdd(_tempoList, _tempoInfoList, tempo).Init(beat, time);
-
-                if (info.StopTime is not 0)
+                var tempo = state.CurrentTempo;
+                if (tempo is > 0)
                 {
-                    (var before, info) = info.SplitStop();
-                    _timeItemList[^1] = before;
-                    _timeList.Add(info.Time);
-                    _timeItemList.Add(info);
+                    // time to info
+                    var time = info.Time;
+                    if (time is 0)
+                    {
+                        _timeItemList[0] = info;
+                    }
+                    else
+                    {
+                        _timeList.Add(time);
+                        _timeItemList.Add(info);
+                    }
+
+                    _lastTempoInfo?.Add(beat, time);
+                    _lastTempoInfo = SortedList.GetOrAdd(_tempoList, _tempoInfoList, (int)tempo).Init(beat, time);
+
+                    if (info.StopTime is not 0)
+                    {
+                        (var before, info) = info.SplitStop();
+                        _timeItemList[^1] = before;
+                        _timeList.Add(info.Time);
+                        _timeItemList.Add(info);
+                    }
                 }
             }
             if (speedChanged)
@@ -152,10 +155,10 @@ namespace LivreNoirLibrary.Media.Bms
         public string GetTimingInfoText()
         {
             StringBuilder sb = new();
-            sb.AppendLine("Beat\tTime\tPosition\tTempo\tStopTime\tScroll");
+            sb.AppendLine("Beat\tTime\tPosition\tTempo\tStopTime\tScroll\tSpB\tBpS");
             foreach (var item in _timeItemList)
             {
-                sb.AppendLine($"{item.Beat}\t{item.Time}\t{item.Position}\t{item.Tempo}\t{item.StopTime}\t{item.Scroll}");
+                sb.AppendLine($"{item.Beat}\t{item.Time}\t{item.Position}\t{item.Tempo}\t{item.StopTime}\t{item.Scroll}\t{item.SecondsPerBeat}\t{item.BeatsPerSecond}");
             }
             return sb.ToString();
         }

@@ -1,5 +1,4 @@
-﻿using LivreNoirLibrary.ObjectModel;
-using System;
+﻿using System;
 using System.Collections.Generic;
 
 namespace LivreNoirLibrary.Media.Bms.Play

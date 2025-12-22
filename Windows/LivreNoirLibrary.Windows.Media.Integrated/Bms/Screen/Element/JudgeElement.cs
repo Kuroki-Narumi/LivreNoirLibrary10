@@ -13,6 +13,7 @@ namespace LivreNoirLibrary.Windows.Controls.Bms.Elements
     {
         private readonly Judge _source = source;
         private readonly Dictionary<JudgeType, (TextureData Name, TextureData Combo)> _textures = [];
+        private int _player;
         private double _padding;
         private UIntBitmap? _nameBitmap;
         private DrRect _nameRect;
@@ -24,20 +25,18 @@ namespace LivreNoirLibrary.Windows.Controls.Bms.Elements
             base.DetermineExpressions(skin, provider);
 
             var s = _source;
-            Add(JudgeType.Perfect, s.Perfect, s.PerfectCombo);
-            Add(JudgeType.Great, s.Great, s.GreatCombo);
-            Add(JudgeType.Good, s.Good, s.GoodCombo);
-            Add(JudgeType.Bad, s.Bad, s.BadCombo);
-            Add(JudgeType.Through, s.Through, s.ThroughCombo);
-            Add(JudgeType.BlankShot, s.BlankShot, s.BlankShotCombo);
-
-            void Add(JudgeType type, ValueExpression? name, ValueExpression? combo)
+            foreach (var child in s.Children.AsSpan())
             {
-                skin.TryGetTextureData(name, provider, out var nameData);
-                skin.TryGetTextureData(combo, provider, out var comboData);
-                _textures[type] = (nameData, comboData);
+                if (child is JudgeTexture j)
+                {
+                    var type = j.Type;
+                    skin.TryGetTextureData(j.Texture, provider, out var nameData);
+                    skin.TryGetTextureData(j.ComboTexture, provider, out var comboData);
+                    _textures[type] = (nameData, comboData);
+                }
             }
 
+            _player = skin.ResolveValue(s.Player, provider, 0);
             _padding = skin.ResolveValue(s.Padding, provider, 0d);
         }
 
@@ -45,21 +44,23 @@ namespace LivreNoirLibrary.Windows.Controls.Bms.Elements
         {
             base.Update(args);
             var displayTime = args.Options.JudgeDisplayTime;
-            var judge = args.ScoreManager;
+            var score = args.ScoreManager;
             var cache = args.Textures;
-            var relativeTime = args.AbsoluteTime - judge.LastJudgeTime;
-            if ((judge.IsJudgeActive || relativeTime < displayTime) &&
-                _textures.TryGetValue(judge.JudgeType, out var item))
+            var absTime = args.AbsoluteTime;
+            if (score.TryGetPlayerJudge(_player, out var judge) &&
+                (absTime - judge.Limit) < displayTime &&
+                _textures.TryGetValue(judge.Type, out var texture))
             {
+                var relativeTime = absTime - judge.LastOccurred;
                 var w = 0;
-                if (cache.TryGetTexture(item.Name, BmsTimer.GetFrameIndex(relativeTime, item.Name), out _nameBitmap, out _nameRect))
+                if (cache.TryGetTexture(texture.Name, BmsTimer.GetFrameIndex(relativeTime, texture.Name), out _nameBitmap, out _nameRect))
                 {
                     w += _nameRect.Width;
                     DestHeight = Math.Max(DestHeight, _nameRect.Height);
                 }
                 var combo = judge.Combo;
                 if (combo is > 1 &&
-                    cache.TryGetTexture(item.Combo, BmsTimer.GetFrameIndex(relativeTime, item.Combo), out _comboBitmap, out var rect))
+                    cache.TryGetTexture(texture.Combo, BmsTimer.GetFrameIndex(relativeTime, texture.Combo), out _comboBitmap, out var rect))
                 {
                     var (rx, ry, rw, rh) = rect;
                     var cw = rw / 10;

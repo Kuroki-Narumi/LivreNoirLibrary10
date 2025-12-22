@@ -13,7 +13,7 @@ namespace LivreNoirLibrary.Windows.Media.Bms.SkinInfo
         public double TickFrequency { get; set => SetValue(ref field, value); }
         public string? StringFormat { get; set => SetValue(ref field, value); }
 
-        public override string? SelectedValue => $"{(double.IsNaN(Value) ? DefaultValue : Value)}";
+        public override string? SelectedValue => (double.IsNaN(Value) ? DefaultValue : Value).ToString(StringFormat);
 
         public void ValidateValue()
         {
@@ -26,6 +26,14 @@ namespace LivreNoirLibrary.Windows.Media.Bms.SkinInfo
         public override void SetDefaultValue()
         {
             Value = DefaultValue;
+        }
+
+        public override void SetValue(string value)
+        {
+            if (double.TryParse(value, out var v))
+            {
+                Value = v;
+            }
         }
     }
 }

@@ -10,7 +10,6 @@ namespace LivreNoirLibrary.Media.Bms
         public double Speed { get; set; }
 
         private double _tempo = initialTempo;
-        private int _tempoSign = 1;
         private double _secondsPerBeat = 240 / initialTempo;
         private double _scroll = 1;
         private double _speed = 1;
@@ -27,13 +26,12 @@ namespace LivreNoirLibrary.Media.Bms
         public readonly double CurrentBeat => _beat;
         public readonly double CurrentTime => _time;
         public readonly double CurrentPosition => _position;
-        public readonly bool IsInvalidTempo => _tempo is <= 0;
 
         public double Setup(double beat)
         {
             _beat = beat;
             _time = _previousTime + (beat - _previousBeat) * _secondsPerBeat;
-            _position = _previousPosition + (beat - _previousBeat) * _scroll * _tempoSign;
+            _position = _previousPosition + (beat - _previousBeat) * _scroll;
             Tempo = double.NaN;
             Stop = 0;
             Scroll = double.NaN;
@@ -64,18 +62,9 @@ namespace LivreNoirLibrary.Media.Bms
         public bool Finalize(out TimingInfo info, out bool speedChanged, out double speed)
         {
             var tempo = Tempo;
-            var tempoChanged = double.IsFinite(tempo) && tempo != (_tempo * _tempoSign);
+            var tempoChanged = double.IsFinite(tempo) && tempo != _tempo;
             if (tempoChanged)
             {
-                if (tempo is >= 0)
-                {
-                    _tempoSign = 1;
-                }
-                else
-                {
-                    tempo = -tempo;
-                    _tempoSign = -1;
-                }
                 _tempo = tempo;
                 _secondsPerBeat = 240 / tempo;
             }
@@ -110,7 +99,8 @@ namespace LivreNoirLibrary.Media.Bms
 
             if (tempoChanged || stopTime is not 0 || scrollChanged || speedChanged)
             {
-                info = new(_beat, _time, _position, tempo, stopTime, scroll * _tempoSign);
+                var bps = tempo / 240;
+                info = new(_beat, _time, _position, tempo, stopTime, scroll, 1 / bps, bps);
                 _previousBeat = _beat;
                 _previousTime = _time + stopTime;
                 _previousPosition = _position;

@@ -67,6 +67,15 @@ namespace LivreNoirLibrary.Windows.Media.Bms.SkinInfo
         {
             SelectedIndex = _defaultIndex;
         }
+
+        public override void SetValue(string value)
+        {
+            var index = Items.FindIndex(item => item.Name == value);
+            if (index is >= 0)
+            {
+                SelectedIndex = index;
+            }
+        }
     }
 
     public class Option : SkinNode

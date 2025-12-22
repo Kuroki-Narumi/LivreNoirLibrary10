@@ -83,10 +83,6 @@ namespace LivreNoirLibrary.Media.Bms.ViewModels
             target.BeginTimelineRefresh(initialTempo);
             foreach (var (pos, list1, list2) in this)
             {
-                if (abortIfInvalidTempo && state.IsInvalidTempo)
-                {
-                    break;
-                }
                 var beat = provider.GetAbsolutePosition(pos);
                 state.Setup(beat);
                 if (list1 is not null)

@@ -1,4 +1,5 @@
-﻿using LivreNoirLibrary.Media.Bms.Play;
+﻿using LivreNoirLibrary.Debug;
+using LivreNoirLibrary.Media.Bms.Play;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -9,19 +10,17 @@ namespace LivreNoirLibrary.Media.Bms
     {
         extension(IBmsTimer obj)
         {
-            public static TimerId JudgeType2TimerId(JudgeType type) => (TimerId)(TimerIdOffsets.GeneralJudge + (int)type);
-            public static TimerId Player2TimerId(int player) => (TimerId)(TimerIdOffsets.PlayerJudge + player * 10);
-            public static TimerId Lane2TimerId(int lane) => (TimerId)(TimerIdOffsets.Button + lane * 10);
+            public static TimerId Player2TimerId(int player) => (TimerId)(TimerIdOffsets.JudgeBegin + player * 10);
+            public static TimerId Lane2TimerId(int lane) => (TimerId)(TimerIdOffsets.ButtonBegin + lane * 10);
 
-            public void SetJudgeTimer(double time, JudgeType type, int player, double offset)
+            public void SetJudgeTimer(double time, int player, double error)
             {
-                obj.Set(JudgeType2TimerId(type), time);
-                if (player is > 0)
+                if (player is >= 0)
                 {
                     var id = Player2TimerId(player);
                     obj.Set(id + TimerIdOffsets.Judge, time);
 
-                    if (offset is > 0)
+                    if (error is > 0)
                     {
                         obj.Set(id + TimerIdOffsets.Late, time);
                     }
@@ -29,7 +28,7 @@ namespace LivreNoirLibrary.Media.Bms
                     {
                         obj.Remove(id + TimerIdOffsets.Late);
                     }
-                    if (offset is < 0)
+                    if (error is < 0)
                     {
                         obj.Set(id + TimerIdOffsets.Early, time);
                     }
@@ -94,14 +93,14 @@ namespace LivreNoirLibrary.Media.Bms
             }
         }
 
-        public static JudgeInfo CreateJudgeInfo(in JudgeDefinition judge, double error, in ScoreDefinition score, in GaugeDefinition gauge, double gaugeGainBase)
+        public static JudgeInfo CreateJudgeInfo(in JudgeDefinition judge, int player, double error, in ScoreDefinition score, in GaugeDefinition gauge, double gaugeGainBase)
         {
             var type = judge.Type;
             var comboChange = judge.ComboChange;
             var isMiss = judge.IsMiss;
             var scoreGain = score.GetScoreGain(type);
             var gaugeGain = gauge.GetGaugeGain(type, gaugeGainBase);
-            return new(type, comboChange, isMiss, error, scoreGain, gaugeGain);
+            return new(type, comboChange, isMiss, player, error, scoreGain, gaugeGain);
         }
 
         extension(IJudgeProvider obj)
@@ -111,13 +110,13 @@ namespace LivreNoirLibrary.Media.Bms
                 obj.GaugeGainBase = vm.Total / vm.CurrentTimeline.GetNoteCount(includesNoteEnd);
             }
 
-            public JudgeInfo GetThroughJudge() => CreateJudgeInfo(obj.Judges.ThroughJudge, 0, obj.ScoreDefinition, obj.GaugeDefinition, obj.GaugeGainBase);
+            public JudgeInfo GetThroughJudge(int player) => CreateJudgeInfo(obj.Judges.ThroughJudge, player, 0, obj.ScoreDefinition, obj.GaugeDefinition, obj.GaugeGainBase);
 
-            public bool TryGetJudge(double error, out JudgeInfo judge)
+            public bool TryGetJudge(int player, double error, out JudgeInfo judge)
             {
                 if (obj.Judges.TryGetJudge(error, out var j))
                 {
-                    judge = CreateJudgeInfo(j, j.Type is JudgeType.Perfect ? 0 : error, obj.ScoreDefinition, obj.GaugeDefinition, obj.GaugeGainBase);
+                    judge = CreateJudgeInfo(j, player, j.Type is JudgeType.Perfect ? 0 : error, obj.ScoreDefinition, obj.GaugeDefinition, obj.GaugeGainBase);
                     return true;
                 }
                 judge = default;

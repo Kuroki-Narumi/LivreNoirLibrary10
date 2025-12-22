@@ -25,6 +25,7 @@ namespace LivreNoirLibrary.Windows.Media.Bms.SkinInfo
         public OptionCollection Options { get; } = [];
         public VariableCollection Variables { get; } = [];
         public TextureCollection Textures { get; } = [];
+        public LaneDefinitionCollection LaneDefinitions { get; } = [];
 
         private string? _directory;
 
@@ -39,12 +40,13 @@ namespace LivreNoirLibrary.Windows.Media.Bms.SkinInfo
             var options = Options;
             var variables = Variables;
             var textures = Textures;
+            var lanes = LaneDefinitions;
             var children = Children;
             // include
             if (includes.Count is > 0)
             {
                 // このスキンでの設定値を保存
-                args.BeginResolveInclude(options, variables, textures);
+                args.BeginResolveInclude(options, variables, textures, lanes);
                 foreach (var include in includes)
                 {
                     if (args.TryGetIncludeSource(directory, include, out var parent))
@@ -52,10 +54,11 @@ namespace LivreNoirLibrary.Windows.Media.Bms.SkinInfo
                         options.AddRange(parent.Options);
                         variables.AddRange(parent.Variables);
                         textures.AddRange(parent.Textures);
+                        lanes.AddRange(parent.LaneDefinitions);
                     }
                 }
                 // このスキンでの設定値で上書きしなおす
-                args.RestoreSkinInfo(options, variables, textures);
+                args.RestoreSkinInfo(options, variables, textures, lanes);
                 // スキン要素のインクルード解決
                 ApplyInclude(this, args);
                 args.FinishResolveInclude();

@@ -1,5 +1,6 @@
 ﻿using LivreNoirLibrary.Collections;
 using LivreNoirLibrary.Debug;
+using LivreNoirLibrary.IO;
 using LivreNoirLibrary.Media;
 using LivreNoirLibrary.Media.Bms;
 using LivreNoirLibrary.Media.Bms.Play;
@@ -10,7 +11,6 @@ using LivreNoirLibrary.ObjectModel;
 using LivreNoirLibrary.Windows;
 using LivreNoirLibrary.Windows.Controls;
 using LivreNoirLibrary.Windows.Controls.Bms;
-using LivreNoirLibrary.Windows.Controls.Bms.Elements;
 using LivreNoirLibrary.Windows.Media;
 using System;
 using System.Buffers;
@@ -19,15 +19,14 @@ using System.Threading;
 
 namespace LivreNoirLibrary.Windows.Media.Bms
 {
-    public class BmsVideoCreator(BmsScreen screen, IBmsVideoCreatorOptions options) : ObservableObjectBase
+    public class BmsVideoCreator(IBmsScreen screen, IBmsVideoCreatorOptions options) : ObservableObjectBase
     {
-        public BmsScreen Screen { get; } = screen;
+        public IBmsScreen Screen { get; } = screen;
         public IBmsVideoCreatorOptions Options { get; } = options;
 
         private double InitializeAudio(int sampleRate, int channels, double delay, ref AntiFreezeUpdater f, ProgressReporter? p, CancellationToken c)
         {
             var screen = Screen;
-            // 演奏時間の算出
             var composer = screen.AudioComposer;
             composer.Setup(sampleRate, channels, delay);
             var provider = composer.Provider;
@@ -35,7 +34,7 @@ namespace LivreNoirLibrary.Windows.Media.Bms
             var i = 0;
             var count = composer.Timeline.KeyCount;
 
-            p?.Report("Initializing Audio");
+            p?.Report("Initializing Audio", null);
             var notIgnore = !composer.IgnoreItemDuration;
             foreach (var list in composer.Timeline)
             {
@@ -47,9 +46,8 @@ namespace LivreNoirLibrary.Windows.Media.Bms
                     musicLength = Math.Max(musicLength, time + total);
                 }
                 i++;
-                p?.Report($"Initializing Audio({i}/{count})", i, count);
-                f.WaitForUpdate();
-                c.ThrowIfCancellationRequested();
+                p?.Report($"{i}/{count}", i, count);
+                f.WaitForUpdate(c);
             }
             return musicLength;
         }
@@ -76,6 +74,7 @@ namespace LivreNoirLibrary.Windows.Media.Bms
                     using WaveEncoder encoder = new(path, new(rate, ch, SampleFormat.Int16));
                     var totalSample = (int)Math.Ceiling(duration * rate) * ch;
 
+                    p?.Report("Assembling", null);
                     for (var time = 0; totalSample is > 0; time += 1, totalSample -= bufferSize)
                     {
                         var span = audioBuffer.AsSpan(0, Math.Min(bufferSize, totalSample));
@@ -85,9 +84,8 @@ namespace LivreNoirLibrary.Windows.Media.Bms
                         // 音声フレームの書き込み
                         encoder.Write(span);
 
-                        var report = $"Assembling {time}/{duration:F2}";
-                        f.WaitForUpdate();
-                        c.ThrowIfCancellationRequested();
+                        p?.Report($"{time}/{duration:F2}", time, duration);
+                        f.WaitForUpdate(c);
                     }
                 }
                 catch(Exception e)
@@ -100,12 +98,11 @@ namespace LivreNoirLibrary.Windows.Media.Bms
         public void CreateVideo(string path, ProgressReporter? p = null, CancellationToken c = default)
         {
             var screen = Screen;
-            if (screen.SkinRoot is PlaySkinRoot skin && screen.IsBmsReady)
+            if (screen.SkinRoot is IPlaySkinRoot skin && screen.IsBmsReady)
             {
                 var f = new AntiFreezeUpdater();
                 const int ch = 2;
 
-                screen.DetermineExpressions();
                 screen.SetupPlay(true);
                 var options = Options;
                 var rate = options.AudioSampleRate;
@@ -136,28 +133,47 @@ namespace LivreNoirLibrary.Windows.Media.Bms
                 var (fps_num, fps_den) = fps;
                 var kbps = options.ApproximateKbps;
                 Mpeg4EncodeOptions codecOptions = options.IsHevc ? new HevcEncodeOptions() : new H264EncodeOptions();
-                if (!codecOptions.EnsureLevel(width, height, (double)fps, kbps))
+                IHardwareEncodeOptions? hardwareOptions = new NvencEncodeOptions();
+                VideoEncodeOptions videoOptions = new(width, height, fps, kbps * 1000, codecOptions, hardwareOptions);
+                f.WaitForUpdate(c);
+                try
                 {
-                    ExConsole.Write($"!ERROR: video size is too large ({width}x{height} {(double)fps}fps {kbps}kbps)");
+                    using var test = General.CreateSafe(path);
+                }
+                catch (Exception e)
+                {
+                    ExConsole.Write($"ERROR: failed to create file \"{path}\".");
+                    ExConsole.Write((e.GetType(), e.Message));
                     return;
                 }
                 using FFmpegEncoder encoder = new(path);
-                IHardwareEncodeOptions? hardwareOptions = new NvencEncodeOptions() { QP = options.QP };
-                VideoEncodeOptions videoOptions = new(width, height, fps, kbps * 1000, codecOptions, hardwareOptions);
-                encoder.CreateVideoStream(videoOptions);
-                encoder.CreateAudioStream(new AudioEncodeOptions(rate, 2));
+                try
+                {
+                    encoder.CreateVideoStream(videoOptions);
+                    encoder.CreateAudioStream(new AudioEncodeOptions(rate, 2));
+                }
+                catch (Exception e)
+                {
+                    ExConsole.Write($"ERROR: failed to create stream.");
+                    ExConsole.Write((e.GetType(), e.Message));
+                    return;
+                }
 
                 // 映像バッファ
                 var size = width * height * 4;
                 var videoBuffer = ArrayPool<byte>.Shared.Rent(size);
                 var videoSpan = videoBuffer.AsSpan(0, size);
+                var aborting = false;
+
+                long totalFrameUnit;
+                void UpdateTotalFrameCount(double time) => totalFrameUnit = (long)Math.Ceiling(time * fps_num) + fps_den;
 
                 p?.Report("Encoding...", null);
                 try
                 {
                     // デバッグ用
                     var t0 = Stopwatch.GetTimestamp();
-                    var totalFrameUnit = (long)Math.Ceiling(totalTime * fps_num) + fps_den;
+                    UpdateTotalFrameCount(totalTime);
                     for (var frame = 0L; frame < totalFrameUnit; )
                     {
                         var frameMax = Math.Min(totalFrameUnit, frame + fps_num);
@@ -166,6 +182,7 @@ namespace LivreNoirLibrary.Windows.Media.Bms
                         for (; frame < frameMax; frame += fps_den)
                         {
                             var time = (double)frame / fps_num;
+
                             // フェード処理
                             screen.FadeOpacity = 
                                 time <= fadeInDuration ? 1 - time / fadeInDuration
@@ -189,7 +206,17 @@ namespace LivreNoirLibrary.Windows.Media.Bms
                             encoder.WritePixels(videoSpan);
 
                             f.WaitForUpdate();
-                            c.ThrowIfCancellationRequested();
+
+                            // 中止処理
+                            if (c.IsCancellationRequested && !aborting && time < fadeOutStart)
+                            {
+                                p?.Report("Aborting...", null);
+                                fadeOutStart = time;
+                                UpdateTotalFrameCount(time + fadeOutDuration);
+                                frameMax = Math.Min(totalFrameUnit, frame + fps_num);
+                                frameUnit = frameMax - frame;
+                                aborting = true;
+                            }
                         }
 
                         // 音声は1秒ごとに書き込む
@@ -200,8 +227,6 @@ namespace LivreNoirLibrary.Windows.Media.Bms
                         span.Clamp(-1, 1);
                         // 音声フレームの書き込み
                         encoder.WriteSamples(span);
-
-                        c.ThrowIfCancellationRequested();
                     }
 
                     p?.Report("Finalizing...");

@@ -1,14 +1,15 @@
 ﻿using LivreNoirLibrary.Collections;
+using LivreNoirLibrary.Debug;
+using LivreNoirLibrary.Media.Wave;
 using LivreNoirLibrary.Numerics;
 using LivreNoirLibrary.ObjectModel;
 using LivreNoirLibrary.Text;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Diagnostics.CodeAnalysis;
+using System.Linq;
 using System.Numerics;
-using LivreNoirLibrary.Media.Wave;
-using LivreNoirLibrary.Debug;
+using System.Text.RegularExpressions;
 
 namespace LivreNoirLibrary.Media.Bms
 {
@@ -58,13 +59,9 @@ namespace LivreNoirLibrary.Media.Bms
             {
                 foreach (var (pos, list) in source.CurrentTimeline.EnumerateList())
                 {
-                    // テンポが正でない場合は終了
-                    if (state.IsInvalidTempo)
-                    {
-                        break;
-                    }
                     // 現在値
                     var time = state.Setup(source.GetAbsolutePosition(pos));
+                    var objectExists = false;
                     foreach (var note in list.AsSpan())
                     {
                         if (state.Update(note))
@@ -92,11 +89,11 @@ namespace LivreNoirLibrary.Media.Bms
                                     lastBgmNotes[value] = soundInfo;
                                     if (!string.IsNullOrEmpty(path))
                                     {
+                                        objectExists = true;
                                         if (double.IsNaN(firstPos))
                                         {
                                             firstPos = time;
                                         }
-                                        lastPos = time;
                                         bgmList.Add(path, soundInfo);
                                     }
                                     if (channel.IsKey())
@@ -132,6 +129,7 @@ namespace LivreNoirLibrary.Media.Bms
                                 path ??= "";
                                 bgaFilenames.Add(value, path);
                             }
+                            objectExists = true;
                             bgaList.GetOrAdd(channel).Layer.Set(time, path);
                         }
                         else if (channel.IsArgb())
@@ -151,6 +149,10 @@ namespace LivreNoirLibrary.Media.Bms
                         {
                             metaList.GetOrAdd(channel).Add(time, value);
                         }
+                    }
+                    if (objectExists)
+                    {
+                        lastPos = time;
                     }
                     ApplyTimeInfo(ref state);
                 }

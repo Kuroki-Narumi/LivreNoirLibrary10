@@ -1,4 +1,4 @@
-﻿using FFmpeg.AutoGen;
+﻿using LivreNoirLibrary.Collections;
 using LivreNoirLibrary.IO;
 using LivreNoirLibrary.Media;
 using LivreNoirLibrary.Media.Bms;
@@ -10,15 +10,17 @@ using LivreNoirLibrary.Windows.Controls;
 using LivreNoirLibrary.Windows.Controls.Bms;
 using LivreNoirLibrary.Windows.Media.Bms;
 using LivreNoirLibrary.Windows.Media.Bms.SkinInfo;
+using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Windows;
 using System.Windows.Input;
+using System.Xml.Linq;
 
 namespace LivreNoirLibrary.SandBox
 {
-    public partial class MainWindow
+    public partial class MainWindow : ISkinOptionProvider
     {
-        public BmsVideoCreatorOptions BmsOptions { get; }
+        public static BmsVideoCreatorOptions BmsOptions => AppSettings.Instance.BmsVideoCreatorOptions;
         public BmsScreen BmsScreen { get; }
         public BmsVideoCreator BmsVideoCreator { get; }
         public SkinCollection BmsSkins { get; }
@@ -34,10 +36,13 @@ namespace LivreNoirLibrary.SandBox
         ];
 
         public static Rational[] FpsList { get; } = [FrameRates.Fps24, FrameRates.Fps30, FrameRates.Fps60, FrameRates.Fps120];
+        public static int[] SampleRateList { get; } = [22050, 24000, 44100, 48000, 96000];
+
+        public IDictionary<string, string>? GetSkinOptions(Skin? skin) => skin?.Name is { } name ? AppSettings.Instance.BmsSkinOptions.GetOrAdd(name) : null;
 
         private void OnClick_SkinOptions(object sender, RoutedEventArgs e)
         {
-            SkinOptionView.Open(BmsScreen.Skin!);
+            SkinOptionView.Open(BmsScreen.Skin, BmsScreen.SkinOptions);
         }
 
         private void OnDragOver_Bms(object sender, DragEventArgs e)

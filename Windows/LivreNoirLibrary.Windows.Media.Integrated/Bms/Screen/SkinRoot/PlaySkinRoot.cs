@@ -3,7 +3,7 @@ using System;
 
 namespace LivreNoirLibrary.Windows.Controls.Bms.Elements
 {
-    public class PlaySkinRoot(PlaySkin skin) : SkinRoot(skin)
+    public class PlaySkinRoot(PlaySkin skin) : SkinRoot(skin), IPlaySkinRoot
     {
         private readonly PlaySkin _skin = skin;
 

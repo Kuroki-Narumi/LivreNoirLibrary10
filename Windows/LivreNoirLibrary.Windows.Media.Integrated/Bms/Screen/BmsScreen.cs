@@ -2,7 +2,9 @@
 using LivreNoirLibrary.Debug;
 using LivreNoirLibrary.Media;
 using LivreNoirLibrary.Media.Bms;
+using LivreNoirLibrary.Media.Bms.Play;
 using LivreNoirLibrary.Media.Bms.ViewModels;
+using LivreNoirLibrary.Media.Wave;
 using LivreNoirLibrary.Windows.Controls.Bms.Elements;
 using LivreNoirLibrary.Windows.Media;
 using LivreNoirLibrary.Windows.Media.Bms.SkinInfo;
@@ -15,16 +17,13 @@ using System.Text;
 using System.Windows;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
-using LivreNoirLibrary.Media.Bms.Play;
-using LivreNoirLibrary.Media.Wave;
 
 namespace LivreNoirLibrary.Windows.Controls.Bms
 {
-    public partial class BmsScreen : FrameworkElement, IVariableProvider
+    public partial class BmsScreen : FrameworkElement, IVariableProvider, IBmsScreen
     {
         public const int DefaultWidth = 1920;
         public const int DefaultHeight = 1080;
-        public static Dictionary<string, string> DefaultSkinOptions { get; } = [];
 
         [DependencyProperty]
         private Skin? _skin;
@@ -42,25 +41,27 @@ namespace LivreNoirLibrary.Windows.Controls.Bms
         private string? _debugText;
         [DependencyProperty]
         private double _fadeOpacity;
+        [DependencyProperty]
+        private ISkinOptionProvider? _skinOptionProvider;
 
         public SimpleBmsViewModel ViewModel { get; } = new();
         public BmsPlayOptions PlayOptions { get; }
-        public BmsTimer Timer { get; } = new();
+        public IBmsTimer Timer => _timer;
         public ScoreManager ScoreManager { get; }
-        public SkinRoot SkinRoot { get; private set; } = SkinRoot.Default;
-        public Dictionary<string, string> SkinOptions { get; private set; } = [];
+        public ISkinRoot? SkinRoot => _skinRoot;
+        public IDictionary<string, string>? SkinOptions { get; private set; }
         public Dictionary<string, string> BmsOptions { get; } = [];
         public Dictionary<string, string> Variables { get; } = [];
         public AudioComposer<string> AudioComposer { get; }
         public double FirstSoundTime => _timingList.FirstSoundTime;
         public double LastSoundTime => _timingList.LastSoundTime;
 
-        private readonly Dictionary<Skin, Dictionary<string, string>> _skinOptionCollection = [];
-
         private WriteableBitmap _bitmap;
         private Rect _bitmapRect;
         private bool _needEnsureBitmap;
         private bool _needRender;
+        private readonly BmsTimer _timer = new();
+        private SkinRoot _skinRoot = Elements.SkinRoot.Default;
         private readonly FloatBitmap _buffer = new(0, 0);
 
         private readonly List<ScreenElement> _children = [];
@@ -85,7 +86,7 @@ namespace LivreNoirLibrary.Windows.Controls.Bms
             AudioComposer = new(_waveProvider, _timingList.BgmTimeline);
         }
 
-        public bool TryGetOption(string key, [MaybeNullWhen(false)] out string value) => SkinOptions.TryGetValue(key, out value) || BmsOptions.TryGetValue(key, out value);
+        public bool TryGetOption(string key, [MaybeNullWhen(false)] out string value) => BmsOptions.TryGetValue(key, out value);
         public bool TryGetVariable(string key, [MaybeNullWhen(false)] out string value) => Variables.TryGetValue(key, out value);
 
         private void OnSkinChanged(Skin? value)
@@ -107,20 +108,42 @@ namespace LivreNoirLibrary.Windows.Controls.Bms
                         AppendChild(children, element);
                     }
                 }
-                SkinRoot = SkinRoot.Create(value);
-                HasSkinOptions = value.Options.Count is > 0;
-                SkinOptions = _skinOptionCollection.GetOrAdd(value);
+                _skinRoot = Elements.SkinRoot.Create(value);
                 _debugRoot = new(value.Name ?? value.GetType().Name, 0, 0);
                 ExConsole.Write($"Skin \"{value.Name}\" loaded");
             }
             else
             {
-                SkinRoot = SkinRoot.Default;
-                HasSkinOptions = false;
-                SkinOptions = DefaultSkinOptions;
+                _skinRoot = Elements.SkinRoot.Default;
                 _debugRoot = default;
             }
+            ApplySkinOptions(value, SkinOptionProvider);
             InvalidateVisual();
+        }
+
+        private void OnSkinOptionProviderChanged(ISkinOptionProvider? provider) => ApplySkinOptions(_skin, provider);
+
+        void ApplySkinOptions(Skin? skin, ISkinOptionProvider? provider)
+        {
+            if (skin is not null && skin.Options.Count is > 0)
+            {
+                HasSkinOptions = true;
+                if ((SkinOptions = provider?.GetSkinOptions(skin)) is { } dic)
+                {
+                    foreach (var option in skin!.Options)
+                    {
+                        if (dic.TryGetValue(option.Key, out var optionValue))
+                        {
+                            option.SetValue(optionValue);
+                        }
+                    }
+                }
+            }
+            else
+            {
+                HasSkinOptions = false;
+                SkinOptions = null;
+            }
         }
 
         void AppendChild(List<ScreenElement> children, SkinElement element, int indent = 1)
@@ -199,7 +222,8 @@ namespace LivreNoirLibrary.Windows.Controls.Bms
         {
             if (_skin is { } skin)
             {
-                SkinRoot.DetermineExpressions(this);
+                _skinRoot.DetermineExpressions(this);
+                _notes.DetermineExpressions(skin, this);
                 foreach (var element in _children.AsSpan())
                 {
                     element.DetermineExpressions(skin, this);
@@ -207,7 +231,7 @@ namespace LivreNoirLibrary.Windows.Controls.Bms
             }
         }
 
-        public void SetupAudio(bool autoPlay)
+        public void SetupAudio(bool isAutoPlay)
         {
             var op = PlayOptions;
             ScoreManager.Clear();
@@ -215,7 +239,7 @@ namespace LivreNoirLibrary.Windows.Controls.Bms
             if (_isBmsReady)
             {
                 var timing = _timingList;
-                timing.Load(ViewModel, BmsDirectory ?? "", autoPlay);
+                timing.Load(ViewModel, BmsDirectory ?? "", isAutoPlay);
                 Variables.SetPlayInfos(timing);
                 _notes.Setup(timing);
                 op.UpdateHsCorrection(timing);
@@ -224,12 +248,13 @@ namespace LivreNoirLibrary.Windows.Controls.Bms
             }
         }
 
-        public void SetupPlay(bool autoPlay)
+        public void SetupPlay(bool isAutoPlay)
         {
+            DetermineExpressions();
             Timer.PrepareToPlay();
             _bga.Clear();
 
-            SetupAudio(autoPlay);
+            SetupAudio(isAutoPlay);
 
             _debugRoot = _debugRoot.Reset();
             var debug = _debugDic;
@@ -246,7 +271,7 @@ namespace LivreNoirLibrary.Windows.Controls.Bms
             if (_skin is { } skin)
             {
                 var options = PlayOptions;
-                var timer = Timer;
+                var timer = _timer;
                 var timings = _timingList;
                 timer.SetBeatTimer(time, timings, ViewModel);
                 UpdateArgs args = new(skin, this, options, timer, time, timings, _textureCache, _mediaCache, _notes, _bga, ScoreManager);

@@ -37,6 +37,19 @@ namespace LivreNoirLibrary.Numerics
             return new(value._numerator - den, den);
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static Rational Abs(Rational value) => value.Abs();
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static bool IsZero(Rational value) => value.IsZero();
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static bool IsPositive(Rational value) => value.IsPositive();
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static bool IsPositiveThanZero(Rational value) => value.IsPositiveThanZero();
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static bool IsNegative(Rational value) => value.IsNegative();
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static bool IsNegativeOrZero(Rational value) => value.IsNegativeOrZero();
+
         /// <inheritdoc cref="Abs(Rational)"/>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public Rational Abs() => _numerator is >= 0 ? this : new(false, -_numerator, Denominator);
@@ -122,19 +135,6 @@ namespace LivreNoirLibrary.Numerics
         public long Floor(long factor = 1) => (long)Math.Floor((double)_numerator * factor / Denominator);
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public long Ceiling(long factor = 1) => (long)Math.Ceiling((double)_numerator * factor / Denominator);
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static Rational Abs(Rational value) => value.Abs();
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static bool IsZero(Rational value) => value.IsZero();
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static bool IsPositive(Rational value) => value.IsPositive();
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static bool IsPositiveThanZero(Rational value) => value.IsPositiveThanZero();
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static bool IsNegative(Rational value) => value.IsNegative();
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static bool IsNegativeOrZero(Rational value) => value.IsNegativeOrZero();
 
         static Rational IAdditiveIdentity<Rational, Rational>.AdditiveIdentity => Zero;
         static Rational IMultiplicativeIdentity<Rational, Rational>.MultiplicativeIdentity => One;

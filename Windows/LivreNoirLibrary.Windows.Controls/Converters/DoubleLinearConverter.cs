@@ -12,12 +12,13 @@ namespace LivreNoirLibrary.Windows.Converters
         public double Slope { get; set; } = 1;
         public double Offset { get; set; }
         public DoubleRounding Rounding { get; set; }
+        public int Digits { get; set; }
 
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
             if (NumberExtensions.TryGetDouble(value, out var v))
             {
-                v = DoubleRoundConverter.GetRound(v * Slope.Validate(1) + Offset.Validate(), Rounding);
+                v = DoubleRoundConverter.GetRound(v * Slope.Validate(1) + Offset.Validate(), Rounding, Digits);
                 if (double.IsFinite(Maximum) && v > Maximum)
                 {
                     v = Maximum;

@@ -50,10 +50,7 @@
 		<Texture Key="beam_blue" BasedOn="beam" Rect="27, 0, 21, 321"/>
 
 		<Texture Key="bomb_1" BasedOn="bomb" Rect="0,   0, 4480, 224" DivX="16" LoopPeriod="0.25"/>
-		<Texture Key="bomb_2" BasedOn="bomb" Rect="0, 224, 2240, 224" DivX="8" LoopPeriod="0.125"/>
-
-		<Texture Key="bomb_3" BasedOn="bomb" Rect="0, 448, 4480, 224" DivX="16" LoopPeriod="0.25"/>
-		<Texture Key="bomb_4" BasedOn="bomb" Rect="0, 672, 4480, 224" DivX="16" LoopPeriod="0.25"/>
+		<Texture Key="bomb_2" BasedOn="bomb" Rect="560, 224, 2240, 224" DivX="8" LoopPeriod="0.125"/>
 
 		<Texture Key="judge_perfect" BasedOn="judge" Rect="0, 0, 120, 144" DivY="3" LoopPeriod="0.125"/>
 		<Texture Key="judge_great" BasedOn="judge" Rect="0, 144, 120, 96" DivY="2" LoopPeriod="0.125"/>

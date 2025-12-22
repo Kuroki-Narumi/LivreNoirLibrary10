@@ -43,9 +43,9 @@ namespace LivreNoirLibrary.Windows.Controls.Bms.Elements
                     dw = sw;
                     dh = sh;
                 }
-                else if (dw is <= 0)
+                else if (dw is < 0)
                 {
-                    if (dh is <= 0)
+                    if (dh is < 0)
                     {
                         dw = Math.Min(sw, MaxWidth);
                         dh = Math.Min(sh, MaxHeight);
@@ -55,7 +55,7 @@ namespace LivreNoirLibrary.Windows.Controls.Bms.Elements
                         dw = Math.Min(sw * dh / sh, MaxWidth);
                     }
                 }
-                else if (dh is <= 0)
+                else if (dh is < 0)
                 {
                     dh = Math.Min(sh * dw / sw, MaxHeight);
                 }

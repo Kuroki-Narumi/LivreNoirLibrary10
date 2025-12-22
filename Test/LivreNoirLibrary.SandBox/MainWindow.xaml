@@ -126,7 +126,7 @@
                         <ct:DropDownMenuButton>
                             <ct:IconPresenter Width="16" Source="{x:Static ct:Icons.Volume_3}"/>
                             <ct:DropDownMenuButton.DropDownContent>
-                                <Grid ColumnDefinitions="Auto, *" RowDefinitions="Auto, Auto, Auto, Auto">
+                                <Grid ColumnDefinitions="Auto, *" RowDefinitions="Auto, Auto, Auto, Auto, Auto">
                                     <TextBlock Style="{StaticResource Top}" Text="Volume"/>
                                     <TextBlock Grid.Row="1" Style="{StaticResource Header}" Text="Master"/>
                                     <TextBlock Grid.Row="2" Style="{StaticResource Header}" Text="Key"/>
@@ -134,6 +134,8 @@
                                     <ct:LabeledSlider Grid.Row="1" Style="{StaticResource VolumeSlider}" Value="{Binding BmsOptions.MasterVolume, Converter={StaticResource PercentConv}}"/>
                                     <ct:LabeledSlider Grid.Row="2" Style="{StaticResource VolumeSlider}" Value="{Binding BmsOptions.KeyVolume, Converter={StaticResource PercentConv}}"/>
                                     <ct:LabeledSlider Grid.Row="3" Style="{StaticResource VolumeSlider}" Value="{Binding BmsOptions.BgmVolume, Converter={StaticResource PercentConv}}"/>
+                                    <TextBlock Grid.Row="4" Style="{StaticResource Header}" Text="S.Rate" />
+                                    <ComboBox Grid.Row="4" Grid.Column="1" ItemsSource="{x:Static local:MainWindow.SampleRateList}" SelectedItem="{Binding BmsOptions.AudioSampleRate}"/>
                                 </Grid>
                             </ct:DropDownMenuButton.DropDownContent>
                         </ct:DropDownMenuButton>

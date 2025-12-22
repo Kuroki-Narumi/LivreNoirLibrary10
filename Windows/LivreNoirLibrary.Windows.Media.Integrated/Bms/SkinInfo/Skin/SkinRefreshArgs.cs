@@ -12,6 +12,7 @@ namespace LivreNoirLibrary.Windows.Media.Bms.SkinInfo
         private readonly List<OptionBase> _options = [];
         private readonly List<Variable> _variables = [];
         private readonly List<Texture> _textures = [];
+        private readonly List<LaneDefinition> _lanes = [];
         private readonly Dictionary<string, Skin> _includeSkins = [];
 
         public void Clear()
@@ -32,15 +33,17 @@ namespace LivreNoirLibrary.Windows.Media.Bms.SkinInfo
             return _skins.TryGetValue(key, out skin);
         }
 
-        public void BeginResolveInclude(OptionCollection options, VariableCollection variables, TextureCollection textures)
+        public void BeginResolveInclude(OptionCollection options, VariableCollection variables, TextureCollection textures, LaneDefinitionCollection lanes)
         {
             _includeSkins.Clear();
             _options.AddRange(options);
             _variables.AddRange(variables);
             _textures.AddRange(textures);
+            _lanes.AddRange(lanes);
             options.Clear();
             variables.Clear();
             textures.Clear();
+            lanes.Clear();
         }
 
         public bool TryGetIncludeSource(string directory, IncludeSource include, [MaybeNullWhen(false)] out Skin source)
@@ -56,14 +59,16 @@ namespace LivreNoirLibrary.Windows.Media.Bms.SkinInfo
 
         public bool TryGetIncludeSource(string key, [MaybeNullWhen(false)] out Skin source) => _includeSkins.TryGetValue(key, out source);
 
-        public void RestoreSkinInfo(OptionCollection options, VariableCollection variables, TextureCollection textures)
+        public void RestoreSkinInfo(OptionCollection options, VariableCollection variables, TextureCollection textures, LaneDefinitionCollection lanes)
         {
             options.AddRange(_options);
             variables.AddRange(_variables);
             textures.AddRange(_textures);
+            lanes.AddRange(_lanes);
             _options.Clear();
             _variables.Clear();
             _textures.Clear();
+            _lanes.Clear();
         }
 
         public void FinishResolveInclude()

@@ -13,5 +13,6 @@ namespace LivreNoirLibrary.Windows.Media.Bms.SkinInfo
         public ValueExpression? LongBody { get; set => SetValue(ref field, value); }
         public ValueExpression? ActiveLongBody { get; set => SetValue(ref field, value); }
         public ValueExpression? Mine { get; set => SetValue(ref field, value); }
+        public ValueExpression? Invisible { get; set => SetValue(ref field, value); }
     }
 }

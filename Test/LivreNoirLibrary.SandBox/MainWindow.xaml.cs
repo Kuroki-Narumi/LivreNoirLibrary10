@@ -1,8 +1,10 @@
-﻿using LivreNoirLibrary.IO;
+﻿using LivreNoirLibrary.Debug;
+using LivreNoirLibrary.IO;
 using LivreNoirLibrary.Media;
 using LivreNoirLibrary.Media.Bms;
 using LivreNoirLibrary.Media.Wave;
 using LivreNoirLibrary.Windows.Controls;
+using System.ComponentModel;
 using System.IO;
 using System.Text;
 using System.Windows;
@@ -24,8 +26,10 @@ namespace LivreNoirLibrary.SandBox
 
         public MainWindow()
         {
-            BmsOptions = new();
-            BmsScreen = new(BmsOptions);
+            BmsScreen = new(BmsOptions)
+            {
+                SkinOptionProvider = this
+            };
             BmsVideoCreator = new(BmsScreen, BmsOptions);
             DataContext = this;
             InitializeComponent();
@@ -35,7 +39,14 @@ namespace LivreNoirLibrary.SandBox
             BmsSkins = new();
             BmsSkins.Load(Path.GetFullPath(@"Themes\BmsSkin\", General.GetAssemblyDir()));
             ComboBox_Skin.ItemsSource = BmsSkins.PlaySkins[0];
-            ComboBox_Skin.SelectedIndex = 0;
+            ComboBox_Skin.SelectedIndex = AppSettings.Instance.SkinIndex;
+        }
+
+        protected override void OnClosing(CancelEventArgs e)
+        {
+            AppSettings.Instance.SkinIndex = ComboBox_Skin.SelectedIndex;
+            AppSettings.Save();
+            base.OnClosing(e);
         }
 
         protected override void OnActivated(EventArgs e)

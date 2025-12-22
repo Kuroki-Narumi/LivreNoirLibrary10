@@ -6,13 +6,8 @@ namespace LivreNoirLibrary.Media.Bms
     {
         public static TimingInfo Create(double tempo)
         {
-            var scroll = 1d;
-            if (tempo is < 0)
-            {
-                tempo = -tempo;
-                scroll = -1;
-            }
-            return new(0, 0, 0, tempo, 0, scroll);
+            var bps = tempo / 240;
+            return new(0, 0, 0, tempo, 0, 1, 1 / bps, bps);
         }
 
         public double Beat { get; }
@@ -24,7 +19,7 @@ namespace LivreNoirLibrary.Media.Bms
         public double SecondsPerBeat { get; }
         public double BeatsPerSecond { get; }
 
-        internal TimingInfo(double beat, double time, double position, double tempo, double stopTime, double scroll)
+        internal TimingInfo(double beat, double time, double position, double tempo, double stopTime, double scroll, double spb, double bps)
         {
             Beat = beat;
             Time = time;
@@ -32,11 +27,11 @@ namespace LivreNoirLibrary.Media.Bms
             Tempo = tempo;
             StopTime = stopTime;
             Scroll = scroll;
-            SecondsPerBeat = 240 / tempo;
-            BeatsPerSecond = tempo / 240;
+            SecondsPerBeat = spb;
+            BeatsPerSecond = bps;
         }
 
         public (TimingInfo Before, TimingInfo After) SplitStop() 
-            => (new(Beat, Time, Position, Tempo, StopTime, 0), new(Beat, Time + StopTime, Position, Tempo, 0, Scroll));
+            => (new(Beat, Time, Position, Tempo, StopTime, 0, double.PositiveInfinity, 0), new(Beat, Time + StopTime, Position, Tempo, 0, Scroll, SecondsPerBeat, BeatsPerSecond));
     }
 }

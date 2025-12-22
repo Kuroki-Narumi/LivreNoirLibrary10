@@ -43,7 +43,7 @@
 	</Group>
 
 	<Image Name="StageFile" Texture="#STAGEFILE">
-		<Destination Rect="0, 28, 0, 180"/>
+		<Destination Rect="0, 28, -1, 180"/>
 	</Image>
 
 	<Group Name="Text Info">

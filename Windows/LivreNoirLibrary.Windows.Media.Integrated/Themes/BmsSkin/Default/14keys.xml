@@ -1,0 +1,131 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<PlaySkin Name="14keys default" 
+		  KeyCount="10, 14" Version="1.0" Author="ROKINA" BaseSize="1280, 720" Background="#111"
+		  FadeInTime="$Options.FadeIn Time" FadeOutTime="$Options.FadeOut Time" LoadTime="$Options.Load Time" ReadyTime="$Options.Ready Time" MarginTime="$Options.Margin Time">
+	<Skin.Includes>
+		<IncludeSource Key="common_textures_bm" Source="Includes/common_textures_bm"/>
+		<IncludeSource Key="common_textures_number" Source="Includes/common_textures_number"/>
+		<IncludeSource Key="info" Source="Includes/include_info"/>
+		<IncludeSource Key="1p_left" Source="Includes/include_7key_1p_left" />
+		<IncludeSource Key="2p_right" Source="Includes/include_7key_2p_right" />
+	</Skin.Includes>
+	<Skin.Options>
+		<ListOption Key="Layout">
+			<Option Value="Left" IsDefault="True"/>
+			<Option Value="Right" />
+		</ListOption>
+		<Separator/>
+		<RangeOption Key="FadeIn Time" Minimum="0" Maximum="10" DefaultValue="0.5" StringFormat="0.0" TickFrequency="0.1" Suffix="s"/>
+		<RangeOption Key="Load Time" Minimum="0" Maximum="10" DefaultValue="2" StringFormat="0.0" TickFrequency="0.1" Suffix="s"/>
+		<RangeOption Key="Ready Time" Minimum="0" Maximum="10" DefaultValue="1" StringFormat="0.0" TickFrequency="0.1" Suffix="s"/>
+		<RangeOption Key="Margin Time" Minimum="0" Maximum="10" DefaultValue="3" StringFormat="0.0" TickFrequency="0.1" Suffix="s"/>
+		<RangeOption Key="FadeOut Time" Minimum="0" Maximum="10" DefaultValue="1" StringFormat="0.0" TickFrequency="0.1" Suffix="s"/>
+	</Skin.Options>
+	<Skin.Variables>
+		<!-- frame position -->
+		<Variable Key="layout_1p_frame" Source="$Options.Layout" DefaultValue="0">
+			<Convert From="Right" To="512"/>
+		</Variable>
+		<Variable Key="layout_2p_frame" Source="$Options.Layout" DefaultValue="896">
+			<Convert From="Left" To="384"/>
+		</Variable>
+		<Variable Key="layout_bga" Source="$Options.Layout" DefaultValue="384">
+			<Convert From="Left" To="768"/>
+			<Convert From="Right" To="0"/>
+		</Variable>
+		
+		<Variable Key="title_opacity" Source="$Options.BackBmp Defined" DefaultValue="1">
+			<Convert From="True" To="0"/>
+		</Variable>
+	</Skin.Variables>
+	<Skin.LaneDefinitions>
+		<LaneDefinition Name="1P1" Channel="11" Lane="1" Player="1" />
+		<LaneDefinition Name="1P2" Channel="12" Lane="2" Player="1" />
+		<LaneDefinition Name="1P3" Channel="13" Lane="3" Player="1" />
+		<LaneDefinition Name="1P4" Channel="14" Lane="4" Player="1" />
+		<LaneDefinition Name="1P5" Channel="15" Lane="5" Player="1" />
+		<LaneDefinition Name="1P6" Channel="18" Lane="6" Player="1" />
+		<LaneDefinition Name="1P7" Channel="19" Lane="7" Player="1" />
+		<LaneDefinition Name="1PScratch" Channel="16" Lane="8" Player="1" />
+		<LaneDefinition Name="2P1" Channel="21" Lane="11" Player="2" />
+		<LaneDefinition Name="2P2" Channel="22" Lane="12" Player="2" />
+		<LaneDefinition Name="2P3" Channel="23" Lane="13" Player="2" />
+		<LaneDefinition Name="2P4" Channel="24" Lane="14" Player="2" />
+		<LaneDefinition Name="2P5" Channel="25" Lane="15" Player="2" />
+		<LaneDefinition Name="2P6" Channel="28" Lane="16" Player="2" />
+		<LaneDefinition Name="2P7" Channel="29" Lane="17" Player="2" />
+		<LaneDefinition Name="2PScratch" Channel="26" Lane="18" Player="2" />
+	</Skin.LaneDefinitions>
+
+	<Bga Name="BGA">
+		<Destination X="$Variables.layout_bga" Y="0" Width="512" Height="512" Opacity="$Options.Bga Opacity"/>
+	</Bga>
+
+	<Group Name="1P Area">
+		<Destination X="$Variables.layout_1p_frame" Y="0" Width="384" Height="640"/>
+		<Include Key="1p_left"/>
+	</Group>
+
+	<Group Name="2P Area">
+		<Destination X="$Variables.layout_2p_frame" Y="0" Width="384" Height="640"/>
+		<Include Key="2p_right"/>
+	</Group>
+
+	<Group Name="LoadingTitle BackBmp">
+		<Destination X="$Variables.layout_bga" Y="32" Width="512" Height="480"/>
+		<Image Texture="#BACKBMP" Blend="Add" DestTimer="Play_LoadingStart" DestLoopStart="0.5">
+			<Destination X="256" Y="256" Height="480" Origin="0.5, 0.5" Opacity="0"/>
+			<Destination Time="0.5" Opacity="1"/>
+		</Image>
+		<Image Texture="#BACKBMP" Blend="Add" DestTimer="Play_LoadingFinish" DestLoopStart="-1">
+			<Destination X="256" Y="256" Height="480" Origin="0.5, 0.5" Opacity="1"/>
+			<Destination Time="0.5" Opacity="0"/>
+		</Image>
+	</Group>
+	<Group Name="LoadingTitle Default">
+		<Destination X="$Variables.layout_bga" Y="32" Width="512" Height="480" Opacity="$Variables.title_opacity"/>
+		<Group Blend="Add" DestTimer="Play_LoadingStart" DestLoopStart="0.5">
+			<Destination Rect="0,0,512,480" Opacity="0"/>
+			<Destination Time="0.5" Opacity="1"/>
+			<Text FontFamily="VL PGothic" FontSize="24" FontWeight="Bold" Content="$Variables.Genre" StrokeThickness="4" MaxWidth="512">
+				<Destination X="256" Y="96" Origin="0.5, 0.5"/>
+			</Text>
+			<Text FontFamily="VL PGothic" FontSize="40" FontWeight="Bold" Content="$Variables.Title" StrokeThickness="4" MaxWidth="512">
+				<Destination X="256" Y="160" Origin="0.5,0.5"/>
+			</Text>
+			<Text FontFamily="VL PGothic" FontSize="24" FontWeight="Bold" Content="$Variables.SubTitle" StrokeThickness="4" MaxWidth="512">
+				<Destination X="256" Y="200" Origin="0.5,0.5"/>
+			</Text>
+			<Text FontFamily="VL PGothic" FontSize="28" FontWeight="Bold" Content="$Variables.Artist" StrokeThickness="4" MaxWidth="512">
+				<Destination X="256" Y="320" Origin="0.5,0.5"/>
+			</Text>
+			<Text FontFamily="VL PGothic" FontSize="24" FontWeight="Bold" Content="$Variables.SubArtist" StrokeThickness="4" MaxWidth="512">
+				<Destination X="256" Y="352" Origin="0.5,0.5"/>
+			</Text>
+		</Group>
+		<Group Blend="Add" DestTimer="Play_LoadingFinish" DestLoopStart="-1">
+			<Destination Rect="0,0,512,480" Opacity="1"/>
+			<Destination Time="0.5" Opacity="0"/>
+			<Text FontFamily="VL PGothic" FontSize="24" FontWeight="Bold" Content="$Variables.Genre" StrokeThickness="4" MaxWidth="512">
+				<Destination X="256" Y="96" Origin="0.5, 0.5"/>
+			</Text>
+			<Text FontFamily="VL PGothic" FontSize="40" FontWeight="Bold" Content="$Variables.Title" StrokeThickness="4" MaxWidth="512">
+				<Destination X="256" Y="160" Origin="0.5,0.5"/>
+			</Text>
+			<Text FontFamily="VL PGothic" FontSize="24" FontWeight="Bold" Content="$Variables.SubTitle" StrokeThickness="4" MaxWidth="512">
+				<Destination X="256" Y="200" Origin="0.5,0.5"/>
+			</Text>
+			<Text FontFamily="VL PGothic" FontSize="28" FontWeight="Bold" Content="$Variables.Artist" StrokeThickness="4" MaxWidth="512">
+				<Destination X="256" Y="320" Origin="0.5,0.5"/>
+			</Text>
+			<Text FontFamily="VL PGothic" FontSize="24" FontWeight="Bold" Content="$Variables.SubArtist" StrokeThickness="4" MaxWidth="512">
+				<Destination X="256" Y="352" Origin="0.5,0.5"/>
+			</Text>
+		</Group>
+	</Group>
+	
+	<Group Name="Info Area">
+		<Destination Rect="0, 512, 1280, 208"/>
+		<Include Key="info"/>
+	</Group>
+</PlaySkin>

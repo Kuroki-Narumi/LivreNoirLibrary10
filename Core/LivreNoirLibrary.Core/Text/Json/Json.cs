@@ -7,6 +7,7 @@ using System.Threading;
 using System.Diagnostics.CodeAnalysis;
 using LivreNoirLibrary.IO;
 using LivreNoirLibrary.Collections;
+using LivreNoirLibrary.Debug;
 
 namespace LivreNoirLibrary.Text
 {
@@ -125,7 +126,10 @@ namespace LivreNoirLibrary.Text
                     return true;
                 }
             }
-            catch { }
+            catch(Exception e)
+            {
+                ExConsole.Write(e);
+            }
             result = null;
             return false;
         }

@@ -16,11 +16,6 @@ namespace LivreNoirLibrary.Media.Bms
             var lastSound = 0d;
             foreach (var (pos, list) in timeline.EnumerateList())
             {
-                // ƒeƒ“ƒ|‚ª³‚Å‚È‚¢ê‡‚ÍI—¹
-                if (state.IsInvalidTempo)
-                {
-                    break;
-                }
                 state.Setup(provider.GetAbsolutePosition(pos));
                 var containsNote = false;
                 foreach (var note in list.AsSpan())

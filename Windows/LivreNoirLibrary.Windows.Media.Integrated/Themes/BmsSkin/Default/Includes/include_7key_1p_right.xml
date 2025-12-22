@@ -60,29 +60,29 @@
 			<Destination Time="0.1" Width="0" Opacity="0"/>
 		</Image>
 
-		<Image Texture="beam_blue" DestTimer="Play_Button8_Press">
+		<Image Texture="beam_blue" DestTimer="Play_Button6_Press">
 			<Destination Rect="201, 512, 30, 0" Origin="0.5, 1"/>
 			<Destination Time="0.10" Height="$Options.Beam Height"/>
 		</Image>
-		<Image Texture="beam_blue" DestTimer="Play_Button8_Release" DestLoopStart="-1">
+		<Image Texture="beam_blue" DestTimer="Play_Button6_Release" DestLoopStart="-1">
 			<Destination X="201" Y="512" Width="30" Height="$Options.Beam Height" Origin="0.5, 1" Opacity="1"/>
 			<Destination Time="0.1" Width="0" Opacity="0"/>
 		</Image>
 
-		<Image Texture="beam_white" DestTimer="Play_Button9_Press">
+		<Image Texture="beam_white" DestTimer="Play_Button7_Press">
 			<Destination Rect="237, 512, 38, 0" Origin="0.5, 1"/>
 			<Destination Time="0.11" Height="$Options.Beam Height"/>
 		</Image>
-		<Image Texture="beam_white" DestTimer="Play_Button9_Release" DestLoopStart="-1">
+		<Image Texture="beam_white" DestTimer="Play_Button7_Release" DestLoopStart="-1">
 			<Destination X="237" Y="512" Width="38" Height="$Options.Beam Height" Origin="0.5, 1" Opacity="1"/>
 			<Destination Time="0.1" Width="0" Opacity="0"/>
 		</Image>
 
-		<Image Texture="beam_red" DestTimer="Play_Button6_Press">
+		<Image Texture="beam_red" DestTimer="Play_Button8_Press">
 			<Destination Rect="288, 512, 60, 0" Origin="0.5, 1"/>
 			<Destination Time="0.12" Height="$Options.Beam Height"/>
 		</Image>
-		<Image Texture="beam_red" DestTimer="Play_Button6_Release" DestLoopStart="-1">
+		<Image Texture="beam_red" DestTimer="Play_Button8_Release" DestLoopStart="-1">
 			<Destination X="288" Y="512" Width="60" Height="$Options.Beam Height" Origin="0.5, 1" Opacity="1"/>
 			<Destination Time="0.1" Width="0" Opacity="0"/>
 		</Image>
@@ -131,7 +131,7 @@
 				  ActiveLongBody="note_white_long_body_active"
 				  Mine="note_white_mine">
 		</NoteLane>
-		<NoteLane Lane="8" X="186" Width="30"
+		<NoteLane Lane="6" X="186" Width="30"
 				  Note="note_blue"
 				  LongHead="note_blue_long_head"
 				  LongTail="note_blue_long_tail"
@@ -139,7 +139,7 @@
 				  ActiveLongBody="note_blue_long_body_active"
 				  Mine="note_blue_mine">
 		</NoteLane>
-		<NoteLane Lane="9" X="218" Width="38"
+		<NoteLane Lane="7" X="218" Width="38"
 				  Note="note_white"
 				  LongHead="note_white_long_head"
 				  LongTail="note_white_long_tail"
@@ -147,7 +147,7 @@
 				  ActiveLongBody="note_white_long_body_active"
 				  Mine="note_white_mine">
 		</NoteLane>
-		<NoteLane Lane="6" X="258" Width="60"
+		<NoteLane Lane="8" X="258" Width="60"
 				  Note="note_red"
 				  LongHead="note_red_long_head"
 				  LongTail="note_red_long_tail"
@@ -162,66 +162,65 @@
 
 		<!-- Normal Bomb -->
 		<Image Texture="bomb_1" SourceTimer="Play_Button1_Bomb" DestTimer="Play_Button1_Bomb" DestLoopStart="-1" DestLoopEnd="0.25" Blend="Add">
-			<Destination Rect="53, 508, 280, 224" Origin="0.436, 0.432"/>
+			<Destination Rect="53, 508, -1, -1" Origin="0.436, 0.432"/>
 		</Image>
 		<Image Texture="bomb_1" SourceTimer="Play_Button2_Bomb" DestTimer="Play_Button2_Bomb" DestLoopStart="-1" DestLoopEnd="0.25" Blend="Add">
-			<Destination Rect="89, 508, 280, 224" Origin="0.436, 0.432"/>
+			<Destination Rect="89, 508, -1, -1" Origin="0.436, 0.432"/>
 		</Image>
 		<Image Texture="bomb_1" SourceTimer="Play_Button3_Bomb" DestTimer="Play_Button3_Bomb" DestLoopStart="-1" DestLoopEnd="0.25" Blend="Add">
-			<Destination Rect="125, 508, 280, 224" Origin="0.436, 0.432"/>
+			<Destination Rect="125, 508, -1, -1" Origin="0.436, 0.432"/>
 		</Image>
 		<Image Texture="bomb_1" SourceTimer="Play_Button4_Bomb" DestTimer="Play_Button4_Bomb" DestLoopStart="-1" DestLoopEnd="0.25" Blend="Add">
-			<Destination Rect="161, 508, 280, 224" Origin="0.436, 0.432"/>
+			<Destination Rect="161, 508, -1, -1" Origin="0.436, 0.432"/>
 		</Image>
 		<Image Texture="bomb_1" SourceTimer="Play_Button5_Bomb" DestTimer="Play_Button5_Bomb" DestLoopStart="-1" DestLoopEnd="0.25" Blend="Add">
-			<Destination Rect="197, 508, 280, 224" Origin="0.436, 0.432"/>
-		</Image>
-		<Image Texture="bomb_1" SourceTimer="Play_Button8_Bomb" DestTimer="Play_Button8_Bomb" DestLoopStart="-1" DestLoopEnd="0.25" Blend="Add">
-			<Destination Rect="233, 508, 280, 224" Origin="0.436, 0.432"/>
-		</Image>
-		<Image Texture="bomb_1" SourceTimer="Play_Button9_Bomb" DestTimer="Play_Button9_Bomb" DestLoopStart="-1" DestLoopEnd="0.25" Blend="Add">
-			<Destination Rect="269, 508, 280, 224" Origin="0.436, 0.432"/>
+			<Destination Rect="197, 508, -1, -1" Origin="0.436, 0.432"/>
 		</Image>
 		<Image Texture="bomb_1" SourceTimer="Play_Button6_Bomb" DestTimer="Play_Button6_Bomb" DestLoopStart="-1" DestLoopEnd="0.25" Blend="Add">
-			<Destination Rect="320, 508, 280, 224" Origin="0.436, 0.432"/>
+			<Destination Rect="233, 508, -1, -1" Origin="0.436, 0.432"/>
+		</Image>
+		<Image Texture="bomb_1" SourceTimer="Play_Button7_Bomb" DestTimer="Play_Button7_Bomb" DestLoopStart="-1" DestLoopEnd="0.25" Blend="Add">
+			<Destination Rect="269, 508, -1, -1" Origin="0.436, 0.432"/>
+		</Image>
+		<Image Texture="bomb_1" SourceTimer="Play_Button8_Bomb" DestTimer="Play_Button8_Bomb" DestLoopStart="-1" DestLoopEnd="0.25" Blend="Add">
+			<Destination Rect="320, 508, -1, -1" Origin="0.436, 0.432"/>
 		</Image>
 
 		<!-- Long Bomb -->
 		<Image Texture="bomb_2" SourceTimer="Play_Button1_LongBomb" DestTimer="Play_Button1_LongBomb" Blend="Add">
-			<Destination Rect="53, 508, 280, 224" Origin="0.436, 0.432"/>
+			<Destination Rect="53, 508, -1, -1" Origin="0.436, 0.432"/>
 		</Image>
 		<Image Texture="bomb_2" SourceTimer="Play_Button2_LongBomb" DestTimer="Play_Button2_LongBomb" Blend="Add">
-			<Destination Rect="89, 508, 280, 224" Origin="0.436, 0.432"/>
+			<Destination Rect="89, 508, -1, -1" Origin="0.436, 0.432"/>
 		</Image>
 		<Image Texture="bomb_2" SourceTimer="Play_Button3_LongBomb" DestTimer="Play_Button3_LongBomb" Blend="Add">
-			<Destination Rect="125, 508, 280, 224" Origin="0.436, 0.432"/>
+			<Destination Rect="125, 508, -1, -1" Origin="0.436, 0.432"/>
 		</Image>
 		<Image Texture="bomb_2" SourceTimer="Play_Button4_LongBomb" DestTimer="Play_Button4_LongBomb" Blend="Add">
-			<Destination Rect="161, 508, 280, 224" Origin="0.436, 0.432"/>
+			<Destination Rect="161, 508, -1, -1" Origin="0.436, 0.432"/>
 		</Image>
 		<Image Texture="bomb_2" SourceTimer="Play_Button5_LongBomb" DestTimer="Play_Button5_LongBomb" Blend="Add">
-			<Destination Rect="197, 508, 280, 224" Origin="0.436, 0.432"/>
-		</Image>
-		<Image Texture="bomb_2" SourceTimer="Play_Button8_LongBomb" DestTimer="Play_Button8_LongBomb" Blend="Add">
-			<Destination Rect="233, 508, 280, 224" Origin="0.436, 0.432"/>
-		</Image>
-		<Image Texture="bomb_2" SourceTimer="Play_Button9_LongBomb" DestTimer="Play_Button9_LongBomb" Blend="Add">
-			<Destination Rect="269, 508, 280, 224" Origin="0.436, 0.432"/>
+			<Destination Rect="197, 508, -1, -1" Origin="0.436, 0.432"/>
 		</Image>
 		<Image Texture="bomb_2" SourceTimer="Play_Button6_LongBomb" DestTimer="Play_Button6_LongBomb" Blend="Add">
-			<Destination Rect="320, 508, 280, 224" Origin="0.436, 0.432"/>
+			<Destination Rect="233, 508, -1, -1" Origin="0.436, 0.432"/>
+		</Image>
+		<Image Texture="bomb_2" SourceTimer="Play_Button7_LongBomb" DestTimer="Play_Button7_LongBomb" Blend="Add">
+			<Destination Rect="269, 508, -1, -1" Origin="0.436, 0.432"/>
+		</Image>
+		<Image Texture="bomb_2" SourceTimer="Play_Button8_LongBomb" DestTimer="Play_Button8_LongBomb" Blend="Add">
+			<Destination Rect="320, 508, -1, -1" Origin="0.436, 0.432"/>
 		</Image>
 	</Group>
 
-	<Judge Name="Judge" DestTimer="Play_1P_Judge" Padding="8"
-		   Perfect="judge_perfect" PerfectCombo="judge_number_perfect"
-		   Great="judge_great" GreatCombo="judge_number"
-		   Good="judge_good" GoodCombo="judge_number"
-		   Bad="judge_bad"
-		   Through="judge_poor"
-		   BlankShot="judge_poor" BlankShotCombo="judge_number"
-			   >
+	<Judge Name="Judge" DestTimer="Play_1P_Judge" Player="1" Padding="8">
 		<Destination X="192" Y="360" Origin="0.5, 0.5"/>
+		<JudgeTexture Type="Perfect" Texture="judge_perfect" ComboTexture="judge_number_perfect"/>
+		<JudgeTexture Type="Great" Texture="judge_great" ComboTexture="judge_number"/>
+		<JudgeTexture Type="Good" Texture="judge_good" ComboTexture="judge_number"/>
+		<JudgeTexture Type="Bad" Texture="judge_bad"/>
+		<JudgeTexture Type="Through" Texture="judge_poor"/>
+		<JudgeTexture Type="BlankShot" Texture="judge_poor" ComboTexture="judge_number"/>
 	</Judge>
 
 	<Include Key="include_7key_effect" />

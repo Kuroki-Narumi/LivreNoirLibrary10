@@ -1,4 +1,5 @@
 ﻿using LivreNoirLibrary.Collections;
+using LivreNoirLibrary.Debug;
 using LivreNoirLibrary.IO;
 using LivreNoirLibrary.Media;
 using LivreNoirLibrary.Media.Bms;
@@ -73,7 +74,7 @@ namespace LivreNoirLibrary.Windows.Controls.Bms
             dict["AverageBpm"] = timingList.AverageTempo.ToString();
             dict["MainBpm"] = timingList.MainTempo.ToString();
             dict["MainTimeBpm"] = timingList.MainTimeTempo.ToString();
-            dict["TotalTime"] = TimeSpan.FromSeconds(timingList.LastSoundTime).ToString(@"mm\:ss");
+            dict["TotalTime"] = TimeSpan.FromSeconds(timingList.LastSoundTime).AutoFormat_Minutes();
         }
 
         public static void UpdateCurrentInfos(this IDictionary<string, string> dict, in UpdateArgs args)
@@ -84,17 +85,17 @@ namespace LivreNoirLibrary.Windows.Controls.Bms
 
             if (timer.TryGet(TimerId.Play_MusicStart, absTime, out var currentTime))
             {
-                dict["CurrentTime"] = TimeSpan.FromSeconds(currentTime).ToString(@"mm\:ss");
+                dict["CurrentTime"] = TimeSpan.FromSeconds(currentTime).AutoFormat_Minutes();
                 dict["CurrentBpm"] = timings.Time2Tempo(currentTime).ToString();
             }
             else
             {
-                dict["CurrentTime"] = "00:00";
+                dict["CurrentTime"] = "0:00";
                 dict["CurrentBpm"] = dict["Bpm"];
             }
             if (dict.TryGetValue("TotalTime", out var tt))
             {
-                dict["FullTime"] = $"{dict["CurrentTime"]} / {tt}";
+                dict["FullTime"] = $"{dict["CurrentTime"]}/{tt}";
             }
             else
             {

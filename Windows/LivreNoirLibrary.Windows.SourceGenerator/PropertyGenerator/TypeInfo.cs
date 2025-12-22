@@ -1,8 +1,5 @@
 ﻿using Microsoft.CodeAnalysis;
 using System;
-using System.Collections.Generic;
-using System.Runtime.CompilerServices;
-using System.Text;
 
 public record TypeInfo
 {
@@ -12,6 +9,13 @@ public record TypeInfo
     public bool IsNullable => Type.EndsWith("?");
 
     public TypeInfo() { }
+
+    public TypeInfo(IPropertySymbol symbol)
+    {
+        Type = Utils.GetTypeFullname(symbol.Type);
+        Name = symbol.Name;
+        IsValueType = symbol.Type.IsValueType;
+    }
 
     public TypeInfo(IFieldSymbol symbol)
     {
@@ -31,13 +35,6 @@ public record TypeInfo
     {
         type = Type;
         name = Name;
-    }
-
-    public void Deconstruct(out string type, out string name, out bool isValueType)
-    {
-        type = Type;
-        name = Name;
-        isValueType = IsValueType;
     }
 
     public void Deconstruct(out string type, out string name, out bool isValueType, out bool isNullbale)

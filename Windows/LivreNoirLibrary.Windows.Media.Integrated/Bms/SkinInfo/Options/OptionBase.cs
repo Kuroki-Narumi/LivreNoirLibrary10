@@ -10,6 +10,7 @@ namespace LivreNoirLibrary.Windows.Media.Bms.SkinInfo
         public string? Suffix { get; set => SetValue(ref field, value); }
 
         public abstract void SetDefaultValue();
+        public abstract void SetValue(string value);
 
         public override string ToString() => $"{GetType().Name}{{Key={Key}, SelectedValue={SelectedValue}}}";
     }

@@ -1,6 +1,9 @@
-﻿using LivreNoirLibrary.ObjectModel;
+﻿using LivreNoirLibrary.Collections;
+using LivreNoirLibrary.Debug;
+using LivreNoirLibrary.ObjectModel;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Text;
 
 namespace LivreNoirLibrary.Media.Bms.Play
@@ -8,6 +11,7 @@ namespace LivreNoirLibrary.Media.Bms.Play
     public class ScoreManager(IJudgeProvider judgeProvider) : ObservableObjectBase
     {
         private double _lastGauge;
+        private readonly Dictionary<int, Judge> _judges = [];
 
         public IJudgeProvider JudgeProvider { get; set => SetValue(ref field, value); } = judgeProvider;
 
@@ -15,9 +19,6 @@ namespace LivreNoirLibrary.Media.Bms.Play
         public int CurrentNoteCount { get; private set => SetValue(ref field, value); }
         public int Combo { get; set => SetValue(ref field, value); }
         public int MaxCombo { get; set => SetValue(ref field, value); }
-        public JudgeType JudgeType { get; set => SetValue(ref field, value); }
-        public double LastJudgeTime { get; set => SetValue(ref field, value); }
-        public bool IsJudgeActive { get; set => SetValue(ref field, value); }
 
         public double Score { get; set => SetValue(ref field, value); }
         public double Gauge { get; set => SetValue(ref field, value); }
@@ -27,16 +28,18 @@ namespace LivreNoirLibrary.Media.Bms.Play
         {
             MaxNoteCount = 0;
             CurrentNoteCount = 0;
+            foreach (var (_, judge) in _judges)
+            {
+                judge.Clear();
+            }
             Combo = 0;
             MaxCombo = 0;
-            JudgeType = 0;
-            LastJudgeTime = 0;
             Score = 0;
             Gauge = JudgeProvider.GaugeDefinition.InitialValue;
             _lastGauge = Gauge;
         }
 
-        public void UpdateJudge(IBmsTimer timer, double absoluteTime, in JudgeInfo info)
+        public void UpdateJudge(IBmsTimer timer, double absoluteTime, double duration, in JudgeInfo info)
         {
             switch (info.ComboChange)
             {
@@ -53,13 +56,12 @@ namespace LivreNoirLibrary.Media.Bms.Play
                     break;
             }
 
-            if (absoluteTime > LastJudgeTime)
-            {
-                var type = info.Type;
-                JudgeType = type;
-                LastJudgeTime = absoluteTime;
-                timer.SetJudgeTimer(absoluteTime, type, 1, info.Error);
-            }
+            var combo = Combo;
+            var type = info.Type;
+            var player = info.Player;
+            var error = info.Error;
+            UpdateJudgeDisplay(timer, 0, combo, type, absoluteTime, duration, error);
+            UpdateJudgeDisplay(timer, player, combo, type, absoluteTime, duration, error);
 
             Score += info.ScoreGain;
 
@@ -107,6 +109,42 @@ namespace LivreNoirLibrary.Media.Bms.Play
                     timer.Set(TimerId.Play_Gauge_Gain, absoluteTime);
                 }
                 _lastGauge = stepped;
+            }
+        }
+
+        private void UpdateJudgeDisplay(IBmsTimer timer, int player, int combo, JudgeType type, double absoluteTime, double duration, double error)
+        {
+            _judges.GetOrAdd(player, p => new(p)).Update(timer, combo, type, absoluteTime, duration, error);
+        }
+
+        public bool TryGetPlayerJudge(int player, [MaybeNullWhen(false)] out Judge judge) => _judges.TryGetValue(player, out judge);
+
+        public class Judge(int player) : ObservableObjectBase
+        {
+            public int Player { get; } = player;
+            public int Combo { get; private set => SetValue(ref field, value); }
+            public JudgeType Type { get; private set => SetValue(ref field, value); }
+            public double LastOccurred { get; private set => SetValue(ref field, value); }
+            public double Limit { get; private set => SetValue(ref field, value); }
+
+            public void Clear()
+            {
+                Combo = 0;
+                Type = 0;
+                LastOccurred = 0;
+                Limit = 0;
+            }
+
+            public void Update(IBmsTimer timer, int combo, JudgeType type, double absoluteTime, double duration, double error)
+            {
+                if (absoluteTime >= LastOccurred)
+                {
+                    Combo = combo;
+                    Type = type;
+                    LastOccurred = absoluteTime;
+                    Limit = Math.Max(Limit, absoluteTime + duration);
+                    timer.SetJudgeTimer(absoluteTime, Player, error);
+                }
             }
         }
     }

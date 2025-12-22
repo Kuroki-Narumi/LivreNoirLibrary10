@@ -99,7 +99,7 @@ namespace LivreNoirLibrary.IO
 
         public static string GetAssemblyDir() => AppDomain.CurrentDomain.BaseDirectory;
 
-        public static string GetAppDataPath(string appName, string @namespace="LivreNoirLibrary")
+        public static string GetAppDataPath(string appName, string @namespace="LivreNoir")
         {
             string path = Path.Join(
                 Environment.GetFolderPath(

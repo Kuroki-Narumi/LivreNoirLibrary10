@@ -1,5 +1,4 @@
 ﻿using System;
-using LivreNoirLibrary.Media.Bms;
 
 namespace LivreNoirLibrary.Windows.Media.Bms.SkinInfo
 {

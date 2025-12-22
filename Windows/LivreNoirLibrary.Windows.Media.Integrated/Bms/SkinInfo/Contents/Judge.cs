@@ -1,21 +1,18 @@
-﻿using System;
+﻿using LivreNoirLibrary.Collections;
+using LivreNoirLibrary.Media.Bms.Play;
 
 namespace LivreNoirLibrary.Windows.Media.Bms.SkinInfo
 {
     public partial class Judge : SkinElement
     {
-        public ValueExpression? Perfect { get; set => SetValue(ref field, value); }
-        public ValueExpression? PerfectCombo { get; set => SetValue(ref field, value); }
-        public ValueExpression? Great { get; set => SetValue(ref field, value); }
-        public ValueExpression? GreatCombo { get; set => SetValue(ref field, value); }
-        public ValueExpression? Good { get; set => SetValue(ref field, value); }
-        public ValueExpression? GoodCombo { get; set => SetValue(ref field, value); }
-        public ValueExpression? Bad { get; set => SetValue(ref field, value); }
-        public ValueExpression? BadCombo { get; set => SetValue(ref field, value); }
-        public ValueExpression? Through { get; set => SetValue(ref field, value); }
-        public ValueExpression? ThroughCombo { get; set => SetValue(ref field, value); }
-        public ValueExpression? BlankShot { get; set => SetValue(ref field, value); }
-        public ValueExpression? BlankShotCombo { get; set => SetValue(ref field, value); }
+        public ValueExpression Player { get; set => SetValue(ref field, value); } = 0;
         public ValueExpression? Padding { get; set => SetValue(ref field, value); }
+    }
+
+    public partial class JudgeTexture : SkinNode
+    {
+        public JudgeType Type { get; set => SetValue(ref field, value); }
+        public ValueExpression? Texture { get; set => SetValue(ref field, value); }
+        public ValueExpression? ComboTexture { get; set => SetValue(ref field, value); }
     }
 }

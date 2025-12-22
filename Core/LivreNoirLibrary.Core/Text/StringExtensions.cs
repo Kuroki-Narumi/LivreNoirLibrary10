@@ -50,7 +50,7 @@ namespace LivreNoirLibrary.Text
             var count = 1;
             foreach (var span in text.AsSpan().EnumerateLines())
             {
-                if (countEmptyLine || (span.Length is > 0 && !span.IsWhiteSpace()) )
+                if (countEmptyLine || (span.Length is > 0 && !span.IsWhiteSpace()))
                 {
                     count++;
                 }
@@ -105,13 +105,5 @@ namespace LivreNoirLibrary.Text
                 return NaturalOrderComparer.Compare(left, right);
             }
         }
-
-        public static string AutoFormat(this TimeSpan time) => time.Ticks switch
-        {
-            >= TimeSpan.TicksPerDay => time.ToString(@"d\d\ h\:mm\:ss"),
-            >= TimeSpan.TicksPerHour => time.ToString(@"h\:mm\:ss\.f"),
-            >= TimeSpan.TicksPerMinute => time.ToString(@"m\:ss\.ff"),
-            _ => time.ToString(@"s\.ffff"),
-        };
     }
 }

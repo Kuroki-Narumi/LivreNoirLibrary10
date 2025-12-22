@@ -7,7 +7,7 @@ namespace LivreNoirLibrary.Numerics
 {
     public readonly partial struct Rational : INumberBase<Rational>
     {
-        private static void ThrowNotSupportedException() => throw new NotSupportedException();
+        public static void ThrowNotSupportedException() => throw new NotSupportedException();
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static Rational CreateChecked<TOther>(TOther value)

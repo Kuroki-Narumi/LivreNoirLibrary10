@@ -3,7 +3,7 @@ using System.Windows;
 
 namespace LivreNoirLibrary.Windows
 {
-    [AttributeUsage(AttributeTargets.Field, AllowMultiple = false, Inherited = false)]
+    [AttributeUsage(AttributeTargets.Field | AttributeTargets.Property, AllowMultiple = false, Inherited = false)]
     public class DependencyPropertyAttribute : Attribute
     {
         public string Name { get; set; } = "";

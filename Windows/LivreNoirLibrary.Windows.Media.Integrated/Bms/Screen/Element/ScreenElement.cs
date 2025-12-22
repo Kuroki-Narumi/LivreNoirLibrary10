@@ -41,8 +41,8 @@ namespace LivreNoirLibrary.Windows.Controls.Bms.Elements
         private readonly DoubleTimeline<double> _slopes = [];
         private readonly DestinationTimeline _dest_x = new(0);
         private readonly DestinationTimeline _dest_y = new(0);
-        private readonly DestinationTimeline _dest_w = new(0);
-        private readonly DestinationTimeline _dest_h = new(0);
+        private readonly DestinationTimeline _dest_w = new(-1);
+        private readonly DestinationTimeline _dest_h = new(-1);
         private readonly DestinationTimeline _dest_opacity = new(1);
         private readonly DestinationTimeline _dest_ox = new(0);
         private readonly DestinationTimeline _dest_oy = new(0);
