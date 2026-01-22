@@ -70,7 +70,11 @@ namespace LivreNoirLibrary.Media.FFmpeg
             _base_context.EstimateKeyFrames(stream, out _keyframe_min_interval, out _keyframe_max_interval);
             _pos_cache.Clear();
             // オフセット
-            _startTime = new Rational(_base_context._format_context->start_time, ffmpeg.AV_TIME_BASE);
+            var start = _base_context._format_context->start_time;
+            if (start != ffmpeg.AV_NOPTS_VALUE)
+            {
+                _startTime = new Rational(start, ffmpeg.AV_TIME_BASE);
+            }
         }
 
         private void SeekCore(long posNum, long posDen)

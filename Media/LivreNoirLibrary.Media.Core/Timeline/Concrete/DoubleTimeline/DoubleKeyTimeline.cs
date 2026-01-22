@@ -10,6 +10,7 @@ namespace LivreNoirLibrary.Media
 {
     public partial class DoubleKeyTimeline<TKey, TValue> : XYSingleTimelineBase<TKey, double, TValue, Operator_double> where TKey : struct
     {
+        /*
         protected (int Start, int Length) GetPositionIndex(List<double> list, Range<decimal> range) => list.IndexRange(range);
         public ReadOnlySpan<double> GetPositions(Range<decimal> range) => _pos_list.Range(range);
         public void RemoveRange(Range<decimal> range) => RemoveRangeCore(GetPositionIndex(_pos_list, range));
@@ -34,6 +35,6 @@ namespace LivreNoirLibrary.Media
             => CopyToCore(key, destination, GetPositionIndex(key, srcRange), 0);
         public void CopyTo<T>(TKey key, T destination, Range<decimal> srcRange, double destOffset) where T : IXSingleTimeline<double, TValue>
             => CopyToCore(key, destination, GetPositionIndex(key, srcRange), destOffset);
-
+        */
     }
 }

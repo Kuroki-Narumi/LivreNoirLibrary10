@@ -12,11 +12,12 @@ namespace LivreNoirLibrary.Media.Bms
             public Selection CreateSelection(IListEnumerable<BarPosition, Note> timeline, Range<BarPosition> range, Selection? selection = null)
             {
                 selection ??= [];
+                var counter = vm.TimeCounter;
                 foreach (var (position, list) in timeline.EnumerateList(range))
                 {
                     var head = vm.GetHead(position);
                     var absPos = vm.GetAbsolutePosition(position);
-                    var time = vm.Beat2Time(absPos);
+                    var time = counter.Beat2Time(absPos);
                     foreach (var note in list.AsSpan())
                     {
                         selection.Add(position, head, absPos, time, note);
@@ -62,12 +63,13 @@ namespace LivreNoirLibrary.Media.Bms
                 }
                 var timeline = vm.CurrentData.Timeline;
                 var barNumber = int.MaxValue;
+                var counter = vm.TimeCounter;
                 if (useRealTime)
                 {
-                    var timeOffset = vm.Beat2Time(offset);
+                    var timeOffset = counter.Beat2Time(offset);
                     foreach (var (_, _, time, note) in selection)
                     {
-                        Add(vm.Time2Beat(time + timeOffset), note);
+                        Add(counter.Time2Beat(time + timeOffset), note);
                     }
                 }
                 else
@@ -152,7 +154,8 @@ namespace LivreNoirLibrary.Media.Bms
                     return source;
                 }
                 var selectionOffset = firstItem.AbsolutePosition;
-                var offset = vm.Beat2Time(selectionOffset);
+                var counter = vm.TimeCounter;
+                var offset = counter.Beat2Time(selectionOffset);
                 List<(double Offset, string DefValue)> noteList = [];
                 HashSet<Channel> longHeadLanes = [];
                 string GetDefValue(double id) => vm.GetDefValue(DefType.Wav, (int)id) ?? $@"\\\***{id}***\\\";
@@ -164,7 +167,7 @@ namespace LivreNoirLibrary.Media.Bms
                         var isNormal = note.IsNormal();
                         if (isNormal || (note.IsLongEnd() && longHeadLanes.Contains(ch)))
                         {
-                            noteList.Add((vm.Beat2Time(p) - offset, GetDefValue(note.Value)));
+                            noteList.Add((counter.Beat2Time(p) - offset, GetDefValue(note.Value)));
                             if (isNormal)
                             {
                                 longHeadLanes.Add(ch);
@@ -191,7 +194,7 @@ namespace LivreNoirLibrary.Media.Bms
                 {
                     if (note.IsPlayableSound(true))
                     {
-                        var time = vm.Position2Time(pos);
+                        var time = counter.Beat2Time(vm.GetAbsolutePosition(pos));
                         decTimeline.Add(time, new NoteCache(pos, note));
                         if (GetDefValue(note.Value) == firstDefValue)
                         {

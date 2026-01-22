@@ -1,5 +1,4 @@
 ﻿using LivreNoirLibrary.Collections;
-using LivreNoirLibrary.Debug;
 using LivreNoirLibrary.Media.Wave;
 using LivreNoirLibrary.Numerics;
 using LivreNoirLibrary.ObjectModel;
@@ -7,9 +6,8 @@ using LivreNoirLibrary.Text;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
-using System.Linq;
 using System.Numerics;
-using System.Text.RegularExpressions;
+using System.Runtime.CompilerServices;
 
 namespace LivreNoirLibrary.Media.Bms
 {
@@ -19,10 +17,9 @@ namespace LivreNoirLibrary.Media.Bms
         private readonly Dictionary<Channel, BgaInfo> _bga = [];
         private readonly Dictionary<Channel, DoubleMultiTimeline<int>> _meta = [];
 
-        public string Directory { get; private set; } = "";
-        public bool AutoPlay { get; private set; }
+        public string Directory { get; set; } = "";
         public BgmTimeline BgmTimeline { get; } = [];
-        public IEnumerable<(Channel, double, KeyInfo)> KeyInfos => _key;
+        public IEnumerable<(Channel Channel, double Position, KeyInfo Info)> KeyInfos => _key;
         public int NoteCount { get; private set; }
 
         public override void Clear()
@@ -35,12 +32,11 @@ namespace LivreNoirLibrary.Media.Bms
             NoteCount = 0;
         }
 
-        public void Load(IBmsViewModel source, string directory, bool autoPlay)
+        public override void Load(IBmsViewModel source)
         {
             const float colorFactor = 1f / 255f;
 
-            Directory = directory;
-            AutoPlay = autoPlay;
+            var directory = Directory;
             var initialTempo = source.Bpm;
             BeginInit(initialTempo);
             TimingInfoState state = new(initialTempo);
@@ -53,14 +49,14 @@ namespace LivreNoirLibrary.Media.Bms
             var wavFilenames = ObjectPool.Rent<Dictionary<int, string>>();
             var bgaFilenames = ObjectPool.Rent<Dictionary<int, string>>();
             var count = 0;
-            var firstPos = double.NaN;
-            var lastPos = double.NaN;
             try
             {
                 foreach (var (pos, list) in source.CurrentTimeline.EnumerateList())
                 {
                     // 現在値
                     var time = state.Setup(source.GetAbsolutePosition(pos));
+                    var isValidTempo = state.CurrentTempo is > 0;
+                    var position = state.CurrentPosition;
                     var objectExists = false;
                     foreach (var note in list.AsSpan())
                     {
@@ -72,99 +68,100 @@ namespace LivreNoirLibrary.Media.Bms
                         var value = (int)note.Value;
                         if (note.IsSoundLane())
                         {
-                            switch (note.Type)
+                            var type = note.Type;
+                            var actualTime = isValidTempo ? time : double.PositiveInfinity;
+                            switch (type)
                             {
                                 case NoteType.Normal:
-                                    if (!wavFilenames.TryGetValue(value, out var path))
+                                    if (isValidTempo)
                                     {
-                                        source.TryGetWavePath(value, directory, out _, out path);
-                                        path ??= "";
-                                        wavFilenames.Add(value, path);
-                                    }
-                                    if (lastBgmNotes.Remove(value, out var previous))
-                                    {
-                                        previous.Length = time - previous.Time;
-                                    }
-                                    SoundInfo soundInfo = new(time, channel);
-                                    lastBgmNotes[value] = soundInfo;
-                                    if (!string.IsNullOrEmpty(path))
-                                    {
-                                        objectExists = true;
-                                        if (double.IsNaN(firstPos))
+                                        if (!wavFilenames.TryGetValue(value, out var path))
                                         {
-                                            firstPos = time;
+                                            source.TryGetWavePath(value, directory, out _, out path);
+                                            path ??= "";
+                                            wavFilenames.Add(value, path);
                                         }
-                                        bgmList.Add(path, soundInfo);
-                                    }
-                                    if (channel.IsKey())
-                                    {
-                                        if (!keyList.TryGetValue(channel, time, SearchMode.Equal, out _, out var keyInfo))
+                                        if (lastBgmNotes.Remove(value, out var previous))
                                         {
-                                            keyInfo = new(time);
-                                            keyList.Set(channel, time, keyInfo);
-                                            lastNoteLane[channel] = keyInfo;
-                                            count++;
+                                            previous.Length = time - previous.Time;
                                         }
+                                        SoundInfo soundInfo = new(time, channel);
+                                        lastBgmNotes[value] = soundInfo;
+                                        if (!string.IsNullOrEmpty(path))
+                                        {
+                                            objectExists = true;
+                                            state.UpdateFirstTime();
+                                            bgmList.Add(path, soundInfo);
+                                        }
+                                    }
+                                    if (UpdateKey(keyList, channel, actualTime, position, type, out var keyInfo))
+                                    {
+                                        lastNoteLane[channel] = keyInfo;
+                                        count++;
                                     }
                                     break;
                                 case NoteType.Mine:
-                                    if (channel.IsKey())
-                                    {
-                                        keyList.Set(channel, time, new(time, true));
-                                    }
+                                case NoteType.Invisible:
+                                    UpdateKey(keyList, channel, actualTime, position, type, out _);
                                     break;
                                 case NoteType.LongEnd:
                                     if (lastNoteLane.Remove(channel, out var info))
                                     {
-                                        info.Length = time - info.Time;
+                                        if (isValidTempo)
+                                        {
+                                            info.TimeLength = time - info.Time;
+                                        }
+                                        info.VisualLength = position - info.Position;
                                     }
                                     break;
                             }
                         }
-                        else if (note.IsBga())
+                        else if (isValidTempo)
                         {
-                            if (!bgaFilenames.TryGetValue(value, out var path))
+                            if (note.IsBga())
                             {
-                                source.TryGetMediaPath(value, directory, out _, out path);
-                                path ??= "";
-                                bgaFilenames.Add(value, path);
+                                if (!bgaFilenames.TryGetValue(value, out var path))
+                                {
+                                    source.TryGetMediaPath(value, directory, out _, out path);
+                                    path ??= "";
+                                    bgaFilenames.Add(value, path);
+                                }
+                                objectExists = true;
+                                bgaList.GetOrAdd(channel).Layer.Set(time, path);
                             }
-                            objectExists = true;
-                            bgaList.GetOrAdd(channel).Layer.Set(time, path);
-                        }
-                        else if (channel.IsArgb())
-                        {
-                            if (TupleStringConverter.TryConvertFromString<int, int, int, int>(source.GetDefValue(DefType.Argb, (int)note.Value), out var tuple))
+                            else if (channel.IsArgb())
                             {
-                                var item = bgaList.GetOrAdd(channel.ToBga());
-                                item.Rgb.Set(time, new(tuple.Item2 * colorFactor, tuple.Item3 * colorFactor, tuple.Item4 * colorFactor));
-                                item.Opacity.Set(time, tuple.Item1 * colorFactor);
+                                if (TupleStringConverter.TryConvertFromString<int, int, int, int>(source.GetDefValue(DefType.Argb, (int)note.Value), out var tuple))
+                                {
+                                    var item = bgaList.GetOrAdd(channel.ToBga());
+                                    item.Rgb.Set(time, new(tuple.Item2 * colorFactor, tuple.Item3 * colorFactor, tuple.Item4 * colorFactor));
+                                    item.Opacity.Set(time, tuple.Item1 * colorFactor);
+                                }
                             }
-                        }
-                        else if (channel.IsOpacity())
-                        {
-                            bgaList.GetOrAdd(channel.ToBga()).Opacity.Set(time, value * colorFactor);
-                        }
-                        else
-                        {
-                            metaList.GetOrAdd(channel).Add(time, value);
+                            else if (channel.IsOpacity())
+                            {
+                                bgaList.GetOrAdd(channel.ToBga()).Opacity.Set(time, value * colorFactor);
+                            }
+                            else
+                            {
+                                metaList.GetOrAdd(channel).Add(time, value);
+                            }
                         }
                     }
                     if (objectExists)
                     {
-                        lastPos = time;
+                        state.UpdateLastTime();
                     }
                     ApplyTimeInfo(ref state);
                 }
-                FirstSoundTime = firstPos;
-                LastSoundTime = lastPos;
                 EndInit(ref state);
                 // 小節線
                 foreach (var (_, head, length) in source.EnumerateBars())
                 {
                     var time = Beat2Time(head);
+                    var pos = Beat2Position(head);
                     //barList.Set(time, (head, length));
-                    keyList.Set(Channel.Bar, time, new(time, false));
+                    keyList.Set(Channel.Bar, pos, new(time, pos, NoteType.Invalid));
                 }
                 NoteCount = count;
             }
@@ -175,6 +172,30 @@ namespace LivreNoirLibrary.Media.Bms
                 ObjectPool.Return(wavFilenames);
                 ObjectPool.Return(bgaFilenames);
             }
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        static bool UpdateKey(DoubleKeyTimeline<Channel, KeyInfo> keyList, Channel channel, double time, double position, NoteType type, [MaybeNullWhen(false)] out KeyInfo keyInfo)
+        {
+            if (channel.IsKey())
+            {
+                if (keyList.TryGetValue(channel, position, SearchMode.Equal, out _, out keyInfo))
+                {
+                    if (keyInfo.Type > type)
+                    {
+                        keyInfo.Type = type;
+                        return true;
+                    }
+                }
+                else
+                {
+                    keyInfo = new(time, position, type);
+                    keyList.Set(channel, position, keyInfo);
+                    return true;
+                }
+            }
+            keyInfo = null;
+            return false;
         }
 
         public bool TryGetBgaLayer(Channel channel, double time, out double start, [MaybeNullWhen(false)] out string path)
@@ -202,6 +223,7 @@ namespace LivreNoirLibrary.Media.Bms
             vector = default;
             return false;
         }
+
         private class BgaInfo
         {
             public DoubleTimeline<string> Layer { get; } = [];
@@ -218,10 +240,12 @@ namespace LivreNoirLibrary.Media.Bms
         public bool IsKey => Channel.IsKey();
     }
 
-    public class KeyInfo(double time, bool isMine = false)
+    public class KeyInfo(double time, double position, NoteType type)
     {
         public double Time { get; } = time;
-        public double Length { get; internal set; }
-        public bool IsMine { get; } = isMine;
+        public double Position { get; } = position;
+        public double TimeLength { get; internal set; }
+        public double VisualLength { get; internal set; }
+        public NoteType Type { get; internal set; } = type;
     }
 }

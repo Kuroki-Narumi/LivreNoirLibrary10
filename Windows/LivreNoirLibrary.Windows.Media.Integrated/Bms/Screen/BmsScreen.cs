@@ -37,6 +37,8 @@ namespace LivreNoirLibrary.Windows.Controls.Bms
         private string? _bmsBaseName;
         [DependencyProperty(SetterScope = Scope.Private)]
         private bool _isBmsReady;
+        [DependencyProperty]
+        private bool _showDebugText;
         [DependencyProperty(SetterScope = Scope.Private)]
         private string? _debugText;
         [DependencyProperty]
@@ -191,6 +193,7 @@ namespace LivreNoirLibrary.Windows.Controls.Bms
                 if (BmsDirectory != directory)
                 {
                     _waveProvider.Clear();
+                    _timingList.Directory = directory;
                     BmsDirectory = directory;
                 }
                 BmsBaseName = Path.GetFileName(value);
@@ -218,6 +221,14 @@ namespace LivreNoirLibrary.Windows.Controls.Bms
             IsBmsReady = false;
         }
 
+        private void OnShowDebugTextChanged(bool value)
+        {
+            if (!value)
+            {
+                DebugText = null;
+            }
+        }
+
         public void DetermineExpressions()
         {
             if (_skin is { } skin)
@@ -231,7 +242,7 @@ namespace LivreNoirLibrary.Windows.Controls.Bms
             }
         }
 
-        public void SetupAudio(bool isAutoPlay)
+        public void SetupAudio()
         {
             var op = PlayOptions;
             ScoreManager.Clear();
@@ -239,7 +250,7 @@ namespace LivreNoirLibrary.Windows.Controls.Bms
             if (_isBmsReady)
             {
                 var timing = _timingList;
-                timing.Load(ViewModel, BmsDirectory ?? "", isAutoPlay);
+                timing.Load(ViewModel);
                 Variables.SetPlayInfos(timing);
                 _notes.Setup(timing);
                 op.UpdateHsCorrection(timing);
@@ -254,7 +265,7 @@ namespace LivreNoirLibrary.Windows.Controls.Bms
             Timer.PrepareToPlay();
             _bga.Clear();
 
-            SetupAudio(isAutoPlay);
+            SetupAudio();
 
             _debugRoot = _debugRoot.Reset();
             var debug = _debugDic;
@@ -358,18 +369,21 @@ namespace LivreNoirLibrary.Windows.Controls.Bms
 
         void ConstructDebugText()
         {
-            var total = _debugRoot.Time;
-            _debugBuilder.Clear();
-            AppendLine(_debugRoot, total);
-            foreach (var (_, item) in _debugDic)
+            if (_showDebugText)
             {
-                if (!string.IsNullOrEmpty(item.Name) && item.Time is not 0)
+                var total = _debugRoot.Time;
+                _debugBuilder.Clear();
+                AppendLine(_debugRoot, total);
+                foreach (var (_, item) in _debugDic)
                 {
-                    _debugBuilder.AppendLine();
-                    AppendLine(item, total);
+                    if (!string.IsNullOrEmpty(item.Name) && item.Time is not 0)
+                    {
+                        _debugBuilder.AppendLine();
+                        AppendLine(item, total);
+                    }
                 }
+                DebugText = _debugBuilder.ToString();
             }
-            DebugText = _debugBuilder.ToString();
         }
 
         void AppendLine(in DebugItem item, double total)

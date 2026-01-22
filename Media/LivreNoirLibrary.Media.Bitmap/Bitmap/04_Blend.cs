@@ -5,6 +5,8 @@ using System.Numerics;
 using System.Runtime.CompilerServices;
 using System.Runtime.Intrinsics;
 using System.Threading.Tasks;
+using static System.Net.Mime.MediaTypeNames;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace LivreNoirLibrary.Media
 {
@@ -219,26 +221,26 @@ namespace LivreNoirLibrary.Media
                     var backBuffer = stackalloc float[count];
                     for (; w >= count; w -= count)
                     {
-                        Process(backBuffer, count);
+                        Process(ref backP, backBuffer, color, frontAlpha, count, blend);
                     }
                     if (w is > 0)
                     {
-                        Process(backBuffer, w);
-                    }
-
-                    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-                    void Process(float* backBuffer, int count)
-                    {
-                        // 背景を正規化してベクトル化
-                        ByteToBuffer(ref backP, backBuffer, count, true);
-                        // ブレンド
-                        var back = *(Vector<float>*)backBuffer;
-                        ColorBlend.Blend(ref back, FloatColor.FillAlphaToAll(back), color, frontAlpha, blend);
-                        // バッファへ書き戻す
-                        *(Vector<float>*)backBuffer = back;
-                        BufferToByte(ref backP, backBuffer, count);
+                        Process(ref backP, backBuffer, color, frontAlpha, w, blend);
                     }
                 });
+
+                [MethodImpl(MethodImplOptions.AggressiveInlining)]
+                static void Process(ref byte* backP, float* backBuffer, Vector<float> color, Vector<float> frontAlpha, int count, BlendFunc blend)
+                {
+                    // 背景を正規化してベクトル化
+                    ByteToBuffer(ref backP, backBuffer, count, true);
+                    // ブレンド
+                    var back = *(Vector<float>*)backBuffer;
+                    ColorBlend.Blend(ref back, FloatColor.FillAlphaToAll(back), color, frontAlpha, blend);
+                    // バッファへ書き戻す
+                    *(Vector<float>*)backBuffer = back;
+                    BufferToByte(ref backP, backBuffer, count);
+                }
             }
         }
 
@@ -288,27 +290,27 @@ namespace LivreNoirLibrary.Media
                         for (; w >= count; w -= count, frontP++)
                         {
                             var front = *frontP * colorCorrection;
-                            Process(backBuffer, front, count);
+                            Process(ref backP, backBuffer, front, count, blend);
                         }
                         if (w is > 0)
                         {
                             var front = FillRemain(frontP, w) * colorCorrection;
-                            Process(backBuffer, front, w);
-                        }
-
-                        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-                        void Process(float* backBuffer, Vector<float> front, int count)
-                        {
-                            // 背景を正規化してベクトル化
-                            ByteToBuffer(ref backP, backBuffer, count, true);
-                            // ブレンド
-                            var back = *(Vector<float>*)backBuffer;
-                            ColorBlend.Blend(ref back, FloatColor.FillAlphaToAll(back), front, FloatColor.FillAlphaToAll(front), blend);
-                            // バッファへ書き戻す
-                            *(Vector<float>*)backBuffer = back;
-                            BufferToByte(ref backP, backBuffer, count);
+                            Process(ref backP, backBuffer, front, w, blend);
                         }
                     });
+
+                    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+                    static void Process(ref byte* backP, float* backBuffer, Vector<float> front, int count, BlendFunc blend)
+                    {
+                        // 背景を正規化してベクトル化
+                        ByteToBuffer(ref backP, backBuffer, count, true);
+                        // ブレンド
+                        var back = *(Vector<float>*)backBuffer;
+                        ColorBlend.Blend(ref back, FloatColor.FillAlphaToAll(back), front, FloatColor.FillAlphaToAll(front), blend);
+                        // バッファへ書き戻す
+                        *(Vector<float>*)backBuffer = back;
+                        BufferToByte(ref backP, backBuffer, count);
+                    }
                 }
             }
             else if (destIsFloat)
@@ -324,26 +326,26 @@ namespace LivreNoirLibrary.Media
                     for (; w >= count; w -= count, backP++)
                     {
                         var back = *backP;
-                        Process(ref back, frontBuffer, count);
+                        Process(ref back, ref frontP, frontBuffer, count, blend, colorCorrection);
                         *backP = back;
                     }
                     if (w is > 0)
                     {
                         var back = FillRemain(backP, w);
-                        Process(ref back, frontBuffer, w);
+                        Process(ref back, ref frontP, frontBuffer, w, blend, colorCorrection);
                         VectorToFloat(backP, back, w);
                     }
-
-                    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-                    void Process(ref Vector<float> back, float* frontBuffer, int count)
-                    {
-                        // 背景を正規化してベクトル化
-                        ByteToBuffer(ref frontP, frontBuffer, count);
-                        // ブレンド
-                        var front = *(Vector<float>*)frontBuffer * colorCorrection;
-                        ColorBlend.Blend(ref back, FloatColor.FillAlphaToAll(back), front, FloatColor.FillAlphaToAll(front), blend);
-                    }
                 });
+
+                [MethodImpl(MethodImplOptions.AggressiveInlining)]
+                static void Process(ref Vector<float> back, ref byte* frontP, float* frontBuffer, int count, BlendFunc blend, Vector<float> colorCorrection)
+                {
+                    // 背景を正規化してベクトル化
+                    ByteToBuffer(ref frontP, frontBuffer, count);
+                    // ブレンド
+                    var front = *(Vector<float>*)frontBuffer * colorCorrection;
+                    ColorBlend.Blend(ref back, FloatColor.FillAlphaToAll(back), front, FloatColor.FillAlphaToAll(front), blend);
+                }
             }
             else
             {
@@ -359,28 +361,28 @@ namespace LivreNoirLibrary.Media
 
                     for (; w >= count; w -= count)
                     {
-                        Process(backBuffer, frontBuffer, count);
+                        Process(ref backP, backBuffer, ref frontP, frontBuffer, count, blend, colorCorrection);
                     }
                     if (w is > 0)
                     {
-                        Process(backBuffer, frontBuffer, w);
-                    }
-
-                    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-                    void Process(float* backBuffer, float* frontBuffer, int count)
-                    {
-                        // 背景を正規化してベクトル化
-                        ByteToBuffer(ref backP, backBuffer, count, true);
-                        ByteToBuffer(ref frontP, frontBuffer, count);
-                        // ブレンド
-                        var back = *(Vector<float>*)backBuffer;
-                        var front = *(Vector<float>*)frontBuffer * colorCorrection;
-                        ColorBlend.Blend(ref back, FloatColor.FillAlphaToAll(back), front, FloatColor.FillAlphaToAll(front), blend);
-                        // バッファへ書き戻す
-                        *(Vector<float>*)backBuffer = back;
-                        BufferToByte(ref backP, backBuffer, count);
+                        Process(ref backP, backBuffer, ref frontP, frontBuffer, w, blend, colorCorrection);
                     }
                 });
+
+                [MethodImpl(MethodImplOptions.AggressiveInlining)]
+                static void Process(ref byte* backP, float* backBuffer, ref byte* frontP, float* frontBuffer, int count, BlendFunc blend, Vector<float> colorCorrection)
+                {
+                    // 背景を正規化してベクトル化
+                    ByteToBuffer(ref backP, backBuffer, count, true);
+                    ByteToBuffer(ref frontP, frontBuffer, count);
+                    // ブレンド
+                    var back = *(Vector<float>*)backBuffer;
+                    var front = *(Vector<float>*)frontBuffer * colorCorrection;
+                    ColorBlend.Blend(ref back, FloatColor.FillAlphaToAll(back), front, FloatColor.FillAlphaToAll(front), blend);
+                    // バッファへ書き戻す
+                    *(Vector<float>*)backBuffer = back;
+                    BufferToByte(ref backP, backBuffer, count);
+                }
             }
         }
 
@@ -646,26 +648,26 @@ namespace LivreNoirLibrary.Media
                     var stride = destW * 4;
                     for (; w >= count; w -= count, dx += count)
                     {
-                        Process(backBuffer, count);
+                        Process(ref backP, backBuffer, dx, range, sourceBegin, stride, weights, count);
                     }
                     if (w is > 0)
                     {
-                        Process(backBuffer, w);
-                    }
-
-                    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-                    void Process(float* backBuffer, int count)
-                    {
-                        // 背景を正規化してベクトル化
-                        ByteToBuffer(ref backP, backBuffer, count, true);
-                        // ブレンド
-                        var back = *(Vector<float>*)backBuffer;
-                        BlendProcess(ref back, dx, range, sourceBegin, stride, weights);
-                        // バッファへ書き戻す
-                        *(Vector<float>*)backBuffer = back;
-                        BufferToByte(ref backP, backBuffer, count);
+                        Process(ref backP, backBuffer, dx, range, sourceBegin, stride, weights, w);
                     }
                 });
+
+                [MethodImpl(MethodImplOptions.AggressiveInlining)]
+                void Process(ref byte* backP, float* backBuffer, int dx, int range, float* sourceBegin, int stride, float* weights, int count)
+                {
+                    // 背景を正規化してベクトル化
+                    ByteToBuffer(ref backP, backBuffer, count, true);
+                    // ブレンド
+                    var back = *(Vector<float>*)backBuffer;
+                    BlendProcess(ref back, dx, range, sourceBegin, stride, weights);
+                    // バッファへ書き戻す
+                    *(Vector<float>*)backBuffer = back;
+                    BufferToByte(ref backP, backBuffer, count);
+                }
             }
         }
     }

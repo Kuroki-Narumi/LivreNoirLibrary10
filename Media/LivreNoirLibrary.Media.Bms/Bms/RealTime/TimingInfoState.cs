@@ -4,39 +4,52 @@ namespace LivreNoirLibrary.Media.Bms
 {
     public struct TimingInfoState(double initialTempo)
     {
-        public double Tempo { get; set; }
-        public double Stop { get; set; }
-        public double Scroll { get; set; }
-        public double Speed { get; set; }
+        public double CurrentTempo { get; private set; } = initialTempo;
+        public double CurrentScroll { get; private set; } = 1;
+        public double CurrentSpeed { get; private set; } = 1;
 
-        private double _tempo = initialTempo;
+        public double CurrentBeat { get; private set; }
+        public double CurrentTime { get; private set; }
+        public double CurrentPosition { get; private set; }
+
+        public double NewTempo { get; private set; }
+        public double NewStop { get; private set; }
+        public double NewScroll { get; private set; }
+        public double NewSpeed { get; private set; }
+
+        public double FirstTime { get; private set; } = double.NaN;
+        public double LastTime { get; private set; } = 0;
+
         private double _secondsPerBeat = 240 / initialTempo;
-        private double _scroll = 1;
-        private double _speed = 1;
-
         private double _previousTime;
         private double _previousBeat;
         private double _previousPosition;
 
-        private double _beat;
-        private double _time;
-        private double _position;
-
-        public readonly double CurrentTempo => _tempo;
-        public readonly double CurrentBeat => _beat;
-        public readonly double CurrentTime => _time;
-        public readonly double CurrentPosition => _position;
-
         public double Setup(double beat)
         {
-            _beat = beat;
-            _time = _previousTime + (beat - _previousBeat) * _secondsPerBeat;
-            _position = _previousPosition + (beat - _previousBeat) * _scroll;
-            Tempo = double.NaN;
-            Stop = 0;
-            Scroll = double.NaN;
-            Speed = double.NaN;
-            return _time;
+            CurrentBeat = beat;
+            CurrentTime = _previousTime + (beat - _previousBeat) * _secondsPerBeat;
+            CurrentPosition = _previousPosition + (beat - _previousBeat) * CurrentScroll;
+            NewTempo = double.NaN;
+            NewStop = 0;
+            NewScroll = double.NaN;
+            NewSpeed = double.NaN;
+            return CurrentTime;
+        }
+
+        public void UpdateFirstTime()
+        {
+            var time = CurrentTime;
+            var first = FirstTime;
+            if (double.IsNaN(first) || time < first)
+            {
+                FirstTime = time;
+            }
+        }
+
+        public void UpdateLastTime()
+        {
+            LastTime = Math.Max(CurrentTime, LastTime);
         }
 
         public bool Update(Note note)
@@ -44,72 +57,75 @@ namespace LivreNoirLibrary.Media.Bms
             switch (note.Channel)
             {
                 case Channel.Bpm:
-                    Tempo = note.Value;
+                    NewTempo = note.Value;
                     return true;
                 case Channel.Stop:
-                    Stop += note.Value;
+                    NewStop += note.Value;
                     return true;
                 case Channel.Scroll:
-                    Scroll = note.Value;
+                    NewScroll = note.Value;
                     return true;
                 case Channel.Speed:
-                    Speed = note.Value;
+                    NewSpeed = note.Value;
                     return true;
             }
             return false;
         }
 
-        public bool Finalize(out TimingInfo info, out bool speedChanged, out double speed)
+        public (bool IsTempoChanged, TimingInfo Info, bool IsSpeedChanged, double Speed) Finalize()
         {
-            var tempo = Tempo;
-            var tempoChanged = double.IsFinite(tempo) && tempo != _tempo;
+            var tempo = NewTempo;
+            var tempoChanged = double.IsFinite(tempo) && tempo != CurrentTempo;
             if (tempoChanged)
             {
-                _tempo = tempo;
+                CurrentTempo = tempo;
                 _secondsPerBeat = 240 / tempo;
             }
             else
             {
-                tempo = _tempo;
+                tempo = CurrentTempo;
             }
 
-            var stopTime = Stop * BmsConstants.StopUnit * _secondsPerBeat;
+            var stopTime = NewStop * BmsConstants.StopUnit * _secondsPerBeat;
+            tempoChanged |= stopTime is not 0;
 
-            var scroll = Scroll;
-            var scrollChanged = double.IsFinite(scroll) && scroll != _scroll;
+            var scroll = NewScroll;
+            var scrollChanged = double.IsFinite(scroll) && scroll != CurrentScroll;
             if (scrollChanged)
             {
-                _scroll = scroll;
+                CurrentScroll = scroll;
             }
             else
             {
-                scroll = _scroll;
+                scroll = CurrentScroll;
             }
 
-            speed = Speed;
-            speedChanged = double.IsFinite(speed) && speed != _speed;
+            var speed = NewSpeed;
+            var speedChanged = double.IsFinite(speed) && speed != CurrentSpeed;
             if (speedChanged)
             {
-                _speed = speed;
+                CurrentSpeed = speed;
             }
             else
             {
-                speed = _speed;
+                speed = CurrentSpeed;
             }
 
-            if (tempoChanged || stopTime is not 0 || scrollChanged || speedChanged)
+            if (tempoChanged || scrollChanged || speedChanged)
             {
                 var bps = tempo / 240;
-                info = new(_beat, _time, _position, tempo, stopTime, scroll, 1 / bps, bps);
-                _previousBeat = _beat;
-                _previousTime = _time + stopTime;
-                _previousPosition = _position;
-                return true;
+                var beat = CurrentBeat;
+                var time = CurrentTime;
+                var position = CurrentPosition;
+                TimingInfo info = new(beat, time, position, tempo, stopTime, scroll, 1 / bps, bps);
+                _previousBeat = beat;
+                _previousTime = time + stopTime;
+                _previousPosition = position;
+                return (tempoChanged, info, speedChanged, speed);
             }
             else
             {
-                info = default;
-                return false;
+                return default;
             }
         }
     }

@@ -20,7 +20,7 @@ namespace LivreNoirLibrary.Benchmark
             base.OnStartup(e);
             //PointerTest.Run();
 
-            BenchmarkRunner.Run<ColorTest>();
+            //BenchmarkRunner.Run<ColorTest>();
 
             //JsonTest.Test();
             //BenchmarkRunner.Run<VectorTest>();
@@ -42,6 +42,9 @@ namespace LivreNoirLibrary.Benchmark
 
             //BenchmarkRunner.Run<DoubleRectTest>();
             //DoubleRectTest.Validate();
+
+            BenchmarkRunner.Run<IfTest>();
+            IfTest.Validate();
         }
     }
 

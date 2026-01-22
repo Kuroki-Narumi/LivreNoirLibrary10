@@ -35,7 +35,6 @@ namespace LivreNoirLibrary.Media
                 }
                 AssertType(bitmap, false);
 
-
                 // Alphaの位置にビットシフト
                 var th = (transparentAlpha + 1u) << 24;
                 var w = bitmap.Width;

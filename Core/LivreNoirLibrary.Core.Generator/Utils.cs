@@ -22,9 +22,6 @@ namespace LivreNoirLibrary.Core
         public const string Int128 = "Int128";
         public const string UInt128 = "UInt128";
 
-        public static readonly string[] Unmanaged = [Byte, SByte, Short, UShort, Int, UInt, IntPtr, UIntPtr, Long, ULong, Float, Double];
-        public static readonly string[] BinaryInteger = [Byte, SByte, Short, UShort, Int, UInt, IntPtr, UIntPtr, Long, ULong];
-        public static readonly string[] Signed = [SByte, Short, Int, IntPtr, Long, Float, Double];
         public static readonly string[] Integer = [Int, UInt, Long, ULong, Int128, UInt128];
         public static readonly string[] Comparable = [Byte, SByte, Short, UShort, Int, UInt, Long, ULong, Float, Double, Decimal, Rational];
 

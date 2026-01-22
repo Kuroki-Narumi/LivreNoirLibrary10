@@ -12,8 +12,8 @@ namespace LivreNoirLibrary.Media.Wave
     {
         private readonly Dictionary<string, WaveBuffer?> _buffers = [];
 
-        public int OutputSampleRate { get; set => ChangeLayout(ref field, value); }
-        public int OutputChannels { get; set => ChangeLayout(ref field, value); }
+        public int SampleRate { get; set => ChangeLayout(ref field, value); } = WaveBuffer.DefaultSampleRate;
+        public int Channels { get; set => ChangeLayout(ref field, value); } = WaveBuffer.DefaultChannels;
 
         public CachedWaveBufferProvider() { }
 
@@ -50,7 +50,7 @@ namespace LivreNoirLibrary.Media.Wave
                 {
                     try
                     {
-                        data = WaveBuffer.CreateUnsafe(OutputSampleRate, OutputChannels);
+                        data = WaveBuffer.CreateUnsafe(SampleRate, Channels);
                         data.AutoDecode(path, false);
                     }
                     catch (Exception ex)

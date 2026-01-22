@@ -12,25 +12,31 @@ using LivreNoirLibrary.Windows;
 using LivreNoirLibrary.Windows.Controls;
 using LivreNoirLibrary.Windows.Controls.Bms;
 using LivreNoirLibrary.Windows.Media;
+using NAudio.Wave;
 using System;
 using System.Buffers;
 using System.Diagnostics;
 using System.Threading;
+using System.Windows.Media;
 
 namespace LivreNoirLibrary.Windows.Media.Bms
 {
     public class BmsVideoCreator(IBmsScreen screen, IBmsVideoCreatorOptions options) : ObservableObjectBase
     {
+        private readonly WaveOutEvent _waveOut = new();
+
         public IBmsScreen Screen { get; } = screen;
         public IBmsVideoCreatorOptions Options { get; } = options;
+        public bool IsPlaying { get; private set => SetValue(ref field, value); }
 
-        private double InitializeAudio(int sampleRate, int channels, double delay, ref AntiFreezeUpdater f, ProgressReporter? p, CancellationToken c)
+        private (double Duration, double MaxLength) InitializeAudio(int sampleRate, int channels, double delay, ref AntiFreezeUpdater f, ProgressReporter? p, CancellationToken c)
         {
             var screen = Screen;
             var composer = screen.AudioComposer;
             composer.Setup(sampleRate, channels, delay);
             var provider = composer.Provider;
             var musicLength = 0d;
+            var maxLength = 0d;
             var i = 0;
             var count = composer.Timeline.KeyCount;
 
@@ -43,13 +49,14 @@ namespace LivreNoirLibrary.Windows.Media.Bms
                     var (time, len, _) = list.LastItem;
                     var total = buffer.TotalSeconds;
                     total = (notIgnore && len is >= 0) ? Math.Min(len, total) : total;
+                    maxLength = Math.Max(maxLength, total);
                     musicLength = Math.Max(musicLength, time + total);
                 }
                 i++;
                 p?.Report($"{i}/{count}", i, count);
                 f.WaitForUpdate(c);
             }
-            return musicLength;
+            return (musicLength, maxLength);
         }
 
         public void Assemble(string path, ProgressReporter? p = null, CancellationToken c = default)
@@ -63,11 +70,12 @@ namespace LivreNoirLibrary.Windows.Media.Bms
                     var rate = Options.AudioSampleRate;
                     const int ch = 2;
 
-                    screen.SetupAudio(true);
+                    screen.SetupAudio();
 
                     var composer = screen.AudioComposer;
                     var offset = screen.FirstSoundTime;
-                    var duration = InitializeAudio(rate, ch, -offset, ref f, p, c) - offset;
+                    var (duration, _) = InitializeAudio(rate, ch, -offset, ref f, p, c);
+                    duration -= offset;
 
                     var bufferSize = rate * ch;
                     var audioBuffer = ArrayPool<float>.Shared.Rent(bufferSize);
@@ -108,10 +116,11 @@ namespace LivreNoirLibrary.Windows.Media.Bms
                 var rate = options.AudioSampleRate;
 
                 // タイマー
+                var offset = options.StartOffset;
                 var fadeInDuration = skin.FadeInTime.Validate(0);
-                var loadingFinish = skin.LoadTime.Validate(0);
-                var musicStart = loadingFinish + skin.ReadyTime.Validate(0);
-                var musicLength = InitializeAudio(rate, ch, musicStart + options.AudioDelay, ref f, p, c);
+                var loadingFinish = skin.LoadTime.Validate(0) - offset;
+                var musicStart = loadingFinish + skin.ReadyTime.Validate(0) - offset;
+                var (musicLength, _) = InitializeAudio(rate, ch, musicStart + options.AudioDelay, ref f, p, c);
 
                 var totalTime = musicStart + Math.Max(musicLength, screen.LastSoundTime + skin.MarginTime.Validate(0));
                 var fadeOutDuration = skin.FadeOutTime.Validate(0);
@@ -119,7 +128,7 @@ namespace LivreNoirLibrary.Windows.Media.Bms
                 var needLoadingFinish = true;
                 var timer = screen.Timer;
                 timer.Set(TimerId.Scene_Start, 0);
-                timer.Set(TimerId.Play_LoadingStart, 0);
+                timer.Set(TimerId.Play_LoadingStart, -offset);
                 timer.Set(TimerId.Play_MusicStart, musicStart);
                 timer.Set(TimerId.Scene_Terminate, fadeOutStart);
 
@@ -237,6 +246,63 @@ namespace LivreNoirLibrary.Windows.Media.Bms
                     ArrayPool<byte>.Shared.Return(videoBuffer);
                 }
             }
+        }
+
+        public bool SetupRealTimePlay(ProgressReporter? p = null, CancellationToken c = default)
+        {
+            var screen = Screen;
+            if (screen.IsBmsReady)
+            {
+                var f = new AntiFreezeUpdater();
+                var options = Options;
+                var rate = options.AudioSampleRate;
+                const int ch = 2;
+                var offset = options.StartOffset;
+                var delay = options.AudioDelay;
+
+                screen.SetupPlay(true);
+
+                screen.FadeOpacity = 0;
+                var composer = screen.AudioComposer;
+                _waveOut.Init(composer, false);
+
+                // タイマー
+                var timer = screen.Timer;
+                timer.Set(TimerId.Scene_Start, 0);
+                timer.Set(TimerId.Play_MusicStart, -offset);
+
+                var (_, maxLength) = InitializeAudio(rate, ch, delay - offset, ref f, p, c);
+                //composer.EnsureBufferSize(maxLength);
+                f.WaitForUpdate(c);
+
+                screen.Update(0);
+                f.WaitForUpdate(c);
+                return true;
+            }
+            return false;
+        }
+
+        private long _startTime;
+
+        public void StartRealTimePlay()
+        {
+            IsPlaying = true;
+            _startTime = Stopwatch.GetTimestamp();
+            CompositionTarget.Rendering += RTP_Update;
+            _waveOut.Play();
+        }
+
+        public void StopRealTimePlay()
+        {
+            IsPlaying = false;
+            CompositionTarget.Rendering -= RTP_Update;
+            _waveOut.Stop();
+        }
+
+        private void RTP_Update(object? sender, EventArgs e)
+        {
+            var time = Stopwatch.GetElapsedTime(_startTime).TotalSeconds;
+            Screen.Update(time);
         }
     }
 }

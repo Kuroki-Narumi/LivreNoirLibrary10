@@ -26,7 +26,7 @@ namespace LivreNoirLibrary.Media.Bms
             BarHead = viewModel.GetHead(position);
             var absPos = viewModel.GetAbsolutePosition(position);
             AbsolutePosition = absPos;
-            Time = viewModel.Beat2Time(absPos);
+            Time = viewModel.TimeCounter.Beat2Time(absPos);
             Note = note;
         }
 

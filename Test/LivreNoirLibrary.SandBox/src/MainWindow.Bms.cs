@@ -10,6 +10,7 @@ using LivreNoirLibrary.Windows.Controls;
 using LivreNoirLibrary.Windows.Controls.Bms;
 using LivreNoirLibrary.Windows.Media.Bms;
 using LivreNoirLibrary.Windows.Media.Bms.SkinInfo;
+using System.ComponentModel;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Windows;
@@ -42,6 +43,10 @@ namespace LivreNoirLibrary.SandBox
 
         private void OnClick_SkinOptions(object sender, RoutedEventArgs e)
         {
+            if (BmsVideoCreator.IsPlaying)
+            {
+                return;
+            }
             SkinOptionView.Open(BmsScreen.Skin, BmsScreen.SkinOptions);
         }
 
@@ -53,6 +58,10 @@ namespace LivreNoirLibrary.SandBox
 
         private void OnDrop_Bms(object sender, DragEventArgs e)
         {
+            if (BmsVideoCreator.IsPlaying)
+            {
+                return;
+            }
             foreach (var path in e.GetFileList())
             {
                 if (ExtRegs.BeMusic.IsMatch(path) && BmsScreen.OpenBms(path))
@@ -74,6 +83,10 @@ namespace LivreNoirLibrary.SandBox
         private void OnExecuted_Open(object sender, ExecutedRoutedEventArgs e)
         {
             e.Handled = true;
+            if (BmsVideoCreator.IsPlaying)
+            {
+                return;
+            }
             if (this.OpenFileDialog(FileDialogOptions.WithInitialPath(BmsScreen.BmsPath), Filters.Bms) is { } path)
             {
                 BmsScreen.OpenBms(path);
@@ -82,6 +95,10 @@ namespace LivreNoirLibrary.SandBox
 
         private void OnExecuted_Save(object sender, ExecutedRoutedEventArgs e)
         {
+            if (BmsVideoCreator.IsPlaying)
+            {
+                return;
+            }
             if (BmsScreen is { IsBmsReady: true, ViewModel.Data: BmsData data } &&
                 this.SaveFileDialog(FileDialogOptions.WithInitialPath(BmsScreen.BmsPath), Filters.Bms_Save) is { } path)
             {
@@ -91,7 +108,7 @@ namespace LivreNoirLibrary.SandBox
 
         private void OnClick_Assemble(object sender, RoutedEventArgs e)
         {
-            if (BmsScreen.IsBmsReady)
+            if (!BmsVideoCreator.IsPlaying && BmsScreen.IsBmsReady)
             {
                 var path = Path.ChangeExtension(BmsScreen.BmsPath, Exts.Wav);
                 if (this.SaveFileDialog(FileDialogOptions.WithInitialPath(path), Filters.Wave) is { } savePath)
@@ -103,12 +120,57 @@ namespace LivreNoirLibrary.SandBox
 
         private void OnClick_Video(object sender, RoutedEventArgs e)
         {
-            if (BmsScreen.IsBmsReady)
+            if (!BmsVideoCreator.IsPlaying && BmsScreen.IsBmsReady)
             {
                 var path = Path.ChangeExtension(BmsScreen.BmsPath, Exts.MP4);
                 if (this.SaveFileDialog(FileDialogOptions.WithInitialPath(path), Filters.MP4) is { } savePath)
                 {
+                    BmsScreen.ShowDebugText = true;
                     this.StartTaskSynchronized((p, c) => BmsVideoCreator.CreateVideo(savePath, p, c));
+                }
+            }
+        }
+
+        private void OnClick_Play(object sender, RoutedEventArgs e)
+        {
+            if (BmsScreen.IsBmsReady)
+            {
+                if (!BmsVideoCreator.IsPlaying)
+                {
+                    BmsScreen.ShowDebugText = false;
+                    var isReady = false;
+                    this.StartTaskSynchronized((p, c) => isReady = BmsVideoCreator.SetupRealTimePlay(p, c));
+                    if (isReady)
+                    {
+                        BmsVideoCreator.StartRealTimePlay();
+                        (sender as Button)?.Icon = Icons.Stop;
+                    }
+                }
+                else
+                {
+                    BmsVideoCreator.StopRealTimePlay();
+                    (sender as Button)?.Icon = Icons.Play;
+                }
+            }
+        }
+
+        private void BmsOptions_PropertyChanged(object? sender, PropertyChangedEventArgs e)
+        {
+            if (BmsVideoCreator.IsPlaying)
+            {
+                var options = BmsOptions;
+                var composer = BmsScreen.AudioComposer;
+                switch (e.PropertyName)
+                {
+                    case nameof(BmsPlayOptions.MasterVolume):
+                        composer.MasterVolume = options.MasterVolume;
+                        break;
+                    case nameof(BmsPlayOptions.KeyVolume):
+                        composer.TagToVolume[BgmTimeline.Tag_KeySound] = options.KeyVolume;
+                        break;
+                    case nameof(BmsPlayOptions.BgmVolume):
+                        composer.TagToVolume[BgmTimeline.Tag_BgmSound] = options.BgmVolume;
+                        break;
                 }
             }
         }

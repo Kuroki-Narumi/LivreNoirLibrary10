@@ -11,8 +11,8 @@ namespace LivreNoirLibrary.Media.Wave
 
         public static WaveBufferProvider Default { get; } = new();
 
-        public int OutputSampleRate { get; set; }
-        public int OutputChannels { get; set; }
+        public int SampleRate { get; set; }
+        public int Channels { get; set; }
 
         private WaveBufferProvider() { }
 
@@ -25,7 +25,7 @@ namespace LivreNoirLibrary.Media.Wave
         {
             try
             {
-                _buffer.SetLayout(OutputSampleRate, OutputChannels);
+                _buffer.SetLayout(SampleRate, Channels);
                 _buffer.AutoDecode(path, false);
                 waveBuffer = _buffer;
                 return true;

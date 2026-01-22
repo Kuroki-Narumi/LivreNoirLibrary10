@@ -6,6 +6,7 @@ namespace LivreNoirLibrary.Media
 {
     public partial class DoubleMultiTimeline<TValue> : XMultiTimelineBase<double, TValue, Operator_double>
     {
+        /*
         protected (int Start, int Length) GetPositionIndex(List<double> list, Range<decimal> range) => list.IndexRange(range);
         public ReadOnlySpan<double> GetPositions(Range<decimal> range) => _pos_list.Range(range);
         public void RemoveRange(Range<decimal> range) => RemoveRangeCore(GetPositionIndex(_pos_list, range));
@@ -17,6 +18,7 @@ namespace LivreNoirLibrary.Media
             => CopyToCore(destination, GetPositionIndex(_pos_list, srcRange), 0);
         public void CopyTo(IXMultiTimeline<double, TValue> destination, Range<decimal> srcRange, double destOffset)
             => CopyToCore(destination, GetPositionIndex(_pos_list, srcRange), destOffset);
+        */
 
     }
 }

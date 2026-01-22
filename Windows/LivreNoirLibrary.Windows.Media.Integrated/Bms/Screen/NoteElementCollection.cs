@@ -7,7 +7,6 @@ using LivreNoirLibrary.ObjectModel;
 using LivreNoirLibrary.Windows.Media.Bms.SkinInfo;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 
 namespace LivreNoirLibrary.Windows.Controls.Bms
 {
@@ -50,37 +49,40 @@ namespace LivreNoirLibrary.Windows.Controls.Bms
             timers.Clear();
             var noteCount = 0;
             var lanes = _lanes;
-            foreach (var (channel, time, info) in timings.KeyInfos)
+            //StringBuilder sb = new();
+            //sb.AppendLine("t\tpos\tch\ttype\tlength");
+            foreach (var (channel, position, info) in timings.KeyInfos)
             {
-                var startPos = (double)timings.Time2Position(time);
+                var time = info.Time;
                 if (channel is Channel.Bar)
                 {
-                    bars.Add(new(time, startPos));
+                    bars.Add(new(time, position));
                 }
                 else
                 {
                     if (lanes.TryGetValue(channel, out var tuple))
                     {
                         var (lane, player) = tuple;
-                        var end = time + info.Length;
+                        var endTime = time + info.TimeLength;
                         var id = BmsTimer.Lane2TimerId(lane);
-                        var isVisible = !info.IsMine;
+                        var type = info.Type;
+                        var isVisible = type is NoteType.Normal;
                         if (isVisible)
                         {
                             timers.Add(id + TimerIdOffsets.Press, time);
-                            timers.AddRelease(id + TimerIdOffsets.Bomb, id + TimerIdOffsets.LongBomb, end);
+                            timers.AddRelease(id + TimerIdOffsets.Bomb, id + TimerIdOffsets.LongBomb, endTime);
+                            //sb.AppendLine($"{time}\t{startPos}\t{channel.ToBased()}\t{type}\t{info.Length}");
                         }
-                        if (info.Length is > 0)
+                        if (info.TimeLength is > 0)
                         {
-                            var endPos = (double)timings.Time2Position(end);
-                            notes.Add(new(lane, player, time, end, startPos, endPos - startPos, info.IsMine));
-                            timers.AddRelease(id + TimerIdOffsets.Release, id + TimerIdOffsets.Press, end);
+                            notes.Add(new(lane, player, time, endTime, position, info.VisualLength, type));
+                            timers.AddRelease(id + TimerIdOffsets.Release, id + TimerIdOffsets.Press, endTime);
                             timers.Add(id + TimerIdOffsets.LongBomb, time);
                             noteCount++;
                         }
                         else
                         {
-                            notes.Add(new(lane, player, time, time, startPos, 0, info.IsMine));
+                            notes.Add(new(lane, player, time, time, position, 0, type));
                             if (isVisible)
                             {
                                 timers.AddRelease(id + TimerIdOffsets.Release, id + TimerIdOffsets.Press, time + 0.01);
@@ -92,6 +94,8 @@ namespace LivreNoirLibrary.Windows.Controls.Bms
             }
             NoteCount = noteCount;
             bars.Sort(BarLineInfoComparer.Instance);
+            //sb.AppendLine(timings.GetTimingInfoText());
+            //Clipboard.SetText(sb.ToString());
         }
 
         public void Update(in UpdateArgs args)
@@ -119,7 +123,10 @@ namespace LivreNoirLibrary.Windows.Controls.Bms
                     {
                         if (!child.IsProcessed)
                         {
-                            judge.UpdateJudge(timer, timeOffset + endTime, 0, new(JudgeType.Perfect, ComboChange.Increase, false, child.Player, 0, 2, 1));
+                            if (child.IsVisible)
+                            {
+                                judge.UpdateJudge(timer, timeOffset + endTime, 0, new(JudgeType.Perfect, ComboChange.Increase, false, child.Player, 0, 2, 1));
+                            }
                             child.IsProcessed = true;
                             child.IsActive = false;
                         }
@@ -147,10 +154,10 @@ namespace LivreNoirLibrary.Windows.Controls.Bms
             }
         }
 
-        public record NoteInfo(int Lane, int Player, double Time, double EndTime, double VisualStart, double VisualLength, bool IsMine)
+        public record NoteInfo(int Lane, int Player, double Time, double EndTime, double VisualStart, double VisualLength, NoteType Type)
         {
             public double CurrentOffset { get; set; }
-            public bool IsVisible { get; set; }
+            public bool IsVisible => Type is NoteType.Normal;
             public bool IsActive { get; set; }
             public bool IsProcessed { get; set; }
         }

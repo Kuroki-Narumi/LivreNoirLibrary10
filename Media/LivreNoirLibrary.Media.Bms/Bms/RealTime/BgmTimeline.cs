@@ -1,7 +1,5 @@
 ﻿using LivreNoirLibrary.Collections;
-using LivreNoirLibrary.Debug;
 using LivreNoirLibrary.Media.Wave;
-using System;
 using System.Collections.Generic;
 
 namespace LivreNoirLibrary.Media.Bms
@@ -11,9 +9,10 @@ namespace LivreNoirLibrary.Media.Bms
         public const int Tag_KeySound = 0;
         public const int Tag_BgmSound = 1;
 
+        private readonly HashSet<string> _keys = [];
         private readonly Dictionary<string, Item> _items = [];
 
-        public int KeyCount => _items.Count;
+        public int KeyCount => _keys.Count;
 
         public void Clear()
         {
@@ -21,10 +20,12 @@ namespace LivreNoirLibrary.Media.Bms
             {
                 list.Clear();
             }
+            _keys.Clear();
         }
 
         public void Add(string key, SoundInfo info)
         {
+            _keys.Add(key);
             _items.GetOrAdd(key, k => new(k)).Add(info);
         }
 

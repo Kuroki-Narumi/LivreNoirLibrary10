@@ -1,5 +1,6 @@
 ﻿using LivreNoirLibrary.Debug;
 using LivreNoirLibrary.Media.Bms.Play;
+using LivreNoirLibrary.Numerics;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -87,7 +88,7 @@ namespace LivreNoirLibrary.Media.Bms
                     HsCorrectionMode.AverageBpm => counter.AverageTempo,
                     HsCorrectionMode.MainBpm => counter.MainTempo,
                     HsCorrectionMode.MainTimeBpm => counter.MainTimeTempo,
-                    _ => 0,
+                    _ => obj.HighSpeedReference.Validate(0),
                 };
                 obj.HighSpeedCorrection = factor is > 0 ? 120 / factor : 1;
             }

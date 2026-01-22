@@ -24,6 +24,7 @@ namespace LivreNoirLibrary.Windows.Controls.Bms.Elements
         private Pen? _pen;
         private readonly DrawingVisual _visual = new();
         private RenderTargetBitmap? _renderTarget;
+        private DrRect _renderRect;
         private readonly UIntBitmap _bitmap = new(0, 0);
 
         public override void DetermineExpressions(Skin skin, IVariableProvider? provider)
@@ -68,7 +69,7 @@ namespace LivreNoirLibrary.Windows.Controls.Bms.Elements
                 _needRefresh = false;
             }
             bitmap = _bitmap;
-            rect = bitmap.Rect;
+            rect = _renderRect;
             return true;
         }
 
@@ -99,6 +100,7 @@ namespace LivreNoirLibrary.Windows.Controls.Bms.Elements
             renderTarget.Render(_visual);
             _bitmap.Resize(renderTarget.PixelWidth, renderTarget.PixelHeight);
             renderTarget.CopyPixels(_bitmap);
+            _renderRect = new(0, 0, width, height);
         }
     }
 }

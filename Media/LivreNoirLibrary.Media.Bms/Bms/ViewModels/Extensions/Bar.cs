@@ -29,7 +29,6 @@ namespace LivreNoirLibrary.Media.Bms
             public void OnConductorChanged(int number = int.MaxValue)
             {
                 vm.BarLengthCache.Clear(number);
-                vm.InvalidateTimeCounter();
             }
 
             public void InsertBar(int number, double length)

@@ -6,6 +6,7 @@ namespace LivreNoirLibrary.Media.Bms.Play
     {
         double HighSpeed { get; }
         HsCorrectionMode HsCorrectionMode { get; }
+        double HighSpeedReference => double.NaN;
         double HighSpeedCorrection { get; set; }
     }
 }

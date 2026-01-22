@@ -55,6 +55,7 @@ namespace LivreNoirLibrary.Windows.Controls.Bms.Elements
                 child.LongBody = GetTexture(source.LongBody);
                 child.ActiveLongBody = GetTexture(source.ActiveLongBody);
                 child.Mine = GetTexture(source.Mine);
+                child.Invisible = GetTexture(source.Invisible);
             }
 
             TextureData GetTexture(ValueExpression? texture)
@@ -110,10 +111,12 @@ namespace LivreNoirLibrary.Windows.Controls.Bms.Elements
                             textureData = laneInfo.LongTail;
                             AddChild(lane + 1000, textureData, laneInfo.X, laneInfo.Width, child.CurrentOffset + visualLength, 0, laneInfo.Note.Height - textureData.Height);
                         }
-                        textureData =
-                            child.IsMine ? laneInfo.Mine :
-                            (child.VisualLength is > 0) ? laneInfo.LongHead :
-                            laneInfo.Note;
+                        textureData = child.Type switch
+                        {
+                            NoteType.Mine => laneInfo.Mine,
+                            NoteType.Invisible => laneInfo.Invisible,
+                            _ => (child.VisualLength is > 0) ? laneInfo.LongHead : laneInfo.Note,
+                        };
                         AddChild(lane, textureData, laneInfo.X, laneInfo.Width, Math.Max(child.CurrentOffset, 0), 0);
                     }
                 }
@@ -162,6 +165,7 @@ namespace LivreNoirLibrary.Windows.Controls.Bms.Elements
             public TextureData LongBody { get; set; }
             public TextureData ActiveLongBody { get; set; }
             public TextureData Mine { get; set; }
+            public TextureData Invisible { get; set; }
         }
     }
 }

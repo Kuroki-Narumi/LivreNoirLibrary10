@@ -1,7 +1,10 @@
 using Microsoft.CodeAnalysis;
+using System;
 using System.Collections.Generic;
 using System.Net.Http.Headers;
+using System.Runtime.InteropServices.ComTypes;
 using System.Text;
+using System.Text.RegularExpressions;
 
 namespace LivreNoirLibrary.Core.Generator;
 using static Utils;
@@ -22,6 +25,9 @@ internal class CollectionExtensions : IIncrementalGenerator
             ($"IList<{PH_Type1}>", "list", $"IEnumerable<{PH_Type1}>"),
         ];
 
+    private static readonly string[] Comparable1 = [Int, Long, Float, Double, Decimal, Rational];
+    private static readonly string[] Comparable2 = [Double, Decimal, Rational];
+
     private static void Generate(IncrementalGeneratorPostInitializationContext context)
     {
         StringBuilder sb = new();
@@ -37,19 +43,31 @@ internal class CollectionExtensions : IIncrementalGenerator
                 {
             """);
 
-        foreach (var type1 in Comparable)
+        Regex replacer = new($"({PH_Source}|{PH_Destination}|{PH_Target}|{PH_Type1}|{PH_Type2})");
+
+        foreach (var type1 in Comparable1)
         {
-            foreach (var type2 in Comparable)
+            foreach (var type2 in Comparable2)
             {
                 if (type1 == type2)
+                {
                     continue;
+                }
                 foreach (var (collectionType, target, rangeType) in CollectionTypes)
                 {
-                    sb.AppendLine(Template.Replace(PH_Source, collectionType)
-                                          .Replace(PH_Destination, rangeType)
-                                          .Replace(PH_Target, target)
-                                          .Replace(PH_Type1, type1)
-                                          .Replace(PH_Type2, type2));
+                    var colType = collectionType.Replace(PH_Type1, type1);
+                    var rngType = rangeType.Replace(PH_Type1, type1);
+
+                    var text = replacer.Replace(Template, match => match.Value switch
+                    {
+                        PH_Source => colType,
+                        PH_Destination => rngType,
+                        PH_Target => target,
+                        PH_Type1 => type1,
+                        PH_Type2 => type2,
+                        _ => match.Value
+                    });
+                    sb.AppendLine(text);
                 }
             }
         }
@@ -86,5 +104,6 @@ internal class CollectionExtensions : IIncrementalGenerator
                 {
                     return IndexRange<{{PH_Type1}}, {{PH_Type2}}, Comparer_{{PH_Type1}}_{{PH_Type2}}>({{PH_Target}}, range);
                 }
+
         """;
 }

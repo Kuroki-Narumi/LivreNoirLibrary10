@@ -23,13 +23,15 @@ namespace LivreNoirLibrary.Media.Bms.ViewModels
         public IListEnumerable<BarPosition, Note> CurrentTimeline => _timeline;
         public DoubleBarLengthCache BarLengthCache { get; } = new();
         public FlowViewModelCollection FlowViewModel { get; }
+        public ITimeCounter TimeCounter { get; set => SetValue(ref field, value); }
 
         IHistory IHistoryOwner.History => _history;
 
-        public BmsViewModel()
+        public BmsViewModel(ITimeCounter timeCounter)
         {
             var root = new BmsData();
             Root = root;
+            TimeCounter = timeCounter;
             FlowViewModel = new(root);
             _history = new(this);
         }
@@ -63,34 +65,6 @@ namespace LivreNoirLibrary.Media.Bms.ViewModels
                 yield return list[i];
             }
         }
-
-        private bool _isTimeCounterReady;
-        private readonly TimeCounter _timeCounter = new();
-
-        public void InvalidateTimeCounter()
-        {
-            _isTimeCounterReady = false;
-        }
-
-        protected ITimeCounter GetTimeCounter()
-        {
-            if (!_isTimeCounterReady)
-            {
-                _timeCounter.Load(this);
-                _isTimeCounterReady = true;
-            }
-            return _timeCounter;
-        }
-
-        public double MinTempo => GetTimeCounter().MinTempo;
-        public double MaxTempo => GetTimeCounter().MaxTempo;
-        public double MainTempo => GetTimeCounter().MainTempo;
-        public double MainTimeTempo => GetTimeCounter().MainTimeTempo;
-        public double FirstSoundTime => GetTimeCounter().FirstSoundTime;
-        public double LastSoundTime => GetTimeCounter().LastSoundTime;
-        public double Beat2Time(double absolutePosition) => GetTimeCounter().Beat2Time(absolutePosition);
-        public double Time2Beat(double time) => GetTimeCounter().Time2Beat(time);
-        public double GetHighSpeed(double time) => GetTimeCounter().GetHighSpeed(time);
 
         public BmsHistoryData GetHistoryData()
         {

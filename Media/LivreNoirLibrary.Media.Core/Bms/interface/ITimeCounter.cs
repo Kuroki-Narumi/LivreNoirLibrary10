@@ -1,8 +1,9 @@
-﻿using System;
+﻿using LivreNoirLibrary.ObjectModel;
+using System;
 
 namespace LivreNoirLibrary.Media.Bms
 {
-    public interface ITimeCounter
+    public interface ITimeCounter : IClear
     {
         double MinTempo { get; }
         double MaxTempo { get; }
@@ -11,6 +12,8 @@ namespace LivreNoirLibrary.Media.Bms
         double MainTimeTempo { get; }
         double FirstSoundTime { get; }
         double LastSoundTime { get; }
+
+        void Load(IBmsViewModel vm);
 
         double Beat2Time(double absolutePosition);
         double Time2Beat(double time);

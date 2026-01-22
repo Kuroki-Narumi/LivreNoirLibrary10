@@ -1,6 +1,8 @@
+using Microsoft.CodeAnalysis;
 using System;
 using System.Text;
-using Microsoft.CodeAnalysis;
+using System.Text.RegularExpressions;
+using System.Xml.Linq;
 
 namespace LivreNoirLibrary.Core.Generator;
 
@@ -16,30 +18,45 @@ internal class SimdOperations : IIncrementalGenerator
 
     private static void Generate(IncrementalGeneratorPostInitializationContext context)
     {
-        // 算術
-        var types = Unmanaged;
-        Span<string> methods = ["CopyFrom", "Add", "Subtract", "Multiply", "Divide", "Min", "Max"];
-        GenerateCore(context, Code_Vector_Overload, Code_Vector_Ptr, methods, types);
-        GenerateCore(context, Code_Vector_Factor_Overload, Code_Vector_Factor_Ptr, ["CopyFrom", "Add"], types, suffix: "F");
-        //GenerateCore(context, Code_Vector_Factor_Overload2, Code_Vector_Factor_Ptr2, ["CopyFrom", "Add"], types, suffix: "FV");
-        GenerateCore(context, Code_Scalar_Overload, Code_Scalar_Ptr, methods, types, suffix: "S");
-        GenerateCore(context, Code_2Scalar_Overload, Code_2Scalar_Ptr, ["Clamp"], types);
+        // 全てのプリミティブ型が対象のメソッド
+        Span<string> types = [Byte, SByte, Short, UShort, Int, UInt, IntPtr, UIntPtr, Long, ULong, Float, Double];
         GenerateCore(context, Code_Unary_Overload, Code_Unary_Ptr, ["Clear"], types);
-        GenerateCore(context, Code_Unary_Overload, Code_Unary_Ptr, ["Abs", "Negate"], Signed);
+        GenerateCore(context, Code_Vector_Overload, Code_Vector_Ptr, ["CopyFrom"], types);
+        GenerateCore(context, Code_Scalar_Overload, Code_Scalar_Ptr, ["CopyFrom"], types, suffix: "S");
         GenerateCore_Equals(context, types);
+        GenerateCore(context, Code_Vector_Overload, Code_Vector_Ptr, ["Min", "Max"], types);
+        GenerateCore(context, Code_2Scalar_Overload, Code_2Scalar_Ptr, ["Clamp"], types);
+
+        // 算術
+        types = [Int, Long, Float, Double];
+        Span<string> methods = ["Add", "Subtract", "Multiply", "Divide"];
+        GenerateCore(context, Code_Vector_Overload, Code_Vector_Ptr, methods, types);
+        GenerateCore(context, Code_Scalar_Overload, Code_Scalar_Ptr, methods, types, suffix: "S");
+        // 補正付きコピー
+        types = [Float, Double];
+        methods = ["CopyFrom", "Add"];
+        GenerateCore(context, Code_Vector_Factor_Overload, Code_Vector_Factor_Ptr, methods, types, suffix: "F");
+        //GenerateCore(context, Code_Vector_Factor_Overload2, Code_Vector_Factor_Ptr2, methods, types, suffix: "FV");
+
+        // 符号関係
+        types = [SByte, Short, Int, IntPtr, Long, Float, Double];
+        GenerateCore(context, Code_Unary_Overload, Code_Unary_Ptr, ["Abs", "Negate"], types);
+
         // 総計
         types = [Int, UInt, Long, ULong, Float, Double];
-        GenerateCore_Readonly(context, ["Sum", "Average", "Square", "MeanSquare"], types, PH_Type);
+        GenerateCore_Readonly(context, ["Sum", "Average", "Square"], types, PH_Type);
         GenerateCore_Readonly(context, ["Min", "Max"], types, PH_Type, "U");
         GenerateCore_Readonly(context, ["MinMax"], types, $"({PH_Type} Min, {PH_Type} Max)");
+        types = [Float, Double];
+        GenerateCore_Readonly(context, ["MeanSquare"], types, PH_Type);
+
         // ビット演算
+        types = [Byte, SByte, Short, UShort, Int, UInt, Long, ULong];
         methods = ["And", "Or", "Xor", "Nand", "Nor", "Xnor"];
-        types = BinaryInteger;
         GenerateCore(context, Code_Vector_Overload, Code_Vector_Ptr, methods, types);
         GenerateCore(context, Code_Scalar_Overload, Code_Scalar_Ptr, methods, types, suffix: "S");
         GenerateCore(context, Code_Unary_Overload, Code_Unary_Ptr, ["Not"], types);
-        methods = ["ShiftLeft", "ShiftRightLogical"];
-        GenerateCore(context, Code_Shift_Overload, Code_Shift_Ptr, methods, types);
+        GenerateCore(context, Code_Shift_Overload, Code_Shift_Ptr, ["ShiftLeft", "ShiftRightLogical"], types);
         GenerateCore(context, Code_Shift_Overload, Code_Shift_Ptr, ["ShiftRightArithmetic"], [SByte, Short, Int, IntPtr, Long]);
     }
 
@@ -53,20 +70,45 @@ internal class SimdOperations : IIncrementalGenerator
             var text = overloadCode.Replace(PH_Method, method);
             var twoVector = text.Contains(PH_Source);
 
+            Regex replacer_dest = new($"{PH_DestinationConvert}|{PH_Destination}");
+            Regex replacer_src = new($"{PH_SourceConvert}|{PH_Source}");
+
             // 配列タイプごとのオーバーロード
-            foreach (var (name, conv) in SpanTypes_Destination)
+            foreach (var (name, conv, srcConv) in SpanTypes_Destination)
             {
-                var destFixed = text.Replace(PH_DestinationConvert, conv)
-                                    .Replace(PH_Destination, name);
+                var destFixed = replacer_dest.Replace(text, m => m.Value switch
+                {
+                    PH_DestinationConvert => conv,
+                    PH_Destination => name,
+                    _ => m.Value
+                });
+
                 if (twoVector)
                 {
-                    foreach (var (name2, conv2) in SpanTypes_ReadOnly)
+                    var srcFixed = replacer_src.Replace(destFixed, m => m.Value switch
                     {
-                        var srcFixed = destFixed.Replace(PH_SourceConvert, conv2)
-                                                .Replace(PH_Source, name2);
-                        foreach (var type in types)
+                        PH_SourceConvert => srcConv,
+                        PH_Source => name,
+                        _ => m.Value
+                    });
+                    foreach (var type in types)
+                    {
+                        sb.AppendLine(srcFixed.Replace(PH_Type, type));
+                    }
+                    foreach (var (name2, conv2) in SpanTypes_TwoVectorSource)
+                    {
+                        if (name2 != name)
                         {
-                            sb.AppendLine(srcFixed.Replace(PH_Type, type));
+                            srcFixed = replacer_src.Replace(destFixed, m => m.Value switch
+                            {
+                                PH_SourceConvert => conv2,
+                                PH_Source => name2,
+                                _ => m.Value
+                            });
+                            foreach (var type in types)
+                            {
+                                sb.AppendLine(srcFixed.Replace(PH_Type, type));
+                            }
                         }
                     }
                 }
@@ -161,13 +203,18 @@ internal class SimdOperations : IIncrementalGenerator
         context.AddSource($"EqualsAll.g.cs", sb.ToString());
     }
 
-    private static readonly (string, string)[] SpanTypes_Destination =
+    private static readonly (string, string, string)[] SpanTypes_Destination =
     [
-        ($"List<{PH_Type}>", "CollectionsMarshal.AsSpan(destination)"),
-        ($"{PH_Type}[]", "destination"),
-        ($"Memory<{PH_Type}>", "destination.Span"),
-        ($"Span<{PH_Type}>", "destination"),
-        ($"ObservableCollectionBase<{PH_Type}>", "CollectionsMarshal.AsSpan(destination._list)")
+        ($"List<{PH_Type}>", "CollectionsMarshal.AsSpan(destination)", "CollectionsMarshal.AsSpan(source)"),
+        ($"{PH_Type}[]", "destination", "source"),
+        ($"Memory<{PH_Type}>", "destination.Span", "source.Span"),
+        ($"Span<{PH_Type}>", "destination", "source"),
+        ($"ObservableCollectionBase<{PH_Type}>", "CollectionsMarshal.AsSpan(destination._list)", "CollectionsMarshal.AsSpan(source._list)")
+    ];
+
+    private static readonly (string, string)[] SpanTypes_TwoVectorSource =
+    [
+        ($"ReadOnlySpan<{PH_Type}>", "source"),
     ];
 
     private static readonly (string, string)[] SpanTypes_ReadOnly =

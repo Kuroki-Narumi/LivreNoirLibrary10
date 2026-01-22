@@ -12,6 +12,7 @@ namespace LivreNoirLibrary.Media.Bms.Play
         public double HighSpeed { get; set => SetValue(ref field, value); } = 2.5;
         [JsonConverter(typeof(JsonStringEnumConverter<HsCorrectionMode>))]
         public HsCorrectionMode HsCorrectionMode { get; set => SetValue(ref field, value); } = HsCorrectionMode.MainTimeBpm;
+        public double HighSpeedReference { get; set => SetValue(ref field, value); } = 120;
         public double HighSpeedCorrection { get; set => SetValue(ref field, value); } = 1;
 
         [JsonConverter(typeof(JsonStringEnumConverter<BgaVisibility>))]

@@ -8,7 +8,7 @@ using System.Text;
 
 namespace LivreNoirLibrary.Media.Bms
 {
-    public class TimeCounterBase : ITimeCounter
+    public abstract class TimeCounterBase : ITimeCounter
     {
         private readonly List<double> _beatList = [];
         private readonly List<TimingInfo> _beatItemList = [];
@@ -16,8 +16,6 @@ namespace LivreNoirLibrary.Media.Bms
         private readonly List<TimingInfo> _timeItemList = [];
         private readonly List<double> _speedTimeList = [];
         private readonly List<double> _speedValueList = [];
-        private readonly List<double> _positionList = [];
-        private readonly List<List<TimingInfo>> _positionItemList = [];
 
         private TempoInfo? _lastTempoInfo;
         private readonly List<int> _tempoList = [];
@@ -28,8 +26,8 @@ namespace LivreNoirLibrary.Media.Bms
         public double AverageTempo { get; private set; }
         public double MainTempo => _tempoList.Count is 0 ? -1 : SortedList.MaxKeyBy(_tempoList, _tempoInfoList, value => value.BeatLength);
         public double MainTimeTempo => _tempoList.Count is 0 ? -1 : SortedList.MaxKeyBy(_tempoList, _tempoInfoList, value => value.TimeLength);
-        public double FirstSoundTime { get; protected set; }
-        public double LastSoundTime { get; protected set; }
+        public double FirstSoundTime { get; private set; }
+        public double LastSoundTime { get; private set; }
 
         public virtual void Clear()
         {
@@ -41,11 +39,11 @@ namespace LivreNoirLibrary.Media.Bms
             _speedValueList.Clear();
             _tempoList.Clear();
             _tempoInfoList.Clear();
-            _positionList.Clear();
-            _positionItemList.Clear();
         }
 
-        public void BeginInit(double initialTempo)
+        public abstract void Load(IBmsViewModel vm);
+
+        protected void BeginInit(double initialTempo)
         {
             Clear();
 
@@ -61,14 +59,12 @@ namespace LivreNoirLibrary.Media.Bms
             _lastTempoInfo = new();
             _tempoList.Add((int)initialTempo);
             _tempoInfoList.Add(_lastTempoInfo);
-
-            _positionList.Add(0);
-            _positionItemList.Add([timingInfo]);
         }
 
-        public void ApplyTimeInfo(ref TimingInfoState state)
+        protected void ApplyTimeInfo(ref TimingInfoState state)
         {
-            if (state.Finalize(out var info, out var speedChanged, out var newSpeed))
+            var (tempoChanged, info, speedChanged, newSpeed) = state.Finalize();
+            if (tempoChanged)
             {
                 // beat to info
                 var beat = info.Beat;
@@ -80,17 +76,6 @@ namespace LivreNoirLibrary.Media.Bms
                 {
                     _beatList.Add(beat);
                     _beatItemList.Add(info);
-                }
-
-                // position to info
-                var position = info.Position;
-                if (position is 0)
-                {
-                    _positionItemList[0].Add(info);
-                }
-                else
-                {
-                    SortedList.GetOrAdd(_positionList, _positionItemList, position).Add(info);
                 }
 
                 var tempo = state.CurrentTempo;
@@ -135,7 +120,7 @@ namespace LivreNoirLibrary.Media.Bms
             }
         }
 
-        public void EndInit(ref TimingInfoState state)
+        protected void EndInit(ref TimingInfoState state)
         {
             _lastTempoInfo?.Add(state.CurrentBeat, state.CurrentTime);
             _lastTempoInfo = null;
@@ -149,45 +134,21 @@ namespace LivreNoirLibrary.Media.Bms
                 den += time;
             }
             AverageTempo = den is 0 ? 0 : (num / den).RoundToInt();
+            FirstSoundTime = state.FirstTime.Validate(0);
+            LastSoundTime = state.LastTime.Validate(0);
             ExConsole.Write($"Min={MinTempo}bpm, Max={MaxTempo}bpm, Avg={AverageTempo}bpm, Main={MainTempo}bpm, MainTime={MainTimeTempo}bpm, FirstSound={FirstSoundTime}, LastSound={LastSoundTime}");
         }
 
-        public string GetTimingInfoText()
-        {
-            StringBuilder sb = new();
-            sb.AppendLine("Beat\tTime\tPosition\tTempo\tStopTime\tScroll\tSpB\tBpS");
-            foreach (var item in _timeItemList)
-            {
-                sb.AppendLine($"{item.Beat}\t{item.Time}\t{item.Position}\t{item.Tempo}\t{item.StopTime}\t{item.Scroll}\t{item.SecondsPerBeat}\t{item.BeatsPerSecond}");
-            }
-            return sb.ToString();
-        }
-
-        public string GetTempoInfoText()
-        {
-            StringBuilder sb = new();
-            sb.AppendLine($"Tempo\tBeats\tSeconds");
-            foreach (var (tempo, item) in SortedList.GetEnumerator(_tempoList, _tempoInfoList))
-            {
-                sb.AppendLine($"{tempo}\t{item.BeatLength}\t{item.TimeLength}");
-            }
-            return sb.ToString();
-        }
-
-        public double Beat2Time(double absolutePosition)
+        public bool TryGetBeat2Info(double absolutePosition, out TimingInfo info)
         {
             var index = _beatList.BinarySearch(absolutePosition);
-            if (index is >= 0)
-            {
-                return _beatItemList[index].Time;
-            }
-            else
+            var found = index is >= 0;
+            if (!found)
             {
                 index = Math.Max(~index - 1, 0);
-                var beatReference = _beatList[index];
-                var item = _beatItemList[index];
-                return item.Time + item.StopTime + (absolutePosition - beatReference) * item.SecondsPerBeat;
             }
+            info = _beatItemList[index];
+            return found;
         }
 
         public bool TryGetTime2Info(double time, out TimingInfo info)
@@ -202,6 +163,20 @@ namespace LivreNoirLibrary.Media.Bms
             return found;
         }
 
+        public double Beat2Time(double absolutePosition)
+        {
+            return TryGetBeat2Info(absolutePosition, out var info)
+                ? info.Time
+                : info.Time + info.StopTime + (absolutePosition - info.Beat) * info.SecondsPerBeat;
+        }
+
+        public double Beat2Position(double absolutePosition)
+        {
+            return TryGetBeat2Info(absolutePosition, out var info) 
+                ? info.Position 
+                : info.Position + (absolutePosition - info.Beat) * info.Scroll;
+        }
+
         public double Time2Tempo(double time)
         {
             TryGetTime2Info(time, out var info);
@@ -210,26 +185,16 @@ namespace LivreNoirLibrary.Media.Bms
 
         public double Time2Beat(double time)
         {
-            if (TryGetTime2Info(time, out var info))
-            {
-                return info.Beat;
-            }
-            else
-            {
-                return info.Beat + (time - info.Time) * info.BeatsPerSecond;
-            }
+            return TryGetTime2Info(time, out var info) 
+                ? info.Beat 
+                : info.Beat + (time - info.Time) * info.BeatsPerSecond;
         }
 
         public double Time2Position(double time)
         {
-            if (TryGetTime2Info(time, out var info))
-            {
-                return info.Position;
-            }
-            else
-            {
-                return info.Position + (time - info.Time) * info.BeatsPerSecond * info.Scroll;
-            }
+            return TryGetTime2Info(time, out var info) 
+                ? info.Position 
+                : info.Position + (time - info.Time) * info.BeatsPerSecond * info.Scroll;
         }
 
         public double GetHighSpeed(double time) => SortedList.TryGetValue(_speedTimeList, _speedValueList, time, out var value) ? value : 1;
@@ -253,6 +218,28 @@ namespace LivreNoirLibrary.Media.Bms
                 BeatLength += beat - LastBeat;
                 TimeLength += time - LastTime;
             }
+        }
+
+        public string GetTimingInfoText()
+        {
+            StringBuilder sb = new();
+            sb.AppendLine("Beat\tTime\tPosition\tTempo\tStopTime\tScroll\tSpB\tBpS");
+            foreach (var item in _timeItemList)
+            {
+                sb.AppendLine($"{item.Beat}\t{item.Time}\t{item.Position}\t{item.Tempo}\t{item.StopTime}\t{item.Scroll}\t{item.SecondsPerBeat}\t{item.BeatsPerSecond}");
+            }
+            return sb.ToString();
+        }
+
+        public string GetTempoInfoText()
+        {
+            StringBuilder sb = new();
+            sb.AppendLine($"Tempo\tBeats\tSeconds");
+            foreach (var (tempo, item) in SortedList.GetEnumerator(_tempoList, _tempoInfoList))
+            {
+                sb.AppendLine($"{tempo}\t{item.BeatLength}\t{item.TimeLength}");
+            }
+            return sb.ToString();
         }
     }
 }

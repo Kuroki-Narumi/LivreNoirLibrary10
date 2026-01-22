@@ -5,12 +5,13 @@ using System.Linq;
 
 namespace LivreNoirLibrary.Media.Bms
 {
-    public interface IBmsViewModel : IBarPositionProvider<double>, ITimeCounter
+    public interface IBmsViewModel : IBarPositionProvider<double>
     {
         IBmsData Root { get; }
         IBmsDataUnit CurrentData { get; }
         IListEnumerable<BarPosition, Note> CurrentTimeline => CurrentData.Timeline;
         DoubleBarLengthCache BarLengthCache { get; }
+        ITimeCounter TimeCounter { get; }
 
         /// <summary>
         /// Returns an enumerable object that iterates through the data in ascending order(from the last descendant to the root).
@@ -24,7 +25,6 @@ namespace LivreNoirLibrary.Media.Bms
         /// <returns>an enumerable that can be used to iterate data.</returns>
         IEnumerable<IBmsDataUnit> ReverseEnumerateParents() => EnumerateParents().Reverse();
 
-        void InvalidateTimeCounter();
         void OnModified() { }
 
         double IBarLengthProvider<double>.GetBarLength(int number)

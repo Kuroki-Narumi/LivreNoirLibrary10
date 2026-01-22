@@ -46,9 +46,9 @@ namespace LivreNoirLibrary.Media.Bms.ViewModels
             => new(ParentTimeline.ReverseEnumerateList(range), CurrentTimeline.ReverseEnumerateList(range));
 
         IEnumerable<(BarPosition, List<Note>)> IListEnumerable<BarPosition, Note>.EnumerateList() => EnumerateCore(GetEnumerator());
-        IEnumerable<(BarPosition, List<Note>)> IListEnumerable<BarPosition, Note>.EnumerateList(Range<BarPosition> range) => EnumerateCore(GetEnumerator());
+        IEnumerable<(BarPosition, List<Note>)> IListEnumerable<BarPosition, Note>.EnumerateList(Range<BarPosition> range) => EnumerateCore(GetEnumerator(range));
         IEnumerable<(BarPosition, List<Note>)> IListEnumerable<BarPosition, Note>.ReverseEnumerateList() => EnumerateCore(GetReverseEnumerator());
-        IEnumerable<(BarPosition, List<Note>)> IListEnumerable<BarPosition, Note>.ReverseEnumerateList(Range<BarPosition> range) => EnumerateCore(GetReverseEnumerator());
+        IEnumerable<(BarPosition, List<Note>)> IListEnumerable<BarPosition, Note>.ReverseEnumerateList(Range<BarPosition> range) => EnumerateCore(GetReverseEnumerator(range));
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private static IEnumerable<(BarPosition, List<Note>)> EnumerateCore(TwoMergedEnumerator<BarPosition, List<Note>> enumer)

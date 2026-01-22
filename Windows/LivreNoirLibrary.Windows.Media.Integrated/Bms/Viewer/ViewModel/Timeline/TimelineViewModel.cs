@@ -66,12 +66,13 @@ namespace LivreNoirLibrary.Windows.Media.Bms
                 var lastNotes = _lastNotes;
                 var radix = Radix;
                 var map = LaneIndexMap;
+                var counter = source.TimeCounter;
 
                 foreach (var (pos, list) in source.CurrentData.Timeline.EnumerateList())
                 {
                     var head = source.GetHead(pos);
                     var absPos = source.GetAbsolutePosition(pos);
-                    var time = source.Beat2Time(absPos);
+                    var time = counter.Beat2Time(absPos);
                     foreach (var note in list.AsSpan())
                     {
                         var ch = note.Channel;

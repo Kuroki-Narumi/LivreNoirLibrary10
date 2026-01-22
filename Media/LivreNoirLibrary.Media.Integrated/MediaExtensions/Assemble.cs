@@ -15,6 +15,7 @@ namespace LivreNoirLibrary.Media.Integrated
 
     public static partial class MediaExtensions
     {
+        /*
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static Predicate<Note> GetDefaultPredicate<T>(IBmsViewModel vm, T options) where T : IAssemblePlaysLongEndOptions
         {
@@ -234,5 +235,6 @@ namespace LivreNoirLibrary.Media.Integrated
                 return defId;
             }
         }
+        */
     }
 }

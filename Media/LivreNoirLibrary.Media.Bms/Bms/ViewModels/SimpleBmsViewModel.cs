@@ -3,10 +3,9 @@ using System.Collections.Generic;
 
 namespace LivreNoirLibrary.Media.Bms.ViewModels
 {
-    public class SimpleBmsViewModel(IBmsData? data = null) : IBmsViewModel
+    public class SimpleBmsViewModel(IBmsData? data = null, ITimeCounter? timeCounter = null) : IBmsViewModel
     {
-        private bool _isTimeCounterReady;
-        private readonly TimeCounter _timeCounter = new();
+        private BaseData? _random;
 
         public IBmsData Data
         {
@@ -16,7 +15,7 @@ namespace LivreNoirLibrary.Media.Bms.ViewModels
                 if (field != value)
                 {
                     field = value;
-                    _isTimeCounterReady = false;
+                    _random = null;
                     BarLengthCache.Clear();
                 }
             }
@@ -27,31 +26,37 @@ namespace LivreNoirLibrary.Media.Bms.ViewModels
         IEnumerable<IBmsDataUnit> IBmsViewModel.EnumerateParents() => [Data.Root];
         IEnumerable<IBmsDataUnit> IBmsViewModel.ReverseEnumerateParents() => [Data.Root];
 
-        public DoubleBarLengthCache BarLengthCache { get; } = new();
+        IListEnumerable<BarPosition, Note> IBmsViewModel.CurrentTimeline => EnsureRandom().Timeline;
 
-        public void InvalidateTimeCounter()
+        private BaseData EnsureRandom()
         {
-            _isTimeCounterReady = false;
-        }
-
-        protected TimeCounter GetTimeCounter()
-        {
-            if (!_isTimeCounterReady)
+            if (_random is null)
             {
-                _timeCounter.Load(this);
-                _isTimeCounterReady = true;
+                DetermineRandom();
             }
-            return _timeCounter;
+            return _random!;
         }
 
-        public double MinTempo => GetTimeCounter().MinTempo;
-        public double MaxTempo => GetTimeCounter().MaxTempo;
-        public double MainTempo => GetTimeCounter().MainTempo;
-        public double MainTimeTempo => GetTimeCounter().MainTimeTempo;
-        public double FirstSoundTime => GetTimeCounter().FirstSoundTime;
-        public double LastSoundTime => GetTimeCounter().LastSoundTime;
-        public double Beat2Time(double absolutePosition) => GetTimeCounter().Beat2Time(absolutePosition);
-        public double Time2Beat(double time) => GetTimeCounter().Time2Beat(time);
-        public double GetHighSpeed(double time) => GetTimeCounter().GetHighSpeed(time);
+        public void DetermineRandom()
+        {
+            if (_random is { } data)
+            {
+                data.Clear();
+            }
+            else
+            {
+                data = new();
+                _random = data;
+            }
+            Data.DetermineRandom(data, ProvideRandom);
+        }
+
+        private int ProvideRandom(int max, string? message = null)
+        {
+            return Random.Shared.Next(max) + 1;
+        }
+
+        public DoubleBarLengthCache BarLengthCache { get; } = new();
+        public ITimeCounter TimeCounter { get; } = timeCounter ?? new TimeCounter();
     }
 }

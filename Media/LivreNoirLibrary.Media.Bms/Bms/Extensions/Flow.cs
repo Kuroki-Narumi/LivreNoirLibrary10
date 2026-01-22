@@ -23,8 +23,8 @@ namespace LivreNoirLibrary.Media.Bms
             public BranchDataEnumerator EnumerateAllData() => new(root, root.Root, true);
             public BranchDataEnumerator EnumerateChildren(IBmsDataUnit? start, bool containsSelf = true) => new(root, start ?? root.Root, containsSelf);
 
-            public void DeterminateRandom(IBmsDataUnit combineTarget, RandomProvider provider) => DeterminateRandom(root, root.Root, combineTarget, provider);
-            public void DeterminateRandom(IBmsDataUnit start, IBmsDataUnit combineTarget, RandomProvider provider)
+            public void DetermineRandom(IBmsDataUnit combineTarget, RandomProvider provider) => DetermineRandom(root, root.Root, combineTarget, provider);
+            public void DetermineRandom(IBmsDataUnit start, IBmsDataUnit combineTarget, RandomProvider provider)
             {
                 combineTarget.Clear();
                 var stack = ObjectPool.Rent<Stack<(IBmsDataUnit, int)>>();
@@ -46,7 +46,7 @@ namespace LivreNoirLibrary.Media.Bms
                             var condition = flow.IsFixed ? flow.Max : provider(flow.Max, flow.Note);
                             if (flow.GetBranch(condition) is { } branch)
                             {
-                                stack.Push((data, flowIndex));
+                                stack.Push((data, flowIndex + 1));
                                 stack.Push((root.GetBranchData(branch), -1));
                                 break;
                             }

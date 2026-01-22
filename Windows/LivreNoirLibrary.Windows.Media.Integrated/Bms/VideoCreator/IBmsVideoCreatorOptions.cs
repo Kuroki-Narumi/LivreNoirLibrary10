@@ -9,6 +9,7 @@ namespace LivreNoirLibrary.Windows.Media.Bms
         int QP { get; }
         int ApproximateKbps { get; }
         int AudioSampleRate { get; }
+        double StartOffset { get; }
         double AudioDelay { get; }
     }
 }

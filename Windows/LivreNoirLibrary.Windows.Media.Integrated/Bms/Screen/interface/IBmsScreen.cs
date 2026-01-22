@@ -14,7 +14,7 @@ namespace LivreNoirLibrary.Windows.Controls.Bms
         double FadeOpacity { get; set; }
         AudioComposer<string> AudioComposer { get; }
 
-        void SetupAudio(bool isAutoPlay);
+        void SetupAudio();
         void SetupPlay(bool isAutoPlay);
         void Update(double time);
         void CopyPixels(Span<byte> buffer, int width);

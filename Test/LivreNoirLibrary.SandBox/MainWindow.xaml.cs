@@ -40,6 +40,8 @@ namespace LivreNoirLibrary.SandBox
             BmsSkins.Load(Path.GetFullPath(@"Themes\BmsSkin\", General.GetAssemblyDir()));
             ComboBox_Skin.ItemsSource = BmsSkins.PlaySkins[0];
             ComboBox_Skin.SelectedIndex = AppSettings.Instance.SkinIndex;
+
+            BmsOptions.PropertyChanged += BmsOptions_PropertyChanged;
         }
 
         protected override void OnClosing(CancelEventArgs e)
