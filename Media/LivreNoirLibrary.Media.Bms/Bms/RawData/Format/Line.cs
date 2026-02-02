@@ -34,25 +34,19 @@ namespace LivreNoirLibrary.Media.Bms
             public void ReductDenominator(long limit)
             {
                 var list = _list;
-                var newList = ObjectPool.Rent<List<(Rational, ushort)>>();
-                try
+                using var o = ObjectPool.Rent<List<(Rational, ushort)>>();
+                var newList = o.Value;
+                foreach (var ((n, d), value) in list)
                 {
-                    foreach (var ((n, d), value) in list)
-                    {
-                        var newPos = new Rational(n * limit / d, limit);
-                        newList.Add((newPos, value));
-                    }
-                    list.Clear();
-                    foreach (var (pos, value) in newList.AsSpan())
-                    {
-                        list[pos] = value;
-                    }
-                    _den = limit;
+                    var newPos = new Rational(n * limit / d, limit);
+                    newList.Add((newPos, value));
                 }
-                finally
+                list.Clear();
+                foreach (var (pos, value) in newList.AsSpan())
                 {
-                    ObjectPool.Return(newList);
+                    list[pos] = value;
                 }
+                _den = limit;
             }
 
             public void WriteText(BmsTextWriter writer, int radix)

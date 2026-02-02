@@ -20,31 +20,25 @@ namespace LivreNoirLibrary.Media.Bms.ViewModels
 
         public void Restore(Selection target, ITimeline timeline)
         {
-            var buffer = ObjectPool.Rent<List<SelectionHistoryItem>>();
-            try
+            using var o = ObjectPool.Rent<List<SelectionHistoryItem>>();
+            var buffer = o.Value;
+            target.Clear();
+            foreach (var (pos, list) in _items)
             {
-                target.Clear();
-                foreach (var (pos, list) in _items)
+                if (timeline.TryGetValue(pos, SearchMode.Equal, out _, out var targetList))
                 {
-                    if (timeline.TryGetValue(pos, SearchMode.Equal, out _, out var targetList))
+                    buffer.AddRange(list);
+                    foreach (var note in targetList.AsSpan())
                     {
-                        buffer.AddRange(list);
-                        foreach (var note in targetList.AsSpan())
+                        var index = buffer.FindIndex(item => item.Equals(note));
+                        if (index is >= 0)
                         {
-                            var index = buffer.FindIndex(item => item.Equals(note));
-                            if (index is >= 0)
-                            {
-                                target.Add(list[index].Restore(pos));
-                                buffer.RemoveAt(index);
-                            }
+                            target.Add(list[index].Restore(pos));
+                            buffer.RemoveAt(index);
                         }
-                        buffer.Clear();
                     }
+                    buffer.Clear();
                 }
-            }
-            finally
-            {
-                ObjectPool.Return(buffer);
             }
         }
     }

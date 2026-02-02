@@ -70,41 +70,35 @@ namespace LivreNoirLibrary.Windows.Media
 
         private static WriteableBitmap CreateBitmap(string text)
         {
-            var buffer = ObjectPool.Rent<List<(Rectangle, Point)>>();
-            try
+            using var o = ObjectPool.Rent<List<(Rectangle, Point)>>();
+            var buffer = o.Value;
+            var x = 0;
+            foreach (var c in text)
             {
-                var x = 0;
-                foreach (var c in text)
+                var w = 1;
+                if (c is ' ')
                 {
-                    var w = 1;
-                    if (c is ' ')
-                    {
-                        w = CharWidth;
-                    }
-                    else if (_rects.TryGetValue(c, out var rect))
-                    {
-                        w = rect.Width;
-                        buffer.Add((rect, new(x, 0)));
-                    }
-                    x += w - 1;
+                    w = CharWidth;
                 }
-                x += 1;
-                var bitmap = Bitmap.Create(x, CharHeight);
-                using (var src = _letterBitmap.BeginRead())
-                using (var dest = bitmap.BeginWrite())
+                else if (_rects.TryGetValue(c, out var rect))
                 {
-                    foreach (var (rect, point) in buffer.AsSpan())
-                    {
-                        src.CopyTo(dest, rect, point);
-                    }
+                    w = rect.Width;
+                    buffer.Add((rect, new(x, 0)));
                 }
-                bitmap.Freeze();
-                return bitmap;
+                x += w - 1;
             }
-            finally
+            x += 1;
+            var bitmap = Bitmap.Create(x, CharHeight);
+            using (var src = _letterBitmap.BeginRead())
+            using (var dest = bitmap.BeginWrite())
             {
-                ObjectPool.Return(buffer);
+                foreach (var (rect, point) in buffer.AsSpan())
+                {
+                    src.CopyTo(dest, rect, point);
+                }
             }
+            bitmap.Freeze();
+            return bitmap;
         }
 
         public static WriteableBitmap GetBitmap(string text, Color color)

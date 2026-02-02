@@ -1,11 +1,12 @@
+using LivreNoirLibrary.Collections;
+using LivreNoirLibrary.IO;
+using LivreNoirLibrary.Numerics;
+using LivreNoirLibrary.ObjectModel;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
-using LivreNoirLibrary.Collections;
-using LivreNoirLibrary.IO;
-using LivreNoirLibrary.Numerics;
 
 namespace LivreNoirLibrary.Media.Midi
 {
@@ -274,7 +275,8 @@ namespace LivreNoirLibrary.Media.Midi
 
         public string JoinName(Func<Note, string> func)
         {
-            StringBuilder sb = new();
+            using var o = ObjectPool.Rent<StringBuilder>();
+            var sb = o.Value;
             int i = 0;
             foreach (var (offset, note) in _members)
             {
@@ -496,7 +498,7 @@ namespace LivreNoirLibrary.Media.Midi
 
         internal SortedSet<Rational> Markers => _markers;
 
-        bool INote.MatchesNumber(SortedSet<int> set)
+        bool INote.MatchesNumber(RangeSet<int> set)
         {
             foreach (var (_, note) in _members)
             {

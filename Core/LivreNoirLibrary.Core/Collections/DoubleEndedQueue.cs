@@ -9,7 +9,7 @@ namespace LivreNoirLibrary.Collections
 {
     public class DoubleEndedQueue<T> : IReadOnlyCollection<T>
     {
-        public const int DefaultCapacity = 16;
+        public const int DefaultCapacity = 4;
 
         private T[] _items;
         private int _head;
@@ -31,7 +31,9 @@ namespace LivreNoirLibrary.Collections
             }
         }
 
-        public DoubleEndedQueue(int capacity = DefaultCapacity)
+        public DoubleEndedQueue() : this(DefaultCapacity) { }
+
+        public DoubleEndedQueue(int capacity)
         {
             _items = new T[(capacity is <= 0 ? DefaultCapacity : capacity)];
         }
@@ -53,7 +55,7 @@ namespace LivreNoirLibrary.Collections
                 _items = new T[(capacity is <= 0 ? DefaultCapacity : capacity)];
                 foreach (var item in collection)
                 {
-                    PushBack(item);
+                    Push(item);
                 }
             }
         }
@@ -109,7 +111,7 @@ namespace LivreNoirLibrary.Collections
             _size++;
         }
 
-        public void PushBack(T item)
+        public void Push(T item)
         {
             if (_size == _items.Length)
             {
@@ -120,6 +122,8 @@ namespace LivreNoirLibrary.Collections
             _size++;
         }
 
+        public void Enqueue(T item) => Push(item);
+
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private void OnPopFront()
         {
@@ -128,7 +132,7 @@ namespace LivreNoirLibrary.Collections
             _size--;
         }
 
-        public bool TryPopFront([MaybeNullWhen(false)] out T result)
+        public bool TryDequeue([MaybeNullWhen(false)] out T result)
         {
             if (_size is > 0)
             {
@@ -140,7 +144,7 @@ namespace LivreNoirLibrary.Collections
             return false;
         }
 
-        public bool PopFrontIf(Predicate<T> match, [MaybeNullWhen(false)] out T result)
+        public bool DequeueIf(Predicate<T> match, [MaybeNullWhen(false)] out T result)
         {
             var item = _items[_head];
             if (_size is > 0 && match(item))
@@ -161,7 +165,7 @@ namespace LivreNoirLibrary.Collections
             _size--;
         }
 
-        public bool TryPopBack([MaybeNullWhen(false)]out T result)
+        public bool TryPop([MaybeNullWhen(false)]out T result)
         {
             if (_size is > 0)
             {
@@ -174,7 +178,7 @@ namespace LivreNoirLibrary.Collections
             return false;
         }
 
-        public bool PopBackIf(Predicate<T> match, [MaybeNullWhen(false)] out T result)
+        public bool PopIf(Predicate<T> match, [MaybeNullWhen(false)] out T result)
         {
             var index = GetPreviousIndex(_tail);
             var item = _items[index];
@@ -188,7 +192,7 @@ namespace LivreNoirLibrary.Collections
             return false;
         }
 
-        public bool TryPeakFront([MaybeNullWhen(false)] out T result)
+        public bool TryPeakBottom([MaybeNullWhen(false)] out T result)
         {
             if (_size is > 0)
             {
@@ -199,7 +203,7 @@ namespace LivreNoirLibrary.Collections
             return false;
         }
 
-        public bool TryPeakBack([MaybeNullWhen(false)] out T result)
+        public bool TryPeakTop([MaybeNullWhen(false)] out T result)
         {
             if (_size is > 0)
             {
@@ -210,13 +214,13 @@ namespace LivreNoirLibrary.Collections
             return false;
         }
 
-        public T PopFront() => TryPopFront(out var result) ? result : ThrowForEmpty();
+        public T Dequeue() => TryDequeue(out var result) ? result : ThrowForEmpty();
 
-        public T PopBack() => TryPopBack(out var result) ? result : ThrowForEmpty();
+        public T Pop() => TryPop(out var result) ? result : ThrowForEmpty();
 
-        public T PeakFront() => _size is 0 ? ThrowForEmpty() : _items[_head];
+        public T PeakBottom() => _size is 0 ? ThrowForEmpty() : _items[_head];
 
-        public T PeakBack() => _size is 0 ? ThrowForEmpty() : _items[GetPreviousIndex(_tail)];
+        public T PeakTop() => _size is 0 ? ThrowForEmpty() : _items[GetPreviousIndex(_tail)];
 
         private void CopyToImpl(T[] array, int index)
         {

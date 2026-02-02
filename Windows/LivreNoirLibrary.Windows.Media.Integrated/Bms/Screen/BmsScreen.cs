@@ -5,6 +5,7 @@ using LivreNoirLibrary.Media.Bms;
 using LivreNoirLibrary.Media.Bms.Play;
 using LivreNoirLibrary.Media.Bms.ViewModels;
 using LivreNoirLibrary.Media.Wave;
+using LivreNoirLibrary.ObjectModel;
 using LivreNoirLibrary.Windows.Controls.Bms.Elements;
 using LivreNoirLibrary.Windows.Media;
 using LivreNoirLibrary.Windows.Media.Bms.SkinInfo;
@@ -365,32 +366,31 @@ namespace LivreNoirLibrary.Windows.Controls.Bms
             }
         }
 
-        readonly StringBuilder _debugBuilder = new();
-
         void ConstructDebugText()
         {
             if (_showDebugText)
             {
+                using var o = ObjectPool.Rent<StringBuilder>();
+                var sb = o.Value;
                 var total = _debugRoot.Time;
-                _debugBuilder.Clear();
-                AppendLine(_debugRoot, total);
+                AppendLine(sb, _debugRoot, total);
                 foreach (var (_, item) in _debugDic)
                 {
                     if (!string.IsNullOrEmpty(item.Name) && item.Time is not 0)
                     {
-                        _debugBuilder.AppendLine();
-                        AppendLine(item, total);
+                        sb.AppendLine();
+                        AppendLine(sb, item, total);
                     }
                 }
-                DebugText = _debugBuilder.ToString();
+                DebugText = sb.ToString();
             }
         }
 
-        void AppendLine(in DebugItem item, double total)
+        void AppendLine(StringBuilder sb, in DebugItem item, double total)
         {
-            _debugBuilder.Append(' ', item.Indent * 2);
-            _debugBuilder.Append(item.Name);
-            _debugBuilder.Append($" - {item.Time / total:P2}({item.Time:F3}ms)");
+            sb.Append(' ', item.Indent * 2);
+            sb.Append(item.Name);
+            sb.Append($" - {item.Time / total:P2}({item.Time:F3}ms)");
         }
     }
 }

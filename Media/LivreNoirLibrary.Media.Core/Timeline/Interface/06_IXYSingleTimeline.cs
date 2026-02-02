@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using LivreNoirLibrary.Collections;
+using LivreNoirLibrary.Numerics;
 
 namespace LivreNoirLibrary.Media
 {

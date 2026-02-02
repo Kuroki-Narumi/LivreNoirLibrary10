@@ -78,7 +78,8 @@ namespace LivreNoirLibrary.Windows.Media.Bms
                     duration -= offset;
 
                     var bufferSize = rate * ch;
-                    var audioBuffer = ArrayPool<float>.Shared.Rent(bufferSize);
+                    using var o = ArrayPool.Rent<float>(bufferSize);
+                    var audioBuffer = o.Array;
                     using WaveEncoder encoder = new(path, new(rate, ch, SampleFormat.Int16));
                     var totalSample = (int)Math.Ceiling(duration * rate) * ch;
 
@@ -133,7 +134,6 @@ namespace LivreNoirLibrary.Windows.Media.Bms
                 timer.Set(TimerId.Scene_Terminate, fadeOutStart);
 
                 // 音声
-                var audioBuffer = ArrayPool<float>.Shared.Rent(rate * ch);
                 var composer = screen.AudioComposer;
 
                 // エンコーダー
@@ -168,83 +168,75 @@ namespace LivreNoirLibrary.Windows.Media.Bms
                     return;
                 }
 
-                // 映像バッファ
-                var size = width * height * 4;
-                var videoBuffer = ArrayPool<byte>.Shared.Rent(size);
-                var videoSpan = videoBuffer.AsSpan(0, size);
-                var aborting = false;
+                // バッファ
+                using var o_a = ArrayPool.Rent<float>(rate * ch);
+                using var o_v = ArrayPool.Rent<byte>(width * height * 4);
+                var videoSpan = o_v.Span;
 
                 long totalFrameUnit;
                 void UpdateTotalFrameCount(double time) => totalFrameUnit = (long)Math.Ceiling(time * fps_num) + fps_den;
 
                 p?.Report("Encoding...", null);
-                try
+                // デバッグ用
+                var t0 = Stopwatch.GetTimestamp();
+                UpdateTotalFrameCount(totalTime);
+                var aborting = false;
+                for (var frame = 0L; frame < totalFrameUnit;)
                 {
-                    // デバッグ用
-                    var t0 = Stopwatch.GetTimestamp();
-                    UpdateTotalFrameCount(totalTime);
-                    for (var frame = 0L; frame < totalFrameUnit; )
+                    var frameMax = Math.Min(totalFrameUnit, frame + fps_num);
+                    var frameUnit = frameMax - frame;
+                    // 映像
+                    for (; frame < frameMax; frame += fps_den)
                     {
-                        var frameMax = Math.Min(totalFrameUnit, frame + fps_num);
-                        var frameUnit = frameMax - frame;
-                        // 映像
-                        for (; frame < frameMax; frame += fps_den)
+                        var time = (double)frame / fps_num;
+
+                        // フェード処理
+                        screen.FadeOpacity =
+                            time <= fadeInDuration ? 1 - time / fadeInDuration
+                            : time >= fadeOutStart ? (time - fadeOutStart) / fadeOutDuration
+                            : 0;
+                        // ロード画面を消す処理
+                        if (needLoadingFinish && time >= loadingFinish)
                         {
-                            var time = (double)frame / fps_num;
-
-                            // フェード処理
-                            screen.FadeOpacity = 
-                                time <= fadeInDuration ? 1 - time / fadeInDuration
-                                : time >= fadeOutStart ? (time - fadeOutStart) / fadeOutDuration 
-                                : 0;
-                            // ロード画面を消す処理
-                            if (needLoadingFinish && time >= loadingFinish)
-                            {
-                                timer.Remove(TimerId.Play_LoadingStart);
-                                timer.Set(TimerId.Play_LoadingFinish, time);
-                                needLoadingFinish = false;
-                            }
-
-                            var report = $"Write frame {time:F2}/{totalTime:F2}({frame / Stopwatch.GetElapsedTime(t0).TotalSeconds / fps_den:0.000}fps)";
-                            p?.Report(report, time, totalTime);
-
-                            // 映像バッファの更新
-                            screen.Update(time);
-                            screen.CopyPixels(videoSpan, width);
-                            // 映像フレームの書き込み
-                            encoder.WritePixels(videoSpan);
-
-                            f.WaitForUpdate();
-
-                            // 中止処理
-                            if (c.IsCancellationRequested && !aborting && time < fadeOutStart)
-                            {
-                                p?.Report("Aborting...", null);
-                                fadeOutStart = time;
-                                UpdateTotalFrameCount(time + fadeOutDuration);
-                                frameMax = Math.Min(totalFrameUnit, frame + fps_num);
-                                frameUnit = frameMax - frame;
-                                aborting = true;
-                            }
+                            timer.Remove(TimerId.Play_LoadingStart);
+                            timer.Set(TimerId.Play_LoadingFinish, time);
+                            needLoadingFinish = false;
                         }
 
-                        // 音声は1秒ごとに書き込む
-                        var totalSample = (int)(frameUnit * rate * 2 / fps_num);
-                        var span = audioBuffer.AsSpan(0, totalSample);
-                        // 音声バッファを取得
-                        composer.Read(span);
-                        span.Clamp(-1, 1);
-                        // 音声フレームの書き込み
-                        encoder.WriteSamples(span);
+                        var report = $"Write frame {time:F2}/{totalTime:F2}({frame / Stopwatch.GetElapsedTime(t0).TotalSeconds / fps_den:0.000}fps)";
+                        p?.Report(report, time, totalTime);
+
+                        // 映像バッファの更新
+                        screen.Update(time);
+                        screen.CopyPixels(videoSpan, width);
+                        // 映像フレームの書き込み
+                        encoder.WritePixels(videoSpan);
+
+                        f.WaitForUpdate();
+
+                        // 中止処理
+                        if (c.IsCancellationRequested && !aborting && time < fadeOutStart)
+                        {
+                            p?.Report("Aborting...", null);
+                            fadeOutStart = time;
+                            UpdateTotalFrameCount(time + fadeOutDuration);
+                            frameMax = Math.Min(totalFrameUnit, frame + fps_num);
+                            frameUnit = frameMax - frame;
+                            aborting = true;
+                        }
                     }
 
-                    p?.Report("Finalizing...");
+                    // 音声は1秒ごとに書き込む
+                    var totalSample = (int)(frameUnit * rate * 2 / fps_num);
+                    var span = o_a.AsSpan(totalSample);
+                    // 音声バッファを取得
+                    composer.Read(span);
+                    span.Clamp(-1, 1);
+                    // 音声フレームの書き込み
+                    encoder.WriteSamples(span);
                 }
-                finally
-                {
-                    ArrayPool<float>.Shared.Return(audioBuffer);
-                    ArrayPool<byte>.Shared.Return(videoBuffer);
-                }
+
+                p?.Report("Finalizing...");
             }
         }
 

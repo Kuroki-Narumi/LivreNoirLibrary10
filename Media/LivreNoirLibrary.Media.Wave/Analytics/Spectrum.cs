@@ -57,31 +57,24 @@ namespace LivreNoirLibrary.Media.Wave
             var src = _source;
             var levelFactor = factor / range;
             var prevFactor = 1 - factor;
-            var ary = ArrayPool<float>.Shared.Rent(ww * 2);
-            try
+            using var o = ArrayPool.Rent<float>(ww * 2);
+            var buffer = o.Span;
+            for (var c = 0; c < ch; c++)
             {
-                var buffer = ary.AsSpan(0, ww * 2);
-                for (var c = 0; c < ch; c++)
+                src.GetChannelComplex(buffer, c, (int)position);
+                buffer.Multiply(hamming);
+                fixed (float* bufferPtr = buffer)
+                fixed (double* resultPtr = _fft_result[c])
                 {
-                    src.GetChannelComplex(buffer, c, (int)position);
-                    buffer.Multiply(hamming);
-                    fixed (float* bufferPtr = buffer)
-                    fixed (double* resultPtr = _fft_result[c])
+                    FFT.FFTCore(true, bufferPtr, ww);
+                    var ptr = bufferPtr;
+                    for (int i = 0; i < w2; i++)
                     {
-                        FFT.FFTCore(true, bufferPtr, ww);
-                        var ptr = bufferPtr;
-                        for (int i = 0; i < w2; i++)
-                        {
-                            var value = *ptr * *ptr++ + *ptr * *ptr++;
-                            var level = Math.Max(Math.Log10(value) / 2 - min, 0);
-                            resultPtr[i] = level * levelFactor + resultPtr[i] * prevFactor;
-                        }
+                        var value = *ptr * *ptr++ + *ptr * *ptr++;
+                        var level = Math.Max(Math.Log10(value) / 2 - min, 0);
+                        resultPtr[i] = level * levelFactor + resultPtr[i] * prevFactor;
                     }
                 }
-            }
-            finally
-            {
-                ArrayPool<float>.Shared.Return(ary);
             }
         }
     }

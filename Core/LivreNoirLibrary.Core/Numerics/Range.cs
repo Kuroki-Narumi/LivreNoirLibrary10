@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace LivreNoirLibrary.Collections
+namespace LivreNoirLibrary.Numerics
 {
     public readonly struct Range<T>
         where T : struct

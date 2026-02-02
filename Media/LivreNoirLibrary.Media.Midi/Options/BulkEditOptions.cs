@@ -19,15 +19,14 @@ namespace LivreNoirLibrary.Media.Midi
         public bool Target_CC { get; set => SetValue(ref field, value); }
         public bool Target_Note { get; set => SetValue(ref field, value); }
 
-        private static readonly List<int> _numbers_cache = [];
-        internal readonly SortedSet<int> _numbers = [];
-        public IEnumerable<int> Numbers
+        internal readonly RangeSet<int> _numbers = [];
+
+        public RangeSet<int> Numbers
         {
             get => _numbers;
             set
             {
-                _numbers.Clear();
-                _numbers.UnionWith(value);
+                _numbers.OverwriteFrom(value);
                 SendPropertyChanged();
             }
         }
@@ -54,9 +53,11 @@ namespace LivreNoirLibrary.Media.Midi
         public string GetNumbersText() => BasedNumber.GetListText(Numbers, 10);
         public bool TrySetNumbers(string? text)
         {
-            if (BasedNumber.TryParseListText(text, _numbers_cache, 10, 127))
+            using var o = ObjectPool.Rent<RangeSet<int>>();
+            var cache = o.Value;
+            if (BasedNumber.TryParseRangeSet(text, cache, 10))
             {
-                Numbers = _numbers_cache;
+                Numbers = cache;
                 return true;
             }
             else

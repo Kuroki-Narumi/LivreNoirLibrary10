@@ -1,4 +1,5 @@
-﻿using System;
+﻿using LivreNoirLibrary.Collections;
+using System;
 using System.Buffers;
 
 namespace LivreNoirLibrary.Numerics
@@ -47,42 +48,20 @@ namespace LivreNoirLibrary.Numerics
             var w2 = ww / 2;
             var result = new double[CalcWindowRepeats(len, w2)];
             var freqList = GetFreqList(sampleRate, ww);
-            var array = ArrayPool<double>.Shared.Rent(ww * 2);
-            var buffer = array.AsSpan();
+            using var o = ArrayPool.Rent<double>(ww * 2);
+            var buffer = o.Span;
 
             var resultIndex = 0;
             var index = 0;
             double num, den;
-            try
-            {
-                fixed (double* resultPtr = result)
-                fixed (double* freqPtr = freqList)
-                fixed (double* bufferPtr = buffer)
-                {
-                    while (len > ww)
-                    {
-                        ToComplex(span[index..(index + ww)], buffer);
-                        ApplyHammingComplex(buffer, ww);
-                        FFTCore(true, bufferPtr, ww);
-                        num = 0;
-                        den = 0;
-                        for (int j = 1; j < w2; j++)
-                        {
-                            var j2 = j * 2;
-                            var re = bufferPtr[j2];
-                            var im = bufferPtr[j2 + 1];
-                            var value = re * re + im * im;
-                            num += freqPtr[j] * value;
-                            den += value;
-                        }
-                        resultPtr[resultIndex] = den is > 0 ? num / den : 0;
 
-                        resultIndex++;
-                        index += w2;
-                        len -= w2;
-                    }
-                    buffer.Clear();
-                    ToComplex(span[index..(index + len)], buffer);
+            fixed (double* resultPtr = result)
+            fixed (double* freqPtr = freqList)
+            fixed (double* bufferPtr = buffer)
+            {
+                while (len > ww)
+                {
+                    ToComplex(span[index..(index + ww)], buffer);
                     ApplyHammingComplex(buffer, ww);
                     FFTCore(true, bufferPtr, ww);
                     num = 0;
@@ -97,13 +76,29 @@ namespace LivreNoirLibrary.Numerics
                         den += value;
                     }
                     resultPtr[resultIndex] = den is > 0 ? num / den : 0;
+
+                    resultIndex++;
+                    index += w2;
+                    len -= w2;
                 }
-                return result;
+                buffer.Clear();
+                ToComplex(span[index..(index + len)], buffer);
+                ApplyHammingComplex(buffer, ww);
+                FFTCore(true, bufferPtr, ww);
+                num = 0;
+                den = 0;
+                for (int j = 1; j < w2; j++)
+                {
+                    var j2 = j * 2;
+                    var re = bufferPtr[j2];
+                    var im = bufferPtr[j2 + 1];
+                    var value = re * re + im * im;
+                    num += freqPtr[j] * value;
+                    den += value;
+                }
+                resultPtr[resultIndex] = den is > 0 ? num / den : 0;
             }
-            finally
-            {
-                ArrayPool<double>.Shared.Return(array);
-            }
+            return result;
         }
 
         public static unsafe float[] Centroids(ReadOnlySpan<float> span, int sampleRate, int ww = DefaultWindowWidth)
@@ -112,42 +107,20 @@ namespace LivreNoirLibrary.Numerics
             var w2 = ww / 2;
             var result = new float[CalcWindowRepeats(len, w2)];
             var freqList = GetFreqList32(sampleRate, ww);
-            var array = ArrayPool<float>.Shared.Rent(ww * 2);
-            var buffer = array.AsSpan(0, ww * 2);
+
+            using var o = ArrayPool.Rent<float>(ww * 2);
+            var buffer = o.Span;
 
             var resultIndex = 0;
             var index = 0;
             float num, den;
-            try
+            fixed (float* resultPtr = result)
+            fixed (float* freqPtr = freqList)
+            fixed (float* bufferPtr = buffer)
             {
-                fixed (float* resultPtr = result)
-                fixed (float* freqPtr = freqList)
-                fixed (float* bufferPtr = buffer)
+                while (len > ww)
                 {
-                    while (len > ww)
-                    {
-                        ToComplex(span[index..(index + ww)], buffer);
-                        ApplyHammingComplex(buffer, ww);
-                        FFTCore(true, bufferPtr, ww);
-                        num = 0;
-                        den = 0;
-                        for (int j = 1; j < w2; j++)
-                        {
-                            var j2 = j * 2;
-                            var re = bufferPtr[j2];
-                            var im = bufferPtr[j2 + 1];
-                            var value = re * re + im * im;
-                            num += freqPtr[j] * value;
-                            den += value;
-                        }
-                        resultPtr[resultIndex] = den is > 0 ? num / den : 0;
-
-                        resultIndex++;
-                        index += w2;
-                        len -= w2;
-                    }
-                    buffer.Clear();
-                    ToComplex(span[index..(index + len)], buffer);
+                    ToComplex(span[index..(index + ww)], buffer);
                     ApplyHammingComplex(buffer, ww);
                     FFTCore(true, bufferPtr, ww);
                     num = 0;
@@ -162,13 +135,29 @@ namespace LivreNoirLibrary.Numerics
                         den += value;
                     }
                     resultPtr[resultIndex] = den is > 0 ? num / den : 0;
+
+                    resultIndex++;
+                    index += w2;
+                    len -= w2;
                 }
-                return result;
+                buffer.Clear();
+                ToComplex(span[index..(index + len)], buffer);
+                ApplyHammingComplex(buffer, ww);
+                FFTCore(true, bufferPtr, ww);
+                num = 0;
+                den = 0;
+                for (int j = 1; j < w2; j++)
+                {
+                    var j2 = j * 2;
+                    var re = bufferPtr[j2];
+                    var im = bufferPtr[j2 + 1];
+                    var value = re * re + im * im;
+                    num += freqPtr[j] * value;
+                    den += value;
+                }
+                resultPtr[resultIndex] = den is > 0 ? num / den : 0;
             }
-            finally
-            {
-                ArrayPool<float>.Shared.Return(array);
-            }
+            return result;
         }
     }
 }

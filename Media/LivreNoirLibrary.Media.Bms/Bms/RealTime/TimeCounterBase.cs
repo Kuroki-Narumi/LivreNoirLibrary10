@@ -1,6 +1,7 @@
 ﻿using LivreNoirLibrary.Collections;
 using LivreNoirLibrary.Debug;
 using LivreNoirLibrary.Numerics;
+using LivreNoirLibrary.ObjectModel;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -222,7 +223,8 @@ namespace LivreNoirLibrary.Media.Bms
 
         public string GetTimingInfoText()
         {
-            StringBuilder sb = new();
+            using var o = ObjectPool.Rent<StringBuilder>();
+            var sb = o.Value;
             sb.AppendLine("Beat\tTime\tPosition\tTempo\tStopTime\tScroll\tSpB\tBpS");
             foreach (var item in _timeItemList)
             {
@@ -233,7 +235,8 @@ namespace LivreNoirLibrary.Media.Bms
 
         public string GetTempoInfoText()
         {
-            StringBuilder sb = new();
+            using var o = ObjectPool.Rent<StringBuilder>();
+            var sb = o.Value;
             sb.AppendLine($"Tempo\tBeats\tSeconds");
             foreach (var (tempo, item) in SortedList.GetEnumerator(_tempoList, _tempoInfoList))
             {

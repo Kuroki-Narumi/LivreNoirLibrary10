@@ -52,30 +52,24 @@ namespace LivreNoirLibrary.Media.Bms
 
             public void EnsureBranches(bool ensureDefault = false)
             {
-                var set = ObjectPool.Rent<HashSet<int>>();
-                try
+                using var o = ObjectPool.Rent<HashSet<int>>();
+                var set = o.Value;
+                var branches = obj.Branches;
+                foreach (var branch in branches.AsSpan())
                 {
-                    var branches = obj.Branches;
-                    foreach (var branch in branches.AsSpan())
+                    set.Add(branch.Condition);
+                }
+                var max = obj.Max;
+                for (var i = 1; i <= max; i++)
+                {
+                    if (set.Add(i))
                     {
-                        set.Add(branch.Condition);
-                    }
-                    var max = obj.Max;
-                    for (var i = 1; i <= max; i++)
-                    {
-                        if (set.Add(i))
-                        {
-                            branches.Add(new(i));
-                        }
-                    }
-                    if (ensureDefault)
-                    {
-                        obj.DefaultBranch ??= new(BmsConstants.DefaultCondition);
+                        branches.Add(new(i));
                     }
                 }
-                finally
+                if (ensureDefault)
                 {
-                    ObjectPool.Return(set);
+                    obj.DefaultBranch ??= new(BmsConstants.DefaultCondition);
                 }
             }
 

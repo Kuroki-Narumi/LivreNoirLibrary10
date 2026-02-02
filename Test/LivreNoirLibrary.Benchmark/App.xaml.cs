@@ -6,6 +6,7 @@ using System.Windows;
 using System.Numerics;
 using System.Runtime.Intrinsics;
 using LivreNoirLibrary.Numerics;
+using LivreNoirLibrary.Text;
 
 namespace LivreNoirLibrary.Benchmark
 {
@@ -43,9 +44,33 @@ namespace LivreNoirLibrary.Benchmark
             //BenchmarkRunner.Run<DoubleRectTest>();
             //DoubleRectTest.Validate();
 
-            BenchmarkRunner.Run<IfTest>();
-            IfTest.Validate();
+            //BenchmarkRunner.Run<IfTest>();
+            //IfTest.Validate();
+
+            RangeSet<int> set = [];
+            void MatchTest(string text)
+            {
+                Console.WriteLine($"MatchTest text: \"{text}\"");
+                if (BasedNumber.TryParseRangeSet(text, set, 10))
+                {
+                    Console.Write($"  Parse successed: ");
+                    foreach (var range in set)
+                    {
+                        Console.Write($"{range}, ");
+                    }
+                    Console.WriteLine();
+                }
+                else
+                {
+                    Console.WriteLine($"  Parse failed!");
+                }
+            }
+
+            ReadOnlySpan<string> texts = ["1 2 3 5 6 7", "1-6 3,4", "-9 4-15", "36-5 3 6 9", "1 5 2 4 3", "6 6 6 9..2"];
+            foreach (var text in texts)
+            {
+                MatchTest(text);
+            }
         }
     }
-
 }

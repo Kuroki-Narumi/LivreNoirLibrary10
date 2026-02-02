@@ -1,5 +1,6 @@
 ﻿using LivreNoirLibrary.Collections;
 using LivreNoirLibrary.Debug;
+using LivreNoirLibrary.Numerics;
 using System;
 using System.Collections.Generic;
 using System.Linq;

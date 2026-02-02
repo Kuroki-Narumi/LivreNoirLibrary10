@@ -1,4 +1,5 @@
-﻿using System;
+﻿using LivreNoirLibrary.ObjectModel;
+using System;
 using System.Text;
 
 namespace LivreNoirLibrary.YuGiOh.Data
@@ -41,7 +42,8 @@ namespace LivreNoirLibrary.YuGiOh.Data
 
         public string GetMonsterInfoText()
         {
-            StringBuilder sb = new();
+            using var o = ObjectPool.Rent<StringBuilder>();
+            var sb = o.Value;
             sb.Append(AttributeText);
             sb.Append(Vocab.Ability_Separator);
             sb.Append(MonsterTypeText);
@@ -61,7 +63,8 @@ namespace LivreNoirLibrary.YuGiOh.Data
 
         public string GetStatusText()
         {
-            StringBuilder sb = new();
+            using var o = ObjectPool.Rent<StringBuilder>();
+            var sb = o.Value;
             sb.Append(Vocab.GetLevelName(CardType));
             sb.Append($" {LevelText}");
             sb.Append(Vocab.Ability_Separator);
@@ -82,7 +85,8 @@ namespace LivreNoirLibrary.YuGiOh.Data
 
         public string GetFullText()
         {
-            StringBuilder sb = new();
+            using var o = ObjectPool.Rent<StringBuilder>();
+            var sb = o.Value;
             if (IsMosnter())
             {
                 sb.AppendLine(GetMonsterInfoText());

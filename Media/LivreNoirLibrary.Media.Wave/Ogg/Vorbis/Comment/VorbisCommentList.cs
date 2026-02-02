@@ -154,34 +154,28 @@ namespace LivreNoirLibrary.Media.Ogg.Vorbis
                 //     comment length + comment string
                 len += sizeof(int)    + comment.GetMaxByteCount(encoding);
             }
-            var buffer = ArrayPool<byte>.Shared.Rent(len);
-            try
+            using var o = ArrayPool.Rent<byte>(len);
+            var buffer = o.Array;
+            // fixed header (header type 03 & "vorbis")
+            VorbisHeader.InitializeHeader(buffer, PacketType.Comment);
+            // vender length & vender string
+            len = VorbisHeader.Index_VendorLength;
+            var count = encoding.GetBytes(vendor, 0, vendor.Length, buffer, len + sizeof(int));
+            buffer.Set(len, count);
+            len += sizeof(int) + count;
+            // number of comments
+            buffer.Set(len, Count);
+            len += sizeof(int);
+            foreach (var comment in span)
             {
-                // fixed header (header type 03 & "vorbis")
-                VorbisHeader.InitializeHeader(buffer, PacketType.Comment);
-                // vender length & vender string
-                len = VorbisHeader.Index_VendorLength;
-                var count = encoding.GetBytes(vendor, 0, vendor.Length, buffer, len + sizeof(int));
+                count = comment.CopyTo(buffer, len + sizeof(int), encoding);
                 buffer.Set(len, count);
                 len += sizeof(int) + count;
-                // number of comments
-                buffer.Set(len, Count);
-                len += sizeof(int);
-                foreach (var comment in span)
-                {
-                    count = comment.CopyTo(buffer, len + sizeof(int), encoding);
-                    buffer.Set(len, count);
-                    len += sizeof(int) + count;
-                }
-                // framing bit
-                buffer[len] = 1;
-                len++;
-                return new(buffer[0..len], 0, false);
             }
-            finally
-            {
-                ArrayPool<byte>.Shared.Return(buffer);
-            }
+            // framing bit
+            buffer[len] = 1;
+            len++;
+            return new(buffer[0..len], 0, false);
         }
 
         public void WriteJson(Utf8JsonWriter writer, JsonSerializerOptions options)

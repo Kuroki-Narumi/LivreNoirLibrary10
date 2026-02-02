@@ -1,3 +1,4 @@
+using LivreNoirLibrary.ObjectModel;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -47,7 +48,8 @@ namespace LivreNoirLibrary.IO
         public static string Get(string description, params string[] exts)
         {
             var extStr = string.Join(';', exts.Select(e => $"*.{e}"));
-            StringBuilder sb = new();
+            using var o = ObjectPool.Rent<StringBuilder>();
+            var sb = o.Value;
             sb.Append(description);
             sb.Append(" (");
             sb.Append(extStr);
@@ -58,7 +60,8 @@ namespace LivreNoirLibrary.IO
 
         public static string Get(string description, params ReadOnlySpan<IEnumerable<string>> extLists)
         {
-            StringBuilder sb = new();
+            using var o = ObjectPool.Rent<StringBuilder>();
+            var sb = o.Value;
             for (int i = 0; i < extLists.Length; i++)
             {
                 if (i > 0)
@@ -82,7 +85,8 @@ namespace LivreNoirLibrary.IO
 
         public static string Join(params ReadOnlySpan<IEnumerable<string>> filterLists)
         {
-            StringBuilder sb = new();
+            using var o = ObjectPool.Rent<StringBuilder>();
+            var sb = o.Value;
             for (int i = 0; i < filterLists.Length; i++)
             {
                 if (i > 0)

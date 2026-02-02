@@ -7,10 +7,10 @@ namespace LivreNoirLibrary.Numerics
 {
     public static unsafe partial class FFT
     {
-        private static readonly Dictionary<int, double[]> _hamming = [];
-        private static readonly Dictionary<int, float[]> _hamming_32 = [];
-        private static readonly Dictionary<int, double[]> _hamming_c = [];
-        private static readonly Dictionary<int, float[]> _hamming_c_32 = [];
+        private static readonly ConcurrentDictionary<int, double[]> _hamming = [];
+        private static readonly ConcurrentDictionary<int, float[]> _hamming_32 = [];
+        private static readonly ConcurrentDictionary<int, double[]> _hamming_c = [];
+        private static readonly ConcurrentDictionary<int, float[]> _hamming_c_32 = [];
 
         private static readonly Func<int, double[]> _create_hamming = ww =>
         {

@@ -62,7 +62,7 @@ namespace LivreNoirLibrary.Media.Bms
 
         public void Prepare()
         {
-            _index_skip = _indexes.Count is 0;
+            _index_skip = _indexes.ValidRangeCount is 0;
             _lane_skip = _channels.Count is 0;
             var t = _note_types;
             t.Clear();

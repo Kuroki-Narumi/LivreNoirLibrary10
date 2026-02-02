@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 
 namespace LivreNoirLibrary.Media.Wave
 {
@@ -11,6 +10,6 @@ namespace LivreNoirLibrary.Media.Wave
         TimelineItem FirstItem { get; }
         TimelineItem LastItem { get; }
         void Rewind();
-        IEnumerable<TimelineItem> Advance(double untilExclusive);
+        bool MoveNext(double untilExclusive, out TimelineItem current);
     }
 }

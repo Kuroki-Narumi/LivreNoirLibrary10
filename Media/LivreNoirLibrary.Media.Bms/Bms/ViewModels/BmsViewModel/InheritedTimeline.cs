@@ -3,6 +3,7 @@ using LivreNoirLibrary.ObjectModel;
 using System;
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
+using LivreNoirLibrary.Numerics;
 
 namespace LivreNoirLibrary.Media.Bms.ViewModels
 {
@@ -53,27 +54,21 @@ namespace LivreNoirLibrary.Media.Bms.ViewModels
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private static IEnumerable<(BarPosition, List<Note>)> EnumerateCore(TwoMergedEnumerator<BarPosition, List<Note>> enumer)
         {
-            var buffer = ObjectPool.Rent<List<Note>>();
-            try
+            using var o = ObjectPool.Rent<List<Note>>();
+            var buffer = o.Value;
+            foreach (var (pos, list1, list2) in enumer)
             {
-                foreach (var (pos, list1, list2) in enumer)
+                if (list1 is not null && list2 is not null)
                 {
-                    if (list1 is not null && list2 is not null)
-                    {
-                        buffer.Clear();
-                        buffer.AddRange(list1);
-                        buffer.AddRange(list2);
-                        yield return (pos, buffer);
-                    }
-                    else
-                    {
-                        yield return (pos, (list1 ?? list2)!);
-                    }
+                    buffer.Clear();
+                    buffer.AddRange(list1);
+                    buffer.AddRange(list2);
+                    yield return (pos, buffer);
                 }
-            }
-            finally
-            {
-                ObjectPool.Return(buffer);
+                else
+                {
+                    yield return (pos, (list1 ?? list2)!);
+                }
             }
         }
 

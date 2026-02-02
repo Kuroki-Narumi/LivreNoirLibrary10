@@ -117,15 +117,9 @@ namespace LivreNoirLibrary.Windows.Media.Bms.SkinInfo
                 value = null;
                 return false;
             }
-            var reflected = ObjectPool.Rent<HashSet<string>>();
-            try
-            {
-                return TryResolveReflection(expr, provider, reflected, out value);
-            }
-            finally
-            {
-                ObjectPool.Return(reflected);
-            }
+            using var o = ObjectPool.Rent<HashSet<string>>();
+            var reflected = o.Value;
+            return TryResolveReflection(expr, provider, reflected, out value);
         }
 
         private bool TryResolveReflection(ValueExpression? expr, IVariableProvider? provider, HashSet<string> reflection, [MaybeNullWhen(false)] out string value)

@@ -1,5 +1,6 @@
 ﻿using LivreNoirLibrary.Collections;
 using LivreNoirLibrary.ObjectModel;
+using LivreNoirLibrary.Numerics;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;

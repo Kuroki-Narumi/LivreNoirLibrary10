@@ -27,35 +27,29 @@ namespace LivreNoirLibrary.Media.Bms
             public void DetermineRandom(IBmsDataUnit start, IBmsDataUnit combineTarget, RandomProvider provider)
             {
                 combineTarget.Clear();
-                var stack = ObjectPool.Rent<Stack<(IBmsDataUnit, int)>>();
-                try
+                using var obj = ObjectPool.Rent<Stack<(IBmsDataUnit, int)>>();
+                var stack = obj.Value;
+                stack.Push((start, -1));
+                while (stack.TryPop(out var state))
                 {
-                    stack.Push((start, -1));
-                    while (stack.TryPop(out var state))
+                    var (data, flowIndex) = state;
+                    if (flowIndex is -1)
                     {
-                        var (data, flowIndex) = state;
-                        if (flowIndex is -1)
+                        combineTarget.Merge(data);
+                        flowIndex++;
+                    }
+                    var flows = data.Flows;
+                    for (; flowIndex < flows.Count; flowIndex++)
+                    {
+                        var flow = flows[flowIndex];
+                        var condition = flow.IsFixed ? flow.Max : provider(flow.Max, flow.Note);
+                        if (flow.GetBranch(condition) is { } branch)
                         {
-                            combineTarget.Merge(data);
-                            flowIndex++;
-                        }
-                        var flows = data.Flows;
-                        for (; flowIndex < flows.Count; flowIndex++)
-                        {
-                            var flow = flows[flowIndex];
-                            var condition = flow.IsFixed ? flow.Max : provider(flow.Max, flow.Note);
-                            if (flow.GetBranch(condition) is { } branch)
-                            {
-                                stack.Push((data, flowIndex + 1));
-                                stack.Push((root.GetBranchData(branch), -1));
-                                break;
-                            }
+                            stack.Push((data, flowIndex + 1));
+                            stack.Push((root.GetBranchData(branch), -1));
+                            break;
                         }
                     }
-                }
-                finally
-                {
-                    ObjectPool.Return(stack);
                 }
             }
         }

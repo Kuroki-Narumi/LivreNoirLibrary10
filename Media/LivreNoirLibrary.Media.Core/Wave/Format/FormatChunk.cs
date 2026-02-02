@@ -5,6 +5,7 @@ using System.Buffers;
 using System.Text.Json;
 using LivreNoirLibrary.IO;
 using LivreNoirLibrary.Text;
+using LivreNoirLibrary.Collections;
 
 namespace LivreNoirLibrary.Media.Wave
 {
@@ -79,23 +80,17 @@ namespace LivreNoirLibrary.Media.Wave
             if (length is >= 18)
             {
                 var extSize = reader.ReadUInt16();
-                var buffer = ArrayPool<byte>.Shared.Rent(extSize);
-                try
+                using var o = ArrayPool.Rent<byte>(extSize);
+                var buffer = o.Array;
+                if (extSize is 22)
                 {
-                    if (extSize is 22)
-                    {
-                        var validBits = reader.ReadUInt16();
-                        var channelMask = reader.ReadUInt32();
-                        reader.Read(buffer, 0, 16);
-                        var subFormat = new Guid(buffer.AsSpan(0, 16));
-                        return new(tag, channels, sampleRate, bytesPerSecond, blockAlign, bits, validBits, channelMask, subFormat);
-                    }
-                    reader.Read(buffer, 0, extSize);
+                    var validBits = reader.ReadUInt16();
+                    var channelMask = reader.ReadUInt32();
+                    reader.Read(buffer, 0, 16);
+                    var subFormat = new Guid(buffer.AsSpan(0, 16));
+                    return new(tag, channels, sampleRate, bytesPerSecond, blockAlign, bits, validBits, channelMask, subFormat);
                 }
-                finally
-                {
-                    ArrayPool<byte>.Shared.Return(buffer);
-                }
+                reader.Read(buffer, 0, extSize);
             }
             return new(tag, channels, sampleRate, bytesPerSecond, blockAlign, bits);
         }
@@ -114,10 +109,10 @@ namespace LivreNoirLibrary.Media.Wave
                 writer.Write((uint)22);
                 writer.Write(ValidBits);
                 writer.Write(ChannelMask);
-                var buffer = ArrayPool<byte>.Shared.Rent(16);
+                using var o = ArrayPool.Rent<byte>(16);
+                var buffer = o.Array;
                 SubFormat.TryWriteBytes(buffer);
                 writer.Write(buffer, 0, 16);
-                ArrayPool<byte>.Shared.Return(buffer);
             }
             if (Tag is not FormatType.PCM)
             {

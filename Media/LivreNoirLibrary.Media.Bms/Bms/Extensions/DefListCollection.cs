@@ -151,38 +151,32 @@ namespace LivreNoirLibrary.Media.Bms
             public bool RemoveUnused(IDictionary<DefType, DefIndexMap> maps, DefIndexCollection used)
             {
                 var modified = false;
-                var remove = ObjectPool.Rent<List<DefType>>();
-                try
+                using var o = ObjectPool.Rent<List<DefType>>();
+                var remove = o.Value;
+                foreach (var (type, list) in obj.EnumerateList())
                 {
-                    foreach (var (type, list) in obj.EnumerateList())
+                    var map = maps.GetOrAdd(type);
+                    if (used.TryGetValue(type, out var set))
                     {
-                        var map = maps.GetOrAdd(type);
-                        if (used.TryGetValue(type, out var set))
-                        {
-                            if (list.RemoveUnused(set, map) is > 0)
-                            {
-                                modified = true;
-                            }
-                        }
-                        else if (list.ClearWithoutZero(map))
+                        if (list.RemoveUnused(set, map) is > 0)
                         {
                             modified = true;
                         }
-                        if (list.Count is 0)
-                        {
-                            remove.Add(type);
-                        }
                     }
-                    foreach (var type in remove.AsSpan())
+                    else if (list.ClearWithoutZero(map))
                     {
-                        obj.RemoveList(type);
+                        modified = true;
                     }
-                    return modified;
+                    if (list.Count is 0)
+                    {
+                        remove.Add(type);
+                    }
                 }
-                finally
+                foreach (var type in remove.AsSpan())
                 {
-                    ObjectPool.Return(remove);
+                    obj.RemoveList(type);
                 }
+                return modified;
             }
 
             public void TryEncode(Encoding encoding)
@@ -270,25 +264,19 @@ namespace LivreNoirLibrary.Media.Bms
 
             public void ProcessLoad(BinaryReader reader)
             {
-                var loaded = ObjectPool.Rent<List<DefType>>();
-                try
+                using var o = ObjectPool.Rent<List<DefType>>();
+                var loaded = o.Value;
+                loaded.AddRange(obj.EnumerateList().Select(kv => kv.Item1));
+                var count = reader.ReadInt32();
+                for (var i = 0; i < count; i++)
                 {
-                    loaded.AddRange(obj.EnumerateList().Select(kv => kv.Item1));
-                    var count = reader.ReadInt32();
-                    for (var i = 0; i < count; i++)
-                    {
-                        var type = (DefType)reader.ReadByte();
-                        obj.GetOrAddList(type).ProcessLoad(reader);
-                        loaded.Remove(type);
-                    }
-                    foreach (var type in loaded)
-                    {
-                        obj.RemoveList(type);
-                    }
+                    var type = (DefType)reader.ReadByte();
+                    obj.GetOrAddList(type).ProcessLoad(reader);
+                    loaded.Remove(type);
                 }
-                finally
+                foreach (var type in loaded)
                 {
-                    ObjectPool.Return(loaded);
+                    obj.RemoveList(type);
                 }
             }
         }

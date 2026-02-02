@@ -1,9 +1,12 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Numerics;
 using System.Runtime.CompilerServices;
 using System.Text.RegularExpressions;
 using LivreNoirLibrary.Debug;
+using LivreNoirLibrary.Numerics;
+using LivreNoirLibrary.ObjectModel;
 
 namespace LivreNoirLibrary.Text
 {
@@ -22,12 +25,14 @@ namespace LivreNoirLibrary.Text
         {
             var s2i = _s2i = [];
             var i2s = _i2s = [];
+
             byte i = 0;
             void Add(char c, byte v)
             {
                 s2i.Add(c, v);
                 i2s.Add(v, c);
             }
+
             for (var c = '0'; c <= '9'; c++, i++)
             {
                 Add(c, i);
@@ -89,7 +94,7 @@ namespace LivreNoirLibrary.Text
         public static int ParseToInt(this ReadOnlySpan<char> span, int radix) => (int)ParseToLong(span, radix);
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static long ParseToLong(this string? text, int radix) => string.IsNullOrEmpty(text) ? 0 : ParseToLong(text.AsSpan(), radix);
+        public static long ParseToLong(this string? text, int radix) => ParseToLong(text.AsSpan(), radix);
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static short ParseToShort(this string? text, int radix) => (short)ParseToLong(text, radix);
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -219,21 +224,17 @@ namespace LivreNoirLibrary.Text
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static string ToBased(this int value, int radix, int minDigits = 0, int maxDigits = 0) => ToBased((long)value, radix, minDigits, maxDigits);
 
-        public static void ToBased(this long value, Span<char> span, int radix, int digits = 2)
+        public static void ToBased(this long value, Span<char> span, int radix)
         {
             ThrowIfRadixOutOfRange(radix);
-            if (digits is <= 0)
-            {
-                throw new ArgumentException($"digits must be > 0.", nameof(digits));
-            }
             if (value is <= 0)
             {
-                span[..digits].Fill('0');
+                span.Fill('0');
             }
             else
             {
                 var map = _i2s;
-                for (var i = digits - 1; i >= 0; i--)
+                for (var i = span.Length - 1; i >= 0; i--)
                 {
                     (value, var r) = Math.DivRem(value, radix);
                     span[i] = map[(byte)r];
@@ -242,22 +243,31 @@ namespace LivreNoirLibrary.Text
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static void ToBased(this short value, Span<char> target, int radix, int digits = 2) => ToBased((long)value, target, radix, digits);
+        public static void ToBased(this short value, Span<char> target, int radix) => ToBased((long)value, target, radix);
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static void ToBased(this int value, Span<char> target, int radix, int digits = 2) => ToBased((long)value, target, radix, digits);
+        public static void ToBased(this int value, Span<char> target, int radix) => ToBased((long)value, target, radix);
 
         private delegate string ToBasedDelegate<T>(T index, int radix, int minDgits, int maxDigits);
+
+        private readonly record struct Segment(string Start, string? End = null)
+        {
+            public override string ToString() => string.IsNullOrEmpty(End) ? Start : $"{Start}-{End}";
+        }
 
         private static string GetListTextCore<T>(IEnumerable<T> source, ToBasedDelegate<T> func, T start, int radix, int minDgits, int maxDigits)
             where T : INumber<T>
         {
-            List<Segment> list = [];
+            using var obj = ObjectPool.Rent<List<Segment>>();
+            var list = obj.Value;
             foreach (var index in source)
             {
                 var text = func(index, radix, minDgits, maxDigits);
                 if (index == ++start)
                 {
-                    list[^1].End = text;
+                    list[^1] = list[^1] with
+                    {
+                        End = text
+                    };
                 }
                 else
                 {
@@ -268,76 +278,99 @@ namespace LivreNoirLibrary.Text
             return string.Join(' ', list);
         }
 
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static string GetListText(IEnumerable<long> source, int radix = DecimalRadix, int minDigits = 0, int maxDigits = 0)
             => GetListTextCore(source, ToBased, long.MinValue, radix, minDigits, maxDigits);
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+
         public static string GetListText(IEnumerable<int> source, int radix = DecimalRadix, int minDigits = 0, int maxDigits = 0)
             => GetListTextCore(source, ToBased, int.MinValue, radix, minDigits, maxDigits);
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+
         public static string GetListText(IEnumerable<short> source, int radix = DecimalRadix, int minDigits = 0, int maxDigits = 0)
             => GetListTextCore(source, ToBased, short.MinValue, radix, minDigits, maxDigits);
 
-        private class Segment(string start)
+        public static string GetListText(this RangeSet<long> set, int radix = DecimalRadix, int minDigits = 0, int maxDigits = 0)
+            => set.ToString(v => ToBased(v, radix, minDigits, maxDigits), "-", " ");
+
+        public static string GetListText(this RangeSet<int> set, int radix = DecimalRadix, int minDigits = 0, int maxDigits = 0)
+            => set.ToString(v => ToBased(v, radix, minDigits, maxDigits), "-", " ");
+
+        public static string GetListText(this RangeSet<short> set, int radix = DecimalRadix, int minDigits = 0, int maxDigits = 0)
+            => set.ToString(v => ToBased(v, radix, minDigits, maxDigits), "-", " ");
+
+        const string IndexFormat = @"[0-9A-Za-z+/]+";
+        const string RangeSeparator = @"(?:[-:~～]+|\.{2,})";
+
+        [GeneratedRegex($@"(?:{IndexFormat}|{RangeSeparator})+")]
+        private static partial Regex Regex_Number { get; }
+
+        [GeneratedRegex(RangeSeparator)]
+        private static partial Regex Regex_Range { get; }
+
+        private delegate bool TryParseDelegate<T>(ReadOnlySpan<char> text, int radix, out T value);
+
+        private static bool TryParseRangeSetCore<T>(string? text, RangeSet<T>? target, TryParseDelegate<T> func, int radix)
+            where T : INumber<T>, IMinMaxValue<T>
         {
-            public string Start { get; set; } = start;
-            public string? End { get; set; }
-
-            public override string ToString() => string.IsNullOrEmpty(End) ? Start : $"{Start}-{End}";
-        }
-
-        [GeneratedRegex(@"(?<a>[0-9A-Za-z]+)(?<b>[-.~～]+(?<c>[0-9A-Za-z]+))?")]
-        private static partial Regex Regex_Index { get; }
-
-        private delegate bool TryParseDelegate<T>(string? text, int radix, out T value);
-
-        private static bool TryParseListTextCore<T>(string? text, ICollection<T> target, TryParseDelegate<T> func, int radix, T max)
-            where T : INumber<T>
-        {
-            target.Clear();
-            if (string.IsNullOrEmpty(text))
+            target?.Clear();
+            var span = text.AsSpan();
+            var rangeSeparator = Regex_Range;
+            // 範囲表現の候補となる部分文字列を走査
+            foreach (var (index, length) in Regex_Number.EnumerateMatches(span))
             {
-                return true;
-            }
-            var matches = Regex_Index.Matches(text);
-            var c = matches.Count;
-            for (var i = 0; i < c; i++)
-            {
-                var match = matches[i];
-                if (func(match.Groups["a"].Value, radix, out var a) && a < max)
+                // 想定されるマッチ: "1", "-", "1-", "-5", "1-5", "1-5-10", "-5-", "1-5-", "-5-10", "1---5"
+                // 受領する表現: "1", "1-", "-5", "1-5", "1---5"
+                var slice = span.Slice(index, length);
+                T value, start = default!, end = default!;
+                var valueCount = 0;
+                foreach (var range in rangeSeparator.EnumerateSplits(slice))
                 {
-                    target.Add(a);
-                    if (match.Groups["b"].Success)
+                    var expr = slice[range];
+                    switch (++valueCount)
                     {
-                        if (func(match.Groups["c"].Value, radix, out var b) && b > a && b < max)
-                        {
-                            for (var j = a + T.One; j <= b; j++)
+                        case 1:
+                            if (expr.Length is 0) // 下限無し
                             {
-                                target.Add(j);
+                                start = T.MinValue;
                             }
-                        }
-                        else
-                        {
+                            else if (func(expr, radix, out value))
+                            {
+                                start = end = value;
+                            }
+                            else
+                            {
+                                return false;
+                            }
+                            break;
+                        case 2:
+                            if (expr.Length is 0) // 上限無し
+                            {
+                                end = T.MaxValue;
+                            }
+                            else if (func(expr, radix, out value))
+                            {
+                                end = value;
+                            }
+                            else
+                            {
+                                return false;
+                            }
+                            break;
+                        default: // "1-5-10" のような表現: 不正
                             return false;
-                        }
                     }
                 }
-                else
-                {
-                    return false;
-                }
+                target?.AddRange(start, end);
             }
             return true;
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static bool TryParseListText(string? text, ICollection<long> target, int radix, long max = long.MaxValue)
-            => TryParseListTextCore(text, target, TryParseToLong, radix, max);
+        public static bool TryParseRangeSet(string? text, RangeSet<long>? target, int radix)
+            => TryParseRangeSetCore(text, target, TryParseToLong, radix);
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static bool TryParseListText(string? text, ICollection<int> target, int radix, int max = int.MaxValue)
-            => TryParseListTextCore(text, target, TryParseToInt, radix, max);
+        public static bool TryParseRangeSet(string? text, RangeSet<int>? target, int radix)
+            => TryParseRangeSetCore(text, target, TryParseToInt, radix);
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static bool TryParseListText(string? text, ICollection<short> target, int radix, short max = short.MaxValue)
-            => TryParseListTextCore(text, target, TryParseToShort, radix, max);
+        public static bool TryParseRangeSet(string? text, RangeSet<short>? target, int radix)
+            => TryParseRangeSetCore(text, target, TryParseToShort, radix);
     }
 }

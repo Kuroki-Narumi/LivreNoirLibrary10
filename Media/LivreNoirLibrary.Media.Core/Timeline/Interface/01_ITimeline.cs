@@ -1,5 +1,6 @@
 ﻿using System;
 using LivreNoirLibrary.Collections;
+using LivreNoirLibrary.Numerics;
 
 namespace LivreNoirLibrary.Media
 {

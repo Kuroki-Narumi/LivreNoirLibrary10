@@ -157,8 +157,9 @@ namespace LivreNoirLibrary.Media.Wave
                 if (provider.TryGetWaveBuffer(key, out var source))
                 {
                     var sourceLength = source.SampleLength;
-                    foreach (var (itemTime, itemDuration, tag) in list.Advance(until))
+                    while (list.MoveNext(until, out var info))
                     {
+                        var (itemTime, itemDuration, tag) = info;
                         var sourceSamples = (notIgnore && itemDuration is >= 0) ? Math.Min((int)Math.Ceiling(itemDuration * rate), sourceLength) : sourceLength;
                         var destOffset = (int)((itemTime - currentSeconds) * rate);
                         Append(ch, list2, masterVolume, tagToVolume, span, requiredSampleCount, new(key, source, 0, sourceSamples, destOffset, tag));

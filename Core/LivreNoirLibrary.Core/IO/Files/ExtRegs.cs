@@ -1,6 +1,7 @@
+using LivreNoirLibrary.ObjectModel;
 using System;
-using System.Text;
 using System.Collections.Generic;
+using System.Text;
 using System.Text.RegularExpressions;
 
 namespace LivreNoirLibrary.IO
@@ -31,7 +32,8 @@ namespace LivreNoirLibrary.IO
 
         public static Regex CreateJoin(params ReadOnlySpan<IEnumerable<string>> exts)
         {
-            StringBuilder sb = new();
+            using var o = ObjectPool.Rent<StringBuilder>();
+            var sb = o.Value;
             sb.Append(Prefix);
             for (int i = 0; i < exts.Length; i++)
             {

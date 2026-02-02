@@ -1,5 +1,6 @@
 using LivreNoirLibrary.Collections;
 using LivreNoirLibrary.Debug;
+using LivreNoirLibrary.ObjectModel;
 using LivreNoirLibrary.Text;
 using System;
 using System.Collections.Generic;
@@ -88,7 +89,8 @@ namespace LivreNoirLibrary.Media.Bms
         {
             if (Count is > 0)
             {
-                StringBuilder sb = new();
+                using var o = ObjectPool.Rent<StringBuilder>();
+                var sb = o.Value;
                 sb.AppendLine("DefSort result:");
                 foreach (var (Before, After) in this.AsSpan())
                 {

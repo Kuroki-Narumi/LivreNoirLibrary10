@@ -1,4 +1,5 @@
-﻿using System;
+﻿using LivreNoirLibrary.ObjectModel;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
@@ -11,28 +12,32 @@ namespace LivreNoirLibrary.Collections
     {
         public static string ToListString<T>(this Span<T> span)
         {
-            StringBuilder sb = new();
+            using var o = ObjectPool.Rent<StringBuilder>();
+            var sb = o.Value;
             BuildString(sb, span);
             return sb.ToString();
         }
 
         public static string ToListString<T>(this ReadOnlySpan<T> span)
         {
-            StringBuilder sb = new();
+            using var o = ObjectPool.Rent<StringBuilder>();
+            var sb = o.Value;
             BuildString(sb, span);
             return sb.ToString();
         }
 
         public static string ToListString<T>(this IEnumerable<T> obj)
         {
-            StringBuilder sb = new();
+            using var o = ObjectPool.Rent<StringBuilder>();
+            var sb = o.Value;
             BuildString(sb, obj);
             return sb.ToString();
         }
 
         public static string ToListString<TKey, TValue>(this IDictionary<TKey, TValue> dic)
         {
-            StringBuilder sb = new();
+            using var o = ObjectPool.Rent<StringBuilder>();
+            var sb = o.Value;
             BuildString(sb, dic);
             return sb.ToString();
         }
@@ -106,7 +111,8 @@ namespace LivreNoirLibrary.Collections
 
         public static string ToListString(this IEnumerable obj)
         {
-            StringBuilder sb = new();
+            using var o = ObjectPool.Rent<StringBuilder>();
+            var sb = o.Value;
             BuildString(sb, obj);
             return sb.ToString();
         }

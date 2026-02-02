@@ -1,10 +1,12 @@
-﻿using System;
+﻿using LivreNoirLibrary.Collections;
+using LivreNoirLibrary.ObjectModel;
+using LivreNoirLibrary.UnsafeOperations;
+using System;
 using System.Buffers;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Linq;
 using System.Text;
-using LivreNoirLibrary.UnsafeOperations;
 
 namespace LivreNoirLibrary.Media.Ogg
 {
@@ -94,7 +96,8 @@ namespace LivreNoirLibrary.Media.Ogg
 
         public static string GetSegmentsTableText(ReadOnlySpan<byte> segmentsTable)
         {
-            StringBuilder sb = new();
+            using var o = ObjectPool.Rent<StringBuilder>();
+            var sb = o.Value;
             sb.Append('[');
             var flag = false;
             foreach (var b in segmentsTable)
@@ -130,57 +133,51 @@ namespace LivreNoirLibrary.Media.Ogg
         public static bool TryRead(BinaryReader reader, [MaybeNullWhen(false)]out OggPage page)
         {
             var ggS = _ggS.AsSpan();
-            var buffer = ArrayPool<byte>.Shared.Rent(255);
-            try
+            using var o = ArrayPool.Rent<byte>(255);
+            var buffer = o.Array;
+            while (true)
             {
-                while (true)
+                try
                 {
-                    try
+                    // capture pattern "OggS"
+                    if (reader.ReadByte() is CapturePattern_O)
                     {
-                        // capture pattern "OggS"
-                        if (reader.ReadByte() is CapturePattern_O)
+                        buffer[0] = CapturePattern_O;
+                        var read = reader.Read(buffer, 1, 3);
+                        if (read is not 3 || !ggS.SequenceEqual(buffer.AsSpan(1, 3)))
                         {
-                            buffer[0] = CapturePattern_O;
-                            var read = reader.Read(buffer, 1, 3);
-                            if (read is not 3 || !ggS.SequenceEqual(buffer.AsSpan(1, 3)))
-                            {
-                                continue;
-                            }
-                            // stream structure version
-                            OggException.Verify_StructureVersion(reader.ReadByte());
-                            // header contents
-                            read = reader.Read(buffer, Index_HeaderType, MinHeaderLength - Index_HeaderType);
-                            OggException.ThrowIfEndOfStream(read, MinHeaderLength - Index_HeaderType);
-                            int segCount = buffer[Index_SegmentsCount];
-                            var header = new byte[MinHeaderLength + segCount];
-                            Array.Copy(buffer, header, MinHeaderLength);
-                            // segments
-                            read = reader.Read(buffer, 0, segCount);
-                            OggException.ThrowIfEndOfStream(read, segCount);
-                            Array.Copy(buffer, 0, header, Index_SegmentsTable, segCount);
-                            // body
-                            var bodyLen = 0;
-                            foreach (var segment in buffer.AsSpan(0, segCount))
-                            {
-                                bodyLen += segment;
-                            }
-                            var body = new byte[bodyLen];
-                            read = reader.Read(body, 0, bodyLen);
-                            OggException.ThrowIfEndOfStream(read, bodyLen);
-                            page = new(header, body);
-                            return true;
+                            continue;
                         }
-                    }
-                    catch (EndOfStreamException)
-                    {
-                        page = null;
-                        return false;
+                        // stream structure version
+                        OggException.Verify_StructureVersion(reader.ReadByte());
+                        // header contents
+                        read = reader.Read(buffer, Index_HeaderType, MinHeaderLength - Index_HeaderType);
+                        OggException.ThrowIfEndOfStream(read, MinHeaderLength - Index_HeaderType);
+                        int segCount = buffer[Index_SegmentsCount];
+                        var header = new byte[MinHeaderLength + segCount];
+                        Array.Copy(buffer, header, MinHeaderLength);
+                        // segments
+                        read = reader.Read(buffer, 0, segCount);
+                        OggException.ThrowIfEndOfStream(read, segCount);
+                        Array.Copy(buffer, 0, header, Index_SegmentsTable, segCount);
+                        // body
+                        var bodyLen = 0;
+                        foreach (var segment in buffer.AsSpan(0, segCount))
+                        {
+                            bodyLen += segment;
+                        }
+                        var body = new byte[bodyLen];
+                        read = reader.Read(body, 0, bodyLen);
+                        OggException.ThrowIfEndOfStream(read, bodyLen);
+                        page = new(header, body);
+                        return true;
                     }
                 }
-            }
-            finally
-            {
-                ArrayPool<byte>.Shared.Return(buffer);
+                catch (EndOfStreamException)
+                {
+                    page = null;
+                    return false;
+                }
             }
         }
 

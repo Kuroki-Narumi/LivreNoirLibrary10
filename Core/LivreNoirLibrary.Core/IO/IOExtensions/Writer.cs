@@ -5,6 +5,7 @@ using System.Buffers.Binary;
 using System.Numerics;
 using System.Runtime.CompilerServices;
 using System.Text;
+using LivreNoirLibrary.Collections;
 
 namespace LivreNoirLibrary.IO
 {
@@ -16,25 +17,19 @@ namespace LivreNoirLibrary.IO
             {
                 length = value.Length;
             }
-            var buffer = ArrayPool<byte>.Shared.Rent(length);
-            try
+            using var o = ArrayPool.Rent<byte>(length);
+            var buffer = o.Array;
+            var len = value.Length;
+            if (len >= length)
             {
-                var len = value.Length;
-                if (len >= length)
-                {
-                    Encoding.ASCII.GetBytes(value, 0, length, buffer, 0);
-                }
-                else
-                {
-                    Encoding.ASCII.GetBytes(value, 0, len, buffer, 0);
-                    Array.Clear(buffer, len, length - len);
-                }
-                stream.Write(buffer, 0, length);
+                Encoding.ASCII.GetBytes(value, 0, length, buffer, 0);
             }
-            finally
+            else
             {
-                ArrayPool<byte>.Shared.Return(buffer);
+                Encoding.ASCII.GetBytes(value, 0, len, buffer, 0);
+                Array.Clear(buffer, len, length - len);
             }
+            stream.Write(buffer, 0, length);
         }
 
         public static void WriteASCII(this BinaryWriter writer, string value, int length = 0) => WriteASCII(writer.BaseStream, value, length);
@@ -119,21 +114,15 @@ namespace LivreNoirLibrary.IO
             {
                 var count = int.Log2(value) / 7 + 1;
                 var uValue = (uint)value;
-                var buffer = ArrayPool<byte>.Shared.Rent(count);
-                try
+                using var o = ArrayPool.Rent<byte>(count);
+                var buffer = o.Array;
+                for (var c = count - 1; c >= 0; c--)
                 {
-                    for (var c = count - 1; c >= 0; c--)
-                    {
-                        buffer[c] = (byte)(uValue | ~0x7Fu);
-                        uValue >>= 7;
-                    }
-                    buffer[count - 1] &= 0x7F;
-                    writer.Write(buffer, 0, count);
+                    buffer[c] = (byte)(uValue | ~0x7Fu);
+                    uValue >>= 7;
                 }
-                finally
-                {
-                    ArrayPool<byte>.Shared.Return(buffer);
-                }
+                buffer[count - 1] &= 0x7F;
+                writer.Write(buffer, 0, count);
             }
         }
 
@@ -147,21 +136,15 @@ namespace LivreNoirLibrary.IO
             {
                 var count = (int)long.Log2(value) / 7 + 1;
                 var uValue = (ulong)value;
-                var buffer = ArrayPool<byte>.Shared.Rent(count);
-                try
+                using var o = ArrayPool.Rent<byte>(count);
+                var buffer = o.Array;
+                for (var c = count - 1; c >= 0; c--)
                 {
-                    for (var c = count - 1; c >= 0; c--)
-                    {
-                        buffer[c] = (byte)(uValue | ~0x7Ful);
-                        uValue >>= 7;
-                    }
-                    buffer[count - 1] &= 0x7F;
-                    writer.Write(buffer, 0, count);
+                    buffer[c] = (byte)(uValue | ~0x7Ful);
+                    uValue >>= 7;
                 }
-                finally
-                {
-                    ArrayPool<byte>.Shared.Return(buffer);
-                }
+                buffer[count - 1] &= 0x7F;
+                writer.Write(buffer, 0, count);
             }
         }
 

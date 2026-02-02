@@ -22,7 +22,7 @@ namespace LivreNoirLibrary.Media.Midi
                 meta = sysex = cc = note = true;
             }
             var numbers = options._numbers;
-            var numberP = numbers.Count is > 0;
+            var numberP = numbers.ValidRangeCount is > 0;
 
             var q_pos = options.PositionQuantize;
             var op_pos = ValueOperation.TryGetOperator(options.PositionOperationMode, options.PositionOperationValue, out var func_pos);

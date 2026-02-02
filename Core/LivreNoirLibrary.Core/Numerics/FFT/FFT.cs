@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Concurrent;
+using System.Collections.Generic;
 using System.Numerics;
 using System.Runtime.CompilerServices;
 using LivreNoirLibrary.Collections;
@@ -67,7 +68,8 @@ namespace LivreNoirLibrary.Numerics
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static ReadOnlySpan<int> BitReverseTable(int m)
         {
-            if (!_bit_reverse.TryGetValue(m, out var ary))
+            var dic = _bit_reverse;
+            if (!dic.TryGetValue(m, out var ary))
             {
                 var len = 1 << m;
                 ary = new int[len];
@@ -80,7 +82,7 @@ namespace LivreNoirLibrary.Numerics
                     }
                     ary[i] = rev;
                 }
-                _bit_reverse[m] = ary;
+                dic[m] = ary;
             }
             return ary;
         }
@@ -109,12 +111,14 @@ namespace LivreNoirLibrary.Numerics
             public readonly T Y = y;
         }
 
-        private static readonly ConcurrentDictionary<int, double[]> _twiddle = [];
+        [ThreadStatic]
+        private static Dictionary<int, double[]>? _twiddle;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static ReadOnlySpan<double> GetTwiddle(int len)
         {
-            if (!_twiddle.TryGetValue(len, out var ary))
+            var dic = _twiddle ??= [];
+            if (!dic.TryGetValue(len, out var ary))
             {
                 ary = new double[len * 2];
                 for (var i = 0; i < len; i++)
@@ -123,17 +127,19 @@ namespace LivreNoirLibrary.Numerics
                     ary[2 * i] = MathF.Cos(angle);     // 実部
                     ary[2 * i + 1] = MathF.Sin(angle); // 虚部
                 }
-                _twiddle[len] = ary;
+                dic[len] = ary;
             }
             return ary;
         }
 
-        private static readonly ConcurrentDictionary<int, float[]> _twiddle_32 = [];
+        [ThreadStatic]
+        private static Dictionary<int, float[]>? _twiddle_32;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static ReadOnlySpan<float> GetTwiddle32(int len)
         {
-            if (!_twiddle_32.TryGetValue(len, out var ary))
+            var dic = _twiddle_32 ??= [];
+            if (!dic.TryGetValue(len, out var ary))
             {
                 ary = new float[len * 2];
                 for (var i = 0; i < len; i++)
@@ -142,7 +148,7 @@ namespace LivreNoirLibrary.Numerics
                     ary[2 * i] = MathF.Cos(angle);     // 実部
                     ary[2 * i + 1] = MathF.Sin(angle); // 虚部
                 }
-                _twiddle_32[len] = ary;
+                dic[len] = ary;
             }
             return ary;
         }

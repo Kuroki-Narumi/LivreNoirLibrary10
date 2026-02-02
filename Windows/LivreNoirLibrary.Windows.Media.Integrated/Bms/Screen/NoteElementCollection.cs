@@ -5,6 +5,7 @@ using LivreNoirLibrary.Media.Bms;
 using LivreNoirLibrary.Media.Bms.Play;
 using LivreNoirLibrary.ObjectModel;
 using LivreNoirLibrary.Windows.Media.Bms.SkinInfo;
+using LivreNoirLibrary.Numerics;
 using System;
 using System.Collections.Generic;
 

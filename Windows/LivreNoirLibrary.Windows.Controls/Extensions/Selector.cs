@@ -161,55 +161,49 @@ namespace LivreNoirLibrary.Windows.Controls
 
         public static void ChangeRadioButtonByWheel(this Panel panel, MouseWheelEventArgs e, bool wrap = true)
         {
-            var cache = ObjectPool.Rent<List<RButton>>();
-            try
+            using var o = ObjectPool.Rent<List<RButton>>();
+            var cache = o.Value;
+            var checkedIndex = 0;
+            var delta = e.Delta is > 0;
+            foreach (var child in panel.EnumerateDescendantsByStack())
             {
-                var checkedIndex = 0;
-                var delta = e.Delta is > 0;
-                foreach (var child in panel.EnumerateDescendantsByStack())
+                if (child is RButton button)
                 {
-                    if (child is RButton button)
+                    if (button.IsChecked is true)
                     {
-                        if (button.IsChecked is true)
-                        {
-                            checkedIndex = cache.Count;
-                        }
-                        cache.Add(button);
+                        checkedIndex = cache.Count;
                     }
-                }
-                switch (cache.Count)
-                {
-                    case 0: // ラジオボタンが一つも見つからなかった
-                        break;
-                    case 1: // ラジオボタンが一つしかなかった
-                        cache[0].IsChecked = true;
-                        break;
-                    default: // 複数のラジオボタンが見つかった
-                        checkedIndex = checkedIndex + (e.Delta is > 0 ? -1 : 1);
-                        if (checkedIndex is < 0)
-                        {
-                            if (wrap)
-                            {
-                                cache[^1].IsChecked = true;
-                            }
-                        }
-                        else if (checkedIndex >= cache.Count)
-                        {
-                            if (wrap)
-                            {
-                                cache[0].IsChecked = true;
-                            }
-                        }
-                        else
-                        {
-                            cache[checkedIndex].IsChecked = true;
-                        }
-                        break;
+                    cache.Add(button);
                 }
             }
-            finally
+            switch (cache.Count)
             {
-                ObjectPool.Return(cache);
+                case 0: // ラジオボタンが一つも見つからなかった
+                    break;
+                case 1: // ラジオボタンが一つしかなかった
+                    cache[0].IsChecked = true;
+                    break;
+                default: // 複数のラジオボタンが見つかった
+                    checkedIndex = checkedIndex + (e.Delta is > 0 ? -1 : 1);
+                    if (checkedIndex is < 0)
+                    {
+                        if (wrap)
+                        {
+                            cache[^1].IsChecked = true;
+                        }
+                    }
+                    else if (checkedIndex >= cache.Count)
+                    {
+                        if (wrap)
+                        {
+                            cache[0].IsChecked = true;
+                        }
+                    }
+                    else
+                    {
+                        cache[checkedIndex].IsChecked = true;
+                    }
+                    break;
             }
         }
     }

@@ -6,12 +6,16 @@ using System.Numerics;
 using System.Runtime.CompilerServices;
 using System.Text;
 using LivreNoirLibrary.Text;
+using LivreNoirLibrary.Collections;
 
 namespace LivreNoirLibrary.IO
 {
     public static partial class IOExtensions
     {
         public const int ChidLength = 6;
+
+        private static int ReadGeneral(Stream stream, ArrayPoolDisposable<byte> o, int length) => stream.Read(o.Array, 0, length);
+        private static int ReadGeneral(BinaryReader stream, ArrayPoolDisposable<byte> o, int length) => stream.Read(o.Array, 0, length);
 
         public static byte[] ReadBytesSafe(this BinaryReader reader, long count)
         {
@@ -22,16 +26,9 @@ namespace LivreNoirLibrary.IO
 
         public static string ReadASCII(this Stream stream, int length)
         {
-            var buffer = ArrayPool<byte>.Shared.Rent(length);
-            try
-            {
-                var len = stream.Read(buffer, 0, length);
-                return Encoding.ASCII.GetString(buffer, 0, len);
-            }
-            finally
-            {
-                ArrayPool<byte>.Shared.Return(buffer);
-            }
+            using var o = ArrayPool.Rent<byte>(length);
+            var len = ReadGeneral(stream, o, length);
+            return Encoding.ASCII.GetString(o.Array, 0, len);
         }
 
         public static string ReadASCII(this BinaryReader reader, int length) => ReadASCII(reader.BaseStream, length);
@@ -114,91 +111,49 @@ namespace LivreNoirLibrary.IO
         public static short ReadInt16BigEndian(this BinaryReader reader)
         {
             var size = sizeof(short);
-            var buffer = ArrayPool<byte>.Shared.Rent(size);
-            try
-            {
-                reader.Read(buffer, 0, size);
-                return BinaryPrimitives.ReadInt16BigEndian(buffer.AsSpan(0, size));
-            }
-            finally
-            {
-                ArrayPool<byte>.Shared.Return(buffer);
-            }
+            using var o = ArrayPool.Rent<byte>(size);
+            ReadGeneral(reader, o, size);
+            return BinaryPrimitives.ReadInt16BigEndian(o.Span);
         }
 
         public static ushort ReadUInt16BigEndian(this BinaryReader reader)
         {
             var size = sizeof(ushort);
-            var buffer = ArrayPool<byte>.Shared.Rent(size);
-            try
-            {
-                reader.Read(buffer, 0, size);
-                return BinaryPrimitives.ReadUInt16BigEndian(buffer.AsSpan(0, size));
-            }
-            finally
-            {
-                ArrayPool<byte>.Shared.Return(buffer);
-            }
+            using var o = ArrayPool.Rent<byte>(size);
+            ReadGeneral(reader, o, size);
+            return BinaryPrimitives.ReadUInt16BigEndian(o.Span);
         }
 
         public static int ReadInt32BigEndian(this BinaryReader reader)
         {
             var size = sizeof(int);
-            var buffer = ArrayPool<byte>.Shared.Rent(size);
-            try
-            {
-                reader.Read(buffer, 0, size);
-                return BinaryPrimitives.ReadInt32BigEndian(buffer.AsSpan(0, size));
-            }
-            finally
-            {
-                ArrayPool<byte>.Shared.Return(buffer);
-            }
+            using var o = ArrayPool.Rent<byte>(size);
+            ReadGeneral(reader, o, size);
+            return BinaryPrimitives.ReadInt32BigEndian(o.Span);
         }
 
         public static uint ReadUInt32BigEndian(this BinaryReader reader)
         {
             var size = sizeof(uint);
-            var buffer = ArrayPool<byte>.Shared.Rent(size);
-            try
-            {
-                reader.Read(buffer, 0, size);
-                return BinaryPrimitives.ReadUInt32BigEndian(buffer.AsSpan(0, size));
-            }
-            finally
-            {
-                ArrayPool<byte>.Shared.Return(buffer);
-            }
+            using var o = ArrayPool.Rent<byte>(size);
+            ReadGeneral(reader, o, size);
+            return BinaryPrimitives.ReadUInt32BigEndian(o.Span);
         }
 
         public static long ReadInt64BigEndian(this BinaryReader reader)
         {
             var size = sizeof(long);
-            var buffer = ArrayPool<byte>.Shared.Rent(size);
-            try
-            {
-                reader.Read(buffer, 0, size);
-                return BinaryPrimitives.ReadInt64BigEndian(buffer.AsSpan(0, size));
-            }
-            finally
-            {
-                ArrayPool<byte>.Shared.Return(buffer);
-            }
+            using var o = ArrayPool.Rent<byte>(size);
+            ReadGeneral(reader, o, size);
+            return BinaryPrimitives.ReadInt64BigEndian(o.Span);
         }
 
         public static ulong ReadUInt64BigEndian(this BinaryReader reader)
         {
             var size = sizeof(ulong);
-            var buffer = ArrayPool<byte>.Shared.Rent(size);
-            try
-            {
-                reader.Read(buffer, 0, size);
-                return BinaryPrimitives.ReadUInt64BigEndian(buffer.AsSpan(0, size));
-            }
-            finally
-            {
-                ArrayPool<byte>.Shared.Return(buffer);
-            }
+            using var o = ArrayPool.Rent<byte>(size);
+            ReadGeneral(reader, o, size);
+            return BinaryPrimitives.ReadUInt64BigEndian(o.Span);
         }
 
         public static int Read7BitEncodedIntBigEndian(this BinaryReader reader)

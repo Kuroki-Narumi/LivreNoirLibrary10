@@ -86,10 +86,9 @@ namespace LivreNoirLibrary.Windows.Controls.Wave
 
             int GetX(float value) => (int)(value * levelScale) + centerX;
 
-            var buffer = ArrayPool<float>.Shared.Rent(intTimeScale);
-            try
+            using (var o = ArrayPool.Rent<float>(intTimeScale))
             {
-                var bufferSpan = buffer.AsSpan(0, intTimeScale);
+                var bufferSpan = o.Span;
                 var ptr = (uint*)bitmap.Offset(top);
                 for (var y = top; y < bottom; y++, ptr += stride)
                 {
@@ -107,10 +106,6 @@ namespace LivreNoirLibrary.Windows.Controls.Wave
                         SimdOperations.Or(ptr + left, colors[c], right - left);
                     }
                 }
-            }
-            finally
-            {
-                ArrayPool<float>.Shared.Return(buffer);
             }
             _lastHeight = RequiredHeight;
             _lastPixelOffset = offset;

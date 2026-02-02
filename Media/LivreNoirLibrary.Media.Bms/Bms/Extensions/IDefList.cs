@@ -82,28 +82,22 @@ namespace LivreNoirLibrary.Media.Bms
 
             public int RemoveAll(Func<short, string, bool> selector, DefIndexMap? map = null)
             {
-                var remove = ObjectPool.Rent<List<short>>();
-                try
+                using var o = ObjectPool.Rent<List<short>>();
+                var remove = o.Value;
+                foreach (var (key, value) in obj)
                 {
-                    foreach (var (key, value) in obj)
+                    if (key is not 0 && selector(key, value))
                     {
-                        if (key is not 0 && selector(key, value))
-                        {
-                            remove.Add(key);
-                            map?.SetRemove(key);
-                        }
+                        remove.Add(key);
+                        map?.SetRemove(key);
                     }
-                    foreach (var key in remove.AsSpan())
-                    {
-                        obj.Remove(key);
-                    }
-                    var result = remove.Count;
-                    return result;
                 }
-                finally
+                foreach (var key in remove.AsSpan())
                 {
-                    ObjectPool.Return(remove);
+                    obj.Remove(key);
                 }
+                var result = remove.Count;
+                return result;
             }
 
             public int RemoveWithBasename(string basename, DefIndexMap? map = null) => obj.RemoveAll((key, value) => value.StartsWith(basename, StringComparison.Ordinal), map);
@@ -122,31 +116,25 @@ namespace LivreNoirLibrary.Media.Bms
                     targets.Add(new(key, obj.TryGetValue(key, out var value) ? value : null));
                 }
                 DefIndexMap result = new();
-                var mapped = ArrayPool<byte>.Shared.Rent(BmsConstants.DefMax_Extended);
-                try
+                using var o = ArrayPool.Rent<byte>(BmsConstants.DefMax_Extended);
+                var mapped = o.Array;
+                SimdOperations.Clear(mapped);
+                var index = (short)headroom;
+                foreach (var (key, _) in targets.Order(sortByName ? SortItemComparer_Value.Instance : SortItemComparer_Id.Instance))
                 {
-                    Array.Clear(mapped);
-                    var index = (short)headroom;
-                    foreach (var (key, _) in targets.Order(sortByName ? SortItemComparer_Value.Instance : SortItemComparer_Id.Instance))
+                    if (key <= headroom || @fixed.Contains(key))
                     {
-                        if (key <= headroom || @fixed.Contains(key))
-                        {
-                            mapped[key] = 1;
-                        }
-                        else
-                        {
-                            while (mapped[index] is 1)
-                            {
-                                index++;
-                            }
-                            result.Set(key, index);
-                            mapped[index] = 1;
-                        }
+                        mapped[key] = 1;
                     }
-                }
-                finally
-                {
-                    ArrayPool<byte>.Shared.Return(mapped);
+                    else
+                    {
+                        while (mapped[index] is 1)
+                        {
+                            index++;
+                        }
+                        result.Set(key, index);
+                        mapped[index] = 1;
+                    }
                 }
                 return result;
             }

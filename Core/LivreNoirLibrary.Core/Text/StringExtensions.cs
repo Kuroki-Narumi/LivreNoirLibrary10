@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 using LivreNoirLibrary.Collections;
 using LivreNoirLibrary.ObjectModel;
 
@@ -26,19 +27,12 @@ namespace LivreNoirLibrary.Text
 
         public static string[] SplitLines(this string? text, bool trim = false)
         {
-            var buffer = ObjectPool.Rent<List<string>>();
-            try
+            var buffer = new List<string>();
+            foreach (var span in text.AsSpan().EnumerateLines())
             {
-                foreach (var span in text.AsSpan().EnumerateLines())
-                {
-                    buffer.Add(new(trim ? span.Trim() : span));
-                }
-                return [.. buffer];
+                buffer.Add(new(trim ? span.Trim() : span));
             }
-            finally
-            {
-                ObjectPool.Return(buffer);
-            }
+            return [.. buffer];
         }
 
         public static int CountLine(this string? text, bool countEmptyLine = true)
@@ -73,6 +67,12 @@ namespace LivreNoirLibrary.Text
                 }
             }
             return count;
+        }
+
+        public static void Deconstruct(this ValueMatch match, out int index, out int length)
+        {
+            index = match.Index;
+            length = match.Length;
         }
 
         public static string? GetNullIfEmpty(this string? text) => string.IsNullOrEmpty(text) ? null : text;

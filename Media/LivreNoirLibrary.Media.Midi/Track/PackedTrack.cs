@@ -1,6 +1,7 @@
 using LivreNoirLibrary.Collections;
 using LivreNoirLibrary.Media.Midi;
 using LivreNoirLibrary.Numerics;
+using LivreNoirLibrary.ObjectModel;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -59,7 +60,8 @@ namespace LivreNoirLibrary.Media.BM3
             var sk2 = options.SortKey2;
             var sk3 = options.SortKey3;
             var sc = track.SideChainSources;
-            StringBuilder sb = new();
+            using var o = ObjectPool.Rent<StringBuilder>();
+            var sb = o.Value;
             TempoTimeline tempo = new(data);
             List<PackedNote> notes = [];
             Dictionary<string, int> obj2id = [];

@@ -63,8 +63,10 @@ namespace LivreNoirLibrary.Media.Wave
             Notify("apply High Pass filter");
 
             var msFactor = _ms_factors;
-            var msList = ObjectPool.Rent<List<float>>();
-            var gatedList = ObjectPool.Rent<List<float>>();
+            using var o1 = ObjectPool.Rent<List<float>>();
+            using var o2 = ObjectPool.Rent<List<float>>();
+            var msList = o1.Value;
+            var gatedList = o2.Value;
             fixed (float* msFactorPtr = msFactor)
             try
             {
@@ -152,8 +154,6 @@ namespace LivreNoirLibrary.Media.Wave
             }
             finally
             {
-                ObjectPool.Return(msList);
-                ObjectPool.Return(gatedList);
                 t0 = t0_total;
                 Notify("total time:");
             }

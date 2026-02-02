@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Threading;
 using LivreNoirLibrary.Text;
 using LivreNoirLibrary.ObjectModel;
+using LivreNoirLibrary.Numerics;
 
 namespace LivreNoirLibrary.Media.Bms
 {
@@ -10,37 +11,32 @@ namespace LivreNoirLibrary.Media.Bms
     {
         public const string DefaultIndexText = "ex) 01-0Z 15 19-1C";
 
-        private static readonly Lock _index_lock = new();
-        private static readonly SortedSet<int> _index_cache = [];
+        protected readonly RangeSet<int> _indexes = [];
 
-        protected readonly SortedSet<int> _indexes = [];
-
-        public SortedSet<int> Indexes
+        public RangeSet<int> Indexes
         {
             get => _indexes;
             set
             {
-                _indexes.Clear();
-                _indexes.UnionWith(value);
+                _indexes.OverwriteFrom(value);
                 SendPropertyChanged();
             }
         }
 
-        public string GetIndexText(int radix) => BasedNumber.GetListText(_indexes, radix);
+        public string GetIndexText(int radix) => _indexes.GetListText(radix);
 
         public bool TrySetIndex(string? text, int radix)
         {
-            lock (_index_lock)
+            using var o = ObjectPool.Rent<RangeSet<int>>();
+            var cache = o.Value;
+            if (BasedNumber.TryParseRangeSet(text, cache, radix))
             {
-                if (BasedNumber.TryParseListText(text, _index_cache, radix, radix * radix))
-                {
-                    Indexes = _index_cache;
-                    return true;
-                }
-                else
-                {
-                    return false;
-                }
+                Indexes = cache;
+                return true;
+            }
+            else
+            {
+                return false;
             }
         }
     }

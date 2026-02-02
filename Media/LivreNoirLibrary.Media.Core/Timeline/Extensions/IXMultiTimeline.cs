@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Runtime.CompilerServices;
+using LivreNoirLibrary.Numerics;
 
 namespace LivreNoirLibrary.Media
 {
@@ -130,28 +131,22 @@ namespace LivreNoirLibrary.Media
 
             private int RemoveAll(IEnumerable<(TX, List<TValue>)> enumer, Predicate<TX, TValue> selector)
             {
-                var removeList = ObjectPool.Rent<HashSet<TX>>();
-                try
+                using var o = ObjectPool.Rent<HashSet<TX>>();
+                var removeList = o.Value;
+                var count = 0;
+                foreach (var (position, list) in enumer)
                 {
-                    var count = 0;
-                    foreach (var (position, list) in enumer)
+                    count += list.RemoveAll(value => selector(position, value));
+                    if (list.Count is 0)
                     {
-                        count += list.RemoveAll(value => selector(position, value));
-                        if (list.Count is 0)
-                        {
-                            removeList.Add(position);
-                        }
+                        removeList.Add(position);
                     }
-                    foreach (var position in removeList)
-                    {
-                        obj.RemoveAt(position);
-                    }
-                    return count;
                 }
-                finally
+                foreach (var position in removeList)
                 {
-                    ObjectPool.Return(removeList);
+                    obj.RemoveAt(position);
                 }
+                return count;
             }
 
             /// <summary>
@@ -179,70 +174,58 @@ namespace LivreNoirLibrary.Media
             {
                 if (!EqualityComparer<TX>.Default.Equals(from, to) && obj.TryGetList(from, out var list))
                 {
-                    var moveList = ObjectPool.Rent<List<TValue>>();
-                    try
+                    using var o = ObjectPool.Rent<List<TValue>>();
+                    var moveList = o.Value;
+                    list.RemoveAll(value =>
                     {
-                        list.RemoveAll(value =>
+                        if (selector(value))
                         {
-                            if (selector(value))
-                            {
-                                moveList.Add(value);
-                                return true;
-                            }
-                            return false;
-                        });
-                        obj.RemoveEmptyList(from, list);
-                        obj.AddRange(to, moveList);
-                    }
-                    finally
-                    {
-                        ObjectPool.Return(moveList);
-                    }
+                            moveList.Add(value);
+                            return true;
+                        }
+                        return false;
+                    });
+                    obj.RemoveEmptyList(from, list);
+                    obj.AddRange(to, moveList);
                 }
             }
 
             private void MoveAll(IEnumerable<(TX, List<TValue>)> enumer, Predicate<TX, TValue> selector, Func<TX, TX> converter)
             {
-                var moveListList = ObjectPool.Rent<Dictionary<TX, List<TValue>>>();
-                var removeList = ObjectPool.Rent<HashSet<TX>>();
-                try
+                using var o1 = ObjectPool.Rent<Dictionary<TX, List<TValue>>>();
+                using var o2 = ObjectPool.Rent<HashSet<TX>>();
+                var moveListList = o1.Value;
+                var removeList = o2.Value;
+                foreach (var (position, list) in enumer)
                 {
-                    foreach (var (position, list) in enumer)
+                    var newPosition = converter(position);
+                    if (EqualityComparer<TX>.Default.Equals(position, newPosition))
                     {
-                        var newPosition = converter(position);
-                        if (EqualityComparer<TX>.Default.Equals(position, newPosition))
-                        {
-                            continue;
-                        }
-                        var moveList = moveListList.GetOrAdd(newPosition);
-                        list.RemoveAll(value =>
-                        {
-                            if (selector(position, value))
-                            {
-                                moveList.Add(value);
-                                return true;
-                            }
-                            return false;
-                        });
-                        if (list.Count is 0)
-                        {
-                            removeList.Add(position);
-                        }
+                        continue;
                     }
-                    foreach (var (position, list) in moveListList)
+                    var moveList = moveListList.GetOrAdd(newPosition);
+                    list.RemoveAll(value =>
                     {
-                        obj.AddRange(position, list);
-                        removeList.Remove(position);
-                    }
-                    foreach (var position in removeList)
+                        if (selector(position, value))
+                        {
+                            moveList.Add(value);
+                            return true;
+                        }
+                        return false;
+                    });
+                    if (list.Count is 0)
                     {
-                        obj.RemoveAt(position);
+                        removeList.Add(position);
                     }
                 }
-                finally
+                foreach (var (position, list) in moveListList)
                 {
-                    ObjectPool.Return(moveListList);
-                    ObjectPool.Return(removeList);
+                    obj.AddRange(position, list);
+                    removeList.Remove(position);
+                }
+                foreach (var position in removeList)
+                {
+                    obj.RemoveAt(position);
                 }
             }
 

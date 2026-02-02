@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Text;
+using LivreNoirLibrary.Collections;
 using LivreNoirLibrary.Debug;
 using LivreNoirLibrary.Media.FFmpeg;
 using LivreNoirLibrary.Numerics;
@@ -161,26 +162,20 @@ namespace LivreNoirLibrary.Media.Wave
                 return true;
             }
             var bytesToRead = Math.Min(BufferSize / block * block, streamRemain);
-            var streamBuffer = ArrayPool<byte>.Shared.Rent(bytesToRead);
-            try
+            using var o = ArrayPool.Rent<byte>(bytesToRead);
+            var streamBuffer = o.Array;
+            bytesToRead = stream.Read(streamBuffer, 0, bytesToRead);
+            if (bytesToRead is 0)
             {
-                bytesToRead = stream.Read(streamBuffer, 0, bytesToRead);
-                if (bytesToRead is 0)
-                {
-                    return true;
-                }
-                var destPtr = _buffer.Pointer;
-                fixed (byte* srcPtr = streamBuffer)
-                {
-                    converter.ConvertRead(srcPtr, destPtr, bytesToRead);
-                }
-                _buffer_length = bytesToRead / block;
-                return false;
+                return true;
             }
-            finally
+            var destPtr = _buffer.Pointer;
+            fixed (byte* srcPtr = streamBuffer)
             {
-                ArrayPool<byte>.Shared.Return(streamBuffer);
+                converter.ConvertRead(srcPtr, destPtr, bytesToRead);
             }
+            _buffer_length = bytesToRead / block;
+            return false;
         }
 
         /// <inheritdoc cref="IAudioBufferDecoder.UpdateBuffer"/>
@@ -197,29 +192,23 @@ namespace LivreNoirLibrary.Media.Wave
             _buffer_length = 0;
             var block = _format.BlockAlign;
             var bytesToRead = Math.Min(BufferSize / block * block, streamRemain);
-            var streamBuffer = ArrayPool<byte>.Shared.Rent(bytesToRead);
-            var convertBuffer = ArrayPool<float>.Shared.Rent(bytesToRead / converter.BytesPerSample);
-            try
+            using var o1 = ArrayPool.Rent<byte>(bytesToRead);
+            using var o2 = ArrayPool.Rent<float>(bytesToRead / converter.BytesPerSample);
+            var streamBuffer = o1.Array;
+            var convertBuffer = o2.Array;
+            bytesToRead = stream.Read(streamBuffer, 0, bytesToRead);
+            if (bytesToRead is 0)
             {
-                bytesToRead = stream.Read(streamBuffer, 0, bytesToRead);
-                if (bytesToRead is 0)
-                {
-                    return true;
-                }
-                fixed (byte* srcPtr = streamBuffer)
-                fixed (float* convPtr = convertBuffer)
-                {
-                    converter.ConvertRead(srcPtr, convPtr, bytesToRead);
-                    var convBytePtr = (byte*)convPtr;
-                    var outSamples = this.SwrConvertToRead(&convBytePtr, bytesToRead / block);
-                    _buffer_length = outSamples;
-                    return false;
-                }
+                return true;
             }
-            finally
+            fixed (byte* srcPtr = streamBuffer)
+            fixed (float* convPtr = convertBuffer)
             {
-                ArrayPool<byte>.Shared.Return(streamBuffer);
-                ArrayPool<float>.Shared.Return(convertBuffer);
+                converter.ConvertRead(srcPtr, convPtr, bytesToRead);
+                var convBytePtr = (byte*)convPtr;
+                var outSamples = this.SwrConvertToRead(&convBytePtr, bytesToRead / block);
+                _buffer_length = outSamples;
+                return false;
             }
         }
     }

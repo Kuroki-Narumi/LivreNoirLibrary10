@@ -1,4 +1,5 @@
-﻿using LivreNoirLibrary.ObjectModel;
+﻿using LivreNoirLibrary.Collections;
+using LivreNoirLibrary.ObjectModel;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
@@ -85,53 +86,41 @@ namespace LivreNoirLibrary.Windows
 
         public static IEnumerable<DependencyObject> EnumerateDescendantsByQueue(this DependencyObject obj)
         {
-            var queue = ObjectPool.Rent<Queue<DependencyObject>>();
-            try
+            using var o1 = ObjectPool.Rent<DoubleEndedQueue<DependencyObject>>();
+            var queue = o1.Value;
+            queue.Enqueue(obj);
+            while (queue.TryDequeue(out var o))
             {
-                queue.Enqueue(obj);
-                while (queue.TryDequeue(out var o))
+                var count = VisualTreeHelper.GetChildrenCount(o);
+                for (var i = 0; i < count; i++)
                 {
-                    var count = VisualTreeHelper.GetChildrenCount(o);
-                    for (var i = 0; i < count; i++)
+                    var child = VisualTreeHelper.GetChild(o, i);
+                    if (child is not null)
                     {
-                        var child = VisualTreeHelper.GetChild(o, i);
-                        if (child is not null)
-                        {
-                            yield return child;
-                            queue.Enqueue(child);
-                        }
+                        yield return child;
+                        queue.Push(child);
                     }
                 }
-            }
-            finally
-            {
-                ObjectPool.Return(queue);
             }
         }
 
         public static IEnumerable<DependencyObject> EnumerateDescendantsByStack(this DependencyObject obj)
         {
-            var stack = ObjectPool.Rent<Stack<DependencyObject>>();
-            try
+            using var o1 = ObjectPool.Rent<DoubleEndedQueue<DependencyObject>>();
+            var stack = o1.Value;
+            stack.Push(obj);
+            while (stack.TryPop(out var o))
             {
-                stack.Push(obj);
-                while (stack.TryPop(out var o))
+                var count = VisualTreeHelper.GetChildrenCount(o);
+                for (var i = 0; i < count; i++)
                 {
-                    var count = VisualTreeHelper.GetChildrenCount(o);
-                    for (var i = 0; i < count; i++)
+                    var child = VisualTreeHelper.GetChild(o, i);
+                    if (child is not null)
                     {
-                        var child = VisualTreeHelper.GetChild(o, i);
-                        if (child is not null)
-                        {
-                            yield return child;
-                            stack.Push(child);
-                        }
+                        yield return child;
+                        stack.Push(child);
                     }
                 }
-            }
-            finally
-            {
-                ObjectPool.Return(stack);
             }
         }
 

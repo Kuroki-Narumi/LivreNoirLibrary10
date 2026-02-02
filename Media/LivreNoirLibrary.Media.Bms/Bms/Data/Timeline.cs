@@ -1,6 +1,6 @@
 using System;
 using System.IO;
-using LivreNoirLibrary.Collections;
+using LivreNoirLibrary.Numerics;
 
 namespace LivreNoirLibrary.Media.Bms
 {

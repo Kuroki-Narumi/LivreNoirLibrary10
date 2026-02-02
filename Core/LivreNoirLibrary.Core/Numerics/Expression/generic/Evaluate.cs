@@ -46,7 +46,8 @@ namespace LivreNoirLibrary.Numerics
         public bool TryEvaluate(TryGetFunc<T> variables, out T result, [MaybeNullWhen(true)] out Exception exception)
         {
             result = default;
-            var nodes = ObjectPool.Rent<List<LazyNode<T>>>();
+            using var obj = ObjectPool.Rent<List<LazyNode<T>>>();
+            var nodes = obj.Value;
             try
             {
                 if (!TryGetLazyNode(nodes, out exception))
@@ -67,32 +68,22 @@ namespace LivreNoirLibrary.Numerics
                 exception = ex;
                 return false;
             }
-            finally
-            {
-                ObjectPool.Return(nodes);
-            }
         }
 
         public IEnumerable<T> EvaluateAll(TryGetFunc<T> variables)
         {
-            var nodes = ObjectPool.Rent<List<LazyNode<T>>>();
-            try
+            using var obj = ObjectPool.Rent<List<LazyNode<T>>>();
+            var nodes = obj.Value;
+            if (TryGetLazyNode(nodes, out _))
             {
-                if (TryGetLazyNode(nodes, out _))
+                foreach (var node in nodes)
                 {
-                    foreach (var node in nodes)
+                    var r = node.Execute(variables);
+                    if (r.IsSuccessful && CheckResult(r.Value, out _))
                     {
-                        var r = node.Execute(variables);
-                        if (r.IsSuccessful && CheckResult(r.Value, out _))
-                        {
-                            yield return r.Value;
-                        }
+                        yield return r.Value;
                     }
                 }
-            }
-            finally
-            {
-                ObjectPool.Return(nodes);
             }
         }
     }

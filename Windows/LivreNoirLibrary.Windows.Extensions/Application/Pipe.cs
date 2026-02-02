@@ -9,6 +9,7 @@ using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
+using LivreNoirLibrary.Collections;
 using LivreNoirLibrary.Debug;
 using LivreNoirLibrary.Text;
 
@@ -79,27 +80,20 @@ namespace LivreNoirLibrary.Windows
             where TApp : Application, IPipeApplication
         {
             var pipeName = TApp.PipeName;
-            var buffer = ArrayPool<byte>.Shared.Rent(sizeof(int));
-            try
+            var o = ArrayPool.Rent<byte>(sizeof(int));
+            while (true)
             {
-                while (true)
+                using NamedPipeServerStream stream = new(pipeName, PipeDirection.In);
+                await stream.WaitForConnectionAsync(c);
+                var count = await stream.ReadAsync(o.Memory, c);
+                if (count is sizeof(int))
                 {
-                    using NamedPipeServerStream stream = new(pipeName, PipeDirection.In);
-                    await stream.WaitForConnectionAsync(c);
-                    var count = await stream.ReadAsync(buffer.AsMemory(0, sizeof(int)), c);
-                    if (count is sizeof(int))
-                    {
-                        var processId = BitConverter.ToInt32(buffer);
-                        using StreamReader reader = new(stream);
-                        var message = await reader.ReadToEndAsync(c);
-                        ProcessRecievedMessage(app, processId, message);
-                    }
-                    c.ThrowIfCancellationRequested();
+                    var processId = BitConverter.ToInt32(o.Span);
+                    using StreamReader reader = new(stream);
+                    var message = await reader.ReadToEndAsync(c);
+                    ProcessRecievedMessage(app, processId, message);
                 }
-            }
-            finally
-            {
-                ArrayPool<byte>.Shared.Return(buffer);
+                c.ThrowIfCancellationRequested();
             }
         }
 
@@ -168,19 +162,12 @@ namespace LivreNoirLibrary.Windows
         {
             using NamedPipeClientStream stream = new(".", TApp.PipeName, PipeDirection.Out);
             stream.Connect();
-            var buffer = ArrayPool<byte>.Shared.Rent(sizeof(int));
-            try
-            {
-                BitConverter.TryWriteBytes(buffer, Environment.ProcessId);
-                stream.Write(buffer, 0, sizeof(int));
-                using StreamWriter writer = new(stream);
-                writer.Write(message);
-                writer.Flush();
-            }
-            finally
-            {
-                ArrayPool<byte>.Shared.Return(buffer);
-            }
+            using var o = ArrayPool.Rent<byte>(sizeof(int));
+            BitConverter.TryWriteBytes(o.Span, Environment.ProcessId);
+            stream.Write(o.Array, 0, sizeof(int));
+            using StreamWriter writer = new(stream);
+            writer.Write(message);
+            writer.Flush();
         }
 
         public static async Task SendMessageAsync<TApp>(string message)
@@ -188,19 +175,12 @@ namespace LivreNoirLibrary.Windows
         {
             using NamedPipeClientStream stream = new(".", TApp.PipeName, PipeDirection.Out);
             await stream.ConnectAsync();
-            var buffer = ArrayPool<byte>.Shared.Rent(sizeof(int));
-            try
-            {
-                BitConverter.TryWriteBytes(buffer, Environment.ProcessId);
-                await stream.WriteAsync(buffer.AsMemory(0, sizeof(int)));
-                using StreamWriter writer = new(stream);
-                await writer.WriteAsync(message);
-                await writer.FlushAsync();
-            }
-            finally
-            {
-                ArrayPool<byte>.Shared.Return(buffer);
-            }
+            using var o = ArrayPool.Rent<byte>(sizeof(int));
+            BitConverter.TryWriteBytes(o.Span, Environment.ProcessId);
+            await stream.WriteAsync(o.Array.AsMemory(0, sizeof(int)));
+            using StreamWriter writer = new(stream);
+            await writer.WriteAsync(message);
+            await writer.FlushAsync();
         }
 
         /// <summary>

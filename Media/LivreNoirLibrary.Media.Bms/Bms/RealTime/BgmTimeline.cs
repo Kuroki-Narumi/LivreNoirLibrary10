@@ -67,27 +67,19 @@ namespace LivreNoirLibrary.Media.Bms
                 _index = 0;
             }
 
-            public IEnumerable<TimelineItem> Advance(double untilExclusive)
+            public bool MoveNext(double untilExclusive, out TimelineItem current)
             {
+                var list = _list;
                 var index = _index;
-                try
+                SoundInfo info;
+                if (index < list.Count && (info = list[index]).Time < untilExclusive)
                 {
-                    var list = _list;
-                    var count = list.Count;
-                    for (; index < count; index++)
-                    {
-                        var item = list[index];
-                        if (item.Time >= untilExclusive)
-                        {
-                            yield break;
-                        }
-                        yield return ToTI(item);
-                    }
+                    current = ToTI(info);
+                    _index = index + 1;
+                    return true;
                 }
-                finally
-                {
-                    _index = index;
-                }
+                current = default;
+                return false;
             }
 
             private static TimelineItem ToTI(SoundInfo info) => new(info.Time, info.Length, info.IsKey ? Tag_KeySound : Tag_BgmSound);

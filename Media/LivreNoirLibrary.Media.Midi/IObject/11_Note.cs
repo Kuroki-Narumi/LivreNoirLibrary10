@@ -119,8 +119,8 @@ namespace LivreNoirLibrary.Media.Midi
                 );
         }
 
-        internal bool MatchedNumber(SortedSet<int> set) => set.Contains(_nn);
-        bool INote.MatchesNumber(SortedSet<int> set) => MatchedNumber(set);
+        internal bool MatchedNumber(RangeSet<int> set) => set.Contains(_nn);
+        bool INote.MatchesNumber(RangeSet<int> set) => MatchedNumber(set);
 
         internal Note GetEdited(Rational lenQ, Func<Rational, Rational>? lenFunc, int velQ, Func<double, double>? velFunc, Func<double, double>? nnFunc)
         {

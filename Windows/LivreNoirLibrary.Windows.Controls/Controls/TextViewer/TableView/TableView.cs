@@ -1,17 +1,18 @@
-﻿using System;
+﻿using LivreNoirLibrary.Collections;
+using LivreNoirLibrary.ObjectModel;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Text;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Media;
 using System.Windows.Data;
-using LivreNoirLibrary.Collections;
+using System.Windows.Media;
 
 namespace LivreNoirLibrary.Windows.Controls
 {
-    using List = List<object>;
     using GroupDictionary = Dictionary<int, List<object>>;
+    using List = List<object>;
 
     public delegate void CellClickedEventHandler(object sender, TableDataCell context);
 
@@ -431,7 +432,8 @@ namespace LivreNoirLibrary.Windows.Controls
                     }
                 }
             }
-            StringBuilder sb = new();
+            using var o = ObjectPool.Rent<StringBuilder>();
+            var sb = o.Value;
             foreach (var row in result.AsSpan())
             {
                 sb.AppendJoin('\t', row);

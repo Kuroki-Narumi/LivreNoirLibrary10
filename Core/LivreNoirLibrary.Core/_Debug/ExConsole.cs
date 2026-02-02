@@ -1,12 +1,13 @@
+using LivreNoirLibrary.Collections;
+using LivreNoirLibrary.ObjectModel;
 using System;
-using System.Threading;
-using System.Threading.Tasks;
 using System.Collections;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Text;
 using System.IO;
-using LivreNoirLibrary.Collections;
+using System.Text;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace LivreNoirLibrary.Debug
 {
@@ -47,8 +48,6 @@ namespace LivreNoirLibrary.Debug
             Written?.Invoke(message);
         }
 
-        private static readonly StringBuilder _sb = new();
-
         public static void Write(params ReadOnlySpan<object?> obj)
         {
             switch (obj.Length)
@@ -60,17 +59,20 @@ namespace LivreNoirLibrary.Debug
                     Write(o is null ? "(null)" : o.ToString());
                     break;
                 default:
-                    var sb = _sb;
-                    lock (_lock)
-                    {
-                        sb.Clear();
-                        sb.Append('(');
-                        sb.AppendJoin(", ", obj);
-                        sb.Append(')');
-                    }
-                    Write(sb.ToString());
+                    WriteWithStringBuilder(obj);
                     break;
             }
+        }
+
+        private static void WriteWithStringBuilder(ReadOnlySpan<object?> obj)
+        {
+            using var o1 = ObjectPool.Rent<StringBuilder>();
+            var sb = o1.Value;
+            sb.Clear();
+            sb.Append('(');
+            sb.AppendJoin(", ", obj);
+            sb.Append(')');
+            Write(sb.ToString());
         }
 
         public static void WriteNow() => Write($"{DateTime.Now:HH:mm:ss.fff}");

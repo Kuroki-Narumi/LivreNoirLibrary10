@@ -13,7 +13,7 @@ namespace LivreNoirLibrary.Media.Midi
         Rational[] GetMarkersArray(Rational offset = default);
         string GetMarkerName(string format);
         IEnumerable<(Rational, Note)> EachNote(Rational position);
-        internal bool MatchesNumber(SortedSet<int> set);
+        internal bool MatchesNumber(RangeSet<int> set);
         internal INote GetEdited(Rational lenQ, Func<Rational, Rational>? lenFunc, int velQ, Func<double, double>? velFunc, Func<double, double>? nnFunc);
 
         static int GetQuantized(int val, int q) => q is <= 0 ? val : (val + (q - 1)) / q * q;
