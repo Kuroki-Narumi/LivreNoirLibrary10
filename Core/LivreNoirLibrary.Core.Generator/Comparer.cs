@@ -85,7 +85,7 @@ internal class Comparer : IIncrementalGenerator
             public readonly struct Comparer_{{PH_Type1}}_{{PH_Type2}} : IComparer<{{PH_Type1}}, {{PH_Type2}}>
             {
                 public static int Compare({{PH_Type1}} x, {{PH_Type2}} y) => x.CompareTo(y);
-                public static bool IsXCloserThanY({{PH_Type1}} x, {{PH_Type1}} y, {{PH_Type2}} z) => x + y - z * 2 is > 0;
+                public static bool IsXCloserThanY({{PH_Type1}} x, {{PH_Type1}} y, {{PH_Type2}} z) => x - z + y - z is > 0;
             }
         """;
 

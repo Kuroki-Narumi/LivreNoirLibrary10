@@ -1,5 +1,6 @@
 using LivreNoirLibrary.Debug;
 using System;
+using System.Collections.Generic;
 using System.Numerics;
 using System.Runtime.CompilerServices;
 
@@ -7,10 +8,6 @@ namespace LivreNoirLibrary.Numerics
 {
     public readonly partial struct Rational
     {
-        private const long FloatDenominator = 4503599627370496L; // 2^52
-        private const int DecimalMaxScale = 18;
-        public const decimal DecimalMaxDenominator = 100_000_000_000_000_000;
-        public const ulong DefaultConvertDenLimit = 10_000_000_000;
         public static readonly Int128 Int128MaxValueAsLong = long.MaxValue;
 
         public void Deconstruct(out long numerator, out long denominator)
@@ -37,10 +34,10 @@ namespace LivreNoirLibrary.Numerics
         public static explicit operator checked Rational(Int128 value) => new(checked((long)value));
         public static explicit operator Rational(UInt128 value) => new((long)value);
         public static explicit operator checked Rational(UInt128 value) => new(checked((long)value));
-        public static explicit operator Rational(Half value) => ConvertBySBT(value);
-        public static explicit operator Rational(float value) => ConvertBySBT(value);
-        public static explicit operator Rational(double value) => ConvertBySBT(value);
-        public static explicit operator Rational(decimal value) => ConvertBySBT(value);
+        public static explicit operator Rational(Half value) => value.ToRational();
+        public static explicit operator Rational(float value) => value.ToRational();
+        public static explicit operator Rational(double value) => value.ToRational();
+        public static explicit operator Rational(decimal value) => value.ToRational();
 
         public static implicit operator (long, long)(Rational value) => (value.Numerator, value.Denominator);
         public static explicit operator (int, int)(Rational value) => ((int)value.Numerator, (int)value.Denominator);
@@ -73,192 +70,11 @@ namespace LivreNoirLibrary.Numerics
         public static explicit operator double(Rational value) => (double)value.Numerator / value.Denominator;
         public static explicit operator decimal(Rational value) => (decimal)value.Numerator / value.Denominator;
 
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private static bool CheckValue(Half value)
-        {
-            if (!Half.IsFinite(value))
-            {
-                ThrowOverflowException();
-            }
-            return value == Half.Zero;
-        }
+        public static bool IsOutOfRange(float value) => !float.IsFinite(value) || value is >= long.MinValue and <= long.MaxValue;
+        public static bool IsOutOfRange(double value) => !double.IsFinite(value) || value is < long.MinValue or > long.MaxValue;
+        public static bool IsOutOfRange(decimal value) => value is < long.MinValue or > long.MaxValue;
 
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private static bool CheckValue(float value)
-        {
-            if (!float.IsFinite(value) || (value is > long.MaxValue or < long.MinValue))
-            {
-                ThrowOverflowException();
-            }
-            return value is 0;
-        }
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private static bool CheckValue(double value)
-        {
-            if (!double.IsFinite(value) || (value is > long.MaxValue or < long.MinValue))
-            {
-                ThrowOverflowException();
-            }
-            return value is 0;
-        }
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private static bool CheckValue(decimal value)
-        {
-            if (value is > long.MaxValue or < long.MinValue)
-            {
-                ThrowOverflowException();
-            }
-            return value is 0;
-        }
-
-        private interface ISbtConverter<T>
-        {
-            T Convert2T(Int128 value);
-            Int128 Convert2Int128(T value);
-        }
-
-        private static Rational ConvertBySBTCore<T, TConv>(T value, Int128 limit, TConv conv)
-            where T : INumber<T>
-            where TConv : ISbtConverter<T>
-        {
-            var sign = T.Sign(value);
-            if (sign is < 0)
-            {
-                value = -value;
-            }
-            var intPart = conv.Convert2Int128(value);
-            var decPart = value - conv.Convert2T(intPart);
-            if (T.IsZero(decPart))
-            {
-                return new((long)(intPart * sign));
-            }
-
-            [MethodImpl(MethodImplOptions.AggressiveInlining)]
-            Int128 Clamp(T num1, T den1, Int128 num2, Int128 den2)
-            {
-                if (T.IsZero(den1))
-                {
-                    return 1;
-                }
-                var x = conv.Convert2Int128(num1 / den1) - 1;
-                var y = (limit - num2) / den2;
-                if (x > y)
-                {
-                    x = y;
-                }
-                return x < 1 ? 1 : x;
-            }
-
-            [MethodImpl(MethodImplOptions.AggressiveInlining)]
-            Rational Return((Int128 num, Int128 den) tuple)
-            {
-                var n = (long)(intPart * tuple.den + tuple.num);
-                return new(true, n * sign, (long)tuple.den);
-            }
-
-            /*
-             * left : (  p  ,   q  , p + r, q + s)
-             * right: (p + r, q + s,   r  ,   s  )
-             */
-            Int128 p = 0, q, r, s;
-            q = r = s = 1;
-
-            T dp = T.Zero, dq, dr, ds;
-            dq = dr = ds = T.One;
-
-            // main loop
-            while (true)
-            {
-                var pr = p + r;
-                var qs = q + s;
-                // denominator is over the limit
-                if (pr > limit || qs > limit)
-                {
-                    break;
-                }
-                // actual current value in the target type
-                /*
-                 *  var current = conv.Convert2T(pr) / conv.Convert2T(qs);
-                 *  Compare(decPart, current)
-                 *  
-                 *  <=> Compare(decPart * dqs, dpr)
-                 */
-                var compare = (decPart * conv.Convert2T(qs)).CompareTo(conv.Convert2T(pr));
-                if (compare is 0)
-                {
-                    return Return((pr, qs));
-                }
-                /*
-                 * Reference: https://qiita.com/okaponta_/items/36d485004d04b37519a3
-                 * 
-                 * t = pt / qt
-                 * pt * qm < qt * pm <=> (pt / qt) * qm < pm
-                 *                   <=> (pt / qt) < (pm / qm)
-                 */
-                var drs = dr - decPart * ds;
-                var dqp = decPart * dq - dp;
-                if (compare is < 0)
-                {
-                    var x = Clamp(drs, dqp, s, q);
-                    r += p * x;
-                    s += q * x;
-                    dr = conv.Convert2T(r);
-                    ds = conv.Convert2T(s);
-                }
-                else
-                {
-                    var x = Clamp(dqp, drs, q, s);
-                    p += r * x;
-                    q += s * x;
-                    dp = conv.Convert2T(p);
-                    dq = conv.Convert2T(q);
-                }
-            }
-            /*
-             *  var d1 = decPart - dp / dq;
-             *  var d2 = dr / ds - decPart;
-             *  if (d1 < d2)
-             */
-            var d0 = decPart * dq * ds;
-            return Return((d0 - dp * ds) < (dr * dq - d0) ? (p, q) : (r, s));
-        }
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static Rational ConvertBySBT(Half value, ulong denLimit = DefaultConvertDenLimit) => CheckValue(value) ? Zero : ConvertBySBTCore(value, denLimit, new HalfSbtConverter());
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static Rational ConvertBySBT(float value, ulong denLimit = DefaultConvertDenLimit) => CheckValue(value) ? Zero : ConvertBySBTCore(value, denLimit, new FloatSbtConverter());
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static Rational ConvertBySBT(double value, ulong denLimit = DefaultConvertDenLimit) => CheckValue(value) ? Zero : ConvertBySBTCore(value, denLimit, new DoubleSbtConverter());
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static Rational ConvertBySBT(decimal value, ulong denLimit = DefaultConvertDenLimit) => CheckValue(value) ? Zero : ConvertBySBTCore(value, denLimit, new DecimalSbtConverter());
-
-        private readonly struct HalfSbtConverter : ISbtConverter<Half>
-        {
-            public Half Convert2T(Int128 value) => (Half)value;
-            public Int128 Convert2Int128(Half value) => (Int128)value;
-        }
-
-        private readonly struct FloatSbtConverter : ISbtConverter<float>
-        {
-            public float Convert2T(Int128 value) => (float)value;
-            public Int128 Convert2Int128(float value) => (Int128)value;
-        }
-
-        private readonly struct DoubleSbtConverter : ISbtConverter<double>
-        {
-            public double Convert2T(Int128 value) => (double)value;
-            public Int128 Convert2Int128(double value) => (Int128)value;
-        }
-
-        private readonly struct DecimalSbtConverter : ISbtConverter<decimal>
-        {
-            public decimal Convert2T(Int128 value) => (decimal)value;
-            public Int128 Convert2Int128(decimal value) => (Int128)value;
-        }
-
-        public static (long Numerator, long Denominator) LimitNumDen(long numerator, long denominator, ulong denLimit = DefaultConvertDenLimit)
+        public static (long Numerator, long Denominator) LimitNumDen(long numerator, long denominator, ulong denLimit = DoubleDenominatorLimit)
         {
             var negative = numerator is < 0;
             var num = (Int128)(negative ? -numerator : numerator);
@@ -315,13 +131,13 @@ namespace LivreNoirLibrary.Numerics
             }
         }
 
-        public Rational LimitNumDen(ulong denLimit = DefaultConvertDenLimit)
+        public Rational LimitNumDen(ulong denLimit = DoubleDenominatorLimit)
         {
             var (n, d) = LimitNumDen(Numerator, Denominator, denLimit);
             return new Rational(false, n, d);
         }
 
-        public Rational LimitDen(ulong denLimit = DefaultConvertDenLimit)
+        public Rational LimitDen(ulong denLimit = DoubleDenominatorLimit)
         {
             var numerator = Numerator;
             var denominator = Denominator;

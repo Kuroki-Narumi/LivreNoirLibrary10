@@ -12,14 +12,14 @@ namespace LivreNoirLibrary.Media
         {
             public void Clear()
             {
-                SimdOperations.Clear((byte*)bitmap.Pointer, bitmap.Height * bitmap.Stride);
+                SimdOperations.Clear((byte*)bitmap.Pointer, (nuint)(bitmap.Height * bitmap.Stride));
             }
 
             public void Clear(Rectangle rect)
             {
                 foreach (var (p, len) in bitmap.EnumerateLines(rect))
                 {
-                    SimdOperations.Clear((byte*)p, len);
+                    SimdOperations.Clear((byte*)p, (nuint)len);
                 }
             }
 

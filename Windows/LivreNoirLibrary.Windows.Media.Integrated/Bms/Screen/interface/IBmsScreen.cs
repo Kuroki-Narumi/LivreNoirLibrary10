@@ -1,6 +1,9 @@
 ﻿using LivreNoirLibrary.Media.Bms.Play;
 using LivreNoirLibrary.Media.Wave;
+using LivreNoirLibrary.ObjectModel;
 using System;
+using System.Collections;
+using System.Threading;
 
 namespace LivreNoirLibrary.Windows.Controls.Bms
 {

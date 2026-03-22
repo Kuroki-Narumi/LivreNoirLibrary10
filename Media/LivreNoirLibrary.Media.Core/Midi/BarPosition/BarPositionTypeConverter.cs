@@ -5,7 +5,7 @@ using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using LivreNoirLibrary.Numerics;
 
-namespace LivreNoirLibrary.Media
+namespace LivreNoirLibrary.Media.Midi
 {
     public class BarPositionTypeConverter : TypeConverter
     {

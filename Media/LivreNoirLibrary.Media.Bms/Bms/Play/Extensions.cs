@@ -46,7 +46,7 @@ namespace LivreNoirLibrary.Media.Bms
                 obj.Set(TimerId.Scene_Start, 0);
             }
 
-            public void SetBeatTimer(double time, ITimeCounter timeCounter, IBarPositionProvider<double> provider)
+            public void SetBeatTimer(double time, ITimeCounter timeCounter, IBarPositionProvider provider)
             {
                 if (obj.TryGet(TimerId.Play_MusicStart, time, out var musicTime))
                 {

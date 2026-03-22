@@ -191,8 +191,8 @@ namespace LivreNoirLibrary.Media.Bms
         public static BmsData Load(Stream stream)
         {
             BmsData result = new();
-            BmsParser parser = new(result);
-            parser.Parse(stream);
+            BmsParser parser = new(stream);
+            parser.Parse(result);
             return result;
         }
 

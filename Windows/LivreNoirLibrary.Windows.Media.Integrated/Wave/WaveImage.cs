@@ -68,7 +68,7 @@ namespace LivreNoirLibrary.Windows.Controls.Wave
             }
             var offset = _pixelOffset;
             using var bitmap = b.BeginWrite();
-            var stride = bitmap.Width;
+            var stride = (nuint)bitmap.Width;
             var h = (int)RequiredHeight;
             AdjustRefreshArea((int)_lastHeight, h, offset, _lastPixelOffset, bitmap, out var top, out var bottom);
 
@@ -103,7 +103,7 @@ namespace LivreNoirLibrary.Windows.Controls.Wave
                         var (min, max) = bufferSpan.MinMax();
                         var left = Math.Clamp(GetX(min), 0, centerX);
                         var right = Math.Clamp(GetX(max), centerX, limitX);
-                        SimdOperations.Or(ptr + left, colors[c], right - left);
+                        SimdOperations.Or(ptr + left, colors[c], (nuint)(right - left));
                     }
                 }
             }

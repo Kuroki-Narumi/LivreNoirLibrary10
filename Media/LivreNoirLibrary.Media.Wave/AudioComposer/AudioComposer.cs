@@ -1,11 +1,8 @@
 ﻿using LivreNoirLibrary.Collections;
-using LivreNoirLibrary.Debug;
 using NAudio.Wave;
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.IO;
-using System.Runtime.CompilerServices;
 
 namespace LivreNoirLibrary.Media.Wave
 {
@@ -137,17 +134,17 @@ namespace LivreNoirLibrary.Media.Wave
 
             SimdOperations.Clear(span);
             var currentSeconds = _currentSeconds;
-            var list1 = _currentList;
-            var list2 = _nextList;
+            var currentQueue = _currentList;
+            var nextQueue = _nextList;
             var masterVolume = MasterVolume;
             var tagToVolume = TagToVolume;
 
             // 既存リストの消化
-            foreach (var info in list1.AsSpan())
+            foreach (var info in currentQueue.AsSpan())
             {
-                Append(ch, list2, masterVolume, tagToVolume, span, requiredSampleCount, info);
+                Append(ch, nextQueue, masterVolume, tagToVolume, span, requiredSampleCount, info);
             }
-            list1.Clear();
+            currentQueue.Clear();
 
             var notIgnore = !IgnoreItemDuration;
             var until = currentSeconds + (double)requiredSampleCount / rate;
@@ -162,14 +159,14 @@ namespace LivreNoirLibrary.Media.Wave
                         var (itemTime, itemDuration, tag) = info;
                         var sourceSamples = (notIgnore && itemDuration is >= 0) ? Math.Min((int)Math.Ceiling(itemDuration * rate), sourceLength) : sourceLength;
                         var destOffset = (int)((itemTime - currentSeconds) * rate);
-                        Append(ch, list2, masterVolume, tagToVolume, span, requiredSampleCount, new(key, source, 0, sourceSamples, destOffset, tag));
+                        Append(ch, nextQueue, masterVolume, tagToVolume, span, requiredSampleCount, new(key, source, 0, sourceSamples, destOffset, tag));
                     }
                 }
             }
             _currentSeconds = until;
             // リストの参照を入れ替える (list1: 空になったリスト, list2: 未処理のソースが追加されたリスト)
-            _currentList = list2;
-            _nextList = list1;
+            _currentList = nextQueue;
+            _nextList = currentQueue;
         }
 
         public int Read(float[] buffer, int offset, int count)

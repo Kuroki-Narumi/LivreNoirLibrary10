@@ -6,13 +6,10 @@ using LivreNoirLibrary.Text;
 
 namespace LivreNoirLibrary.Media.Wave
 {
-    public readonly struct DataChunk(long position, uint length) : IRiffChunk<DataChunk>, IJsonWriter
+    public readonly record struct DataChunk(long Position, uint Length) : IRiffChunk<DataChunk>, IJsonWriter
     {
         public string Chid => ChunkIds.Data;
         public uint ByteSize => Length;
-
-        public readonly long Position = position;
-        public readonly uint Length = length;
 
         public static DataChunk LoadContents(BinaryReader reader, ref uint length)
         {

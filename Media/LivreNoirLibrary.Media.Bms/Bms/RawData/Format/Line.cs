@@ -14,20 +14,24 @@ namespace LivreNoirLibrary.Media.Bms
             internal long _den = 1;
 
             public Line() { }
-            public Line(Rational pos, int value)
+            public Line(double pos, int value)
             {
-                _list[pos] = (ushort)value;
-                _den = pos.Denominator;
+                var rPos = Rationalize(pos);
+                _list[rPos] = (ushort)value;
+                _den = rPos.Denominator;
             }
 
-            public bool TryAdd(Rational position, int value)
+            private static Rational Rationalize(double position) => Rational.RationalizeUnsafe(position, BmsConstants.MaxInnerResolution);
+
+            public bool TryAdd(double position, int value)
             {
-                if (_list.ContainsKey(position))
+                var rPos = Rationalize(position);
+                if (_list.ContainsKey(rPos))
                 {
                     return false;
                 }
-                _den = NumberExtensions.LCM(_den, position.Denominator);
-                _list.Add(position, (ushort)value);
+                _den = NumberExtensions.LCM(_den, rPos.Denominator);
+                _list.Add(rPos, (ushort)value);
                 return true;
             }
 

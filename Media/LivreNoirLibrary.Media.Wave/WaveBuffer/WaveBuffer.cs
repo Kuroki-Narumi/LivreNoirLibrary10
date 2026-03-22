@@ -5,6 +5,7 @@ using LivreNoirLibrary.ObjectModel;
 using LivreNoirLibrary.Text;
 using System;
 using System.Diagnostics;
+using System.Numerics;
 using System.Text.Json;
 
 namespace LivreNoirLibrary.Media.Wave
@@ -16,7 +17,7 @@ namespace LivreNoirLibrary.Media.Wave
 
         public static WaveBuffer Empty() => new();
 
-        private readonly UnmanagedArray<float> _data = [];
+        private readonly UnmanagedArray<float> _data = new();
         protected readonly MarkerCollection _markers = [];
 
         public Span<float> Data => _data.Slice(0, TotalSample);
@@ -33,6 +34,7 @@ namespace LivreNoirLibrary.Media.Wave
         protected override void DisposeUnmanaged()
         {
             _data.Free();
+            TotalSample = 0;
             base.DisposeUnmanaged();
         }
 
@@ -44,14 +46,23 @@ namespace LivreNoirLibrary.Media.Wave
 
         public void SetTotalSample(int size, bool clear = true)
         {
+            ArgumentOutOfRangeException.ThrowIfNegative(size, nameof(size));
+            _data.EnsureSize(size, clear);
+            /*
             if (TotalSample < size)
             {
-                _data.EnsureSize(size, false);
-                if (clear)
+                if (size > _data.Length)
                 {
-                    _data.Clear(TotalSample);
+                    var newArray = new float[(int)Math.Min(BitOperations.RoundUpToPowerOf2((uint)size), int.MaxValue)];
+                    newArray.AsSpan().CopyFrom(Data);
+                    _data = newArray;
+                }
+                else if (clear)
+                {
+                    _data.AsSpan(TotalSample).Clear();
                 }
             }
+            //*/
             TotalSample = size;
         }
 

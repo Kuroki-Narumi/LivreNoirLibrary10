@@ -1,7 +1,5 @@
-using LivreNoirLibrary.Debug;
 using LivreNoirLibrary.ObjectModel;
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Numerics;
 using System.Runtime.CompilerServices;
@@ -9,7 +7,7 @@ using System.Runtime.InteropServices;
 
 namespace LivreNoirLibrary.Collections
 {
-    public unsafe class UnmanagedArray<T> : DisposableBase, IEnumerable<T>, IClear
+    public unsafe class UnmanagedArray<T> : DisposableBase, IClear
         where T : unmanaged
     {
         /// <summary>
@@ -20,51 +18,31 @@ namespace LivreNoirLibrary.Collections
         /// </returns>
         public static bool IsHardwareAccelerated { get; } = Vector<T>.IsSupported;
 
+        /// <summary>
+        /// Gets the maximum allowable length for instances of <see cref="UnmanagedArray{T}"/>, 
+        /// calculated as the largest value that can be safely represented based on <see langword="sizeof"/>(<typeparamref name="T"/>).
+        /// </summary>
+        public static nuint MaxLength { get; } = nuint.MaxValue / (nuint)sizeof(T);
+
         private T* _ptr;
-        private int _size;
+        private nuint _size;
 
         /// <summary>
-        /// Gets the pointer to the first element of the allocated memory.
+        /// Create an instance of <see cref="UnmanagedArray{T}"/> without allocation.
         /// </summary>
-        public T* Pointer => _ptr;
+        public UnmanagedArray() { }
 
         /// <summary>
-        /// Gets the number of elements contained in this <see cref="UnmanagedArray{T}"/>.
+        /// Create an instance of <see cref="UnmanagedArray{T}"/> with the specified size allocated.
         /// </summary>
-        /// <remarks>
-        /// This value matches the size in bytes in memory only if <typeparamref name="T"/> is <see cref="byte"/>; otherwise, the actual size in memory is this value multiplied by <see langword="sizeof"/>(<typeparamref name="T"/>).
-        /// </remarks>
-        public int Length => _size;
+        /// <param name="length">number of elements.</param>
+        public UnmanagedArray(nuint length) => Realloc(length);
 
-        /// <summary>
-        /// Gets a reference to the element of specified index.
-        /// </summary>
-        /// <param name="index">index to get reference.</param>
-        /// <returns>a reference to the element of specified index.</returns>
-        /// <exception cref="IndexOutOfRangeException"></exception>
-        public ref T this[int index]
-        {
-            get
-            {
-                if ((uint)index < (uint)_size)
-                {
-                    return ref _ptr[index];
-                }
-                throw new IndexOutOfRangeException($"Index out of range (given:{index}, size:{_size})");
-            }
-        }
+        ///<inheritdoc cref="UnmanagedArray(nuint)"/>
+        public UnmanagedArray(long length) => Realloc(length);
 
-        /// <inheritdoc cref="this[int]"/>
-        public ref T this[Index index] => ref this[index.GetOffset(_size)];
-
-        /// <inheritdoc cref="Slice(Range)"/>
-        public Span<T> this[Range range] => Slice(range);
-
-        /// <summary>
-        /// Create an instance of <see cref="UnmanagedArray{T}"/> with the specified size.
-        /// </summary>
-        /// <param name="size">number of elements.</param>
-        public UnmanagedArray(int size = 0) => Realloc(size);
+        ///<inheritdoc cref="UnmanagedArray(nuint)"/>
+        public UnmanagedArray(int length) => Realloc(length);
 
         /// <summary>
         /// Create an instance of <see cref="UnmanagedArray{T}"/> from an existing buffer.
@@ -77,6 +55,61 @@ namespace LivreNoirLibrary.Collections
         }
 
         /// <summary>
+        /// Gets the pointer to the first element of the allocated memory.
+        /// </summary>
+        public T* Pointer => _ptr;
+
+        /// <summary>
+        /// Gets the number of elements contained in this <see cref="UnmanagedArray{T}"/>.
+        /// </summary>
+        /// <remarks>
+        /// This value matches the size in bytes in memory only if <typeparamref name="T"/> is <see cref="byte"/>; 
+        /// otherwise, the actual size in memory is this value multiplied by <see langword="sizeof"/>(<typeparamref name="T"/>).
+        /// </remarks>
+        public nuint Length => _size;
+
+        /// <summary>
+        /// Gets a reference to the element of specified index.
+        /// </summary>
+        /// <param name="index">index to get reference.</param>
+        /// <returns>a reference to the element of specified index.</returns>
+        /// <exception cref="IndexOutOfRangeException"></exception>
+        public ref T this[nuint index] => ref GetRefByIndex(index);
+
+        /// <inheritdoc cref="this[nuint]"/>
+        public ref T this[int index]
+        {
+            get
+            {
+                ArgumentOutOfRangeException.ThrowIfNegative(index);
+                return ref GetRefByIndex((nuint)index);
+            }
+        }
+
+        /// <inheritdoc cref="this[nuint]"/>
+        public ref T this[long index]
+        {
+            get
+            {
+                ArgumentOutOfRangeException.ThrowIfNegative(index);
+                return ref GetRefByIndex((nuint)index);
+            }
+        }
+
+        /// <inheritdoc cref="this[nuint]"/>
+        public ref T this[Index index]
+        {
+            get
+            {
+                var actualIndex = ConvertIndexSafe(index);
+                return ref _ptr[actualIndex];
+            }
+        }
+
+        /// <inheritdoc cref="Slice(Range)"/>
+        public Span<T> this[Range range] => Slice(range);
+
+        /// <summary>
         /// Frees the allocated memory and sets its <see cref="Length"/> to 0.
         /// </summary>
         public void Free()
@@ -86,50 +119,66 @@ namespace LivreNoirLibrary.Collections
             _size = 0;
         }
 
-        private void ReallocCore(int size, bool clear)
-        {
-            var newPtr = (T*)NativeMemory.Realloc(_ptr, (nuint)(size * sizeof(T)));
-            if (clear && size > _size)
-            {
-                ClearCore(newPtr + _size, size - _size);
-            }
-            _ptr = newPtr;
-            _size = size;
-        }
-
         /// <summary>
         /// Reallocates memory to be the specified size.
         /// </summary>
-        /// <param name="size">the new number of elements.</param>
+        /// <param name="newCount">the new number of elements.</param>
         /// <param name="clear">if <see langword="true"/>, when reallocating a larger area, the enlarged area will be set to 0; 
         /// if <see langword="false"/>, the enlarged area will remain as is.</param>
         /// <exception cref="ArgumentOutOfRangeException"/>
         /// <exception cref="OutOfMemoryException"/>
-        public void Realloc(int size, bool clear = true)
+        public void Realloc(nuint newCount, bool clear = true) => ReallocImpl(newCount, clear);
+
+        /// <inheritdoc cref="Realloc(nuint, bool)"/>
+        public void Realloc(int newCount, bool clear = true)
         {
-            ArgumentOutOfRangeException.ThrowIfLessThan(size, 0);
-            if (size is 0)
-            {
-                Free();
-            }
-            else
-            {
-                ReallocCore(size, clear);
-            }
+            ArgumentOutOfRangeException.ThrowIfNegative(newCount);
+            ReallocImpl((nuint)newCount, clear);
+        }
+
+        /// <inheritdoc cref="Realloc(nuint, bool)"/>
+        public void Realloc(long newCount, bool clear = true)
+        {
+            ArgumentOutOfRangeException.ThrowIfNegative(newCount);
+            ReallocImpl((nuint)newCount, clear);
         }
 
         /// <summary>
         /// Reallocates memory so that its size is a power of 2 greater than or equal to the specified size.
         /// </summary>
-        /// <param name="requiredSize">the minimum number of elements.</param>
+        /// <param name="requiredCount">the minimum number of elements.</param>
         /// <param name="clear">if <see langword="true"/>, when reallocating a larger area, the enlarged area will be set to 0; 
         /// if <see langword="false"/>, the enlarged area will remain as is.</param>
         /// <exception cref="ArgumentOutOfRangeException"/>
         /// <exception cref="OutOfMemoryException"/>
-        public void ReallocToPowerOf2(int requiredSize, bool clear = true)
+        public void ReallocToPowerOf2(nuint requiredCount, bool clear = true)
         {
-            ArgumentOutOfRangeException.ThrowIfLessThan(requiredSize, 0);
-            ReallocCore((int)BitOperations.RoundUpToPowerOf2((uint)requiredSize), clear);
+            nuint size;
+            if (sizeof(nuint) == sizeof(ulong))
+            {
+                var r = (ulong)requiredCount;
+                size = r is > 0x8000_0000_0000_0000 ? nuint.MaxValue : (nuint)BitOperations.RoundUpToPowerOf2(r);
+            }
+            else
+            {
+                var r = (uint)requiredCount;
+                size = r is > 0x8000_0000 ? nuint.MaxValue : BitOperations.RoundUpToPowerOf2(r);
+            }
+            Realloc(size, clear);
+        }
+
+        /// <inheritdoc cref="ReallocToPowerOf2(nuint, bool)"/>
+        public void ReallocToPowerOf2(int requiredCount, bool clear = true)
+        {
+            ArgumentOutOfRangeException.ThrowIfNegative(requiredCount);
+            ReallocToPowerOf2((nuint)requiredCount, clear);
+        }
+
+        /// <inheritdoc cref="ReallocToPowerOf2(nuint, bool)"/>
+        public void ReallocToPowerOf2(long requiredCount, bool clear = true)
+        {
+            ArgumentOutOfRangeException.ThrowIfNegative(requiredCount);
+            ReallocToPowerOf2((nuint)requiredCount, clear);
         }
 
         /// <summary>
@@ -141,206 +190,241 @@ namespace LivreNoirLibrary.Collections
         /// <returns>
         /// <see langword="true"/> if reallocated; otherwise, <see langword="false"/>.
         /// </returns>
-        public bool EnsureSize(int size, bool clear = true)
+        public bool EnsureSize(nuint size, bool clear = true)
         {
             if (size > _size)
             {
                 ReallocToPowerOf2(size, clear);
                 return true;
             }
-            else if (clear)
+            else if (size < _size && clear)
             {
                 Clear(size);
             }
             return false;
         }
 
+        /// <inheritdoc cref="EnsureSize(nuint, bool)"/>
+        public bool EnsureSize(int size, bool clear = true)
+        {
+            ArgumentOutOfRangeException.ThrowIfNegative(size);
+            return EnsureSize((nuint)size, clear);
+        }
+
+        /// <inheritdoc cref="EnsureSize(nuint, bool)"/>
+        public bool EnsureSize(long size, bool clear = true)
+        {
+            ArgumentOutOfRangeException.ThrowIfNegative(size);
+            return EnsureSize((nuint)size, clear);
+        }
+
         /// <summary>
         /// Creates a new span over this <see cref="UnmanagedArray{T}"/>.
         /// </summary>
-        public Span<T> AsSpan() => _ptr is null ? [] : new(_ptr, _size);
-
-        private Span<T> ThrowOutOfRange(int start)
+        /// <exception cref="OverflowException"/>
+        public Span<T> AsSpan()
         {
-            throw new ArgumentOutOfRangeException($"index must be >= 0 and < {_size}. (given:{start})");
-        }
-
-        private Span<T> ThrowOutOfRange(int start, int length)
-        {
-            if (start is < 0)
+            if (_ptr is null)
             {
-                throw new ArgumentOutOfRangeException(nameof(start), $"index must be >= 0. (given:{start})");
+                return [];
             }
-            throw new ArgumentOutOfRangeException(nameof(length), $"count must be < {_size - start}. (given:{length})");
+            var length = checked((int)_size);
+            return new(_ptr, length);
         }
 
         /// <summary>
         /// Forms a slice out of this <see cref="UnmanagedArray{T}"/>.
         /// </summary>
         /// <param name="start">The index at which to begin the Span.</param>
-        /// <param name="length">The number of elements in the Span.</param>
+        /// <param name="count">The number of elements in the Span.</param>
         /// <returns>The span representation of this <see cref="UnmanagedArray{T}"/>.</returns>
         /// <exception cref="ArgumentOutOfRangeException"/>
-        public Span<T> Slice(int start, int length)
+        /// <exception cref="OverflowException"/>
+        public Span<T> Slice(nuint start, nuint count)
         {
-            if (start is >= 0 && start + length <= _size)
-            {
-                return new(_ptr + start, length);
-            }
-            else
-            {
-                return ThrowOutOfRange(start, length);
-            }
+            ThrowIfIndexOutOfRange(start, nameof(start));
+            ThrowIfCountOutOfRange(start, count);
+            var length = checked((int)count);
+            return new(_ptr + start, length);
         }
 
-        /// <inheritdoc cref="Slice(int, int)"/>
+        /// <inheritdoc cref="Slice(nuint, nuint)"/>
+        public Span<T> Slice(int start, int count)
+        {
+            ArgumentOutOfRangeException.ThrowIfNegative(start);
+            ArgumentOutOfRangeException.ThrowIfNegative(count);
+            return Slice((nuint)start, (nuint)count);
+        }
+
+        /// <inheritdoc cref="Slice(nuint, nuint)"/>
+        public Span<T> Slice(long start, long count)
+        {
+            ArgumentOutOfRangeException.ThrowIfNegative(start);
+            ArgumentOutOfRangeException.ThrowIfNegative(count);
+            return Slice((nuint)start, (nuint)count);
+        }
+
+        /// <inheritdoc cref="Slice(nuint, nuint)"/>
+        public Span<T> Slice(nuint start)
+        {
+            ThrowIfIndexOutOfRange(start, nameof(start));
+            var length = checked((int)_size);
+            return new(_ptr + start, length);
+        }
+
+        /// <inheritdoc cref="Slice(nuint)"/>
         public Span<T> Slice(int start)
         {
-            if ((uint)start <= (uint)_size)
-            {
-                return new(_ptr + start, _size - start);
-            }
-            else
-            {
-                return ThrowOutOfRange(start);
-            }
+            ArgumentOutOfRangeException.ThrowIfNegative(start);
+            return Slice((nuint)start);
         }
 
-        /// <inheritdoc cref="Slice(int, int)"/>
-        public Span<T> Slice(Index start) => Slice(start.GetOffset(_size));
+        /// <inheritdoc cref="Slice(nuint)"/>
+        public Span<T> Slice(long start)
+        {
+            ArgumentOutOfRangeException.ThrowIfNegative(start);
+            return Slice((nuint)start);
+        }
 
-        /// <inheritdoc cref="Slice(int, int)"/>
+        /// <inheritdoc cref="Slice(nuint)"/>
+        public Span<T> Slice(Index start)
+        {
+            var index = ConvertIndexSafe(start);
+            var length = checked((int)(_size - index));
+            return new(_ptr + index, length);
+        }
+
+        /// <inheritdoc cref="Slice(nuint, nuint)"/>
         /// <param name="range">The range of slice.</param>
         public Span<T> Slice(Range range)
         {
-            var (offset, length) = range.GetOffsetAndLength(_size);
-            return Slice(offset, length);
+            var (start, length) = ConvertRangeSafe(range);
+            return new(_ptr + start, checked((int)length));
         }
 
         public static implicit operator Span<T>(UnmanagedArray<T> obj) => obj.AsSpan();
         public static implicit operator ReadOnlySpan<T>(UnmanagedArray<T> obj) => obj.AsSpan();
 
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private static void ClearCore(T* ptr, int count)
-        {
-            if (IsHardwareAccelerated)
-            {
-                SimdOperations.Clear(ptr, count);
-            }
-            else
-            {
-                NativeMemory.Clear(ptr, (nuint)(count * sizeof(T)));
-            }
-        }
-
         /// <summary>
         /// Sets all elements of this <see cref="UnmanagedArray{T}"/> to 0.
         /// </summary>
-        public void Clear() => ClearCore(_ptr, _size);
+        public void Clear() => ClearImpl(_ptr, _size);
 
         /// <summary>
         /// Sets elements of this <see cref="UnmanagedArray{T}"/> in the specified range to 0.
         /// </summary>
         /// <param name="start">The index to start clearing from.</param>
-        /// <param name="length">The length to clear.</param>
+        /// <param name="count">The elements count to clear.</param>
         /// <exception cref="ArgumentOutOfRangeException"/>
-        public void Clear(int start, int length)
+        public void Clear(nuint start, nuint count)
         {
-            if (start is >= 0 && start + length <= _size)
-            {
-                ClearCore(_ptr + start, length);
-            }
-            else
-            {
-                ThrowOutOfRange(start, length);
-            }
+            ThrowIfIndexOutOfRange(start, nameof(start));
+            ThrowIfCountOutOfRange(start, count);
+            ClearImpl(_ptr + start, count);
         }
 
-        /// <inheritdoc cref="Clear(int, int)"/>
+        /// <inheritdoc cref="Clear(nuint, nuint)"/>
+        public void Clear(int start, int count)
+        {
+            ArgumentOutOfRangeException.ThrowIfNegative(start);
+            ArgumentOutOfRangeException.ThrowIfNegative(count);
+            Clear((nuint)start, (nuint)count);
+        }
+
+        /// <inheritdoc cref="Clear(nuint, nuint)"/>
+        public void Clear(long start, long count)
+        {
+            ArgumentOutOfRangeException.ThrowIfNegative(start);
+            ArgumentOutOfRangeException.ThrowIfNegative(count);
+            Clear((nuint)start, (nuint)count);
+        }
+
+        /// <inheritdoc cref="Clear(nuint, nuint)"/>
+        public void Clear(nuint start)
+        {
+            ThrowIfIndexOutOfRange(start, nameof(start));
+            ClearImpl(_ptr + start, _size - start);
+        }
+
+        /// <inheritdoc cref="Clear(nuint)"/>
         public void Clear(int start)
         {
-            if ((uint)start < (uint)_size)
-            {
-                ClearCore(_ptr + start, _size - start);
-            }
-            else if (start != _size)
-            {
-                ThrowOutOfRange(start);
-            }
+            ArgumentOutOfRangeException.ThrowIfNegative(start);
+            Clear((nuint)start);
+        }
+
+        /// <inheritdoc cref="Clear(nuint)"/>
+        public void Clear(long start)
+        {
+            ArgumentOutOfRangeException.ThrowIfNegative(start);
+            Clear((nuint)start);
         }
 
         /// <inheritdoc cref="Clear(int, int)"/>
-        public void Clear(Index index) => Clear(index.GetOffset(_size));
+        public void Clear(Index index) => Clear(ConvertIndexSafe(index));
 
         /// <inheritdoc cref="Clear(int, int)"/>
         /// <param name="range">The range to clear.</param>
         public void Clear(Range range)
         {
-            var (offset, length) = range.GetOffsetAndLength(_size);
-            Clear(offset, length);
-        }
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private static void FillCore(T value, T* ptr, int count)
-        {
-            if (IsHardwareAccelerated)
-            {
-                SimdOperations.CopyFrom(ptr, value, count);
-            }
-            else
-            {
-                new Span<T>(ptr, count).Fill(value);
-            }
+            var (start, length) = ConvertRangeSafe(range);
+            Clear(start, length);
         }
 
         /// <summary>
         /// Sets all elements of this <see cref="UnmanagedArray{T}"/> to the specified value.
         /// </summary>
         /// <param name="value">The value to fill.</param>
-        public void Fill(T value) => FillCore(value, _ptr, _size);
+        public void Fill(T value) => FillImpl(value, _ptr, _size);
 
         /// <summary>
         /// Sets elements of this <see cref="UnmanagedArray{T}"/> in the specified range to the specified value.
         /// </summary>
         /// <param name="value">The value to fill.</param>
         /// <param name="start">The index to start filling from.</param>
-        /// <param name="length">The length to fill.</param>
-        public void Fill(T value, int start, int length)
+        /// <param name="count">The number of elements to fill.</param>
+        public void Fill(T value, nuint start, nuint count)
         {
-            if (start is >= 0 && start + length <= _size)
-            {
-                FillCore(value, _ptr + start, length);
-            }
-            else
-            {
-                ThrowOutOfRange(start, length);
-            }
+            ThrowIfIndexOutOfRange(start, nameof(start));
+            ThrowIfCountOutOfRange(start, count);
+            FillImpl(value, _ptr + start, count);
         }
 
-        /// <inheritdoc cref="Fill(T, int, int)"/>
-        public void Fill(T value, int index)
+        /// <inheritdoc cref="Fill(T, nuint, nuint)"/>
+        public void Fill(T value, int start, int count)
         {
-            if ((uint)index < (uint)_size)
-            {
-                FillCore(value, _ptr + index, _size - index);
-            }
-            else if (index != _size)
-            {
-                ThrowOutOfRange(index);
-            }
+            ArgumentOutOfRangeException.ThrowIfNegative(start);
+            ArgumentOutOfRangeException.ThrowIfNegative(count);
+            Fill(value, (nuint)start, (nuint)count);
         }
 
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private static void CopyFromCore(T* ptr, T* src, int length)
+        /// <inheritdoc cref="Fill(T, nuint, nuint)"/>
+        public void Fill(T value, long start, long count)
         {
-            if (IsHardwareAccelerated)
-            {
-                SimdOperations.CopyFrom(ptr, src, length);
-            }
-            else
-            {
-                new Span<T>(src, length).CopyTo(new Span<T>(ptr, length));
-            }
+            ArgumentOutOfRangeException.ThrowIfNegative(start);
+            ArgumentOutOfRangeException.ThrowIfNegative(count);
+            Fill(value, (nuint)start, (nuint)count);
+        }
+
+        /// <inheritdoc cref="Fill(T, nuint, nuint)"/>
+        public void Fill(T value, nuint start)
+        {
+            ThrowIfIndexOutOfRange(start, nameof(start));
+            FillImpl(value, _ptr + start, _size - start);
+        }
+
+        /// <inheritdoc cref="Fill(T, nuint)"/>
+        public void Fill(T value, int start)
+        {
+            ArgumentOutOfRangeException.ThrowIfNegative(start);
+            Fill(value, (nuint)start);
+        }
+
+        /// <inheritdoc cref="Fill(T, nuint)"/>
+        public void Fill(T value, long start)
+        {
+            ArgumentOutOfRangeException.ThrowIfNegative(start);
+            Fill(value, (nuint)start);
         }
 
         /// <summary>
@@ -354,7 +438,7 @@ namespace LivreNoirLibrary.Collections
         {
             fixed (T* src = source)
             {
-                CopyFromCore(_ptr, src, Math.Min(_size, source.Length));
+                CopyFromImpl(_ptr, src, Math.Min(_size, (nuint)source.Length));
             }
         }
 
@@ -363,7 +447,7 @@ namespace LivreNoirLibrary.Collections
         {
             fixed (T* src = source)
             {
-                CopyFromCore(_ptr, src, Math.Min(_size, source.Length));
+                CopyFromImpl(_ptr, src, Math.Min(_size, (nuint)source.Length));
             }
         }
 
@@ -373,7 +457,7 @@ namespace LivreNoirLibrary.Collections
             var span = source.AsSpan();
             fixed (T* src = span)
             {
-                CopyFromCore(_ptr, src, Math.Min(_size, source.Count));
+                CopyFromImpl(_ptr, src, Math.Min(_size, (nuint)source.Count));
             }
         }
 
@@ -384,54 +468,29 @@ namespace LivreNoirLibrary.Collections
         /// If the source is longer than the rest of this <see cref="UnmanagedArray{T}"/>, the excess elements are not copied.
         /// </remarks>
         /// <param name="source">The source of values.</param>
-        /// <param name="start">The starting index of the destination.</param>
+        /// <param name="offset">The starting index of the destination.</param>
         /// <exception cref="ArgumentOutOfRangeException"/>
-        public void CopyFrom(ReadOnlySpan<T> source, int start)
+        public void CopyFrom(ReadOnlySpan<T> source, nuint offset)
         {
-            if ((uint)start < (uint)_size)
+            ThrowIfIndexOutOfRange(offset, nameof(offset));
+            fixed (T* src = source)
             {
-                fixed (T* src = source)
-                {
-                    CopyFromCore(_ptr + start, src, Math.Min(_size - start, source.Length));
-                }
-            }
-            else if (start != _size)
-            {
-                ThrowOutOfRange(start);
+                CopyFromImpl(_ptr + offset, src, Math.Min(_size - offset, (nuint)source.Length));
             }
         }
 
-        /// <inheritdoc cref="CopyFrom(ReadOnlySpan{T}, int)"/>
-        public void CopyFrom(T[] source, int start)
+        /// <inheritdoc cref="CopyFrom(ReadOnlySpan{T}, nuint)"/>
+        public void CopyFrom(ReadOnlySpan<T> source, int offset)
         {
-            if ((uint)start < (uint)_size)
-            {
-                fixed (T* src = source)
-                {
-                    CopyFromCore(_ptr + start, src, Math.Min(_size - start, source.Length));
-                }
-            }
-            else if (start != _size)
-            {
-                ThrowOutOfRange(start);
-            }
+            ArgumentOutOfRangeException.ThrowIfNegative(offset);
+            CopyFrom(source, (nuint)offset);
         }
 
-        /// <inheritdoc cref="CopyFrom(ReadOnlySpan{T}, int)"/>
-        public void CopyFrom(List<T> source, int start)
+        /// <inheritdoc cref="CopyFrom(ReadOnlySpan{T}, nuint)"/>
+        public void CopyFrom(ReadOnlySpan<T> source, long offset)
         {
-            if ((uint)start < (uint)_size)
-            {
-                var span = source.AsSpan();
-                fixed (T* src = span)
-                {
-                    CopyFromCore(_ptr + start, src, Math.Min(_size - start, source.Count));
-                }
-            }
-            else if (start != _size)
-            {
-                ThrowOutOfRange(start);
-            }
+            ArgumentOutOfRangeException.ThrowIfNegative(offset);
+            CopyFrom(source, (nuint)offset);
         }
 
         protected override void DisposeUnmanaged()
@@ -439,45 +498,157 @@ namespace LivreNoirLibrary.Collections
             Free();
         }
 
-        /// <inheritdoc cref="IEnumerable{T}.GetEnumerator"/>
-        public Enumerator GetEnumerator() => new(this);
-        IEnumerator<T> IEnumerable<T>.GetEnumerator() => GetEnumerator();
-        IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
+        private ref T GetRefByIndex(nuint index)
+        {
+            ThrowIfIndexOutOfRange(index);
+            return ref _ptr[index];
+        }
 
-        public struct Enumerator : IEnumerator<T>
+        private void ThrowIfIndexOutOfRange(nuint index, string indexName = "index")
+        {
+            if (index >= _size)
+            {
+                throw new IndexOutOfRangeException($"{indexName} must be < {_size} (given:{index})");
+            }
+        }
+
+        private void ThrowIfCountOutOfRange(nuint index, nuint count, string countName = "count")
+        {
+            if (index + count > _size)
+            {
+                throw new IndexOutOfRangeException($"{countName} must be <= {_size - index} (given:{count})");
+            }
+        }
+
+        private nuint ConvertIndexSafe(Index index)
+        {
+            var actualIndex = (nuint)index.Value;
+            if (index.IsFromEnd)
+            {
+                if (actualIndex > _size)
+                {
+                    throw new IndexOutOfRangeException($"index must be >= ^{_size} (given:{index})");
+                }
+                actualIndex = _size - actualIndex;
+            }
+            else
+            {
+                ThrowIfIndexOutOfRange(actualIndex);
+            }
+            return actualIndex;
+        }
+
+        private (nuint, nuint) ConvertRangeSafe(Range range)
+        {
+            var start = ConvertIndexSafe(range.Start);
+            var end = ConvertIndexSafe(range.End);
+            return (start, end - start);
+        }
+
+        private void ReallocImpl(nuint count, bool clear)
+        {
+            if (count is 0)
+            {
+                Free();
+                return;
+            }
+            if (count > MaxLength)
+            {
+                throw new ArgumentOutOfRangeException($"count must be <= {MaxLength} (given:{count})");
+            }
+            var newPtr = (T*)NativeMemory.Realloc(_ptr, count * (nuint)sizeof(T));
+            if (clear && count > _size)
+            {
+                ClearImpl(newPtr + _size, count - _size);
+            }
+            _ptr = newPtr;
+            _size = count;
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        private static void ClearImpl(T* ptr, nuint count)
+        {
+            if (IsHardwareAccelerated)
+            {
+                SimdOperations.Clear(ptr, count);
+            }
+            else
+            {
+                NativeMemory.Clear(ptr, count * (nuint)sizeof(T));
+            }
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        private static void FillImpl(T value, T* ptr, nuint count)
+        {
+            if (IsHardwareAccelerated)
+            {
+                SimdOperations.CopyFrom(ptr, value, count);
+            }
+            else
+            {
+                foreach (var span in new ChunkEnumerator(ptr, count))
+                {
+                    span.Fill(value);
+                }
+            }
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        private static void CopyFromImpl(T* ptr, T* src, nuint count)
+        {
+            if (IsHardwareAccelerated)
+            {
+                SimdOperations.CopyFrom(ptr, src, count);
+            }
+            else
+            {
+                nuint index = 0;
+                foreach (var srcSpan in new ChunkEnumerator(src, count))
+                {
+                    var dstSpan = new Span<T>(ptr + index, srcSpan.Length);
+                    srcSpan.CopyTo(dstSpan);
+                    index += (nuint)srcSpan.Length;
+                }
+            }
+        }
+
+        public ChunkEnumerator EnumerateChunks(int chunkSize = int.MaxValue)
+        {
+            ArgumentOutOfRangeException.ThrowIfNegativeOrZero(chunkSize);
+            return new ChunkEnumerator(_ptr, _size, (nuint)chunkSize);
+        }
+
+        public ref struct ChunkEnumerator
         {
             private readonly T* _ptr;
-            private readonly int _size;
-            private int _index;
-            private T _current;
+            private readonly nuint _size;
+            private readonly nuint _chunkSize;
+            private nuint _index;
+            private Span<T> _current;
 
-            public readonly T Current => _current;
-            readonly object IEnumerator.Current => Current;
+            public readonly Span<T> Current => _current;
 
-            internal Enumerator(UnmanagedArray<T> array)
+            internal ChunkEnumerator(T* ptr, nuint size, nuint chunkSize = int.MaxValue)
             {
-                _ptr = array._ptr;
-                _size = array._size;
+                _ptr = ptr;
+                _size = size;
+                _chunkSize = chunkSize;
             }
 
             public bool MoveNext()
             {
                 if (_index < _size)
                 {
-                    _current = _ptr[_index];
-                    _index++;
+                    var currentChunkSize = Math.Min(_chunkSize, _size - _index);
+                    _current = new Span<T>(_ptr + _index, (int)currentChunkSize);
+                    _index += currentChunkSize;
                     return true;
                 }
                 return false;
             }
 
-            public void Reset()
-            {
-                _index = 0;
-                _current = default;
-            }
-
-            public readonly void Dispose() { }
+            public readonly ChunkEnumerator GetEnumerator() => this;
         }
     }
 }

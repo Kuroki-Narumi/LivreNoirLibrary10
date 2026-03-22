@@ -23,7 +23,7 @@ namespace LivreNoirLibrary.Windows.Media.Bms
 {
     public class BmsVideoCreator(IBmsScreen screen, IBmsVideoCreatorOptions options) : ObservableObjectBase
     {
-        private readonly WaveOutEvent _waveOut = new();
+        private WaveOutEvent? _waveOut;
 
         public IBmsScreen Screen { get; } = screen;
         public IBmsVideoCreatorOptions Options { get; } = options;
@@ -31,6 +31,7 @@ namespace LivreNoirLibrary.Windows.Media.Bms
 
         private (double Duration, double MaxLength) InitializeAudio(int sampleRate, int channels, double delay, ref AntiFreezeUpdater f, ProgressReporter? p, CancellationToken c)
         {
+            StopRealTimePlay();
             var screen = Screen;
             var composer = screen.AudioComposer;
             composer.Setup(sampleRate, channels, delay);
@@ -253,18 +254,18 @@ namespace LivreNoirLibrary.Windows.Media.Bms
                 var delay = options.AudioDelay;
 
                 screen.SetupPlay(true);
-
                 screen.FadeOpacity = 0;
-                var composer = screen.AudioComposer;
-                _waveOut.Init(composer, false);
 
                 // タイマー
                 var timer = screen.Timer;
                 timer.Set(TimerId.Scene_Start, 0);
                 timer.Set(TimerId.Play_MusicStart, -offset);
 
-                var (_, maxLength) = InitializeAudio(rate, ch, delay - offset, ref f, p, c);
-                //composer.EnsureBufferSize(maxLength);
+                InitializeAudio(rate, ch, delay - offset, ref f, p, c);
+                var composer = screen.AudioComposer;
+                _waveOut = new();
+                _waveOut.Init(composer, false);
+
                 f.WaitForUpdate(c);
 
                 screen.Update(0);
@@ -281,14 +282,15 @@ namespace LivreNoirLibrary.Windows.Media.Bms
             IsPlaying = true;
             _startTime = Stopwatch.GetTimestamp();
             CompositionTarget.Rendering += RTP_Update;
-            _waveOut.Play();
+            _waveOut?.Play();
         }
 
         public void StopRealTimePlay()
         {
             IsPlaying = false;
             CompositionTarget.Rendering -= RTP_Update;
-            _waveOut.Stop();
+            _waveOut?.Dispose();
+            _waveOut = null;
         }
 
         private void RTP_Update(object? sender, EventArgs e)

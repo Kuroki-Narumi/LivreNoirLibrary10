@@ -20,25 +20,34 @@ namespace LivreNoirLibrary.Media.Wave
             WaveInfo result = new();
             FourLetterHeader.CheckAndThrow(reader, ChunkIds.RiffHeader);
             var length = (long)reader.ReadUInt32();
-            var endPos = stream.Position + length;
+            var endPos = Math.Min(stream.Length, stream.Position + length);
             FourLetterHeader.CheckAndThrow(reader, ChunkIds.DataHeader);
             var list = result.Chunks;
             list.Clear();
             while (stream.Position < endPos)
             {
-                var chid = FourLetterHeader.Read(reader);
-                if (chid is ChunkIds.Data)
+                try
                 {
-                    result.Data = reader.ReadRiffChunk<DataChunk>();
+                    var chid = FourLetterHeader.Read(reader);
+                    if (chid is ChunkIds.Data)
+                    {
+                        result.Data = reader.ReadRiffChunk<DataChunk>();
+                    }
+                    else if (chid is ChunkIds.Format)
+                    {
+                        result.Format = reader.ReadRiffChunk<FormatChunk>();
+                    }
+                    else
+                    {
+                        var chunk = RiffChunk.Create(chid, reader);
+                        list.Add(chunk);
+                    }
                 }
-                else if (chid is ChunkIds.Format)
+                catch
                 {
-                    result.Format = reader.ReadRiffChunk<FormatChunk>();
-                }
-                else
-                {
-                    var chunk = RiffChunk.Create(chid, reader);
-                    list.Add(chunk);
+                    ExConsole.Write($"pos={stream.Position}, endPos={endPos}, data={result.Data}");
+                    ExConsole.Write($"format={result.Format}");
+                    throw;
                 }
             }
             return result;

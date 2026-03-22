@@ -1,4 +1,7 @@
-﻿using System.Buffers.Binary;
+﻿using LivreNoirLibrary.Media;
+using LivreNoirLibrary.Numerics;
+using LivreNoirLibrary.Text;
+using System.Buffers.Binary;
 using System.Runtime.Intrinsics;
 using System.Text;
 using System.Windows;
@@ -10,7 +13,6 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
-using LivreNoirLibrary.Media;
 
 namespace LivreNoirLibrary.Benchmark
 {
@@ -19,8 +21,11 @@ namespace LivreNoirLibrary.Benchmark
     /// </summary>
     public partial class MainWindow : Window
     {
+        private readonly MainWindowViewModel _viewModel = new();
+
         public MainWindow()
         {
+            DataContext = _viewModel;
             InitializeComponent();
         }
 
@@ -36,6 +41,41 @@ namespace LivreNoirLibrary.Benchmark
 
             return;
         }
+
+        private static void RangeSetTest()
+        {
+            RangeSet<int> set = [];
+            void MatchTest(string text)
+            {
+                Console.WriteLine($"MatchTest text: \"{text}\"");
+                if (BasedNumber.TryParseRangeSet(text, set, 10))
+                {
+                    Console.Write($"  Parse successed: ");
+                    foreach (var range in set)
+                    {
+                        Console.Write($"{range}, ");
+                    }
+                    Console.WriteLine();
+                }
+                else
+                {
+                    Console.WriteLine($"  Parse failed!");
+                }
+            }
+
+            ReadOnlySpan<string> texts = ["1 2 3 5 6 7", "1-6 3,4", "-9 4-15", "36-5 3 6 9", "1 5 2 4 3", "6 6 6 9..2"];
+            foreach (var text in texts)
+            {
+                MatchTest(text);
+            }
+        }
+
+        private void OnClick_Float_Plus(object sender, RoutedEventArgs e) => _viewModel.FloatApplyDelta(true, 1);
+        private void OnClick_Float_Minus(object sender, RoutedEventArgs e) => _viewModel.FloatApplyDelta(false, 1);
+        private void OnClick_Float_Plus100(object sender, RoutedEventArgs e) => _viewModel.FloatApplyDelta(true, 100);
+        private void OnClick_Float_Minus100(object sender, RoutedEventArgs e) => _viewModel.FloatApplyDelta(false, 100);
+        private void OnClick_Float_Plus10000(object sender, RoutedEventArgs e) => _viewModel.FloatApplyDelta(true, 10000);
+        private void OnClick_Float_Minus10000(object sender, RoutedEventArgs e) => _viewModel.FloatApplyDelta(false, 10000);
     }
 
     public readonly record struct Rect(int X, int Y, int Width, int Height);

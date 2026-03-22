@@ -63,7 +63,7 @@ namespace LivreNoirLibrary.Media.FFmpeg
                         remain = decoder.BufferLength * channels;
                     }
                     remain = Math.Min(remain, dstSize);
-                    SimdOperations.CopyFrom(bufferPtr + dstIndex, decoder.BufferPointer + bufferRead, remain);
+                    SimdOperations.CopyFrom(bufferPtr + dstIndex, decoder.BufferPointer + bufferRead, (nuint)remain);
                     dstIndex += remain;   // 書き込み位置(読み出されたサンプル数)
                     dstSize -= remain;    // 要求読み出しサンプル数
                     bufferRead += remain; // バッファの読み出し位置
@@ -95,7 +95,7 @@ namespace LivreNoirLibrary.Media.FFmpeg
                         remain = encoder.BufferLength * channels;
                     }
                     remain = Math.Min(remain, srcSize);
-                    SimdOperations.CopyFrom(encoder.BufferPointer + bufferWrote, bufferPtr + srcIndex, remain);
+                    SimdOperations.CopyFrom(encoder.BufferPointer + bufferWrote, bufferPtr + srcIndex, (nuint)remain);
                     srcIndex += remain; // 読み込み位置(書き込まれたサンプル数)
                     srcSize -= remain;  // 要求書き込みサンプル数
                     encoder.BufferIndex = bufferWrote + remain; // バッファの書き込み位置

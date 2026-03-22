@@ -143,6 +143,7 @@ namespace LivreNoirLibrary.Media.Bms
             List<NoteDiff> buffer = [];
             foreach (var pos in positions)
             {
+                var ratOffset = pos.RationalOffset;
                 var l = leftTimeline.TryGetValue(pos, SearchMode.Equal, out _, out var leftList);
                 var r = rightTimeline.TryGetValue(pos, SearchMode.Equal, out _, out var rightList);
                 if (l)
@@ -180,16 +181,16 @@ namespace LivreNoirLibrary.Media.Bms
                                 var index = leftNotes.FindIndex(n => n.Channel == channel);
                                 if (index is >= 0)
                                 {
-                                    buffer.Add(NoteDiff.CreateChanged(pos.Offset, leftNotes[index].Note, rightNote, left, right));
+                                    buffer.Add(NoteDiff.CreateChanged(ratOffset, leftNotes[index].Note, rightNote, left, right));
                                     leftNotes.RemoveAt(index);
                                     continue;
                                 }
                             }
-                            buffer.Add(NoteDiff.CreateAdded(pos.Offset, rightNote, right));
+                            buffer.Add(NoteDiff.CreateAdded(ratOffset, rightNote, right));
                         }
                         foreach (var (_, leftNote) in leftNotes)
                         {
-                            buffer.Add(NoteDiff.CreateRemoved(pos.Offset, leftNote, left));
+                            buffer.Add(NoteDiff.CreateRemoved(ratOffset, leftNote, left));
                         }
                         if (buffer.Count is > 0)
                         {
@@ -202,7 +203,7 @@ namespace LivreNoirLibrary.Media.Bms
                         var list = dict.GetOrAdd(pos.Bar);
                         foreach (var note in leftList!)
                         {
-                            buffer.Add(NoteDiff.CreateRemoved(pos.Offset, note, left));
+                            buffer.Add(NoteDiff.CreateRemoved(ratOffset, note, left));
                         }
                     }
                 }
@@ -211,7 +212,7 @@ namespace LivreNoirLibrary.Media.Bms
                     var list = dict.GetOrAdd(pos.Bar);
                     foreach (var note in rightList!)
                     {
-                        buffer.Add(NoteDiff.CreateAdded(pos.Offset, note, right));
+                        buffer.Add(NoteDiff.CreateAdded(ratOffset, note, right));
                     }
                 }
             }

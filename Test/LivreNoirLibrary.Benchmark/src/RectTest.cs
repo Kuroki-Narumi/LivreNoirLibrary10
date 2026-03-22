@@ -1,7 +1,6 @@
 ﻿using BenchmarkDotNet.Attributes;
 using LivreNoirLibrary.Numerics;
 using System;
-using System.Windows.Media.Media3D;
 
 namespace LivreNoirLibrary.Benchmark
 {

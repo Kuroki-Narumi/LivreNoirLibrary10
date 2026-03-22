@@ -5,12 +5,12 @@ using System.Linq;
 
 namespace LivreNoirLibrary.Media.Bms
 {
-    public interface IBmsViewModel : IBarPositionProvider<double>
+    public interface IBmsViewModel : IBarPositionProvider
     {
         IBmsData Root { get; }
         IBmsDataUnit CurrentData { get; }
         IListEnumerable<BarPosition, Note> CurrentTimeline => CurrentData.Timeline;
-        DoubleBarLengthCache BarLengthCache { get; }
+        BarLengthCache BarLengthCache { get; }
         ITimeCounter TimeCounter { get; }
 
         /// <summary>
@@ -27,7 +27,7 @@ namespace LivreNoirLibrary.Media.Bms
 
         void OnModified() { }
 
-        double IBarLengthProvider<double>.GetBarLength(int number)
+        double IBarLengthProvider.GetBarLength(int number)
         {
             if (CurrentData.BarDefs.TryGetValue(number, out var value))
             {
@@ -43,7 +43,7 @@ namespace LivreNoirLibrary.Media.Bms
             return BmsConstants.DefaultBarLength;
         }
 
-        double IBarPositionProvider<double>.GetAbsolutePosition(BarPosition position) => BarLengthCache.GetAbsolutePosition(position, this);
-        BarPosition IBarPositionProvider<double>.GetBarPosition(double absolutePosition) => BarLengthCache.GetBarPosition(absolutePosition, this);
+        double IBarPositionProvider.GetAbsolutePosition(BarPosition position) => BarLengthCache.GetAbsolutePosition(position, this);
+        BarPosition IBarPositionProvider.GetBarPosition(double absolutePosition) => BarLengthCache.GetBarPosition(absolutePosition, this);
     }
 }

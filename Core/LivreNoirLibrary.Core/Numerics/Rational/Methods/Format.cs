@@ -1,4 +1,5 @@
 using System;
+using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.Runtime.CompilerServices;
 
@@ -13,12 +14,12 @@ namespace LivreNoirLibrary.Numerics
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static Rational Parse(string s, NumberStyles style, IFormatProvider? provider = null) => Parse(s.AsSpan(), style, provider);
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static Rational Parse(ReadOnlySpan<char> s, NumberStyles style, IFormatProvider? provider = null) => Parse(s, DefaultConvertDenLimit, style, provider);
+        public static Rational Parse(ReadOnlySpan<char> s, NumberStyles style, IFormatProvider? provider = null) => Parse(s, DoubleDenominatorLimit, style, provider);
 
         /// <inheritdoc cref="Parse(ReadOnlySpan{char}, NumberStyles, IFormatProvider?)"/>
         /// <param name="denLimit">Maximum value of denominator.</param>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static Rational Parse(ReadOnlySpan<char> s, ulong denLimit, NumberStyles style, IFormatProvider? provider)
+        public static Rational Parse(ReadOnlySpan<char> s, long denLimit, NumberStyles style, IFormatProvider? provider)
         {
             if (!TryParse(s, denLimit, style, provider, out var value))
             {
@@ -40,75 +41,64 @@ namespace LivreNoirLibrary.Numerics
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static bool TryParse(string? s, NumberStyles style, IFormatProvider? provider, out Rational result) => TryParse(s.AsSpan(), style, provider, out result);
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static bool TryParse(ReadOnlySpan<char> s, NumberStyles style, IFormatProvider? provider, out Rational result) => TryParse(s, DefaultConvertDenLimit, style, provider, out result);
+        public static bool TryParse(ReadOnlySpan<char> s, NumberStyles style, IFormatProvider? provider, out Rational result) => TryParse(s, DoubleDenominatorLimit, style, provider, out result);
 
-        /// <inheritdoc cref="TryParse(ReadOnlySpan{char}, ulong, NumberStyles, IFormatProvider?, out Rational)"/>
+        /// <inheritdoc cref="TryParse(ReadOnlySpan{char}, long, NumberStyles, IFormatProvider?, out Rational)"/>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static bool TryParse(string? s, ulong denLimit, out Rational result) => TryParse(s.AsSpan(), denLimit, NumberStyles.Number, null, out result);
+        public static bool TryParse(string? s, long denLimit, out Rational result) => TryParse(s.AsSpan(), denLimit, NumberStyles.Number, null, out result);
 
         /// <inheritdoc cref="TryParse(ReadOnlySpan{char}, NumberStyles, IFormatProvider?, out Rational)"/>
         /// <param name="denLimit">Maximum value of denominator.</param>
-        public static bool TryParse(ReadOnlySpan<char> s, ulong denLimit, NumberStyles style, IFormatProvider? provider, out Rational result)
+        public static bool TryParse(ReadOnlySpan<char> s, long denLimit, NumberStyles style, IFormatProvider? provider, out Rational result)
         {
+            if (TryParseCore(s, denLimit, style, provider, out var num, out var den))
+            {
+                result = new(true, num, den);
+                return true;
+            }
             result = default;
+            return false;
+        }
+
+        public static bool TryParseCore(ReadOnlySpan<char> s, long denLimit, NumberStyles style, IFormatProvider? provider, out long numerator, out long denominator)
+        {
+            numerator = denominator = default;
             // 分子と分母に分割するためのバッファ
             var dest = (stackalloc Range[3]);
             // 区切り文字 "/" で分割
             var count = s.Split(dest, '/', StringSplitOptions.TrimEntries);
-            // 分割数 1(分子のみ)または 2(分子/分母)のみを正しい書式とみなす
-            if (count is not 1 or 2)
+            // 分割数1(分子のみ)または2(分子/分母)が正しい形式
+            if (count is not (1 or 2))
             {
                 return false;
             }
             // 分子
-            var numSpan = s[dest[0]];
-            var doubleNum = 0d;
-            var doubleDen = 1d;
-            // 分子が整数
-            var isLong = long.TryParse(numSpan, style, provider, out var longNum);
-            if (isLong)
-            {
-                doubleNum = longNum;
-            }
-            // 分子が数値として解釈できない
-            else if (!double.TryParse(numSpan, style, provider, out doubleNum))
+            if (!double.TryParse(s[dest[0]], style, provider, out var dNum))
             {
                 return false;
             }
-            // 分母
-            if (count is 2)
+            // 分母が無い場合
+            if (count is 1)
             {
-                var denSpan = s[dest[1]];
-                // 分母も整数
-                if (isLong && long.TryParse(denSpan, style, provider, out var longDen))
-                {
-                    if (longDen is 0)
-                    {
-                        return false;
-                    }
-                    result = new(longNum, longDen);
-                    return true;
-                }
-                // 分母が数値として解釈できない、または 0
-                if (!double.TryParse(denSpan, style, provider, out doubleDen) || doubleDen is 0)
-                {
-                    return false;
-                }
-                doubleNum /= doubleDen;
+                return TryRationalize(dNum, denLimit, out numerator, out denominator);
             }
-            if (isLong)
-            {
-                result = new(longNum);
-            }
-            else if (!double.IsFinite(doubleNum) || doubleNum is < long.MinValue or > long.MaxValue)
+            if (!double.TryParse(s[dest[1]], style, provider, out var dDen) || dDen is 0)
             {
                 return false;
             }
-            else
+            // 両方が整数の場合
+            var intNum = Math.Truncate(dNum);
+            var intDen = Math.Truncate(dDen);
+            if (intNum == dNum && intDen == dDen)
             {
-                result = ConvertBySBT(doubleNum, denLimit);
+                numerator = (long)intNum;
+                denominator = (long)intDen;
+                var gcd = numerator.GCD(denominator);
+                numerator /= gcd;
+                denominator /= gcd;
+                return true;
             }
-            return true;
+            return TryRationalize(dNum / dDen, denLimit, out numerator, out denominator);
         }
 
         public override string ToString() => _denominatorMinusOne is 0 ? $"{_numerator}" : $"{_numerator}/{Denominator}";
@@ -127,18 +117,18 @@ namespace LivreNoirLibrary.Numerics
                 return $"{_numerator}";
             }
             var (quo, rem) = Math.DivRem(_numerator, den);
-            return $"{quo}+{rem}/{den}";
+            return quo is 0 ? $"{rem}/{den}" : $"{quo}+{rem}/{den}";
         }
 
-        public bool TryFormat(Span<char> destination, out int charsWritten, ReadOnlySpan<char> format = default, IFormatProvider? provider = null)
+        public static bool TryFormatCore(long numerator, long denominator, Span<char> destination, out int charsWritten, ReadOnlySpan<char> format = default, IFormatProvider? provider = null)
         {
             // 分子を書き込む
-            if (!_numerator.TryFormat(destination, out charsWritten, format, provider))
+            if (!numerator.TryFormat(destination, out charsWritten, format, provider))
             {
                 return false;
             }
             // 分母が 1 の場合は終了
-            if (_denominatorMinusOne is 0)
+            if (denominator is 1)
             {
                 return true;
             }
@@ -149,9 +139,12 @@ namespace LivreNoirLibrary.Numerics
             }
             destination[charsWritten] = '/';
             charsWritten++;
-            var ret = Denominator.TryFormat(destination[charsWritten..], out var denCharsWritten, format, provider);
+            var ret = denominator.TryFormat(destination[charsWritten..], out var denCharsWritten, format, provider);
             charsWritten += denCharsWritten;
             return ret;
         }
+
+        public bool TryFormat(Span<char> destination, out int charsWritten, ReadOnlySpan<char> format = default, IFormatProvider? provider = null)
+            => TryFormatCore(Numerator, Denominator, destination, out charsWritten, format, provider);
     }
 }

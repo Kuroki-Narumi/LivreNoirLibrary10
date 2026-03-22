@@ -17,7 +17,7 @@ namespace LivreNoirLibrary.Collections
             fixed (byte* dstPtr = dst)
             fixed (byte* srcPtr = src)
             {
-                CopyFromCore(dstPtr, srcPtr, factor, length);
+                CopyFromCore(dstPtr, srcPtr, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -29,7 +29,7 @@ namespace LivreNoirLibrary.Collections
             fixed (byte* dstPtr = dst)
             fixed (byte* srcPtr = src)
             {
-                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, length);
+                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -41,7 +41,7 @@ namespace LivreNoirLibrary.Collections
             fixed (sbyte* dstPtr = dst)
             fixed (sbyte* srcPtr = src)
             {
-                CopyFromCore(dstPtr, srcPtr, factor, length);
+                CopyFromCore(dstPtr, srcPtr, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -53,7 +53,7 @@ namespace LivreNoirLibrary.Collections
             fixed (sbyte* dstPtr = dst)
             fixed (sbyte* srcPtr = src)
             {
-                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, length);
+                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -65,7 +65,7 @@ namespace LivreNoirLibrary.Collections
             fixed (short* dstPtr = dst)
             fixed (short* srcPtr = src)
             {
-                CopyFromCore(dstPtr, srcPtr, factor, length);
+                CopyFromCore(dstPtr, srcPtr, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -77,7 +77,7 @@ namespace LivreNoirLibrary.Collections
             fixed (short* dstPtr = dst)
             fixed (short* srcPtr = src)
             {
-                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, length);
+                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -89,7 +89,7 @@ namespace LivreNoirLibrary.Collections
             fixed (ushort* dstPtr = dst)
             fixed (ushort* srcPtr = src)
             {
-                CopyFromCore(dstPtr, srcPtr, factor, length);
+                CopyFromCore(dstPtr, srcPtr, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -101,7 +101,7 @@ namespace LivreNoirLibrary.Collections
             fixed (ushort* dstPtr = dst)
             fixed (ushort* srcPtr = src)
             {
-                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, length);
+                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -113,7 +113,7 @@ namespace LivreNoirLibrary.Collections
             fixed (int* dstPtr = dst)
             fixed (int* srcPtr = src)
             {
-                CopyFromCore(dstPtr, srcPtr, factor, length);
+                CopyFromCore(dstPtr, srcPtr, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -125,7 +125,7 @@ namespace LivreNoirLibrary.Collections
             fixed (int* dstPtr = dst)
             fixed (int* srcPtr = src)
             {
-                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, length);
+                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -137,7 +137,7 @@ namespace LivreNoirLibrary.Collections
             fixed (uint* dstPtr = dst)
             fixed (uint* srcPtr = src)
             {
-                CopyFromCore(dstPtr, srcPtr, factor, length);
+                CopyFromCore(dstPtr, srcPtr, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -149,7 +149,7 @@ namespace LivreNoirLibrary.Collections
             fixed (uint* dstPtr = dst)
             fixed (uint* srcPtr = src)
             {
-                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, length);
+                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -161,7 +161,7 @@ namespace LivreNoirLibrary.Collections
             fixed (nint* dstPtr = dst)
             fixed (nint* srcPtr = src)
             {
-                CopyFromCore(dstPtr, srcPtr, factor, length);
+                CopyFromCore(dstPtr, srcPtr, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -173,7 +173,7 @@ namespace LivreNoirLibrary.Collections
             fixed (nint* dstPtr = dst)
             fixed (nint* srcPtr = src)
             {
-                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, length);
+                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -185,7 +185,7 @@ namespace LivreNoirLibrary.Collections
             fixed (nuint* dstPtr = dst)
             fixed (nuint* srcPtr = src)
             {
-                CopyFromCore(dstPtr, srcPtr, factor, length);
+                CopyFromCore(dstPtr, srcPtr, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -197,7 +197,7 @@ namespace LivreNoirLibrary.Collections
             fixed (nuint* dstPtr = dst)
             fixed (nuint* srcPtr = src)
             {
-                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, length);
+                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -209,7 +209,7 @@ namespace LivreNoirLibrary.Collections
             fixed (long* dstPtr = dst)
             fixed (long* srcPtr = src)
             {
-                CopyFromCore(dstPtr, srcPtr, factor, length);
+                CopyFromCore(dstPtr, srcPtr, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -221,7 +221,7 @@ namespace LivreNoirLibrary.Collections
             fixed (long* dstPtr = dst)
             fixed (long* srcPtr = src)
             {
-                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, length);
+                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -233,7 +233,7 @@ namespace LivreNoirLibrary.Collections
             fixed (ulong* dstPtr = dst)
             fixed (ulong* srcPtr = src)
             {
-                CopyFromCore(dstPtr, srcPtr, factor, length);
+                CopyFromCore(dstPtr, srcPtr, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -245,7 +245,7 @@ namespace LivreNoirLibrary.Collections
             fixed (ulong* dstPtr = dst)
             fixed (ulong* srcPtr = src)
             {
-                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, length);
+                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -257,7 +257,7 @@ namespace LivreNoirLibrary.Collections
             fixed (float* dstPtr = dst)
             fixed (float* srcPtr = src)
             {
-                CopyFromCore(dstPtr, srcPtr, factor, length);
+                CopyFromCore(dstPtr, srcPtr, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -269,7 +269,7 @@ namespace LivreNoirLibrary.Collections
             fixed (float* dstPtr = dst)
             fixed (float* srcPtr = src)
             {
-                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, length);
+                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -281,7 +281,7 @@ namespace LivreNoirLibrary.Collections
             fixed (double* dstPtr = dst)
             fixed (double* srcPtr = src)
             {
-                CopyFromCore(dstPtr, srcPtr, factor, length);
+                CopyFromCore(dstPtr, srcPtr, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -293,7 +293,7 @@ namespace LivreNoirLibrary.Collections
             fixed (double* dstPtr = dst)
             fixed (double* srcPtr = src)
             {
-                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, length);
+                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -305,7 +305,7 @@ namespace LivreNoirLibrary.Collections
             fixed (byte* dstPtr = dst)
             fixed (byte* srcPtr = src)
             {
-                CopyFromCore(dstPtr, srcPtr, factor, length);
+                CopyFromCore(dstPtr, srcPtr, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -317,7 +317,7 @@ namespace LivreNoirLibrary.Collections
             fixed (byte* dstPtr = dst)
             fixed (byte* srcPtr = src)
             {
-                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, length);
+                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -329,7 +329,7 @@ namespace LivreNoirLibrary.Collections
             fixed (sbyte* dstPtr = dst)
             fixed (sbyte* srcPtr = src)
             {
-                CopyFromCore(dstPtr, srcPtr, factor, length);
+                CopyFromCore(dstPtr, srcPtr, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -341,7 +341,7 @@ namespace LivreNoirLibrary.Collections
             fixed (sbyte* dstPtr = dst)
             fixed (sbyte* srcPtr = src)
             {
-                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, length);
+                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -353,7 +353,7 @@ namespace LivreNoirLibrary.Collections
             fixed (short* dstPtr = dst)
             fixed (short* srcPtr = src)
             {
-                CopyFromCore(dstPtr, srcPtr, factor, length);
+                CopyFromCore(dstPtr, srcPtr, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -365,7 +365,7 @@ namespace LivreNoirLibrary.Collections
             fixed (short* dstPtr = dst)
             fixed (short* srcPtr = src)
             {
-                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, length);
+                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -377,7 +377,7 @@ namespace LivreNoirLibrary.Collections
             fixed (ushort* dstPtr = dst)
             fixed (ushort* srcPtr = src)
             {
-                CopyFromCore(dstPtr, srcPtr, factor, length);
+                CopyFromCore(dstPtr, srcPtr, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -389,7 +389,7 @@ namespace LivreNoirLibrary.Collections
             fixed (ushort* dstPtr = dst)
             fixed (ushort* srcPtr = src)
             {
-                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, length);
+                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -401,7 +401,7 @@ namespace LivreNoirLibrary.Collections
             fixed (int* dstPtr = dst)
             fixed (int* srcPtr = src)
             {
-                CopyFromCore(dstPtr, srcPtr, factor, length);
+                CopyFromCore(dstPtr, srcPtr, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -413,7 +413,7 @@ namespace LivreNoirLibrary.Collections
             fixed (int* dstPtr = dst)
             fixed (int* srcPtr = src)
             {
-                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, length);
+                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -425,7 +425,7 @@ namespace LivreNoirLibrary.Collections
             fixed (uint* dstPtr = dst)
             fixed (uint* srcPtr = src)
             {
-                CopyFromCore(dstPtr, srcPtr, factor, length);
+                CopyFromCore(dstPtr, srcPtr, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -437,7 +437,7 @@ namespace LivreNoirLibrary.Collections
             fixed (uint* dstPtr = dst)
             fixed (uint* srcPtr = src)
             {
-                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, length);
+                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -449,7 +449,7 @@ namespace LivreNoirLibrary.Collections
             fixed (nint* dstPtr = dst)
             fixed (nint* srcPtr = src)
             {
-                CopyFromCore(dstPtr, srcPtr, factor, length);
+                CopyFromCore(dstPtr, srcPtr, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -461,7 +461,7 @@ namespace LivreNoirLibrary.Collections
             fixed (nint* dstPtr = dst)
             fixed (nint* srcPtr = src)
             {
-                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, length);
+                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -473,7 +473,7 @@ namespace LivreNoirLibrary.Collections
             fixed (nuint* dstPtr = dst)
             fixed (nuint* srcPtr = src)
             {
-                CopyFromCore(dstPtr, srcPtr, factor, length);
+                CopyFromCore(dstPtr, srcPtr, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -485,7 +485,7 @@ namespace LivreNoirLibrary.Collections
             fixed (nuint* dstPtr = dst)
             fixed (nuint* srcPtr = src)
             {
-                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, length);
+                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -497,7 +497,7 @@ namespace LivreNoirLibrary.Collections
             fixed (long* dstPtr = dst)
             fixed (long* srcPtr = src)
             {
-                CopyFromCore(dstPtr, srcPtr, factor, length);
+                CopyFromCore(dstPtr, srcPtr, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -509,7 +509,7 @@ namespace LivreNoirLibrary.Collections
             fixed (long* dstPtr = dst)
             fixed (long* srcPtr = src)
             {
-                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, length);
+                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -521,7 +521,7 @@ namespace LivreNoirLibrary.Collections
             fixed (ulong* dstPtr = dst)
             fixed (ulong* srcPtr = src)
             {
-                CopyFromCore(dstPtr, srcPtr, factor, length);
+                CopyFromCore(dstPtr, srcPtr, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -533,7 +533,7 @@ namespace LivreNoirLibrary.Collections
             fixed (ulong* dstPtr = dst)
             fixed (ulong* srcPtr = src)
             {
-                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, length);
+                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -545,7 +545,7 @@ namespace LivreNoirLibrary.Collections
             fixed (float* dstPtr = dst)
             fixed (float* srcPtr = src)
             {
-                CopyFromCore(dstPtr, srcPtr, factor, length);
+                CopyFromCore(dstPtr, srcPtr, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -557,7 +557,7 @@ namespace LivreNoirLibrary.Collections
             fixed (float* dstPtr = dst)
             fixed (float* srcPtr = src)
             {
-                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, length);
+                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -569,7 +569,7 @@ namespace LivreNoirLibrary.Collections
             fixed (double* dstPtr = dst)
             fixed (double* srcPtr = src)
             {
-                CopyFromCore(dstPtr, srcPtr, factor, length);
+                CopyFromCore(dstPtr, srcPtr, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -581,7 +581,7 @@ namespace LivreNoirLibrary.Collections
             fixed (double* dstPtr = dst)
             fixed (double* srcPtr = src)
             {
-                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, length);
+                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -593,7 +593,7 @@ namespace LivreNoirLibrary.Collections
             fixed (byte* dstPtr = dst)
             fixed (byte* srcPtr = src)
             {
-                CopyFromCore(dstPtr, srcPtr, factor, length);
+                CopyFromCore(dstPtr, srcPtr, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -605,7 +605,7 @@ namespace LivreNoirLibrary.Collections
             fixed (byte* dstPtr = dst)
             fixed (byte* srcPtr = src)
             {
-                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, length);
+                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -617,7 +617,7 @@ namespace LivreNoirLibrary.Collections
             fixed (sbyte* dstPtr = dst)
             fixed (sbyte* srcPtr = src)
             {
-                CopyFromCore(dstPtr, srcPtr, factor, length);
+                CopyFromCore(dstPtr, srcPtr, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -629,7 +629,7 @@ namespace LivreNoirLibrary.Collections
             fixed (sbyte* dstPtr = dst)
             fixed (sbyte* srcPtr = src)
             {
-                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, length);
+                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -641,7 +641,7 @@ namespace LivreNoirLibrary.Collections
             fixed (short* dstPtr = dst)
             fixed (short* srcPtr = src)
             {
-                CopyFromCore(dstPtr, srcPtr, factor, length);
+                CopyFromCore(dstPtr, srcPtr, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -653,7 +653,7 @@ namespace LivreNoirLibrary.Collections
             fixed (short* dstPtr = dst)
             fixed (short* srcPtr = src)
             {
-                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, length);
+                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -665,7 +665,7 @@ namespace LivreNoirLibrary.Collections
             fixed (ushort* dstPtr = dst)
             fixed (ushort* srcPtr = src)
             {
-                CopyFromCore(dstPtr, srcPtr, factor, length);
+                CopyFromCore(dstPtr, srcPtr, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -677,7 +677,7 @@ namespace LivreNoirLibrary.Collections
             fixed (ushort* dstPtr = dst)
             fixed (ushort* srcPtr = src)
             {
-                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, length);
+                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -689,7 +689,7 @@ namespace LivreNoirLibrary.Collections
             fixed (int* dstPtr = dst)
             fixed (int* srcPtr = src)
             {
-                CopyFromCore(dstPtr, srcPtr, factor, length);
+                CopyFromCore(dstPtr, srcPtr, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -701,7 +701,7 @@ namespace LivreNoirLibrary.Collections
             fixed (int* dstPtr = dst)
             fixed (int* srcPtr = src)
             {
-                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, length);
+                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -713,7 +713,7 @@ namespace LivreNoirLibrary.Collections
             fixed (uint* dstPtr = dst)
             fixed (uint* srcPtr = src)
             {
-                CopyFromCore(dstPtr, srcPtr, factor, length);
+                CopyFromCore(dstPtr, srcPtr, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -725,7 +725,7 @@ namespace LivreNoirLibrary.Collections
             fixed (uint* dstPtr = dst)
             fixed (uint* srcPtr = src)
             {
-                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, length);
+                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -737,7 +737,7 @@ namespace LivreNoirLibrary.Collections
             fixed (nint* dstPtr = dst)
             fixed (nint* srcPtr = src)
             {
-                CopyFromCore(dstPtr, srcPtr, factor, length);
+                CopyFromCore(dstPtr, srcPtr, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -749,7 +749,7 @@ namespace LivreNoirLibrary.Collections
             fixed (nint* dstPtr = dst)
             fixed (nint* srcPtr = src)
             {
-                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, length);
+                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -761,7 +761,7 @@ namespace LivreNoirLibrary.Collections
             fixed (nuint* dstPtr = dst)
             fixed (nuint* srcPtr = src)
             {
-                CopyFromCore(dstPtr, srcPtr, factor, length);
+                CopyFromCore(dstPtr, srcPtr, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -773,7 +773,7 @@ namespace LivreNoirLibrary.Collections
             fixed (nuint* dstPtr = dst)
             fixed (nuint* srcPtr = src)
             {
-                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, length);
+                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -785,7 +785,7 @@ namespace LivreNoirLibrary.Collections
             fixed (long* dstPtr = dst)
             fixed (long* srcPtr = src)
             {
-                CopyFromCore(dstPtr, srcPtr, factor, length);
+                CopyFromCore(dstPtr, srcPtr, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -797,7 +797,7 @@ namespace LivreNoirLibrary.Collections
             fixed (long* dstPtr = dst)
             fixed (long* srcPtr = src)
             {
-                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, length);
+                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -809,7 +809,7 @@ namespace LivreNoirLibrary.Collections
             fixed (ulong* dstPtr = dst)
             fixed (ulong* srcPtr = src)
             {
-                CopyFromCore(dstPtr, srcPtr, factor, length);
+                CopyFromCore(dstPtr, srcPtr, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -821,7 +821,7 @@ namespace LivreNoirLibrary.Collections
             fixed (ulong* dstPtr = dst)
             fixed (ulong* srcPtr = src)
             {
-                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, length);
+                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -833,7 +833,7 @@ namespace LivreNoirLibrary.Collections
             fixed (float* dstPtr = dst)
             fixed (float* srcPtr = src)
             {
-                CopyFromCore(dstPtr, srcPtr, factor, length);
+                CopyFromCore(dstPtr, srcPtr, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -845,7 +845,7 @@ namespace LivreNoirLibrary.Collections
             fixed (float* dstPtr = dst)
             fixed (float* srcPtr = src)
             {
-                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, length);
+                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -857,7 +857,7 @@ namespace LivreNoirLibrary.Collections
             fixed (double* dstPtr = dst)
             fixed (double* srcPtr = src)
             {
-                CopyFromCore(dstPtr, srcPtr, factor, length);
+                CopyFromCore(dstPtr, srcPtr, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -869,7 +869,7 @@ namespace LivreNoirLibrary.Collections
             fixed (double* dstPtr = dst)
             fixed (double* srcPtr = src)
             {
-                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, length);
+                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -881,7 +881,7 @@ namespace LivreNoirLibrary.Collections
             fixed (byte* dstPtr = dst)
             fixed (byte* srcPtr = src)
             {
-                CopyFromCore(dstPtr, srcPtr, factor, length);
+                CopyFromCore(dstPtr, srcPtr, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -893,7 +893,7 @@ namespace LivreNoirLibrary.Collections
             fixed (byte* dstPtr = dst)
             fixed (byte* srcPtr = src)
             {
-                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, length);
+                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -905,7 +905,7 @@ namespace LivreNoirLibrary.Collections
             fixed (sbyte* dstPtr = dst)
             fixed (sbyte* srcPtr = src)
             {
-                CopyFromCore(dstPtr, srcPtr, factor, length);
+                CopyFromCore(dstPtr, srcPtr, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -917,7 +917,7 @@ namespace LivreNoirLibrary.Collections
             fixed (sbyte* dstPtr = dst)
             fixed (sbyte* srcPtr = src)
             {
-                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, length);
+                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -929,7 +929,7 @@ namespace LivreNoirLibrary.Collections
             fixed (short* dstPtr = dst)
             fixed (short* srcPtr = src)
             {
-                CopyFromCore(dstPtr, srcPtr, factor, length);
+                CopyFromCore(dstPtr, srcPtr, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -941,7 +941,7 @@ namespace LivreNoirLibrary.Collections
             fixed (short* dstPtr = dst)
             fixed (short* srcPtr = src)
             {
-                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, length);
+                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -953,7 +953,7 @@ namespace LivreNoirLibrary.Collections
             fixed (ushort* dstPtr = dst)
             fixed (ushort* srcPtr = src)
             {
-                CopyFromCore(dstPtr, srcPtr, factor, length);
+                CopyFromCore(dstPtr, srcPtr, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -965,7 +965,7 @@ namespace LivreNoirLibrary.Collections
             fixed (ushort* dstPtr = dst)
             fixed (ushort* srcPtr = src)
             {
-                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, length);
+                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -977,7 +977,7 @@ namespace LivreNoirLibrary.Collections
             fixed (int* dstPtr = dst)
             fixed (int* srcPtr = src)
             {
-                CopyFromCore(dstPtr, srcPtr, factor, length);
+                CopyFromCore(dstPtr, srcPtr, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -989,7 +989,7 @@ namespace LivreNoirLibrary.Collections
             fixed (int* dstPtr = dst)
             fixed (int* srcPtr = src)
             {
-                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, length);
+                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -1001,7 +1001,7 @@ namespace LivreNoirLibrary.Collections
             fixed (uint* dstPtr = dst)
             fixed (uint* srcPtr = src)
             {
-                CopyFromCore(dstPtr, srcPtr, factor, length);
+                CopyFromCore(dstPtr, srcPtr, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -1013,7 +1013,7 @@ namespace LivreNoirLibrary.Collections
             fixed (uint* dstPtr = dst)
             fixed (uint* srcPtr = src)
             {
-                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, length);
+                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -1025,7 +1025,7 @@ namespace LivreNoirLibrary.Collections
             fixed (nint* dstPtr = dst)
             fixed (nint* srcPtr = src)
             {
-                CopyFromCore(dstPtr, srcPtr, factor, length);
+                CopyFromCore(dstPtr, srcPtr, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -1037,7 +1037,7 @@ namespace LivreNoirLibrary.Collections
             fixed (nint* dstPtr = dst)
             fixed (nint* srcPtr = src)
             {
-                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, length);
+                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -1049,7 +1049,7 @@ namespace LivreNoirLibrary.Collections
             fixed (nuint* dstPtr = dst)
             fixed (nuint* srcPtr = src)
             {
-                CopyFromCore(dstPtr, srcPtr, factor, length);
+                CopyFromCore(dstPtr, srcPtr, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -1061,7 +1061,7 @@ namespace LivreNoirLibrary.Collections
             fixed (nuint* dstPtr = dst)
             fixed (nuint* srcPtr = src)
             {
-                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, length);
+                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -1073,7 +1073,7 @@ namespace LivreNoirLibrary.Collections
             fixed (long* dstPtr = dst)
             fixed (long* srcPtr = src)
             {
-                CopyFromCore(dstPtr, srcPtr, factor, length);
+                CopyFromCore(dstPtr, srcPtr, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -1085,7 +1085,7 @@ namespace LivreNoirLibrary.Collections
             fixed (long* dstPtr = dst)
             fixed (long* srcPtr = src)
             {
-                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, length);
+                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -1097,7 +1097,7 @@ namespace LivreNoirLibrary.Collections
             fixed (ulong* dstPtr = dst)
             fixed (ulong* srcPtr = src)
             {
-                CopyFromCore(dstPtr, srcPtr, factor, length);
+                CopyFromCore(dstPtr, srcPtr, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -1109,7 +1109,7 @@ namespace LivreNoirLibrary.Collections
             fixed (ulong* dstPtr = dst)
             fixed (ulong* srcPtr = src)
             {
-                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, length);
+                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -1121,7 +1121,7 @@ namespace LivreNoirLibrary.Collections
             fixed (float* dstPtr = dst)
             fixed (float* srcPtr = src)
             {
-                CopyFromCore(dstPtr, srcPtr, factor, length);
+                CopyFromCore(dstPtr, srcPtr, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -1133,7 +1133,7 @@ namespace LivreNoirLibrary.Collections
             fixed (float* dstPtr = dst)
             fixed (float* srcPtr = src)
             {
-                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, length);
+                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -1145,7 +1145,7 @@ namespace LivreNoirLibrary.Collections
             fixed (double* dstPtr = dst)
             fixed (double* srcPtr = src)
             {
-                CopyFromCore(dstPtr, srcPtr, factor, length);
+                CopyFromCore(dstPtr, srcPtr, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -1157,7 +1157,7 @@ namespace LivreNoirLibrary.Collections
             fixed (double* dstPtr = dst)
             fixed (double* srcPtr = src)
             {
-                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, length);
+                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -1169,7 +1169,7 @@ namespace LivreNoirLibrary.Collections
             fixed (byte* dstPtr = dst)
             fixed (byte* srcPtr = src)
             {
-                CopyFromCore(dstPtr, srcPtr, factor, length);
+                CopyFromCore(dstPtr, srcPtr, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -1181,7 +1181,7 @@ namespace LivreNoirLibrary.Collections
             fixed (byte* dstPtr = dst)
             fixed (byte* srcPtr = src)
             {
-                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, length);
+                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -1193,7 +1193,7 @@ namespace LivreNoirLibrary.Collections
             fixed (sbyte* dstPtr = dst)
             fixed (sbyte* srcPtr = src)
             {
-                CopyFromCore(dstPtr, srcPtr, factor, length);
+                CopyFromCore(dstPtr, srcPtr, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -1205,7 +1205,7 @@ namespace LivreNoirLibrary.Collections
             fixed (sbyte* dstPtr = dst)
             fixed (sbyte* srcPtr = src)
             {
-                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, length);
+                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -1217,7 +1217,7 @@ namespace LivreNoirLibrary.Collections
             fixed (short* dstPtr = dst)
             fixed (short* srcPtr = src)
             {
-                CopyFromCore(dstPtr, srcPtr, factor, length);
+                CopyFromCore(dstPtr, srcPtr, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -1229,7 +1229,7 @@ namespace LivreNoirLibrary.Collections
             fixed (short* dstPtr = dst)
             fixed (short* srcPtr = src)
             {
-                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, length);
+                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -1241,7 +1241,7 @@ namespace LivreNoirLibrary.Collections
             fixed (ushort* dstPtr = dst)
             fixed (ushort* srcPtr = src)
             {
-                CopyFromCore(dstPtr, srcPtr, factor, length);
+                CopyFromCore(dstPtr, srcPtr, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -1253,7 +1253,7 @@ namespace LivreNoirLibrary.Collections
             fixed (ushort* dstPtr = dst)
             fixed (ushort* srcPtr = src)
             {
-                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, length);
+                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -1265,7 +1265,7 @@ namespace LivreNoirLibrary.Collections
             fixed (int* dstPtr = dst)
             fixed (int* srcPtr = src)
             {
-                CopyFromCore(dstPtr, srcPtr, factor, length);
+                CopyFromCore(dstPtr, srcPtr, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -1277,7 +1277,7 @@ namespace LivreNoirLibrary.Collections
             fixed (int* dstPtr = dst)
             fixed (int* srcPtr = src)
             {
-                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, length);
+                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -1289,7 +1289,7 @@ namespace LivreNoirLibrary.Collections
             fixed (uint* dstPtr = dst)
             fixed (uint* srcPtr = src)
             {
-                CopyFromCore(dstPtr, srcPtr, factor, length);
+                CopyFromCore(dstPtr, srcPtr, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -1301,7 +1301,7 @@ namespace LivreNoirLibrary.Collections
             fixed (uint* dstPtr = dst)
             fixed (uint* srcPtr = src)
             {
-                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, length);
+                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -1313,7 +1313,7 @@ namespace LivreNoirLibrary.Collections
             fixed (nint* dstPtr = dst)
             fixed (nint* srcPtr = src)
             {
-                CopyFromCore(dstPtr, srcPtr, factor, length);
+                CopyFromCore(dstPtr, srcPtr, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -1325,7 +1325,7 @@ namespace LivreNoirLibrary.Collections
             fixed (nint* dstPtr = dst)
             fixed (nint* srcPtr = src)
             {
-                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, length);
+                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -1337,7 +1337,7 @@ namespace LivreNoirLibrary.Collections
             fixed (nuint* dstPtr = dst)
             fixed (nuint* srcPtr = src)
             {
-                CopyFromCore(dstPtr, srcPtr, factor, length);
+                CopyFromCore(dstPtr, srcPtr, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -1349,7 +1349,7 @@ namespace LivreNoirLibrary.Collections
             fixed (nuint* dstPtr = dst)
             fixed (nuint* srcPtr = src)
             {
-                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, length);
+                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -1361,7 +1361,7 @@ namespace LivreNoirLibrary.Collections
             fixed (long* dstPtr = dst)
             fixed (long* srcPtr = src)
             {
-                CopyFromCore(dstPtr, srcPtr, factor, length);
+                CopyFromCore(dstPtr, srcPtr, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -1373,7 +1373,7 @@ namespace LivreNoirLibrary.Collections
             fixed (long* dstPtr = dst)
             fixed (long* srcPtr = src)
             {
-                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, length);
+                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -1385,7 +1385,7 @@ namespace LivreNoirLibrary.Collections
             fixed (ulong* dstPtr = dst)
             fixed (ulong* srcPtr = src)
             {
-                CopyFromCore(dstPtr, srcPtr, factor, length);
+                CopyFromCore(dstPtr, srcPtr, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -1397,7 +1397,7 @@ namespace LivreNoirLibrary.Collections
             fixed (ulong* dstPtr = dst)
             fixed (ulong* srcPtr = src)
             {
-                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, length);
+                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -1409,7 +1409,7 @@ namespace LivreNoirLibrary.Collections
             fixed (float* dstPtr = dst)
             fixed (float* srcPtr = src)
             {
-                CopyFromCore(dstPtr, srcPtr, factor, length);
+                CopyFromCore(dstPtr, srcPtr, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -1421,7 +1421,7 @@ namespace LivreNoirLibrary.Collections
             fixed (float* dstPtr = dst)
             fixed (float* srcPtr = src)
             {
-                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, length);
+                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -1433,7 +1433,7 @@ namespace LivreNoirLibrary.Collections
             fixed (double* dstPtr = dst)
             fixed (double* srcPtr = src)
             {
-                CopyFromCore(dstPtr, srcPtr, factor, length);
+                CopyFromCore(dstPtr, srcPtr, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -1445,7 +1445,7 @@ namespace LivreNoirLibrary.Collections
             fixed (double* dstPtr = dst)
             fixed (double* srcPtr = src)
             {
-                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, length);
+                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -1457,7 +1457,7 @@ namespace LivreNoirLibrary.Collections
             fixed (byte* dstPtr = dst)
             fixed (byte* srcPtr = src)
             {
-                CopyFromCore(dstPtr, srcPtr, factor, length);
+                CopyFromCore(dstPtr, srcPtr, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -1469,7 +1469,7 @@ namespace LivreNoirLibrary.Collections
             fixed (byte* dstPtr = dst)
             fixed (byte* srcPtr = src)
             {
-                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, length);
+                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -1481,7 +1481,7 @@ namespace LivreNoirLibrary.Collections
             fixed (sbyte* dstPtr = dst)
             fixed (sbyte* srcPtr = src)
             {
-                CopyFromCore(dstPtr, srcPtr, factor, length);
+                CopyFromCore(dstPtr, srcPtr, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -1493,7 +1493,7 @@ namespace LivreNoirLibrary.Collections
             fixed (sbyte* dstPtr = dst)
             fixed (sbyte* srcPtr = src)
             {
-                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, length);
+                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -1505,7 +1505,7 @@ namespace LivreNoirLibrary.Collections
             fixed (short* dstPtr = dst)
             fixed (short* srcPtr = src)
             {
-                CopyFromCore(dstPtr, srcPtr, factor, length);
+                CopyFromCore(dstPtr, srcPtr, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -1517,7 +1517,7 @@ namespace LivreNoirLibrary.Collections
             fixed (short* dstPtr = dst)
             fixed (short* srcPtr = src)
             {
-                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, length);
+                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -1529,7 +1529,7 @@ namespace LivreNoirLibrary.Collections
             fixed (ushort* dstPtr = dst)
             fixed (ushort* srcPtr = src)
             {
-                CopyFromCore(dstPtr, srcPtr, factor, length);
+                CopyFromCore(dstPtr, srcPtr, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -1541,7 +1541,7 @@ namespace LivreNoirLibrary.Collections
             fixed (ushort* dstPtr = dst)
             fixed (ushort* srcPtr = src)
             {
-                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, length);
+                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -1553,7 +1553,7 @@ namespace LivreNoirLibrary.Collections
             fixed (int* dstPtr = dst)
             fixed (int* srcPtr = src)
             {
-                CopyFromCore(dstPtr, srcPtr, factor, length);
+                CopyFromCore(dstPtr, srcPtr, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -1565,7 +1565,7 @@ namespace LivreNoirLibrary.Collections
             fixed (int* dstPtr = dst)
             fixed (int* srcPtr = src)
             {
-                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, length);
+                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -1577,7 +1577,7 @@ namespace LivreNoirLibrary.Collections
             fixed (uint* dstPtr = dst)
             fixed (uint* srcPtr = src)
             {
-                CopyFromCore(dstPtr, srcPtr, factor, length);
+                CopyFromCore(dstPtr, srcPtr, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -1589,7 +1589,7 @@ namespace LivreNoirLibrary.Collections
             fixed (uint* dstPtr = dst)
             fixed (uint* srcPtr = src)
             {
-                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, length);
+                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -1601,7 +1601,7 @@ namespace LivreNoirLibrary.Collections
             fixed (nint* dstPtr = dst)
             fixed (nint* srcPtr = src)
             {
-                CopyFromCore(dstPtr, srcPtr, factor, length);
+                CopyFromCore(dstPtr, srcPtr, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -1613,7 +1613,7 @@ namespace LivreNoirLibrary.Collections
             fixed (nint* dstPtr = dst)
             fixed (nint* srcPtr = src)
             {
-                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, length);
+                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -1625,7 +1625,7 @@ namespace LivreNoirLibrary.Collections
             fixed (nuint* dstPtr = dst)
             fixed (nuint* srcPtr = src)
             {
-                CopyFromCore(dstPtr, srcPtr, factor, length);
+                CopyFromCore(dstPtr, srcPtr, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -1637,7 +1637,7 @@ namespace LivreNoirLibrary.Collections
             fixed (nuint* dstPtr = dst)
             fixed (nuint* srcPtr = src)
             {
-                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, length);
+                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -1649,7 +1649,7 @@ namespace LivreNoirLibrary.Collections
             fixed (long* dstPtr = dst)
             fixed (long* srcPtr = src)
             {
-                CopyFromCore(dstPtr, srcPtr, factor, length);
+                CopyFromCore(dstPtr, srcPtr, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -1661,7 +1661,7 @@ namespace LivreNoirLibrary.Collections
             fixed (long* dstPtr = dst)
             fixed (long* srcPtr = src)
             {
-                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, length);
+                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -1673,7 +1673,7 @@ namespace LivreNoirLibrary.Collections
             fixed (ulong* dstPtr = dst)
             fixed (ulong* srcPtr = src)
             {
-                CopyFromCore(dstPtr, srcPtr, factor, length);
+                CopyFromCore(dstPtr, srcPtr, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -1685,7 +1685,7 @@ namespace LivreNoirLibrary.Collections
             fixed (ulong* dstPtr = dst)
             fixed (ulong* srcPtr = src)
             {
-                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, length);
+                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -1697,7 +1697,7 @@ namespace LivreNoirLibrary.Collections
             fixed (float* dstPtr = dst)
             fixed (float* srcPtr = src)
             {
-                CopyFromCore(dstPtr, srcPtr, factor, length);
+                CopyFromCore(dstPtr, srcPtr, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -1709,7 +1709,7 @@ namespace LivreNoirLibrary.Collections
             fixed (float* dstPtr = dst)
             fixed (float* srcPtr = src)
             {
-                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, length);
+                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -1721,7 +1721,7 @@ namespace LivreNoirLibrary.Collections
             fixed (double* dstPtr = dst)
             fixed (double* srcPtr = src)
             {
-                CopyFromCore(dstPtr, srcPtr, factor, length);
+                CopyFromCore(dstPtr, srcPtr, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -1733,7 +1733,7 @@ namespace LivreNoirLibrary.Collections
             fixed (double* dstPtr = dst)
             fixed (double* srcPtr = src)
             {
-                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, length);
+                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -1745,7 +1745,7 @@ namespace LivreNoirLibrary.Collections
             fixed (byte* dstPtr = dst)
             fixed (byte* srcPtr = src)
             {
-                CopyFromCore(dstPtr, srcPtr, factor, length);
+                CopyFromCore(dstPtr, srcPtr, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -1757,7 +1757,7 @@ namespace LivreNoirLibrary.Collections
             fixed (byte* dstPtr = dst)
             fixed (byte* srcPtr = src)
             {
-                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, length);
+                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -1769,7 +1769,7 @@ namespace LivreNoirLibrary.Collections
             fixed (sbyte* dstPtr = dst)
             fixed (sbyte* srcPtr = src)
             {
-                CopyFromCore(dstPtr, srcPtr, factor, length);
+                CopyFromCore(dstPtr, srcPtr, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -1781,7 +1781,7 @@ namespace LivreNoirLibrary.Collections
             fixed (sbyte* dstPtr = dst)
             fixed (sbyte* srcPtr = src)
             {
-                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, length);
+                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -1793,7 +1793,7 @@ namespace LivreNoirLibrary.Collections
             fixed (short* dstPtr = dst)
             fixed (short* srcPtr = src)
             {
-                CopyFromCore(dstPtr, srcPtr, factor, length);
+                CopyFromCore(dstPtr, srcPtr, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -1805,7 +1805,7 @@ namespace LivreNoirLibrary.Collections
             fixed (short* dstPtr = dst)
             fixed (short* srcPtr = src)
             {
-                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, length);
+                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -1817,7 +1817,7 @@ namespace LivreNoirLibrary.Collections
             fixed (ushort* dstPtr = dst)
             fixed (ushort* srcPtr = src)
             {
-                CopyFromCore(dstPtr, srcPtr, factor, length);
+                CopyFromCore(dstPtr, srcPtr, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -1829,7 +1829,7 @@ namespace LivreNoirLibrary.Collections
             fixed (ushort* dstPtr = dst)
             fixed (ushort* srcPtr = src)
             {
-                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, length);
+                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -1841,7 +1841,7 @@ namespace LivreNoirLibrary.Collections
             fixed (int* dstPtr = dst)
             fixed (int* srcPtr = src)
             {
-                CopyFromCore(dstPtr, srcPtr, factor, length);
+                CopyFromCore(dstPtr, srcPtr, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -1853,7 +1853,7 @@ namespace LivreNoirLibrary.Collections
             fixed (int* dstPtr = dst)
             fixed (int* srcPtr = src)
             {
-                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, length);
+                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -1865,7 +1865,7 @@ namespace LivreNoirLibrary.Collections
             fixed (uint* dstPtr = dst)
             fixed (uint* srcPtr = src)
             {
-                CopyFromCore(dstPtr, srcPtr, factor, length);
+                CopyFromCore(dstPtr, srcPtr, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -1877,7 +1877,7 @@ namespace LivreNoirLibrary.Collections
             fixed (uint* dstPtr = dst)
             fixed (uint* srcPtr = src)
             {
-                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, length);
+                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -1889,7 +1889,7 @@ namespace LivreNoirLibrary.Collections
             fixed (nint* dstPtr = dst)
             fixed (nint* srcPtr = src)
             {
-                CopyFromCore(dstPtr, srcPtr, factor, length);
+                CopyFromCore(dstPtr, srcPtr, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -1901,7 +1901,7 @@ namespace LivreNoirLibrary.Collections
             fixed (nint* dstPtr = dst)
             fixed (nint* srcPtr = src)
             {
-                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, length);
+                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -1913,7 +1913,7 @@ namespace LivreNoirLibrary.Collections
             fixed (nuint* dstPtr = dst)
             fixed (nuint* srcPtr = src)
             {
-                CopyFromCore(dstPtr, srcPtr, factor, length);
+                CopyFromCore(dstPtr, srcPtr, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -1925,7 +1925,7 @@ namespace LivreNoirLibrary.Collections
             fixed (nuint* dstPtr = dst)
             fixed (nuint* srcPtr = src)
             {
-                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, length);
+                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -1937,7 +1937,7 @@ namespace LivreNoirLibrary.Collections
             fixed (long* dstPtr = dst)
             fixed (long* srcPtr = src)
             {
-                CopyFromCore(dstPtr, srcPtr, factor, length);
+                CopyFromCore(dstPtr, srcPtr, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -1949,7 +1949,7 @@ namespace LivreNoirLibrary.Collections
             fixed (long* dstPtr = dst)
             fixed (long* srcPtr = src)
             {
-                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, length);
+                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -1961,7 +1961,7 @@ namespace LivreNoirLibrary.Collections
             fixed (ulong* dstPtr = dst)
             fixed (ulong* srcPtr = src)
             {
-                CopyFromCore(dstPtr, srcPtr, factor, length);
+                CopyFromCore(dstPtr, srcPtr, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -1973,7 +1973,7 @@ namespace LivreNoirLibrary.Collections
             fixed (ulong* dstPtr = dst)
             fixed (ulong* srcPtr = src)
             {
-                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, length);
+                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -1985,7 +1985,7 @@ namespace LivreNoirLibrary.Collections
             fixed (float* dstPtr = dst)
             fixed (float* srcPtr = src)
             {
-                CopyFromCore(dstPtr, srcPtr, factor, length);
+                CopyFromCore(dstPtr, srcPtr, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -1997,7 +1997,7 @@ namespace LivreNoirLibrary.Collections
             fixed (float* dstPtr = dst)
             fixed (float* srcPtr = src)
             {
-                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, length);
+                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -2009,7 +2009,7 @@ namespace LivreNoirLibrary.Collections
             fixed (double* dstPtr = dst)
             fixed (double* srcPtr = src)
             {
-                CopyFromCore(dstPtr, srcPtr, factor, length);
+                CopyFromCore(dstPtr, srcPtr, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -2021,7 +2021,7 @@ namespace LivreNoirLibrary.Collections
             fixed (double* dstPtr = dst)
             fixed (double* srcPtr = src)
             {
-                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, length);
+                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -2033,7 +2033,7 @@ namespace LivreNoirLibrary.Collections
             fixed (byte* dstPtr = dst)
             fixed (byte* srcPtr = src)
             {
-                CopyFromCore(dstPtr, srcPtr, factor, length);
+                CopyFromCore(dstPtr, srcPtr, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -2045,7 +2045,7 @@ namespace LivreNoirLibrary.Collections
             fixed (byte* dstPtr = dst)
             fixed (byte* srcPtr = src)
             {
-                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, length);
+                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -2057,7 +2057,7 @@ namespace LivreNoirLibrary.Collections
             fixed (sbyte* dstPtr = dst)
             fixed (sbyte* srcPtr = src)
             {
-                CopyFromCore(dstPtr, srcPtr, factor, length);
+                CopyFromCore(dstPtr, srcPtr, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -2069,7 +2069,7 @@ namespace LivreNoirLibrary.Collections
             fixed (sbyte* dstPtr = dst)
             fixed (sbyte* srcPtr = src)
             {
-                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, length);
+                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -2081,7 +2081,7 @@ namespace LivreNoirLibrary.Collections
             fixed (short* dstPtr = dst)
             fixed (short* srcPtr = src)
             {
-                CopyFromCore(dstPtr, srcPtr, factor, length);
+                CopyFromCore(dstPtr, srcPtr, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -2093,7 +2093,7 @@ namespace LivreNoirLibrary.Collections
             fixed (short* dstPtr = dst)
             fixed (short* srcPtr = src)
             {
-                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, length);
+                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -2105,7 +2105,7 @@ namespace LivreNoirLibrary.Collections
             fixed (ushort* dstPtr = dst)
             fixed (ushort* srcPtr = src)
             {
-                CopyFromCore(dstPtr, srcPtr, factor, length);
+                CopyFromCore(dstPtr, srcPtr, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -2117,7 +2117,7 @@ namespace LivreNoirLibrary.Collections
             fixed (ushort* dstPtr = dst)
             fixed (ushort* srcPtr = src)
             {
-                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, length);
+                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -2129,7 +2129,7 @@ namespace LivreNoirLibrary.Collections
             fixed (int* dstPtr = dst)
             fixed (int* srcPtr = src)
             {
-                CopyFromCore(dstPtr, srcPtr, factor, length);
+                CopyFromCore(dstPtr, srcPtr, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -2141,7 +2141,7 @@ namespace LivreNoirLibrary.Collections
             fixed (int* dstPtr = dst)
             fixed (int* srcPtr = src)
             {
-                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, length);
+                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -2153,7 +2153,7 @@ namespace LivreNoirLibrary.Collections
             fixed (uint* dstPtr = dst)
             fixed (uint* srcPtr = src)
             {
-                CopyFromCore(dstPtr, srcPtr, factor, length);
+                CopyFromCore(dstPtr, srcPtr, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -2165,7 +2165,7 @@ namespace LivreNoirLibrary.Collections
             fixed (uint* dstPtr = dst)
             fixed (uint* srcPtr = src)
             {
-                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, length);
+                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -2177,7 +2177,7 @@ namespace LivreNoirLibrary.Collections
             fixed (nint* dstPtr = dst)
             fixed (nint* srcPtr = src)
             {
-                CopyFromCore(dstPtr, srcPtr, factor, length);
+                CopyFromCore(dstPtr, srcPtr, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -2189,7 +2189,7 @@ namespace LivreNoirLibrary.Collections
             fixed (nint* dstPtr = dst)
             fixed (nint* srcPtr = src)
             {
-                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, length);
+                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -2201,7 +2201,7 @@ namespace LivreNoirLibrary.Collections
             fixed (nuint* dstPtr = dst)
             fixed (nuint* srcPtr = src)
             {
-                CopyFromCore(dstPtr, srcPtr, factor, length);
+                CopyFromCore(dstPtr, srcPtr, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -2213,7 +2213,7 @@ namespace LivreNoirLibrary.Collections
             fixed (nuint* dstPtr = dst)
             fixed (nuint* srcPtr = src)
             {
-                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, length);
+                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -2225,7 +2225,7 @@ namespace LivreNoirLibrary.Collections
             fixed (long* dstPtr = dst)
             fixed (long* srcPtr = src)
             {
-                CopyFromCore(dstPtr, srcPtr, factor, length);
+                CopyFromCore(dstPtr, srcPtr, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -2237,7 +2237,7 @@ namespace LivreNoirLibrary.Collections
             fixed (long* dstPtr = dst)
             fixed (long* srcPtr = src)
             {
-                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, length);
+                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -2249,7 +2249,7 @@ namespace LivreNoirLibrary.Collections
             fixed (ulong* dstPtr = dst)
             fixed (ulong* srcPtr = src)
             {
-                CopyFromCore(dstPtr, srcPtr, factor, length);
+                CopyFromCore(dstPtr, srcPtr, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -2261,7 +2261,7 @@ namespace LivreNoirLibrary.Collections
             fixed (ulong* dstPtr = dst)
             fixed (ulong* srcPtr = src)
             {
-                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, length);
+                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -2273,7 +2273,7 @@ namespace LivreNoirLibrary.Collections
             fixed (float* dstPtr = dst)
             fixed (float* srcPtr = src)
             {
-                CopyFromCore(dstPtr, srcPtr, factor, length);
+                CopyFromCore(dstPtr, srcPtr, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -2285,7 +2285,7 @@ namespace LivreNoirLibrary.Collections
             fixed (float* dstPtr = dst)
             fixed (float* srcPtr = src)
             {
-                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, length);
+                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -2297,7 +2297,7 @@ namespace LivreNoirLibrary.Collections
             fixed (double* dstPtr = dst)
             fixed (double* srcPtr = src)
             {
-                CopyFromCore(dstPtr, srcPtr, factor, length);
+                CopyFromCore(dstPtr, srcPtr, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -2309,7 +2309,7 @@ namespace LivreNoirLibrary.Collections
             fixed (double* dstPtr = dst)
             fixed (double* srcPtr = src)
             {
-                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, length);
+                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -2321,7 +2321,7 @@ namespace LivreNoirLibrary.Collections
             fixed (byte* dstPtr = dst)
             fixed (byte* srcPtr = src)
             {
-                CopyFromCore(dstPtr, srcPtr, factor, length);
+                CopyFromCore(dstPtr, srcPtr, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -2333,7 +2333,7 @@ namespace LivreNoirLibrary.Collections
             fixed (byte* dstPtr = dst)
             fixed (byte* srcPtr = src)
             {
-                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, length);
+                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -2345,7 +2345,7 @@ namespace LivreNoirLibrary.Collections
             fixed (sbyte* dstPtr = dst)
             fixed (sbyte* srcPtr = src)
             {
-                CopyFromCore(dstPtr, srcPtr, factor, length);
+                CopyFromCore(dstPtr, srcPtr, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -2357,7 +2357,7 @@ namespace LivreNoirLibrary.Collections
             fixed (sbyte* dstPtr = dst)
             fixed (sbyte* srcPtr = src)
             {
-                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, length);
+                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -2369,7 +2369,7 @@ namespace LivreNoirLibrary.Collections
             fixed (short* dstPtr = dst)
             fixed (short* srcPtr = src)
             {
-                CopyFromCore(dstPtr, srcPtr, factor, length);
+                CopyFromCore(dstPtr, srcPtr, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -2381,7 +2381,7 @@ namespace LivreNoirLibrary.Collections
             fixed (short* dstPtr = dst)
             fixed (short* srcPtr = src)
             {
-                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, length);
+                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -2393,7 +2393,7 @@ namespace LivreNoirLibrary.Collections
             fixed (ushort* dstPtr = dst)
             fixed (ushort* srcPtr = src)
             {
-                CopyFromCore(dstPtr, srcPtr, factor, length);
+                CopyFromCore(dstPtr, srcPtr, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -2405,7 +2405,7 @@ namespace LivreNoirLibrary.Collections
             fixed (ushort* dstPtr = dst)
             fixed (ushort* srcPtr = src)
             {
-                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, length);
+                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -2417,7 +2417,7 @@ namespace LivreNoirLibrary.Collections
             fixed (int* dstPtr = dst)
             fixed (int* srcPtr = src)
             {
-                CopyFromCore(dstPtr, srcPtr, factor, length);
+                CopyFromCore(dstPtr, srcPtr, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -2429,7 +2429,7 @@ namespace LivreNoirLibrary.Collections
             fixed (int* dstPtr = dst)
             fixed (int* srcPtr = src)
             {
-                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, length);
+                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -2441,7 +2441,7 @@ namespace LivreNoirLibrary.Collections
             fixed (uint* dstPtr = dst)
             fixed (uint* srcPtr = src)
             {
-                CopyFromCore(dstPtr, srcPtr, factor, length);
+                CopyFromCore(dstPtr, srcPtr, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -2453,7 +2453,7 @@ namespace LivreNoirLibrary.Collections
             fixed (uint* dstPtr = dst)
             fixed (uint* srcPtr = src)
             {
-                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, length);
+                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -2465,7 +2465,7 @@ namespace LivreNoirLibrary.Collections
             fixed (nint* dstPtr = dst)
             fixed (nint* srcPtr = src)
             {
-                CopyFromCore(dstPtr, srcPtr, factor, length);
+                CopyFromCore(dstPtr, srcPtr, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -2477,7 +2477,7 @@ namespace LivreNoirLibrary.Collections
             fixed (nint* dstPtr = dst)
             fixed (nint* srcPtr = src)
             {
-                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, length);
+                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -2489,7 +2489,7 @@ namespace LivreNoirLibrary.Collections
             fixed (nuint* dstPtr = dst)
             fixed (nuint* srcPtr = src)
             {
-                CopyFromCore(dstPtr, srcPtr, factor, length);
+                CopyFromCore(dstPtr, srcPtr, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -2501,7 +2501,7 @@ namespace LivreNoirLibrary.Collections
             fixed (nuint* dstPtr = dst)
             fixed (nuint* srcPtr = src)
             {
-                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, length);
+                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -2513,7 +2513,7 @@ namespace LivreNoirLibrary.Collections
             fixed (long* dstPtr = dst)
             fixed (long* srcPtr = src)
             {
-                CopyFromCore(dstPtr, srcPtr, factor, length);
+                CopyFromCore(dstPtr, srcPtr, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -2525,7 +2525,7 @@ namespace LivreNoirLibrary.Collections
             fixed (long* dstPtr = dst)
             fixed (long* srcPtr = src)
             {
-                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, length);
+                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -2537,7 +2537,7 @@ namespace LivreNoirLibrary.Collections
             fixed (ulong* dstPtr = dst)
             fixed (ulong* srcPtr = src)
             {
-                CopyFromCore(dstPtr, srcPtr, factor, length);
+                CopyFromCore(dstPtr, srcPtr, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -2549,7 +2549,7 @@ namespace LivreNoirLibrary.Collections
             fixed (ulong* dstPtr = dst)
             fixed (ulong* srcPtr = src)
             {
-                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, length);
+                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -2561,7 +2561,7 @@ namespace LivreNoirLibrary.Collections
             fixed (float* dstPtr = dst)
             fixed (float* srcPtr = src)
             {
-                CopyFromCore(dstPtr, srcPtr, factor, length);
+                CopyFromCore(dstPtr, srcPtr, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -2573,7 +2573,7 @@ namespace LivreNoirLibrary.Collections
             fixed (float* dstPtr = dst)
             fixed (float* srcPtr = src)
             {
-                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, length);
+                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -2585,7 +2585,7 @@ namespace LivreNoirLibrary.Collections
             fixed (double* dstPtr = dst)
             fixed (double* srcPtr = src)
             {
-                CopyFromCore(dstPtr, srcPtr, factor, length);
+                CopyFromCore(dstPtr, srcPtr, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -2597,7 +2597,7 @@ namespace LivreNoirLibrary.Collections
             fixed (double* dstPtr = dst)
             fixed (double* srcPtr = src)
             {
-                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, length);
+                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -2609,7 +2609,7 @@ namespace LivreNoirLibrary.Collections
             fixed (byte* dstPtr = dst)
             fixed (byte* srcPtr = src)
             {
-                CopyFromCore(dstPtr, srcPtr, factor, length);
+                CopyFromCore(dstPtr, srcPtr, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -2621,7 +2621,7 @@ namespace LivreNoirLibrary.Collections
             fixed (byte* dstPtr = dst)
             fixed (byte* srcPtr = src)
             {
-                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, length);
+                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -2633,7 +2633,7 @@ namespace LivreNoirLibrary.Collections
             fixed (sbyte* dstPtr = dst)
             fixed (sbyte* srcPtr = src)
             {
-                CopyFromCore(dstPtr, srcPtr, factor, length);
+                CopyFromCore(dstPtr, srcPtr, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -2645,7 +2645,7 @@ namespace LivreNoirLibrary.Collections
             fixed (sbyte* dstPtr = dst)
             fixed (sbyte* srcPtr = src)
             {
-                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, length);
+                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -2657,7 +2657,7 @@ namespace LivreNoirLibrary.Collections
             fixed (short* dstPtr = dst)
             fixed (short* srcPtr = src)
             {
-                CopyFromCore(dstPtr, srcPtr, factor, length);
+                CopyFromCore(dstPtr, srcPtr, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -2669,7 +2669,7 @@ namespace LivreNoirLibrary.Collections
             fixed (short* dstPtr = dst)
             fixed (short* srcPtr = src)
             {
-                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, length);
+                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -2681,7 +2681,7 @@ namespace LivreNoirLibrary.Collections
             fixed (ushort* dstPtr = dst)
             fixed (ushort* srcPtr = src)
             {
-                CopyFromCore(dstPtr, srcPtr, factor, length);
+                CopyFromCore(dstPtr, srcPtr, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -2693,7 +2693,7 @@ namespace LivreNoirLibrary.Collections
             fixed (ushort* dstPtr = dst)
             fixed (ushort* srcPtr = src)
             {
-                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, length);
+                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -2705,7 +2705,7 @@ namespace LivreNoirLibrary.Collections
             fixed (int* dstPtr = dst)
             fixed (int* srcPtr = src)
             {
-                CopyFromCore(dstPtr, srcPtr, factor, length);
+                CopyFromCore(dstPtr, srcPtr, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -2717,7 +2717,7 @@ namespace LivreNoirLibrary.Collections
             fixed (int* dstPtr = dst)
             fixed (int* srcPtr = src)
             {
-                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, length);
+                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -2729,7 +2729,7 @@ namespace LivreNoirLibrary.Collections
             fixed (uint* dstPtr = dst)
             fixed (uint* srcPtr = src)
             {
-                CopyFromCore(dstPtr, srcPtr, factor, length);
+                CopyFromCore(dstPtr, srcPtr, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -2741,7 +2741,7 @@ namespace LivreNoirLibrary.Collections
             fixed (uint* dstPtr = dst)
             fixed (uint* srcPtr = src)
             {
-                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, length);
+                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -2753,7 +2753,7 @@ namespace LivreNoirLibrary.Collections
             fixed (nint* dstPtr = dst)
             fixed (nint* srcPtr = src)
             {
-                CopyFromCore(dstPtr, srcPtr, factor, length);
+                CopyFromCore(dstPtr, srcPtr, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -2765,7 +2765,7 @@ namespace LivreNoirLibrary.Collections
             fixed (nint* dstPtr = dst)
             fixed (nint* srcPtr = src)
             {
-                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, length);
+                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -2777,7 +2777,7 @@ namespace LivreNoirLibrary.Collections
             fixed (nuint* dstPtr = dst)
             fixed (nuint* srcPtr = src)
             {
-                CopyFromCore(dstPtr, srcPtr, factor, length);
+                CopyFromCore(dstPtr, srcPtr, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -2789,7 +2789,7 @@ namespace LivreNoirLibrary.Collections
             fixed (nuint* dstPtr = dst)
             fixed (nuint* srcPtr = src)
             {
-                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, length);
+                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -2801,7 +2801,7 @@ namespace LivreNoirLibrary.Collections
             fixed (long* dstPtr = dst)
             fixed (long* srcPtr = src)
             {
-                CopyFromCore(dstPtr, srcPtr, factor, length);
+                CopyFromCore(dstPtr, srcPtr, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -2813,7 +2813,7 @@ namespace LivreNoirLibrary.Collections
             fixed (long* dstPtr = dst)
             fixed (long* srcPtr = src)
             {
-                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, length);
+                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -2825,7 +2825,7 @@ namespace LivreNoirLibrary.Collections
             fixed (ulong* dstPtr = dst)
             fixed (ulong* srcPtr = src)
             {
-                CopyFromCore(dstPtr, srcPtr, factor, length);
+                CopyFromCore(dstPtr, srcPtr, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -2837,7 +2837,7 @@ namespace LivreNoirLibrary.Collections
             fixed (ulong* dstPtr = dst)
             fixed (ulong* srcPtr = src)
             {
-                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, length);
+                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -2849,7 +2849,7 @@ namespace LivreNoirLibrary.Collections
             fixed (float* dstPtr = dst)
             fixed (float* srcPtr = src)
             {
-                CopyFromCore(dstPtr, srcPtr, factor, length);
+                CopyFromCore(dstPtr, srcPtr, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -2861,7 +2861,7 @@ namespace LivreNoirLibrary.Collections
             fixed (float* dstPtr = dst)
             fixed (float* srcPtr = src)
             {
-                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, length);
+                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -2873,7 +2873,7 @@ namespace LivreNoirLibrary.Collections
             fixed (double* dstPtr = dst)
             fixed (double* srcPtr = src)
             {
-                CopyFromCore(dstPtr, srcPtr, factor, length);
+                CopyFromCore(dstPtr, srcPtr, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -2885,7 +2885,7 @@ namespace LivreNoirLibrary.Collections
             fixed (double* dstPtr = dst)
             fixed (double* srcPtr = src)
             {
-                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, length);
+                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -2897,7 +2897,7 @@ namespace LivreNoirLibrary.Collections
             fixed (byte* dstPtr = dst)
             fixed (byte* srcPtr = src)
             {
-                CopyFromCore(dstPtr, srcPtr, factor, length);
+                CopyFromCore(dstPtr, srcPtr, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -2909,7 +2909,7 @@ namespace LivreNoirLibrary.Collections
             fixed (byte* dstPtr = dst)
             fixed (byte* srcPtr = src)
             {
-                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, length);
+                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -2921,7 +2921,7 @@ namespace LivreNoirLibrary.Collections
             fixed (sbyte* dstPtr = dst)
             fixed (sbyte* srcPtr = src)
             {
-                CopyFromCore(dstPtr, srcPtr, factor, length);
+                CopyFromCore(dstPtr, srcPtr, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -2933,7 +2933,7 @@ namespace LivreNoirLibrary.Collections
             fixed (sbyte* dstPtr = dst)
             fixed (sbyte* srcPtr = src)
             {
-                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, length);
+                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -2945,7 +2945,7 @@ namespace LivreNoirLibrary.Collections
             fixed (short* dstPtr = dst)
             fixed (short* srcPtr = src)
             {
-                CopyFromCore(dstPtr, srcPtr, factor, length);
+                CopyFromCore(dstPtr, srcPtr, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -2957,7 +2957,7 @@ namespace LivreNoirLibrary.Collections
             fixed (short* dstPtr = dst)
             fixed (short* srcPtr = src)
             {
-                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, length);
+                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -2969,7 +2969,7 @@ namespace LivreNoirLibrary.Collections
             fixed (ushort* dstPtr = dst)
             fixed (ushort* srcPtr = src)
             {
-                CopyFromCore(dstPtr, srcPtr, factor, length);
+                CopyFromCore(dstPtr, srcPtr, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -2981,7 +2981,7 @@ namespace LivreNoirLibrary.Collections
             fixed (ushort* dstPtr = dst)
             fixed (ushort* srcPtr = src)
             {
-                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, length);
+                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -2993,7 +2993,7 @@ namespace LivreNoirLibrary.Collections
             fixed (int* dstPtr = dst)
             fixed (int* srcPtr = src)
             {
-                CopyFromCore(dstPtr, srcPtr, factor, length);
+                CopyFromCore(dstPtr, srcPtr, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -3005,7 +3005,7 @@ namespace LivreNoirLibrary.Collections
             fixed (int* dstPtr = dst)
             fixed (int* srcPtr = src)
             {
-                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, length);
+                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -3017,7 +3017,7 @@ namespace LivreNoirLibrary.Collections
             fixed (uint* dstPtr = dst)
             fixed (uint* srcPtr = src)
             {
-                CopyFromCore(dstPtr, srcPtr, factor, length);
+                CopyFromCore(dstPtr, srcPtr, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -3029,7 +3029,7 @@ namespace LivreNoirLibrary.Collections
             fixed (uint* dstPtr = dst)
             fixed (uint* srcPtr = src)
             {
-                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, length);
+                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -3041,7 +3041,7 @@ namespace LivreNoirLibrary.Collections
             fixed (nint* dstPtr = dst)
             fixed (nint* srcPtr = src)
             {
-                CopyFromCore(dstPtr, srcPtr, factor, length);
+                CopyFromCore(dstPtr, srcPtr, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -3053,7 +3053,7 @@ namespace LivreNoirLibrary.Collections
             fixed (nint* dstPtr = dst)
             fixed (nint* srcPtr = src)
             {
-                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, length);
+                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -3065,7 +3065,7 @@ namespace LivreNoirLibrary.Collections
             fixed (nuint* dstPtr = dst)
             fixed (nuint* srcPtr = src)
             {
-                CopyFromCore(dstPtr, srcPtr, factor, length);
+                CopyFromCore(dstPtr, srcPtr, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -3077,7 +3077,7 @@ namespace LivreNoirLibrary.Collections
             fixed (nuint* dstPtr = dst)
             fixed (nuint* srcPtr = src)
             {
-                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, length);
+                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -3089,7 +3089,7 @@ namespace LivreNoirLibrary.Collections
             fixed (long* dstPtr = dst)
             fixed (long* srcPtr = src)
             {
-                CopyFromCore(dstPtr, srcPtr, factor, length);
+                CopyFromCore(dstPtr, srcPtr, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -3101,7 +3101,7 @@ namespace LivreNoirLibrary.Collections
             fixed (long* dstPtr = dst)
             fixed (long* srcPtr = src)
             {
-                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, length);
+                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -3113,7 +3113,7 @@ namespace LivreNoirLibrary.Collections
             fixed (ulong* dstPtr = dst)
             fixed (ulong* srcPtr = src)
             {
-                CopyFromCore(dstPtr, srcPtr, factor, length);
+                CopyFromCore(dstPtr, srcPtr, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -3125,7 +3125,7 @@ namespace LivreNoirLibrary.Collections
             fixed (ulong* dstPtr = dst)
             fixed (ulong* srcPtr = src)
             {
-                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, length);
+                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -3137,7 +3137,7 @@ namespace LivreNoirLibrary.Collections
             fixed (float* dstPtr = dst)
             fixed (float* srcPtr = src)
             {
-                CopyFromCore(dstPtr, srcPtr, factor, length);
+                CopyFromCore(dstPtr, srcPtr, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -3149,7 +3149,7 @@ namespace LivreNoirLibrary.Collections
             fixed (float* dstPtr = dst)
             fixed (float* srcPtr = src)
             {
-                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, length);
+                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -3161,7 +3161,7 @@ namespace LivreNoirLibrary.Collections
             fixed (double* dstPtr = dst)
             fixed (double* srcPtr = src)
             {
-                CopyFromCore(dstPtr, srcPtr, factor, length);
+                CopyFromCore(dstPtr, srcPtr, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -3173,7 +3173,7 @@ namespace LivreNoirLibrary.Collections
             fixed (double* dstPtr = dst)
             fixed (double* srcPtr = src)
             {
-                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, length);
+                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -3185,7 +3185,7 @@ namespace LivreNoirLibrary.Collections
             fixed (byte* dstPtr = dst)
             fixed (byte* srcPtr = src)
             {
-                CopyFromCore(dstPtr, srcPtr, factor, length);
+                CopyFromCore(dstPtr, srcPtr, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -3197,7 +3197,7 @@ namespace LivreNoirLibrary.Collections
             fixed (byte* dstPtr = dst)
             fixed (byte* srcPtr = src)
             {
-                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, length);
+                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -3209,7 +3209,7 @@ namespace LivreNoirLibrary.Collections
             fixed (sbyte* dstPtr = dst)
             fixed (sbyte* srcPtr = src)
             {
-                CopyFromCore(dstPtr, srcPtr, factor, length);
+                CopyFromCore(dstPtr, srcPtr, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -3221,7 +3221,7 @@ namespace LivreNoirLibrary.Collections
             fixed (sbyte* dstPtr = dst)
             fixed (sbyte* srcPtr = src)
             {
-                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, length);
+                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -3233,7 +3233,7 @@ namespace LivreNoirLibrary.Collections
             fixed (short* dstPtr = dst)
             fixed (short* srcPtr = src)
             {
-                CopyFromCore(dstPtr, srcPtr, factor, length);
+                CopyFromCore(dstPtr, srcPtr, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -3245,7 +3245,7 @@ namespace LivreNoirLibrary.Collections
             fixed (short* dstPtr = dst)
             fixed (short* srcPtr = src)
             {
-                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, length);
+                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -3257,7 +3257,7 @@ namespace LivreNoirLibrary.Collections
             fixed (ushort* dstPtr = dst)
             fixed (ushort* srcPtr = src)
             {
-                CopyFromCore(dstPtr, srcPtr, factor, length);
+                CopyFromCore(dstPtr, srcPtr, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -3269,7 +3269,7 @@ namespace LivreNoirLibrary.Collections
             fixed (ushort* dstPtr = dst)
             fixed (ushort* srcPtr = src)
             {
-                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, length);
+                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -3281,7 +3281,7 @@ namespace LivreNoirLibrary.Collections
             fixed (int* dstPtr = dst)
             fixed (int* srcPtr = src)
             {
-                CopyFromCore(dstPtr, srcPtr, factor, length);
+                CopyFromCore(dstPtr, srcPtr, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -3293,7 +3293,7 @@ namespace LivreNoirLibrary.Collections
             fixed (int* dstPtr = dst)
             fixed (int* srcPtr = src)
             {
-                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, length);
+                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -3305,7 +3305,7 @@ namespace LivreNoirLibrary.Collections
             fixed (uint* dstPtr = dst)
             fixed (uint* srcPtr = src)
             {
-                CopyFromCore(dstPtr, srcPtr, factor, length);
+                CopyFromCore(dstPtr, srcPtr, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -3317,7 +3317,7 @@ namespace LivreNoirLibrary.Collections
             fixed (uint* dstPtr = dst)
             fixed (uint* srcPtr = src)
             {
-                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, length);
+                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -3329,7 +3329,7 @@ namespace LivreNoirLibrary.Collections
             fixed (nint* dstPtr = dst)
             fixed (nint* srcPtr = src)
             {
-                CopyFromCore(dstPtr, srcPtr, factor, length);
+                CopyFromCore(dstPtr, srcPtr, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -3341,7 +3341,7 @@ namespace LivreNoirLibrary.Collections
             fixed (nint* dstPtr = dst)
             fixed (nint* srcPtr = src)
             {
-                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, length);
+                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -3353,7 +3353,7 @@ namespace LivreNoirLibrary.Collections
             fixed (nuint* dstPtr = dst)
             fixed (nuint* srcPtr = src)
             {
-                CopyFromCore(dstPtr, srcPtr, factor, length);
+                CopyFromCore(dstPtr, srcPtr, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -3365,7 +3365,7 @@ namespace LivreNoirLibrary.Collections
             fixed (nuint* dstPtr = dst)
             fixed (nuint* srcPtr = src)
             {
-                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, length);
+                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -3377,7 +3377,7 @@ namespace LivreNoirLibrary.Collections
             fixed (long* dstPtr = dst)
             fixed (long* srcPtr = src)
             {
-                CopyFromCore(dstPtr, srcPtr, factor, length);
+                CopyFromCore(dstPtr, srcPtr, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -3389,7 +3389,7 @@ namespace LivreNoirLibrary.Collections
             fixed (long* dstPtr = dst)
             fixed (long* srcPtr = src)
             {
-                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, length);
+                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -3401,7 +3401,7 @@ namespace LivreNoirLibrary.Collections
             fixed (ulong* dstPtr = dst)
             fixed (ulong* srcPtr = src)
             {
-                CopyFromCore(dstPtr, srcPtr, factor, length);
+                CopyFromCore(dstPtr, srcPtr, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -3413,7 +3413,7 @@ namespace LivreNoirLibrary.Collections
             fixed (ulong* dstPtr = dst)
             fixed (ulong* srcPtr = src)
             {
-                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, length);
+                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -3425,7 +3425,7 @@ namespace LivreNoirLibrary.Collections
             fixed (float* dstPtr = dst)
             fixed (float* srcPtr = src)
             {
-                CopyFromCore(dstPtr, srcPtr, factor, length);
+                CopyFromCore(dstPtr, srcPtr, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -3437,7 +3437,7 @@ namespace LivreNoirLibrary.Collections
             fixed (float* dstPtr = dst)
             fixed (float* srcPtr = src)
             {
-                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, length);
+                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -3449,7 +3449,7 @@ namespace LivreNoirLibrary.Collections
             fixed (double* dstPtr = dst)
             fixed (double* srcPtr = src)
             {
-                CopyFromCore(dstPtr, srcPtr, factor, length);
+                CopyFromCore(dstPtr, srcPtr, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -3461,7 +3461,7 @@ namespace LivreNoirLibrary.Collections
             fixed (double* dstPtr = dst)
             fixed (double* srcPtr = src)
             {
-                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, length);
+                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -3473,7 +3473,7 @@ namespace LivreNoirLibrary.Collections
             fixed (byte* dstPtr = dst)
             fixed (byte* srcPtr = src)
             {
-                CopyFromCore(dstPtr, srcPtr, factor, length);
+                CopyFromCore(dstPtr, srcPtr, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -3485,7 +3485,7 @@ namespace LivreNoirLibrary.Collections
             fixed (byte* dstPtr = dst)
             fixed (byte* srcPtr = src)
             {
-                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, length);
+                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -3497,7 +3497,7 @@ namespace LivreNoirLibrary.Collections
             fixed (sbyte* dstPtr = dst)
             fixed (sbyte* srcPtr = src)
             {
-                CopyFromCore(dstPtr, srcPtr, factor, length);
+                CopyFromCore(dstPtr, srcPtr, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -3509,7 +3509,7 @@ namespace LivreNoirLibrary.Collections
             fixed (sbyte* dstPtr = dst)
             fixed (sbyte* srcPtr = src)
             {
-                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, length);
+                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -3521,7 +3521,7 @@ namespace LivreNoirLibrary.Collections
             fixed (short* dstPtr = dst)
             fixed (short* srcPtr = src)
             {
-                CopyFromCore(dstPtr, srcPtr, factor, length);
+                CopyFromCore(dstPtr, srcPtr, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -3533,7 +3533,7 @@ namespace LivreNoirLibrary.Collections
             fixed (short* dstPtr = dst)
             fixed (short* srcPtr = src)
             {
-                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, length);
+                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -3545,7 +3545,7 @@ namespace LivreNoirLibrary.Collections
             fixed (ushort* dstPtr = dst)
             fixed (ushort* srcPtr = src)
             {
-                CopyFromCore(dstPtr, srcPtr, factor, length);
+                CopyFromCore(dstPtr, srcPtr, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -3557,7 +3557,7 @@ namespace LivreNoirLibrary.Collections
             fixed (ushort* dstPtr = dst)
             fixed (ushort* srcPtr = src)
             {
-                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, length);
+                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -3569,7 +3569,7 @@ namespace LivreNoirLibrary.Collections
             fixed (int* dstPtr = dst)
             fixed (int* srcPtr = src)
             {
-                CopyFromCore(dstPtr, srcPtr, factor, length);
+                CopyFromCore(dstPtr, srcPtr, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -3581,7 +3581,7 @@ namespace LivreNoirLibrary.Collections
             fixed (int* dstPtr = dst)
             fixed (int* srcPtr = src)
             {
-                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, length);
+                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -3593,7 +3593,7 @@ namespace LivreNoirLibrary.Collections
             fixed (uint* dstPtr = dst)
             fixed (uint* srcPtr = src)
             {
-                CopyFromCore(dstPtr, srcPtr, factor, length);
+                CopyFromCore(dstPtr, srcPtr, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -3605,7 +3605,7 @@ namespace LivreNoirLibrary.Collections
             fixed (uint* dstPtr = dst)
             fixed (uint* srcPtr = src)
             {
-                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, length);
+                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -3617,7 +3617,7 @@ namespace LivreNoirLibrary.Collections
             fixed (nint* dstPtr = dst)
             fixed (nint* srcPtr = src)
             {
-                CopyFromCore(dstPtr, srcPtr, factor, length);
+                CopyFromCore(dstPtr, srcPtr, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -3629,7 +3629,7 @@ namespace LivreNoirLibrary.Collections
             fixed (nint* dstPtr = dst)
             fixed (nint* srcPtr = src)
             {
-                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, length);
+                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -3641,7 +3641,7 @@ namespace LivreNoirLibrary.Collections
             fixed (nuint* dstPtr = dst)
             fixed (nuint* srcPtr = src)
             {
-                CopyFromCore(dstPtr, srcPtr, factor, length);
+                CopyFromCore(dstPtr, srcPtr, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -3653,7 +3653,7 @@ namespace LivreNoirLibrary.Collections
             fixed (nuint* dstPtr = dst)
             fixed (nuint* srcPtr = src)
             {
-                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, length);
+                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -3665,7 +3665,7 @@ namespace LivreNoirLibrary.Collections
             fixed (long* dstPtr = dst)
             fixed (long* srcPtr = src)
             {
-                CopyFromCore(dstPtr, srcPtr, factor, length);
+                CopyFromCore(dstPtr, srcPtr, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -3677,7 +3677,7 @@ namespace LivreNoirLibrary.Collections
             fixed (long* dstPtr = dst)
             fixed (long* srcPtr = src)
             {
-                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, length);
+                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -3689,7 +3689,7 @@ namespace LivreNoirLibrary.Collections
             fixed (ulong* dstPtr = dst)
             fixed (ulong* srcPtr = src)
             {
-                CopyFromCore(dstPtr, srcPtr, factor, length);
+                CopyFromCore(dstPtr, srcPtr, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -3701,7 +3701,7 @@ namespace LivreNoirLibrary.Collections
             fixed (ulong* dstPtr = dst)
             fixed (ulong* srcPtr = src)
             {
-                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, length);
+                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -3713,7 +3713,7 @@ namespace LivreNoirLibrary.Collections
             fixed (float* dstPtr = dst)
             fixed (float* srcPtr = src)
             {
-                CopyFromCore(dstPtr, srcPtr, factor, length);
+                CopyFromCore(dstPtr, srcPtr, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -3725,7 +3725,7 @@ namespace LivreNoirLibrary.Collections
             fixed (float* dstPtr = dst)
             fixed (float* srcPtr = src)
             {
-                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, length);
+                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -3737,7 +3737,7 @@ namespace LivreNoirLibrary.Collections
             fixed (double* dstPtr = dst)
             fixed (double* srcPtr = src)
             {
-                CopyFromCore(dstPtr, srcPtr, factor, length);
+                CopyFromCore(dstPtr, srcPtr, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -3749,7 +3749,7 @@ namespace LivreNoirLibrary.Collections
             fixed (double* dstPtr = dst)
             fixed (double* srcPtr = src)
             {
-                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, length);
+                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -3761,7 +3761,7 @@ namespace LivreNoirLibrary.Collections
             fixed (byte* dstPtr = dst)
             fixed (byte* srcPtr = src)
             {
-                CopyFromCore(dstPtr, srcPtr, factor, length);
+                CopyFromCore(dstPtr, srcPtr, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -3773,7 +3773,7 @@ namespace LivreNoirLibrary.Collections
             fixed (byte* dstPtr = dst)
             fixed (byte* srcPtr = src)
             {
-                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, length);
+                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -3785,7 +3785,7 @@ namespace LivreNoirLibrary.Collections
             fixed (sbyte* dstPtr = dst)
             fixed (sbyte* srcPtr = src)
             {
-                CopyFromCore(dstPtr, srcPtr, factor, length);
+                CopyFromCore(dstPtr, srcPtr, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -3797,7 +3797,7 @@ namespace LivreNoirLibrary.Collections
             fixed (sbyte* dstPtr = dst)
             fixed (sbyte* srcPtr = src)
             {
-                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, length);
+                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -3809,7 +3809,7 @@ namespace LivreNoirLibrary.Collections
             fixed (short* dstPtr = dst)
             fixed (short* srcPtr = src)
             {
-                CopyFromCore(dstPtr, srcPtr, factor, length);
+                CopyFromCore(dstPtr, srcPtr, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -3821,7 +3821,7 @@ namespace LivreNoirLibrary.Collections
             fixed (short* dstPtr = dst)
             fixed (short* srcPtr = src)
             {
-                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, length);
+                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -3833,7 +3833,7 @@ namespace LivreNoirLibrary.Collections
             fixed (ushort* dstPtr = dst)
             fixed (ushort* srcPtr = src)
             {
-                CopyFromCore(dstPtr, srcPtr, factor, length);
+                CopyFromCore(dstPtr, srcPtr, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -3845,7 +3845,7 @@ namespace LivreNoirLibrary.Collections
             fixed (ushort* dstPtr = dst)
             fixed (ushort* srcPtr = src)
             {
-                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, length);
+                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -3857,7 +3857,7 @@ namespace LivreNoirLibrary.Collections
             fixed (int* dstPtr = dst)
             fixed (int* srcPtr = src)
             {
-                CopyFromCore(dstPtr, srcPtr, factor, length);
+                CopyFromCore(dstPtr, srcPtr, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -3869,7 +3869,7 @@ namespace LivreNoirLibrary.Collections
             fixed (int* dstPtr = dst)
             fixed (int* srcPtr = src)
             {
-                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, length);
+                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -3881,7 +3881,7 @@ namespace LivreNoirLibrary.Collections
             fixed (uint* dstPtr = dst)
             fixed (uint* srcPtr = src)
             {
-                CopyFromCore(dstPtr, srcPtr, factor, length);
+                CopyFromCore(dstPtr, srcPtr, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -3893,7 +3893,7 @@ namespace LivreNoirLibrary.Collections
             fixed (uint* dstPtr = dst)
             fixed (uint* srcPtr = src)
             {
-                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, length);
+                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -3905,7 +3905,7 @@ namespace LivreNoirLibrary.Collections
             fixed (nint* dstPtr = dst)
             fixed (nint* srcPtr = src)
             {
-                CopyFromCore(dstPtr, srcPtr, factor, length);
+                CopyFromCore(dstPtr, srcPtr, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -3917,7 +3917,7 @@ namespace LivreNoirLibrary.Collections
             fixed (nint* dstPtr = dst)
             fixed (nint* srcPtr = src)
             {
-                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, length);
+                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -3929,7 +3929,7 @@ namespace LivreNoirLibrary.Collections
             fixed (nuint* dstPtr = dst)
             fixed (nuint* srcPtr = src)
             {
-                CopyFromCore(dstPtr, srcPtr, factor, length);
+                CopyFromCore(dstPtr, srcPtr, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -3941,7 +3941,7 @@ namespace LivreNoirLibrary.Collections
             fixed (nuint* dstPtr = dst)
             fixed (nuint* srcPtr = src)
             {
-                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, length);
+                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -3953,7 +3953,7 @@ namespace LivreNoirLibrary.Collections
             fixed (long* dstPtr = dst)
             fixed (long* srcPtr = src)
             {
-                CopyFromCore(dstPtr, srcPtr, factor, length);
+                CopyFromCore(dstPtr, srcPtr, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -3965,7 +3965,7 @@ namespace LivreNoirLibrary.Collections
             fixed (long* dstPtr = dst)
             fixed (long* srcPtr = src)
             {
-                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, length);
+                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -3977,7 +3977,7 @@ namespace LivreNoirLibrary.Collections
             fixed (ulong* dstPtr = dst)
             fixed (ulong* srcPtr = src)
             {
-                CopyFromCore(dstPtr, srcPtr, factor, length);
+                CopyFromCore(dstPtr, srcPtr, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -3989,7 +3989,7 @@ namespace LivreNoirLibrary.Collections
             fixed (ulong* dstPtr = dst)
             fixed (ulong* srcPtr = src)
             {
-                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, length);
+                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -4001,7 +4001,7 @@ namespace LivreNoirLibrary.Collections
             fixed (float* dstPtr = dst)
             fixed (float* srcPtr = src)
             {
-                CopyFromCore(dstPtr, srcPtr, factor, length);
+                CopyFromCore(dstPtr, srcPtr, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -4013,7 +4013,7 @@ namespace LivreNoirLibrary.Collections
             fixed (float* dstPtr = dst)
             fixed (float* srcPtr = src)
             {
-                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, length);
+                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -4025,7 +4025,7 @@ namespace LivreNoirLibrary.Collections
             fixed (double* dstPtr = dst)
             fixed (double* srcPtr = src)
             {
-                CopyFromCore(dstPtr, srcPtr, factor, length);
+                CopyFromCore(dstPtr, srcPtr, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -4037,7 +4037,7 @@ namespace LivreNoirLibrary.Collections
             fixed (double* dstPtr = dst)
             fixed (double* srcPtr = src)
             {
-                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, length);
+                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -4049,7 +4049,7 @@ namespace LivreNoirLibrary.Collections
             fixed (byte* dstPtr = dst)
             fixed (byte* srcPtr = src)
             {
-                CopyFromCore(dstPtr, srcPtr, factor, length);
+                CopyFromCore(dstPtr, srcPtr, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -4061,7 +4061,7 @@ namespace LivreNoirLibrary.Collections
             fixed (byte* dstPtr = dst)
             fixed (byte* srcPtr = src)
             {
-                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, length);
+                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -4073,7 +4073,7 @@ namespace LivreNoirLibrary.Collections
             fixed (sbyte* dstPtr = dst)
             fixed (sbyte* srcPtr = src)
             {
-                CopyFromCore(dstPtr, srcPtr, factor, length);
+                CopyFromCore(dstPtr, srcPtr, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -4085,7 +4085,7 @@ namespace LivreNoirLibrary.Collections
             fixed (sbyte* dstPtr = dst)
             fixed (sbyte* srcPtr = src)
             {
-                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, length);
+                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -4097,7 +4097,7 @@ namespace LivreNoirLibrary.Collections
             fixed (short* dstPtr = dst)
             fixed (short* srcPtr = src)
             {
-                CopyFromCore(dstPtr, srcPtr, factor, length);
+                CopyFromCore(dstPtr, srcPtr, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -4109,7 +4109,7 @@ namespace LivreNoirLibrary.Collections
             fixed (short* dstPtr = dst)
             fixed (short* srcPtr = src)
             {
-                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, length);
+                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -4121,7 +4121,7 @@ namespace LivreNoirLibrary.Collections
             fixed (ushort* dstPtr = dst)
             fixed (ushort* srcPtr = src)
             {
-                CopyFromCore(dstPtr, srcPtr, factor, length);
+                CopyFromCore(dstPtr, srcPtr, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -4133,7 +4133,7 @@ namespace LivreNoirLibrary.Collections
             fixed (ushort* dstPtr = dst)
             fixed (ushort* srcPtr = src)
             {
-                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, length);
+                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -4145,7 +4145,7 @@ namespace LivreNoirLibrary.Collections
             fixed (int* dstPtr = dst)
             fixed (int* srcPtr = src)
             {
-                CopyFromCore(dstPtr, srcPtr, factor, length);
+                CopyFromCore(dstPtr, srcPtr, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -4157,7 +4157,7 @@ namespace LivreNoirLibrary.Collections
             fixed (int* dstPtr = dst)
             fixed (int* srcPtr = src)
             {
-                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, length);
+                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -4169,7 +4169,7 @@ namespace LivreNoirLibrary.Collections
             fixed (uint* dstPtr = dst)
             fixed (uint* srcPtr = src)
             {
-                CopyFromCore(dstPtr, srcPtr, factor, length);
+                CopyFromCore(dstPtr, srcPtr, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -4181,7 +4181,7 @@ namespace LivreNoirLibrary.Collections
             fixed (uint* dstPtr = dst)
             fixed (uint* srcPtr = src)
             {
-                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, length);
+                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -4193,7 +4193,7 @@ namespace LivreNoirLibrary.Collections
             fixed (nint* dstPtr = dst)
             fixed (nint* srcPtr = src)
             {
-                CopyFromCore(dstPtr, srcPtr, factor, length);
+                CopyFromCore(dstPtr, srcPtr, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -4205,7 +4205,7 @@ namespace LivreNoirLibrary.Collections
             fixed (nint* dstPtr = dst)
             fixed (nint* srcPtr = src)
             {
-                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, length);
+                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -4217,7 +4217,7 @@ namespace LivreNoirLibrary.Collections
             fixed (nuint* dstPtr = dst)
             fixed (nuint* srcPtr = src)
             {
-                CopyFromCore(dstPtr, srcPtr, factor, length);
+                CopyFromCore(dstPtr, srcPtr, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -4229,7 +4229,7 @@ namespace LivreNoirLibrary.Collections
             fixed (nuint* dstPtr = dst)
             fixed (nuint* srcPtr = src)
             {
-                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, length);
+                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -4241,7 +4241,7 @@ namespace LivreNoirLibrary.Collections
             fixed (long* dstPtr = dst)
             fixed (long* srcPtr = src)
             {
-                CopyFromCore(dstPtr, srcPtr, factor, length);
+                CopyFromCore(dstPtr, srcPtr, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -4253,7 +4253,7 @@ namespace LivreNoirLibrary.Collections
             fixed (long* dstPtr = dst)
             fixed (long* srcPtr = src)
             {
-                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, length);
+                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -4265,7 +4265,7 @@ namespace LivreNoirLibrary.Collections
             fixed (ulong* dstPtr = dst)
             fixed (ulong* srcPtr = src)
             {
-                CopyFromCore(dstPtr, srcPtr, factor, length);
+                CopyFromCore(dstPtr, srcPtr, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -4277,7 +4277,7 @@ namespace LivreNoirLibrary.Collections
             fixed (ulong* dstPtr = dst)
             fixed (ulong* srcPtr = src)
             {
-                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, length);
+                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -4289,7 +4289,7 @@ namespace LivreNoirLibrary.Collections
             fixed (float* dstPtr = dst)
             fixed (float* srcPtr = src)
             {
-                CopyFromCore(dstPtr, srcPtr, factor, length);
+                CopyFromCore(dstPtr, srcPtr, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -4301,7 +4301,7 @@ namespace LivreNoirLibrary.Collections
             fixed (float* dstPtr = dst)
             fixed (float* srcPtr = src)
             {
-                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, length);
+                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -4313,7 +4313,7 @@ namespace LivreNoirLibrary.Collections
             fixed (double* dstPtr = dst)
             fixed (double* srcPtr = src)
             {
-                CopyFromCore(dstPtr, srcPtr, factor, length);
+                CopyFromCore(dstPtr, srcPtr, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -4325,7 +4325,7 @@ namespace LivreNoirLibrary.Collections
             fixed (double* dstPtr = dst)
             fixed (double* srcPtr = src)
             {
-                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, length);
+                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -4337,7 +4337,7 @@ namespace LivreNoirLibrary.Collections
             fixed (byte* dstPtr = dst)
             fixed (byte* srcPtr = src)
             {
-                CopyFromCore(dstPtr, srcPtr, factor, length);
+                CopyFromCore(dstPtr, srcPtr, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -4349,7 +4349,7 @@ namespace LivreNoirLibrary.Collections
             fixed (byte* dstPtr = dst)
             fixed (byte* srcPtr = src)
             {
-                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, length);
+                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -4361,7 +4361,7 @@ namespace LivreNoirLibrary.Collections
             fixed (sbyte* dstPtr = dst)
             fixed (sbyte* srcPtr = src)
             {
-                CopyFromCore(dstPtr, srcPtr, factor, length);
+                CopyFromCore(dstPtr, srcPtr, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -4373,7 +4373,7 @@ namespace LivreNoirLibrary.Collections
             fixed (sbyte* dstPtr = dst)
             fixed (sbyte* srcPtr = src)
             {
-                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, length);
+                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -4385,7 +4385,7 @@ namespace LivreNoirLibrary.Collections
             fixed (short* dstPtr = dst)
             fixed (short* srcPtr = src)
             {
-                CopyFromCore(dstPtr, srcPtr, factor, length);
+                CopyFromCore(dstPtr, srcPtr, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -4397,7 +4397,7 @@ namespace LivreNoirLibrary.Collections
             fixed (short* dstPtr = dst)
             fixed (short* srcPtr = src)
             {
-                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, length);
+                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -4409,7 +4409,7 @@ namespace LivreNoirLibrary.Collections
             fixed (ushort* dstPtr = dst)
             fixed (ushort* srcPtr = src)
             {
-                CopyFromCore(dstPtr, srcPtr, factor, length);
+                CopyFromCore(dstPtr, srcPtr, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -4421,7 +4421,7 @@ namespace LivreNoirLibrary.Collections
             fixed (ushort* dstPtr = dst)
             fixed (ushort* srcPtr = src)
             {
-                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, length);
+                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -4433,7 +4433,7 @@ namespace LivreNoirLibrary.Collections
             fixed (int* dstPtr = dst)
             fixed (int* srcPtr = src)
             {
-                CopyFromCore(dstPtr, srcPtr, factor, length);
+                CopyFromCore(dstPtr, srcPtr, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -4445,7 +4445,7 @@ namespace LivreNoirLibrary.Collections
             fixed (int* dstPtr = dst)
             fixed (int* srcPtr = src)
             {
-                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, length);
+                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -4457,7 +4457,7 @@ namespace LivreNoirLibrary.Collections
             fixed (uint* dstPtr = dst)
             fixed (uint* srcPtr = src)
             {
-                CopyFromCore(dstPtr, srcPtr, factor, length);
+                CopyFromCore(dstPtr, srcPtr, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -4469,7 +4469,7 @@ namespace LivreNoirLibrary.Collections
             fixed (uint* dstPtr = dst)
             fixed (uint* srcPtr = src)
             {
-                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, length);
+                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -4481,7 +4481,7 @@ namespace LivreNoirLibrary.Collections
             fixed (nint* dstPtr = dst)
             fixed (nint* srcPtr = src)
             {
-                CopyFromCore(dstPtr, srcPtr, factor, length);
+                CopyFromCore(dstPtr, srcPtr, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -4493,7 +4493,7 @@ namespace LivreNoirLibrary.Collections
             fixed (nint* dstPtr = dst)
             fixed (nint* srcPtr = src)
             {
-                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, length);
+                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -4505,7 +4505,7 @@ namespace LivreNoirLibrary.Collections
             fixed (nuint* dstPtr = dst)
             fixed (nuint* srcPtr = src)
             {
-                CopyFromCore(dstPtr, srcPtr, factor, length);
+                CopyFromCore(dstPtr, srcPtr, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -4517,7 +4517,7 @@ namespace LivreNoirLibrary.Collections
             fixed (nuint* dstPtr = dst)
             fixed (nuint* srcPtr = src)
             {
-                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, length);
+                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -4529,7 +4529,7 @@ namespace LivreNoirLibrary.Collections
             fixed (long* dstPtr = dst)
             fixed (long* srcPtr = src)
             {
-                CopyFromCore(dstPtr, srcPtr, factor, length);
+                CopyFromCore(dstPtr, srcPtr, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -4541,7 +4541,7 @@ namespace LivreNoirLibrary.Collections
             fixed (long* dstPtr = dst)
             fixed (long* srcPtr = src)
             {
-                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, length);
+                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -4553,7 +4553,7 @@ namespace LivreNoirLibrary.Collections
             fixed (ulong* dstPtr = dst)
             fixed (ulong* srcPtr = src)
             {
-                CopyFromCore(dstPtr, srcPtr, factor, length);
+                CopyFromCore(dstPtr, srcPtr, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -4565,7 +4565,7 @@ namespace LivreNoirLibrary.Collections
             fixed (ulong* dstPtr = dst)
             fixed (ulong* srcPtr = src)
             {
-                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, length);
+                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -4577,7 +4577,7 @@ namespace LivreNoirLibrary.Collections
             fixed (float* dstPtr = dst)
             fixed (float* srcPtr = src)
             {
-                CopyFromCore(dstPtr, srcPtr, factor, length);
+                CopyFromCore(dstPtr, srcPtr, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -4589,7 +4589,7 @@ namespace LivreNoirLibrary.Collections
             fixed (float* dstPtr = dst)
             fixed (float* srcPtr = src)
             {
-                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, length);
+                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -4601,7 +4601,7 @@ namespace LivreNoirLibrary.Collections
             fixed (double* dstPtr = dst)
             fixed (double* srcPtr = src)
             {
-                CopyFromCore(dstPtr, srcPtr, factor, length);
+                CopyFromCore(dstPtr, srcPtr, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -4613,7 +4613,7 @@ namespace LivreNoirLibrary.Collections
             fixed (double* dstPtr = dst)
             fixed (double* srcPtr = src)
             {
-                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, length);
+                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -4625,7 +4625,7 @@ namespace LivreNoirLibrary.Collections
             fixed (byte* dstPtr = dst)
             fixed (byte* srcPtr = src)
             {
-                CopyFromCore(dstPtr, srcPtr, factor, length);
+                CopyFromCore(dstPtr, srcPtr, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -4637,7 +4637,7 @@ namespace LivreNoirLibrary.Collections
             fixed (byte* dstPtr = dst)
             fixed (byte* srcPtr = src)
             {
-                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, length);
+                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -4649,7 +4649,7 @@ namespace LivreNoirLibrary.Collections
             fixed (sbyte* dstPtr = dst)
             fixed (sbyte* srcPtr = src)
             {
-                CopyFromCore(dstPtr, srcPtr, factor, length);
+                CopyFromCore(dstPtr, srcPtr, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -4661,7 +4661,7 @@ namespace LivreNoirLibrary.Collections
             fixed (sbyte* dstPtr = dst)
             fixed (sbyte* srcPtr = src)
             {
-                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, length);
+                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -4673,7 +4673,7 @@ namespace LivreNoirLibrary.Collections
             fixed (short* dstPtr = dst)
             fixed (short* srcPtr = src)
             {
-                CopyFromCore(dstPtr, srcPtr, factor, length);
+                CopyFromCore(dstPtr, srcPtr, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -4685,7 +4685,7 @@ namespace LivreNoirLibrary.Collections
             fixed (short* dstPtr = dst)
             fixed (short* srcPtr = src)
             {
-                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, length);
+                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -4697,7 +4697,7 @@ namespace LivreNoirLibrary.Collections
             fixed (ushort* dstPtr = dst)
             fixed (ushort* srcPtr = src)
             {
-                CopyFromCore(dstPtr, srcPtr, factor, length);
+                CopyFromCore(dstPtr, srcPtr, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -4709,7 +4709,7 @@ namespace LivreNoirLibrary.Collections
             fixed (ushort* dstPtr = dst)
             fixed (ushort* srcPtr = src)
             {
-                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, length);
+                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -4721,7 +4721,7 @@ namespace LivreNoirLibrary.Collections
             fixed (int* dstPtr = dst)
             fixed (int* srcPtr = src)
             {
-                CopyFromCore(dstPtr, srcPtr, factor, length);
+                CopyFromCore(dstPtr, srcPtr, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -4733,7 +4733,7 @@ namespace LivreNoirLibrary.Collections
             fixed (int* dstPtr = dst)
             fixed (int* srcPtr = src)
             {
-                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, length);
+                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -4745,7 +4745,7 @@ namespace LivreNoirLibrary.Collections
             fixed (uint* dstPtr = dst)
             fixed (uint* srcPtr = src)
             {
-                CopyFromCore(dstPtr, srcPtr, factor, length);
+                CopyFromCore(dstPtr, srcPtr, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -4757,7 +4757,7 @@ namespace LivreNoirLibrary.Collections
             fixed (uint* dstPtr = dst)
             fixed (uint* srcPtr = src)
             {
-                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, length);
+                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -4769,7 +4769,7 @@ namespace LivreNoirLibrary.Collections
             fixed (nint* dstPtr = dst)
             fixed (nint* srcPtr = src)
             {
-                CopyFromCore(dstPtr, srcPtr, factor, length);
+                CopyFromCore(dstPtr, srcPtr, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -4781,7 +4781,7 @@ namespace LivreNoirLibrary.Collections
             fixed (nint* dstPtr = dst)
             fixed (nint* srcPtr = src)
             {
-                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, length);
+                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -4793,7 +4793,7 @@ namespace LivreNoirLibrary.Collections
             fixed (nuint* dstPtr = dst)
             fixed (nuint* srcPtr = src)
             {
-                CopyFromCore(dstPtr, srcPtr, factor, length);
+                CopyFromCore(dstPtr, srcPtr, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -4805,7 +4805,7 @@ namespace LivreNoirLibrary.Collections
             fixed (nuint* dstPtr = dst)
             fixed (nuint* srcPtr = src)
             {
-                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, length);
+                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -4817,7 +4817,7 @@ namespace LivreNoirLibrary.Collections
             fixed (long* dstPtr = dst)
             fixed (long* srcPtr = src)
             {
-                CopyFromCore(dstPtr, srcPtr, factor, length);
+                CopyFromCore(dstPtr, srcPtr, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -4829,7 +4829,7 @@ namespace LivreNoirLibrary.Collections
             fixed (long* dstPtr = dst)
             fixed (long* srcPtr = src)
             {
-                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, length);
+                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -4841,7 +4841,7 @@ namespace LivreNoirLibrary.Collections
             fixed (ulong* dstPtr = dst)
             fixed (ulong* srcPtr = src)
             {
-                CopyFromCore(dstPtr, srcPtr, factor, length);
+                CopyFromCore(dstPtr, srcPtr, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -4853,7 +4853,7 @@ namespace LivreNoirLibrary.Collections
             fixed (ulong* dstPtr = dst)
             fixed (ulong* srcPtr = src)
             {
-                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, length);
+                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -4865,7 +4865,7 @@ namespace LivreNoirLibrary.Collections
             fixed (float* dstPtr = dst)
             fixed (float* srcPtr = src)
             {
-                CopyFromCore(dstPtr, srcPtr, factor, length);
+                CopyFromCore(dstPtr, srcPtr, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -4877,7 +4877,7 @@ namespace LivreNoirLibrary.Collections
             fixed (float* dstPtr = dst)
             fixed (float* srcPtr = src)
             {
-                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, length);
+                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -4889,7 +4889,7 @@ namespace LivreNoirLibrary.Collections
             fixed (double* dstPtr = dst)
             fixed (double* srcPtr = src)
             {
-                CopyFromCore(dstPtr, srcPtr, factor, length);
+                CopyFromCore(dstPtr, srcPtr, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -4901,7 +4901,7 @@ namespace LivreNoirLibrary.Collections
             fixed (double* dstPtr = dst)
             fixed (double* srcPtr = src)
             {
-                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, length);
+                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -4913,7 +4913,7 @@ namespace LivreNoirLibrary.Collections
             fixed (byte* dstPtr = dst)
             fixed (byte* srcPtr = src)
             {
-                CopyFromCore(dstPtr, srcPtr, factor, length);
+                CopyFromCore(dstPtr, srcPtr, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -4925,7 +4925,7 @@ namespace LivreNoirLibrary.Collections
             fixed (byte* dstPtr = dst)
             fixed (byte* srcPtr = src)
             {
-                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, length);
+                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -4937,7 +4937,7 @@ namespace LivreNoirLibrary.Collections
             fixed (sbyte* dstPtr = dst)
             fixed (sbyte* srcPtr = src)
             {
-                CopyFromCore(dstPtr, srcPtr, factor, length);
+                CopyFromCore(dstPtr, srcPtr, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -4949,7 +4949,7 @@ namespace LivreNoirLibrary.Collections
             fixed (sbyte* dstPtr = dst)
             fixed (sbyte* srcPtr = src)
             {
-                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, length);
+                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -4961,7 +4961,7 @@ namespace LivreNoirLibrary.Collections
             fixed (short* dstPtr = dst)
             fixed (short* srcPtr = src)
             {
-                CopyFromCore(dstPtr, srcPtr, factor, length);
+                CopyFromCore(dstPtr, srcPtr, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -4973,7 +4973,7 @@ namespace LivreNoirLibrary.Collections
             fixed (short* dstPtr = dst)
             fixed (short* srcPtr = src)
             {
-                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, length);
+                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -4985,7 +4985,7 @@ namespace LivreNoirLibrary.Collections
             fixed (ushort* dstPtr = dst)
             fixed (ushort* srcPtr = src)
             {
-                CopyFromCore(dstPtr, srcPtr, factor, length);
+                CopyFromCore(dstPtr, srcPtr, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -4997,7 +4997,7 @@ namespace LivreNoirLibrary.Collections
             fixed (ushort* dstPtr = dst)
             fixed (ushort* srcPtr = src)
             {
-                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, length);
+                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -5009,7 +5009,7 @@ namespace LivreNoirLibrary.Collections
             fixed (int* dstPtr = dst)
             fixed (int* srcPtr = src)
             {
-                CopyFromCore(dstPtr, srcPtr, factor, length);
+                CopyFromCore(dstPtr, srcPtr, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -5021,7 +5021,7 @@ namespace LivreNoirLibrary.Collections
             fixed (int* dstPtr = dst)
             fixed (int* srcPtr = src)
             {
-                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, length);
+                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -5033,7 +5033,7 @@ namespace LivreNoirLibrary.Collections
             fixed (uint* dstPtr = dst)
             fixed (uint* srcPtr = src)
             {
-                CopyFromCore(dstPtr, srcPtr, factor, length);
+                CopyFromCore(dstPtr, srcPtr, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -5045,7 +5045,7 @@ namespace LivreNoirLibrary.Collections
             fixed (uint* dstPtr = dst)
             fixed (uint* srcPtr = src)
             {
-                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, length);
+                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -5057,7 +5057,7 @@ namespace LivreNoirLibrary.Collections
             fixed (nint* dstPtr = dst)
             fixed (nint* srcPtr = src)
             {
-                CopyFromCore(dstPtr, srcPtr, factor, length);
+                CopyFromCore(dstPtr, srcPtr, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -5069,7 +5069,7 @@ namespace LivreNoirLibrary.Collections
             fixed (nint* dstPtr = dst)
             fixed (nint* srcPtr = src)
             {
-                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, length);
+                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -5081,7 +5081,7 @@ namespace LivreNoirLibrary.Collections
             fixed (nuint* dstPtr = dst)
             fixed (nuint* srcPtr = src)
             {
-                CopyFromCore(dstPtr, srcPtr, factor, length);
+                CopyFromCore(dstPtr, srcPtr, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -5093,7 +5093,7 @@ namespace LivreNoirLibrary.Collections
             fixed (nuint* dstPtr = dst)
             fixed (nuint* srcPtr = src)
             {
-                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, length);
+                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -5105,7 +5105,7 @@ namespace LivreNoirLibrary.Collections
             fixed (long* dstPtr = dst)
             fixed (long* srcPtr = src)
             {
-                CopyFromCore(dstPtr, srcPtr, factor, length);
+                CopyFromCore(dstPtr, srcPtr, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -5117,7 +5117,7 @@ namespace LivreNoirLibrary.Collections
             fixed (long* dstPtr = dst)
             fixed (long* srcPtr = src)
             {
-                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, length);
+                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -5129,7 +5129,7 @@ namespace LivreNoirLibrary.Collections
             fixed (ulong* dstPtr = dst)
             fixed (ulong* srcPtr = src)
             {
-                CopyFromCore(dstPtr, srcPtr, factor, length);
+                CopyFromCore(dstPtr, srcPtr, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -5141,7 +5141,7 @@ namespace LivreNoirLibrary.Collections
             fixed (ulong* dstPtr = dst)
             fixed (ulong* srcPtr = src)
             {
-                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, length);
+                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -5153,7 +5153,7 @@ namespace LivreNoirLibrary.Collections
             fixed (float* dstPtr = dst)
             fixed (float* srcPtr = src)
             {
-                CopyFromCore(dstPtr, srcPtr, factor, length);
+                CopyFromCore(dstPtr, srcPtr, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -5165,7 +5165,7 @@ namespace LivreNoirLibrary.Collections
             fixed (float* dstPtr = dst)
             fixed (float* srcPtr = src)
             {
-                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, length);
+                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -5177,7 +5177,7 @@ namespace LivreNoirLibrary.Collections
             fixed (double* dstPtr = dst)
             fixed (double* srcPtr = src)
             {
-                CopyFromCore(dstPtr, srcPtr, factor, length);
+                CopyFromCore(dstPtr, srcPtr, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -5189,7 +5189,7 @@ namespace LivreNoirLibrary.Collections
             fixed (double* dstPtr = dst)
             fixed (double* srcPtr = src)
             {
-                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, length);
+                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -5201,7 +5201,7 @@ namespace LivreNoirLibrary.Collections
             fixed (byte* dstPtr = dst)
             fixed (byte* srcPtr = src)
             {
-                CopyFromCore(dstPtr, srcPtr, factor, length);
+                CopyFromCore(dstPtr, srcPtr, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -5213,7 +5213,7 @@ namespace LivreNoirLibrary.Collections
             fixed (byte* dstPtr = dst)
             fixed (byte* srcPtr = src)
             {
-                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, length);
+                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -5225,7 +5225,7 @@ namespace LivreNoirLibrary.Collections
             fixed (sbyte* dstPtr = dst)
             fixed (sbyte* srcPtr = src)
             {
-                CopyFromCore(dstPtr, srcPtr, factor, length);
+                CopyFromCore(dstPtr, srcPtr, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -5237,7 +5237,7 @@ namespace LivreNoirLibrary.Collections
             fixed (sbyte* dstPtr = dst)
             fixed (sbyte* srcPtr = src)
             {
-                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, length);
+                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -5249,7 +5249,7 @@ namespace LivreNoirLibrary.Collections
             fixed (short* dstPtr = dst)
             fixed (short* srcPtr = src)
             {
-                CopyFromCore(dstPtr, srcPtr, factor, length);
+                CopyFromCore(dstPtr, srcPtr, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -5261,7 +5261,7 @@ namespace LivreNoirLibrary.Collections
             fixed (short* dstPtr = dst)
             fixed (short* srcPtr = src)
             {
-                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, length);
+                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -5273,7 +5273,7 @@ namespace LivreNoirLibrary.Collections
             fixed (ushort* dstPtr = dst)
             fixed (ushort* srcPtr = src)
             {
-                CopyFromCore(dstPtr, srcPtr, factor, length);
+                CopyFromCore(dstPtr, srcPtr, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -5285,7 +5285,7 @@ namespace LivreNoirLibrary.Collections
             fixed (ushort* dstPtr = dst)
             fixed (ushort* srcPtr = src)
             {
-                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, length);
+                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -5297,7 +5297,7 @@ namespace LivreNoirLibrary.Collections
             fixed (int* dstPtr = dst)
             fixed (int* srcPtr = src)
             {
-                CopyFromCore(dstPtr, srcPtr, factor, length);
+                CopyFromCore(dstPtr, srcPtr, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -5309,7 +5309,7 @@ namespace LivreNoirLibrary.Collections
             fixed (int* dstPtr = dst)
             fixed (int* srcPtr = src)
             {
-                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, length);
+                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -5321,7 +5321,7 @@ namespace LivreNoirLibrary.Collections
             fixed (uint* dstPtr = dst)
             fixed (uint* srcPtr = src)
             {
-                CopyFromCore(dstPtr, srcPtr, factor, length);
+                CopyFromCore(dstPtr, srcPtr, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -5333,7 +5333,7 @@ namespace LivreNoirLibrary.Collections
             fixed (uint* dstPtr = dst)
             fixed (uint* srcPtr = src)
             {
-                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, length);
+                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -5345,7 +5345,7 @@ namespace LivreNoirLibrary.Collections
             fixed (nint* dstPtr = dst)
             fixed (nint* srcPtr = src)
             {
-                CopyFromCore(dstPtr, srcPtr, factor, length);
+                CopyFromCore(dstPtr, srcPtr, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -5357,7 +5357,7 @@ namespace LivreNoirLibrary.Collections
             fixed (nint* dstPtr = dst)
             fixed (nint* srcPtr = src)
             {
-                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, length);
+                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -5369,7 +5369,7 @@ namespace LivreNoirLibrary.Collections
             fixed (nuint* dstPtr = dst)
             fixed (nuint* srcPtr = src)
             {
-                CopyFromCore(dstPtr, srcPtr, factor, length);
+                CopyFromCore(dstPtr, srcPtr, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -5381,7 +5381,7 @@ namespace LivreNoirLibrary.Collections
             fixed (nuint* dstPtr = dst)
             fixed (nuint* srcPtr = src)
             {
-                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, length);
+                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -5393,7 +5393,7 @@ namespace LivreNoirLibrary.Collections
             fixed (long* dstPtr = dst)
             fixed (long* srcPtr = src)
             {
-                CopyFromCore(dstPtr, srcPtr, factor, length);
+                CopyFromCore(dstPtr, srcPtr, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -5405,7 +5405,7 @@ namespace LivreNoirLibrary.Collections
             fixed (long* dstPtr = dst)
             fixed (long* srcPtr = src)
             {
-                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, length);
+                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -5417,7 +5417,7 @@ namespace LivreNoirLibrary.Collections
             fixed (ulong* dstPtr = dst)
             fixed (ulong* srcPtr = src)
             {
-                CopyFromCore(dstPtr, srcPtr, factor, length);
+                CopyFromCore(dstPtr, srcPtr, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -5429,7 +5429,7 @@ namespace LivreNoirLibrary.Collections
             fixed (ulong* dstPtr = dst)
             fixed (ulong* srcPtr = src)
             {
-                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, length);
+                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -5441,7 +5441,7 @@ namespace LivreNoirLibrary.Collections
             fixed (float* dstPtr = dst)
             fixed (float* srcPtr = src)
             {
-                CopyFromCore(dstPtr, srcPtr, factor, length);
+                CopyFromCore(dstPtr, srcPtr, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -5453,7 +5453,7 @@ namespace LivreNoirLibrary.Collections
             fixed (float* dstPtr = dst)
             fixed (float* srcPtr = src)
             {
-                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, length);
+                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -5465,7 +5465,7 @@ namespace LivreNoirLibrary.Collections
             fixed (double* dstPtr = dst)
             fixed (double* srcPtr = src)
             {
-                CopyFromCore(dstPtr, srcPtr, factor, length);
+                CopyFromCore(dstPtr, srcPtr, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -5477,7 +5477,7 @@ namespace LivreNoirLibrary.Collections
             fixed (double* dstPtr = dst)
             fixed (double* srcPtr = src)
             {
-                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, length);
+                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -5489,7 +5489,7 @@ namespace LivreNoirLibrary.Collections
             fixed (byte* dstPtr = dst)
             fixed (byte* srcPtr = src)
             {
-                CopyFromCore(dstPtr, srcPtr, factor, length);
+                CopyFromCore(dstPtr, srcPtr, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -5501,7 +5501,7 @@ namespace LivreNoirLibrary.Collections
             fixed (byte* dstPtr = dst)
             fixed (byte* srcPtr = src)
             {
-                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, length);
+                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -5513,7 +5513,7 @@ namespace LivreNoirLibrary.Collections
             fixed (sbyte* dstPtr = dst)
             fixed (sbyte* srcPtr = src)
             {
-                CopyFromCore(dstPtr, srcPtr, factor, length);
+                CopyFromCore(dstPtr, srcPtr, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -5525,7 +5525,7 @@ namespace LivreNoirLibrary.Collections
             fixed (sbyte* dstPtr = dst)
             fixed (sbyte* srcPtr = src)
             {
-                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, length);
+                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -5537,7 +5537,7 @@ namespace LivreNoirLibrary.Collections
             fixed (short* dstPtr = dst)
             fixed (short* srcPtr = src)
             {
-                CopyFromCore(dstPtr, srcPtr, factor, length);
+                CopyFromCore(dstPtr, srcPtr, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -5549,7 +5549,7 @@ namespace LivreNoirLibrary.Collections
             fixed (short* dstPtr = dst)
             fixed (short* srcPtr = src)
             {
-                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, length);
+                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -5561,7 +5561,7 @@ namespace LivreNoirLibrary.Collections
             fixed (ushort* dstPtr = dst)
             fixed (ushort* srcPtr = src)
             {
-                CopyFromCore(dstPtr, srcPtr, factor, length);
+                CopyFromCore(dstPtr, srcPtr, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -5573,7 +5573,7 @@ namespace LivreNoirLibrary.Collections
             fixed (ushort* dstPtr = dst)
             fixed (ushort* srcPtr = src)
             {
-                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, length);
+                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -5585,7 +5585,7 @@ namespace LivreNoirLibrary.Collections
             fixed (int* dstPtr = dst)
             fixed (int* srcPtr = src)
             {
-                CopyFromCore(dstPtr, srcPtr, factor, length);
+                CopyFromCore(dstPtr, srcPtr, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -5597,7 +5597,7 @@ namespace LivreNoirLibrary.Collections
             fixed (int* dstPtr = dst)
             fixed (int* srcPtr = src)
             {
-                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, length);
+                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -5609,7 +5609,7 @@ namespace LivreNoirLibrary.Collections
             fixed (uint* dstPtr = dst)
             fixed (uint* srcPtr = src)
             {
-                CopyFromCore(dstPtr, srcPtr, factor, length);
+                CopyFromCore(dstPtr, srcPtr, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -5621,7 +5621,7 @@ namespace LivreNoirLibrary.Collections
             fixed (uint* dstPtr = dst)
             fixed (uint* srcPtr = src)
             {
-                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, length);
+                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -5633,7 +5633,7 @@ namespace LivreNoirLibrary.Collections
             fixed (nint* dstPtr = dst)
             fixed (nint* srcPtr = src)
             {
-                CopyFromCore(dstPtr, srcPtr, factor, length);
+                CopyFromCore(dstPtr, srcPtr, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -5645,7 +5645,7 @@ namespace LivreNoirLibrary.Collections
             fixed (nint* dstPtr = dst)
             fixed (nint* srcPtr = src)
             {
-                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, length);
+                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -5657,7 +5657,7 @@ namespace LivreNoirLibrary.Collections
             fixed (nuint* dstPtr = dst)
             fixed (nuint* srcPtr = src)
             {
-                CopyFromCore(dstPtr, srcPtr, factor, length);
+                CopyFromCore(dstPtr, srcPtr, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -5669,7 +5669,7 @@ namespace LivreNoirLibrary.Collections
             fixed (nuint* dstPtr = dst)
             fixed (nuint* srcPtr = src)
             {
-                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, length);
+                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -5681,7 +5681,7 @@ namespace LivreNoirLibrary.Collections
             fixed (long* dstPtr = dst)
             fixed (long* srcPtr = src)
             {
-                CopyFromCore(dstPtr, srcPtr, factor, length);
+                CopyFromCore(dstPtr, srcPtr, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -5693,7 +5693,7 @@ namespace LivreNoirLibrary.Collections
             fixed (long* dstPtr = dst)
             fixed (long* srcPtr = src)
             {
-                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, length);
+                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -5705,7 +5705,7 @@ namespace LivreNoirLibrary.Collections
             fixed (ulong* dstPtr = dst)
             fixed (ulong* srcPtr = src)
             {
-                CopyFromCore(dstPtr, srcPtr, factor, length);
+                CopyFromCore(dstPtr, srcPtr, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -5717,7 +5717,7 @@ namespace LivreNoirLibrary.Collections
             fixed (ulong* dstPtr = dst)
             fixed (ulong* srcPtr = src)
             {
-                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, length);
+                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -5729,7 +5729,7 @@ namespace LivreNoirLibrary.Collections
             fixed (float* dstPtr = dst)
             fixed (float* srcPtr = src)
             {
-                CopyFromCore(dstPtr, srcPtr, factor, length);
+                CopyFromCore(dstPtr, srcPtr, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -5741,7 +5741,7 @@ namespace LivreNoirLibrary.Collections
             fixed (float* dstPtr = dst)
             fixed (float* srcPtr = src)
             {
-                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, length);
+                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -5753,7 +5753,7 @@ namespace LivreNoirLibrary.Collections
             fixed (double* dstPtr = dst)
             fixed (double* srcPtr = src)
             {
-                CopyFromCore(dstPtr, srcPtr, factor, length);
+                CopyFromCore(dstPtr, srcPtr, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -5765,7 +5765,7 @@ namespace LivreNoirLibrary.Collections
             fixed (double* dstPtr = dst)
             fixed (double* srcPtr = src)
             {
-                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, length);
+                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -5777,7 +5777,7 @@ namespace LivreNoirLibrary.Collections
             fixed (byte* dstPtr = dst)
             fixed (byte* srcPtr = src)
             {
-                CopyFromCore(dstPtr, srcPtr, factor, length);
+                CopyFromCore(dstPtr, srcPtr, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -5789,7 +5789,7 @@ namespace LivreNoirLibrary.Collections
             fixed (byte* dstPtr = dst)
             fixed (byte* srcPtr = src)
             {
-                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, length);
+                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -5801,7 +5801,7 @@ namespace LivreNoirLibrary.Collections
             fixed (sbyte* dstPtr = dst)
             fixed (sbyte* srcPtr = src)
             {
-                CopyFromCore(dstPtr, srcPtr, factor, length);
+                CopyFromCore(dstPtr, srcPtr, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -5813,7 +5813,7 @@ namespace LivreNoirLibrary.Collections
             fixed (sbyte* dstPtr = dst)
             fixed (sbyte* srcPtr = src)
             {
-                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, length);
+                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -5825,7 +5825,7 @@ namespace LivreNoirLibrary.Collections
             fixed (short* dstPtr = dst)
             fixed (short* srcPtr = src)
             {
-                CopyFromCore(dstPtr, srcPtr, factor, length);
+                CopyFromCore(dstPtr, srcPtr, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -5837,7 +5837,7 @@ namespace LivreNoirLibrary.Collections
             fixed (short* dstPtr = dst)
             fixed (short* srcPtr = src)
             {
-                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, length);
+                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -5849,7 +5849,7 @@ namespace LivreNoirLibrary.Collections
             fixed (ushort* dstPtr = dst)
             fixed (ushort* srcPtr = src)
             {
-                CopyFromCore(dstPtr, srcPtr, factor, length);
+                CopyFromCore(dstPtr, srcPtr, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -5861,7 +5861,7 @@ namespace LivreNoirLibrary.Collections
             fixed (ushort* dstPtr = dst)
             fixed (ushort* srcPtr = src)
             {
-                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, length);
+                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -5873,7 +5873,7 @@ namespace LivreNoirLibrary.Collections
             fixed (int* dstPtr = dst)
             fixed (int* srcPtr = src)
             {
-                CopyFromCore(dstPtr, srcPtr, factor, length);
+                CopyFromCore(dstPtr, srcPtr, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -5885,7 +5885,7 @@ namespace LivreNoirLibrary.Collections
             fixed (int* dstPtr = dst)
             fixed (int* srcPtr = src)
             {
-                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, length);
+                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -5897,7 +5897,7 @@ namespace LivreNoirLibrary.Collections
             fixed (uint* dstPtr = dst)
             fixed (uint* srcPtr = src)
             {
-                CopyFromCore(dstPtr, srcPtr, factor, length);
+                CopyFromCore(dstPtr, srcPtr, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -5909,7 +5909,7 @@ namespace LivreNoirLibrary.Collections
             fixed (uint* dstPtr = dst)
             fixed (uint* srcPtr = src)
             {
-                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, length);
+                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -5921,7 +5921,7 @@ namespace LivreNoirLibrary.Collections
             fixed (nint* dstPtr = dst)
             fixed (nint* srcPtr = src)
             {
-                CopyFromCore(dstPtr, srcPtr, factor, length);
+                CopyFromCore(dstPtr, srcPtr, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -5933,7 +5933,7 @@ namespace LivreNoirLibrary.Collections
             fixed (nint* dstPtr = dst)
             fixed (nint* srcPtr = src)
             {
-                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, length);
+                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -5945,7 +5945,7 @@ namespace LivreNoirLibrary.Collections
             fixed (nuint* dstPtr = dst)
             fixed (nuint* srcPtr = src)
             {
-                CopyFromCore(dstPtr, srcPtr, factor, length);
+                CopyFromCore(dstPtr, srcPtr, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -5957,7 +5957,7 @@ namespace LivreNoirLibrary.Collections
             fixed (nuint* dstPtr = dst)
             fixed (nuint* srcPtr = src)
             {
-                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, length);
+                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -5969,7 +5969,7 @@ namespace LivreNoirLibrary.Collections
             fixed (long* dstPtr = dst)
             fixed (long* srcPtr = src)
             {
-                CopyFromCore(dstPtr, srcPtr, factor, length);
+                CopyFromCore(dstPtr, srcPtr, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -5981,7 +5981,7 @@ namespace LivreNoirLibrary.Collections
             fixed (long* dstPtr = dst)
             fixed (long* srcPtr = src)
             {
-                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, length);
+                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -5993,7 +5993,7 @@ namespace LivreNoirLibrary.Collections
             fixed (ulong* dstPtr = dst)
             fixed (ulong* srcPtr = src)
             {
-                CopyFromCore(dstPtr, srcPtr, factor, length);
+                CopyFromCore(dstPtr, srcPtr, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -6005,7 +6005,7 @@ namespace LivreNoirLibrary.Collections
             fixed (ulong* dstPtr = dst)
             fixed (ulong* srcPtr = src)
             {
-                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, length);
+                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -6017,7 +6017,7 @@ namespace LivreNoirLibrary.Collections
             fixed (float* dstPtr = dst)
             fixed (float* srcPtr = src)
             {
-                CopyFromCore(dstPtr, srcPtr, factor, length);
+                CopyFromCore(dstPtr, srcPtr, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -6029,7 +6029,7 @@ namespace LivreNoirLibrary.Collections
             fixed (float* dstPtr = dst)
             fixed (float* srcPtr = src)
             {
-                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, length);
+                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -6041,7 +6041,7 @@ namespace LivreNoirLibrary.Collections
             fixed (double* dstPtr = dst)
             fixed (double* srcPtr = src)
             {
-                CopyFromCore(dstPtr, srcPtr, factor, length);
+                CopyFromCore(dstPtr, srcPtr, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -6053,7 +6053,7 @@ namespace LivreNoirLibrary.Collections
             fixed (double* dstPtr = dst)
             fixed (double* srcPtr = src)
             {
-                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, length);
+                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -6065,7 +6065,7 @@ namespace LivreNoirLibrary.Collections
             fixed (byte* dstPtr = dst)
             fixed (byte* srcPtr = src)
             {
-                CopyFromCore(dstPtr, srcPtr, factor, length);
+                CopyFromCore(dstPtr, srcPtr, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -6077,7 +6077,7 @@ namespace LivreNoirLibrary.Collections
             fixed (byte* dstPtr = dst)
             fixed (byte* srcPtr = src)
             {
-                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, length);
+                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -6089,7 +6089,7 @@ namespace LivreNoirLibrary.Collections
             fixed (sbyte* dstPtr = dst)
             fixed (sbyte* srcPtr = src)
             {
-                CopyFromCore(dstPtr, srcPtr, factor, length);
+                CopyFromCore(dstPtr, srcPtr, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -6101,7 +6101,7 @@ namespace LivreNoirLibrary.Collections
             fixed (sbyte* dstPtr = dst)
             fixed (sbyte* srcPtr = src)
             {
-                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, length);
+                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -6113,7 +6113,7 @@ namespace LivreNoirLibrary.Collections
             fixed (short* dstPtr = dst)
             fixed (short* srcPtr = src)
             {
-                CopyFromCore(dstPtr, srcPtr, factor, length);
+                CopyFromCore(dstPtr, srcPtr, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -6125,7 +6125,7 @@ namespace LivreNoirLibrary.Collections
             fixed (short* dstPtr = dst)
             fixed (short* srcPtr = src)
             {
-                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, length);
+                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -6137,7 +6137,7 @@ namespace LivreNoirLibrary.Collections
             fixed (ushort* dstPtr = dst)
             fixed (ushort* srcPtr = src)
             {
-                CopyFromCore(dstPtr, srcPtr, factor, length);
+                CopyFromCore(dstPtr, srcPtr, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -6149,7 +6149,7 @@ namespace LivreNoirLibrary.Collections
             fixed (ushort* dstPtr = dst)
             fixed (ushort* srcPtr = src)
             {
-                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, length);
+                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -6161,7 +6161,7 @@ namespace LivreNoirLibrary.Collections
             fixed (int* dstPtr = dst)
             fixed (int* srcPtr = src)
             {
-                CopyFromCore(dstPtr, srcPtr, factor, length);
+                CopyFromCore(dstPtr, srcPtr, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -6173,7 +6173,7 @@ namespace LivreNoirLibrary.Collections
             fixed (int* dstPtr = dst)
             fixed (int* srcPtr = src)
             {
-                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, length);
+                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -6185,7 +6185,7 @@ namespace LivreNoirLibrary.Collections
             fixed (uint* dstPtr = dst)
             fixed (uint* srcPtr = src)
             {
-                CopyFromCore(dstPtr, srcPtr, factor, length);
+                CopyFromCore(dstPtr, srcPtr, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -6197,7 +6197,7 @@ namespace LivreNoirLibrary.Collections
             fixed (uint* dstPtr = dst)
             fixed (uint* srcPtr = src)
             {
-                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, length);
+                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -6209,7 +6209,7 @@ namespace LivreNoirLibrary.Collections
             fixed (nint* dstPtr = dst)
             fixed (nint* srcPtr = src)
             {
-                CopyFromCore(dstPtr, srcPtr, factor, length);
+                CopyFromCore(dstPtr, srcPtr, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -6221,7 +6221,7 @@ namespace LivreNoirLibrary.Collections
             fixed (nint* dstPtr = dst)
             fixed (nint* srcPtr = src)
             {
-                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, length);
+                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -6233,7 +6233,7 @@ namespace LivreNoirLibrary.Collections
             fixed (nuint* dstPtr = dst)
             fixed (nuint* srcPtr = src)
             {
-                CopyFromCore(dstPtr, srcPtr, factor, length);
+                CopyFromCore(dstPtr, srcPtr, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -6245,7 +6245,7 @@ namespace LivreNoirLibrary.Collections
             fixed (nuint* dstPtr = dst)
             fixed (nuint* srcPtr = src)
             {
-                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, length);
+                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -6257,7 +6257,7 @@ namespace LivreNoirLibrary.Collections
             fixed (long* dstPtr = dst)
             fixed (long* srcPtr = src)
             {
-                CopyFromCore(dstPtr, srcPtr, factor, length);
+                CopyFromCore(dstPtr, srcPtr, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -6269,7 +6269,7 @@ namespace LivreNoirLibrary.Collections
             fixed (long* dstPtr = dst)
             fixed (long* srcPtr = src)
             {
-                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, length);
+                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -6281,7 +6281,7 @@ namespace LivreNoirLibrary.Collections
             fixed (ulong* dstPtr = dst)
             fixed (ulong* srcPtr = src)
             {
-                CopyFromCore(dstPtr, srcPtr, factor, length);
+                CopyFromCore(dstPtr, srcPtr, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -6293,7 +6293,7 @@ namespace LivreNoirLibrary.Collections
             fixed (ulong* dstPtr = dst)
             fixed (ulong* srcPtr = src)
             {
-                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, length);
+                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -6305,7 +6305,7 @@ namespace LivreNoirLibrary.Collections
             fixed (float* dstPtr = dst)
             fixed (float* srcPtr = src)
             {
-                CopyFromCore(dstPtr, srcPtr, factor, length);
+                CopyFromCore(dstPtr, srcPtr, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -6317,7 +6317,7 @@ namespace LivreNoirLibrary.Collections
             fixed (float* dstPtr = dst)
             fixed (float* srcPtr = src)
             {
-                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, length);
+                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -6329,7 +6329,7 @@ namespace LivreNoirLibrary.Collections
             fixed (double* dstPtr = dst)
             fixed (double* srcPtr = src)
             {
-                CopyFromCore(dstPtr, srcPtr, factor, length);
+                CopyFromCore(dstPtr, srcPtr, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -6341,7 +6341,7 @@ namespace LivreNoirLibrary.Collections
             fixed (double* dstPtr = dst)
             fixed (double* srcPtr = src)
             {
-                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, length);
+                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -6353,7 +6353,7 @@ namespace LivreNoirLibrary.Collections
             fixed (byte* dstPtr = dst)
             fixed (byte* srcPtr = src)
             {
-                CopyFromCore(dstPtr, srcPtr, factor, length);
+                CopyFromCore(dstPtr, srcPtr, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -6365,7 +6365,7 @@ namespace LivreNoirLibrary.Collections
             fixed (byte* dstPtr = dst)
             fixed (byte* srcPtr = src)
             {
-                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, length);
+                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -6377,7 +6377,7 @@ namespace LivreNoirLibrary.Collections
             fixed (sbyte* dstPtr = dst)
             fixed (sbyte* srcPtr = src)
             {
-                CopyFromCore(dstPtr, srcPtr, factor, length);
+                CopyFromCore(dstPtr, srcPtr, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -6389,7 +6389,7 @@ namespace LivreNoirLibrary.Collections
             fixed (sbyte* dstPtr = dst)
             fixed (sbyte* srcPtr = src)
             {
-                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, length);
+                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -6401,7 +6401,7 @@ namespace LivreNoirLibrary.Collections
             fixed (short* dstPtr = dst)
             fixed (short* srcPtr = src)
             {
-                CopyFromCore(dstPtr, srcPtr, factor, length);
+                CopyFromCore(dstPtr, srcPtr, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -6413,7 +6413,7 @@ namespace LivreNoirLibrary.Collections
             fixed (short* dstPtr = dst)
             fixed (short* srcPtr = src)
             {
-                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, length);
+                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -6425,7 +6425,7 @@ namespace LivreNoirLibrary.Collections
             fixed (ushort* dstPtr = dst)
             fixed (ushort* srcPtr = src)
             {
-                CopyFromCore(dstPtr, srcPtr, factor, length);
+                CopyFromCore(dstPtr, srcPtr, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -6437,7 +6437,7 @@ namespace LivreNoirLibrary.Collections
             fixed (ushort* dstPtr = dst)
             fixed (ushort* srcPtr = src)
             {
-                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, length);
+                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -6449,7 +6449,7 @@ namespace LivreNoirLibrary.Collections
             fixed (int* dstPtr = dst)
             fixed (int* srcPtr = src)
             {
-                CopyFromCore(dstPtr, srcPtr, factor, length);
+                CopyFromCore(dstPtr, srcPtr, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -6461,7 +6461,7 @@ namespace LivreNoirLibrary.Collections
             fixed (int* dstPtr = dst)
             fixed (int* srcPtr = src)
             {
-                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, length);
+                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -6473,7 +6473,7 @@ namespace LivreNoirLibrary.Collections
             fixed (uint* dstPtr = dst)
             fixed (uint* srcPtr = src)
             {
-                CopyFromCore(dstPtr, srcPtr, factor, length);
+                CopyFromCore(dstPtr, srcPtr, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -6485,7 +6485,7 @@ namespace LivreNoirLibrary.Collections
             fixed (uint* dstPtr = dst)
             fixed (uint* srcPtr = src)
             {
-                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, length);
+                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -6497,7 +6497,7 @@ namespace LivreNoirLibrary.Collections
             fixed (nint* dstPtr = dst)
             fixed (nint* srcPtr = src)
             {
-                CopyFromCore(dstPtr, srcPtr, factor, length);
+                CopyFromCore(dstPtr, srcPtr, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -6509,7 +6509,7 @@ namespace LivreNoirLibrary.Collections
             fixed (nint* dstPtr = dst)
             fixed (nint* srcPtr = src)
             {
-                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, length);
+                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -6521,7 +6521,7 @@ namespace LivreNoirLibrary.Collections
             fixed (nuint* dstPtr = dst)
             fixed (nuint* srcPtr = src)
             {
-                CopyFromCore(dstPtr, srcPtr, factor, length);
+                CopyFromCore(dstPtr, srcPtr, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -6533,7 +6533,7 @@ namespace LivreNoirLibrary.Collections
             fixed (nuint* dstPtr = dst)
             fixed (nuint* srcPtr = src)
             {
-                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, length);
+                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -6545,7 +6545,7 @@ namespace LivreNoirLibrary.Collections
             fixed (long* dstPtr = dst)
             fixed (long* srcPtr = src)
             {
-                CopyFromCore(dstPtr, srcPtr, factor, length);
+                CopyFromCore(dstPtr, srcPtr, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -6557,7 +6557,7 @@ namespace LivreNoirLibrary.Collections
             fixed (long* dstPtr = dst)
             fixed (long* srcPtr = src)
             {
-                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, length);
+                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -6569,7 +6569,7 @@ namespace LivreNoirLibrary.Collections
             fixed (ulong* dstPtr = dst)
             fixed (ulong* srcPtr = src)
             {
-                CopyFromCore(dstPtr, srcPtr, factor, length);
+                CopyFromCore(dstPtr, srcPtr, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -6581,7 +6581,7 @@ namespace LivreNoirLibrary.Collections
             fixed (ulong* dstPtr = dst)
             fixed (ulong* srcPtr = src)
             {
-                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, length);
+                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -6593,7 +6593,7 @@ namespace LivreNoirLibrary.Collections
             fixed (float* dstPtr = dst)
             fixed (float* srcPtr = src)
             {
-                CopyFromCore(dstPtr, srcPtr, factor, length);
+                CopyFromCore(dstPtr, srcPtr, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -6605,7 +6605,7 @@ namespace LivreNoirLibrary.Collections
             fixed (float* dstPtr = dst)
             fixed (float* srcPtr = src)
             {
-                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, length);
+                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -6617,7 +6617,7 @@ namespace LivreNoirLibrary.Collections
             fixed (double* dstPtr = dst)
             fixed (double* srcPtr = src)
             {
-                CopyFromCore(dstPtr, srcPtr, factor, length);
+                CopyFromCore(dstPtr, srcPtr, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -6629,7 +6629,7 @@ namespace LivreNoirLibrary.Collections
             fixed (double* dstPtr = dst)
             fixed (double* srcPtr = src)
             {
-                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, length);
+                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -6641,7 +6641,7 @@ namespace LivreNoirLibrary.Collections
             fixed (byte* dstPtr = dst)
             fixed (byte* srcPtr = src)
             {
-                CopyFromCore(dstPtr, srcPtr, factor, length);
+                CopyFromCore(dstPtr, srcPtr, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -6653,7 +6653,7 @@ namespace LivreNoirLibrary.Collections
             fixed (byte* dstPtr = dst)
             fixed (byte* srcPtr = src)
             {
-                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, length);
+                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -6665,7 +6665,7 @@ namespace LivreNoirLibrary.Collections
             fixed (sbyte* dstPtr = dst)
             fixed (sbyte* srcPtr = src)
             {
-                CopyFromCore(dstPtr, srcPtr, factor, length);
+                CopyFromCore(dstPtr, srcPtr, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -6677,7 +6677,7 @@ namespace LivreNoirLibrary.Collections
             fixed (sbyte* dstPtr = dst)
             fixed (sbyte* srcPtr = src)
             {
-                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, length);
+                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -6689,7 +6689,7 @@ namespace LivreNoirLibrary.Collections
             fixed (short* dstPtr = dst)
             fixed (short* srcPtr = src)
             {
-                CopyFromCore(dstPtr, srcPtr, factor, length);
+                CopyFromCore(dstPtr, srcPtr, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -6701,7 +6701,7 @@ namespace LivreNoirLibrary.Collections
             fixed (short* dstPtr = dst)
             fixed (short* srcPtr = src)
             {
-                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, length);
+                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -6713,7 +6713,7 @@ namespace LivreNoirLibrary.Collections
             fixed (ushort* dstPtr = dst)
             fixed (ushort* srcPtr = src)
             {
-                CopyFromCore(dstPtr, srcPtr, factor, length);
+                CopyFromCore(dstPtr, srcPtr, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -6725,7 +6725,7 @@ namespace LivreNoirLibrary.Collections
             fixed (ushort* dstPtr = dst)
             fixed (ushort* srcPtr = src)
             {
-                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, length);
+                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -6737,7 +6737,7 @@ namespace LivreNoirLibrary.Collections
             fixed (int* dstPtr = dst)
             fixed (int* srcPtr = src)
             {
-                CopyFromCore(dstPtr, srcPtr, factor, length);
+                CopyFromCore(dstPtr, srcPtr, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -6749,7 +6749,7 @@ namespace LivreNoirLibrary.Collections
             fixed (int* dstPtr = dst)
             fixed (int* srcPtr = src)
             {
-                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, length);
+                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -6761,7 +6761,7 @@ namespace LivreNoirLibrary.Collections
             fixed (uint* dstPtr = dst)
             fixed (uint* srcPtr = src)
             {
-                CopyFromCore(dstPtr, srcPtr, factor, length);
+                CopyFromCore(dstPtr, srcPtr, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -6773,7 +6773,7 @@ namespace LivreNoirLibrary.Collections
             fixed (uint* dstPtr = dst)
             fixed (uint* srcPtr = src)
             {
-                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, length);
+                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -6785,7 +6785,7 @@ namespace LivreNoirLibrary.Collections
             fixed (nint* dstPtr = dst)
             fixed (nint* srcPtr = src)
             {
-                CopyFromCore(dstPtr, srcPtr, factor, length);
+                CopyFromCore(dstPtr, srcPtr, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -6797,7 +6797,7 @@ namespace LivreNoirLibrary.Collections
             fixed (nint* dstPtr = dst)
             fixed (nint* srcPtr = src)
             {
-                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, length);
+                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -6809,7 +6809,7 @@ namespace LivreNoirLibrary.Collections
             fixed (nuint* dstPtr = dst)
             fixed (nuint* srcPtr = src)
             {
-                CopyFromCore(dstPtr, srcPtr, factor, length);
+                CopyFromCore(dstPtr, srcPtr, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -6821,7 +6821,7 @@ namespace LivreNoirLibrary.Collections
             fixed (nuint* dstPtr = dst)
             fixed (nuint* srcPtr = src)
             {
-                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, length);
+                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -6833,7 +6833,7 @@ namespace LivreNoirLibrary.Collections
             fixed (long* dstPtr = dst)
             fixed (long* srcPtr = src)
             {
-                CopyFromCore(dstPtr, srcPtr, factor, length);
+                CopyFromCore(dstPtr, srcPtr, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -6845,7 +6845,7 @@ namespace LivreNoirLibrary.Collections
             fixed (long* dstPtr = dst)
             fixed (long* srcPtr = src)
             {
-                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, length);
+                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -6857,7 +6857,7 @@ namespace LivreNoirLibrary.Collections
             fixed (ulong* dstPtr = dst)
             fixed (ulong* srcPtr = src)
             {
-                CopyFromCore(dstPtr, srcPtr, factor, length);
+                CopyFromCore(dstPtr, srcPtr, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -6869,7 +6869,7 @@ namespace LivreNoirLibrary.Collections
             fixed (ulong* dstPtr = dst)
             fixed (ulong* srcPtr = src)
             {
-                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, length);
+                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -6881,7 +6881,7 @@ namespace LivreNoirLibrary.Collections
             fixed (float* dstPtr = dst)
             fixed (float* srcPtr = src)
             {
-                CopyFromCore(dstPtr, srcPtr, factor, length);
+                CopyFromCore(dstPtr, srcPtr, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -6893,7 +6893,7 @@ namespace LivreNoirLibrary.Collections
             fixed (float* dstPtr = dst)
             fixed (float* srcPtr = src)
             {
-                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, length);
+                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -6905,7 +6905,7 @@ namespace LivreNoirLibrary.Collections
             fixed (double* dstPtr = dst)
             fixed (double* srcPtr = src)
             {
-                CopyFromCore(dstPtr, srcPtr, factor, length);
+                CopyFromCore(dstPtr, srcPtr, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -6917,7 +6917,7 @@ namespace LivreNoirLibrary.Collections
             fixed (double* dstPtr = dst)
             fixed (double* srcPtr = src)
             {
-                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, length);
+                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -6929,7 +6929,7 @@ namespace LivreNoirLibrary.Collections
             fixed (byte* dstPtr = dst)
             fixed (byte* srcPtr = src)
             {
-                CopyFromCore(dstPtr, srcPtr, factor, length);
+                CopyFromCore(dstPtr, srcPtr, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -6941,7 +6941,7 @@ namespace LivreNoirLibrary.Collections
             fixed (byte* dstPtr = dst)
             fixed (byte* srcPtr = src)
             {
-                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, length);
+                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -6953,7 +6953,7 @@ namespace LivreNoirLibrary.Collections
             fixed (sbyte* dstPtr = dst)
             fixed (sbyte* srcPtr = src)
             {
-                CopyFromCore(dstPtr, srcPtr, factor, length);
+                CopyFromCore(dstPtr, srcPtr, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -6965,7 +6965,7 @@ namespace LivreNoirLibrary.Collections
             fixed (sbyte* dstPtr = dst)
             fixed (sbyte* srcPtr = src)
             {
-                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, length);
+                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -6977,7 +6977,7 @@ namespace LivreNoirLibrary.Collections
             fixed (short* dstPtr = dst)
             fixed (short* srcPtr = src)
             {
-                CopyFromCore(dstPtr, srcPtr, factor, length);
+                CopyFromCore(dstPtr, srcPtr, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -6989,7 +6989,7 @@ namespace LivreNoirLibrary.Collections
             fixed (short* dstPtr = dst)
             fixed (short* srcPtr = src)
             {
-                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, length);
+                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -7001,7 +7001,7 @@ namespace LivreNoirLibrary.Collections
             fixed (ushort* dstPtr = dst)
             fixed (ushort* srcPtr = src)
             {
-                CopyFromCore(dstPtr, srcPtr, factor, length);
+                CopyFromCore(dstPtr, srcPtr, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -7013,7 +7013,7 @@ namespace LivreNoirLibrary.Collections
             fixed (ushort* dstPtr = dst)
             fixed (ushort* srcPtr = src)
             {
-                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, length);
+                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -7025,7 +7025,7 @@ namespace LivreNoirLibrary.Collections
             fixed (int* dstPtr = dst)
             fixed (int* srcPtr = src)
             {
-                CopyFromCore(dstPtr, srcPtr, factor, length);
+                CopyFromCore(dstPtr, srcPtr, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -7037,7 +7037,7 @@ namespace LivreNoirLibrary.Collections
             fixed (int* dstPtr = dst)
             fixed (int* srcPtr = src)
             {
-                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, length);
+                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -7049,7 +7049,7 @@ namespace LivreNoirLibrary.Collections
             fixed (uint* dstPtr = dst)
             fixed (uint* srcPtr = src)
             {
-                CopyFromCore(dstPtr, srcPtr, factor, length);
+                CopyFromCore(dstPtr, srcPtr, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -7061,7 +7061,7 @@ namespace LivreNoirLibrary.Collections
             fixed (uint* dstPtr = dst)
             fixed (uint* srcPtr = src)
             {
-                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, length);
+                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -7073,7 +7073,7 @@ namespace LivreNoirLibrary.Collections
             fixed (nint* dstPtr = dst)
             fixed (nint* srcPtr = src)
             {
-                CopyFromCore(dstPtr, srcPtr, factor, length);
+                CopyFromCore(dstPtr, srcPtr, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -7085,7 +7085,7 @@ namespace LivreNoirLibrary.Collections
             fixed (nint* dstPtr = dst)
             fixed (nint* srcPtr = src)
             {
-                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, length);
+                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -7097,7 +7097,7 @@ namespace LivreNoirLibrary.Collections
             fixed (nuint* dstPtr = dst)
             fixed (nuint* srcPtr = src)
             {
-                CopyFromCore(dstPtr, srcPtr, factor, length);
+                CopyFromCore(dstPtr, srcPtr, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -7109,7 +7109,7 @@ namespace LivreNoirLibrary.Collections
             fixed (nuint* dstPtr = dst)
             fixed (nuint* srcPtr = src)
             {
-                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, length);
+                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -7121,7 +7121,7 @@ namespace LivreNoirLibrary.Collections
             fixed (long* dstPtr = dst)
             fixed (long* srcPtr = src)
             {
-                CopyFromCore(dstPtr, srcPtr, factor, length);
+                CopyFromCore(dstPtr, srcPtr, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -7133,7 +7133,7 @@ namespace LivreNoirLibrary.Collections
             fixed (long* dstPtr = dst)
             fixed (long* srcPtr = src)
             {
-                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, length);
+                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -7145,7 +7145,7 @@ namespace LivreNoirLibrary.Collections
             fixed (ulong* dstPtr = dst)
             fixed (ulong* srcPtr = src)
             {
-                CopyFromCore(dstPtr, srcPtr, factor, length);
+                CopyFromCore(dstPtr, srcPtr, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -7157,7 +7157,7 @@ namespace LivreNoirLibrary.Collections
             fixed (ulong* dstPtr = dst)
             fixed (ulong* srcPtr = src)
             {
-                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, length);
+                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -7169,7 +7169,7 @@ namespace LivreNoirLibrary.Collections
             fixed (float* dstPtr = dst)
             fixed (float* srcPtr = src)
             {
-                CopyFromCore(dstPtr, srcPtr, factor, length);
+                CopyFromCore(dstPtr, srcPtr, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -7181,7 +7181,7 @@ namespace LivreNoirLibrary.Collections
             fixed (float* dstPtr = dst)
             fixed (float* srcPtr = src)
             {
-                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, length);
+                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -7193,7 +7193,7 @@ namespace LivreNoirLibrary.Collections
             fixed (double* dstPtr = dst)
             fixed (double* srcPtr = src)
             {
-                CopyFromCore(dstPtr, srcPtr, factor, length);
+                CopyFromCore(dstPtr, srcPtr, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -7205,7 +7205,7 @@ namespace LivreNoirLibrary.Collections
             fixed (double* dstPtr = dst)
             fixed (double* srcPtr = src)
             {
-                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, length);
+                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -7217,7 +7217,7 @@ namespace LivreNoirLibrary.Collections
             fixed (byte* dstPtr = dst)
             fixed (byte* srcPtr = src)
             {
-                CopyFromCore(dstPtr, srcPtr, factor, length);
+                CopyFromCore(dstPtr, srcPtr, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -7229,7 +7229,7 @@ namespace LivreNoirLibrary.Collections
             fixed (byte* dstPtr = dst)
             fixed (byte* srcPtr = src)
             {
-                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, length);
+                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -7241,7 +7241,7 @@ namespace LivreNoirLibrary.Collections
             fixed (sbyte* dstPtr = dst)
             fixed (sbyte* srcPtr = src)
             {
-                CopyFromCore(dstPtr, srcPtr, factor, length);
+                CopyFromCore(dstPtr, srcPtr, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -7253,7 +7253,7 @@ namespace LivreNoirLibrary.Collections
             fixed (sbyte* dstPtr = dst)
             fixed (sbyte* srcPtr = src)
             {
-                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, length);
+                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -7265,7 +7265,7 @@ namespace LivreNoirLibrary.Collections
             fixed (short* dstPtr = dst)
             fixed (short* srcPtr = src)
             {
-                CopyFromCore(dstPtr, srcPtr, factor, length);
+                CopyFromCore(dstPtr, srcPtr, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -7277,7 +7277,7 @@ namespace LivreNoirLibrary.Collections
             fixed (short* dstPtr = dst)
             fixed (short* srcPtr = src)
             {
-                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, length);
+                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -7289,7 +7289,7 @@ namespace LivreNoirLibrary.Collections
             fixed (ushort* dstPtr = dst)
             fixed (ushort* srcPtr = src)
             {
-                CopyFromCore(dstPtr, srcPtr, factor, length);
+                CopyFromCore(dstPtr, srcPtr, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -7301,7 +7301,7 @@ namespace LivreNoirLibrary.Collections
             fixed (ushort* dstPtr = dst)
             fixed (ushort* srcPtr = src)
             {
-                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, length);
+                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -7313,7 +7313,7 @@ namespace LivreNoirLibrary.Collections
             fixed (int* dstPtr = dst)
             fixed (int* srcPtr = src)
             {
-                CopyFromCore(dstPtr, srcPtr, factor, length);
+                CopyFromCore(dstPtr, srcPtr, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -7325,7 +7325,7 @@ namespace LivreNoirLibrary.Collections
             fixed (int* dstPtr = dst)
             fixed (int* srcPtr = src)
             {
-                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, length);
+                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -7337,7 +7337,7 @@ namespace LivreNoirLibrary.Collections
             fixed (uint* dstPtr = dst)
             fixed (uint* srcPtr = src)
             {
-                CopyFromCore(dstPtr, srcPtr, factor, length);
+                CopyFromCore(dstPtr, srcPtr, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -7349,7 +7349,7 @@ namespace LivreNoirLibrary.Collections
             fixed (uint* dstPtr = dst)
             fixed (uint* srcPtr = src)
             {
-                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, length);
+                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -7361,7 +7361,7 @@ namespace LivreNoirLibrary.Collections
             fixed (nint* dstPtr = dst)
             fixed (nint* srcPtr = src)
             {
-                CopyFromCore(dstPtr, srcPtr, factor, length);
+                CopyFromCore(dstPtr, srcPtr, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -7373,7 +7373,7 @@ namespace LivreNoirLibrary.Collections
             fixed (nint* dstPtr = dst)
             fixed (nint* srcPtr = src)
             {
-                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, length);
+                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -7385,7 +7385,7 @@ namespace LivreNoirLibrary.Collections
             fixed (nuint* dstPtr = dst)
             fixed (nuint* srcPtr = src)
             {
-                CopyFromCore(dstPtr, srcPtr, factor, length);
+                CopyFromCore(dstPtr, srcPtr, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -7397,7 +7397,7 @@ namespace LivreNoirLibrary.Collections
             fixed (nuint* dstPtr = dst)
             fixed (nuint* srcPtr = src)
             {
-                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, length);
+                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -7409,7 +7409,7 @@ namespace LivreNoirLibrary.Collections
             fixed (long* dstPtr = dst)
             fixed (long* srcPtr = src)
             {
-                CopyFromCore(dstPtr, srcPtr, factor, length);
+                CopyFromCore(dstPtr, srcPtr, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -7421,7 +7421,7 @@ namespace LivreNoirLibrary.Collections
             fixed (long* dstPtr = dst)
             fixed (long* srcPtr = src)
             {
-                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, length);
+                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -7433,7 +7433,7 @@ namespace LivreNoirLibrary.Collections
             fixed (ulong* dstPtr = dst)
             fixed (ulong* srcPtr = src)
             {
-                CopyFromCore(dstPtr, srcPtr, factor, length);
+                CopyFromCore(dstPtr, srcPtr, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -7445,7 +7445,7 @@ namespace LivreNoirLibrary.Collections
             fixed (ulong* dstPtr = dst)
             fixed (ulong* srcPtr = src)
             {
-                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, length);
+                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -7457,7 +7457,7 @@ namespace LivreNoirLibrary.Collections
             fixed (float* dstPtr = dst)
             fixed (float* srcPtr = src)
             {
-                CopyFromCore(dstPtr, srcPtr, factor, length);
+                CopyFromCore(dstPtr, srcPtr, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -7469,7 +7469,7 @@ namespace LivreNoirLibrary.Collections
             fixed (float* dstPtr = dst)
             fixed (float* srcPtr = src)
             {
-                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, length);
+                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -7481,7 +7481,7 @@ namespace LivreNoirLibrary.Collections
             fixed (double* dstPtr = dst)
             fixed (double* srcPtr = src)
             {
-                CopyFromCore(dstPtr, srcPtr, factor, length);
+                CopyFromCore(dstPtr, srcPtr, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -7493,7 +7493,7 @@ namespace LivreNoirLibrary.Collections
             fixed (double* dstPtr = dst)
             fixed (double* srcPtr = src)
             {
-                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, length);
+                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -7505,7 +7505,7 @@ namespace LivreNoirLibrary.Collections
             fixed (byte* dstPtr = dst)
             fixed (byte* srcPtr = src)
             {
-                CopyFromCore(dstPtr, srcPtr, factor, length);
+                CopyFromCore(dstPtr, srcPtr, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -7517,7 +7517,7 @@ namespace LivreNoirLibrary.Collections
             fixed (byte* dstPtr = dst)
             fixed (byte* srcPtr = src)
             {
-                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, length);
+                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -7529,7 +7529,7 @@ namespace LivreNoirLibrary.Collections
             fixed (sbyte* dstPtr = dst)
             fixed (sbyte* srcPtr = src)
             {
-                CopyFromCore(dstPtr, srcPtr, factor, length);
+                CopyFromCore(dstPtr, srcPtr, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -7541,7 +7541,7 @@ namespace LivreNoirLibrary.Collections
             fixed (sbyte* dstPtr = dst)
             fixed (sbyte* srcPtr = src)
             {
-                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, length);
+                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -7553,7 +7553,7 @@ namespace LivreNoirLibrary.Collections
             fixed (short* dstPtr = dst)
             fixed (short* srcPtr = src)
             {
-                CopyFromCore(dstPtr, srcPtr, factor, length);
+                CopyFromCore(dstPtr, srcPtr, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -7565,7 +7565,7 @@ namespace LivreNoirLibrary.Collections
             fixed (short* dstPtr = dst)
             fixed (short* srcPtr = src)
             {
-                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, length);
+                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -7577,7 +7577,7 @@ namespace LivreNoirLibrary.Collections
             fixed (ushort* dstPtr = dst)
             fixed (ushort* srcPtr = src)
             {
-                CopyFromCore(dstPtr, srcPtr, factor, length);
+                CopyFromCore(dstPtr, srcPtr, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -7589,7 +7589,7 @@ namespace LivreNoirLibrary.Collections
             fixed (ushort* dstPtr = dst)
             fixed (ushort* srcPtr = src)
             {
-                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, length);
+                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -7601,7 +7601,7 @@ namespace LivreNoirLibrary.Collections
             fixed (int* dstPtr = dst)
             fixed (int* srcPtr = src)
             {
-                CopyFromCore(dstPtr, srcPtr, factor, length);
+                CopyFromCore(dstPtr, srcPtr, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -7613,7 +7613,7 @@ namespace LivreNoirLibrary.Collections
             fixed (int* dstPtr = dst)
             fixed (int* srcPtr = src)
             {
-                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, length);
+                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -7625,7 +7625,7 @@ namespace LivreNoirLibrary.Collections
             fixed (uint* dstPtr = dst)
             fixed (uint* srcPtr = src)
             {
-                CopyFromCore(dstPtr, srcPtr, factor, length);
+                CopyFromCore(dstPtr, srcPtr, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -7637,7 +7637,7 @@ namespace LivreNoirLibrary.Collections
             fixed (uint* dstPtr = dst)
             fixed (uint* srcPtr = src)
             {
-                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, length);
+                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -7649,7 +7649,7 @@ namespace LivreNoirLibrary.Collections
             fixed (nint* dstPtr = dst)
             fixed (nint* srcPtr = src)
             {
-                CopyFromCore(dstPtr, srcPtr, factor, length);
+                CopyFromCore(dstPtr, srcPtr, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -7661,7 +7661,7 @@ namespace LivreNoirLibrary.Collections
             fixed (nint* dstPtr = dst)
             fixed (nint* srcPtr = src)
             {
-                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, length);
+                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -7673,7 +7673,7 @@ namespace LivreNoirLibrary.Collections
             fixed (nuint* dstPtr = dst)
             fixed (nuint* srcPtr = src)
             {
-                CopyFromCore(dstPtr, srcPtr, factor, length);
+                CopyFromCore(dstPtr, srcPtr, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -7685,7 +7685,7 @@ namespace LivreNoirLibrary.Collections
             fixed (nuint* dstPtr = dst)
             fixed (nuint* srcPtr = src)
             {
-                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, length);
+                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -7697,7 +7697,7 @@ namespace LivreNoirLibrary.Collections
             fixed (long* dstPtr = dst)
             fixed (long* srcPtr = src)
             {
-                CopyFromCore(dstPtr, srcPtr, factor, length);
+                CopyFromCore(dstPtr, srcPtr, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -7709,7 +7709,7 @@ namespace LivreNoirLibrary.Collections
             fixed (long* dstPtr = dst)
             fixed (long* srcPtr = src)
             {
-                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, length);
+                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -7721,7 +7721,7 @@ namespace LivreNoirLibrary.Collections
             fixed (ulong* dstPtr = dst)
             fixed (ulong* srcPtr = src)
             {
-                CopyFromCore(dstPtr, srcPtr, factor, length);
+                CopyFromCore(dstPtr, srcPtr, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -7733,7 +7733,7 @@ namespace LivreNoirLibrary.Collections
             fixed (ulong* dstPtr = dst)
             fixed (ulong* srcPtr = src)
             {
-                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, length);
+                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -7745,7 +7745,7 @@ namespace LivreNoirLibrary.Collections
             fixed (float* dstPtr = dst)
             fixed (float* srcPtr = src)
             {
-                CopyFromCore(dstPtr, srcPtr, factor, length);
+                CopyFromCore(dstPtr, srcPtr, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -7757,7 +7757,7 @@ namespace LivreNoirLibrary.Collections
             fixed (float* dstPtr = dst)
             fixed (float* srcPtr = src)
             {
-                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, length);
+                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -7769,7 +7769,7 @@ namespace LivreNoirLibrary.Collections
             fixed (double* dstPtr = dst)
             fixed (double* srcPtr = src)
             {
-                CopyFromCore(dstPtr, srcPtr, factor, length);
+                CopyFromCore(dstPtr, srcPtr, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -7781,7 +7781,7 @@ namespace LivreNoirLibrary.Collections
             fixed (double* dstPtr = dst)
             fixed (double* srcPtr = src)
             {
-                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, length);
+                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -7793,7 +7793,7 @@ namespace LivreNoirLibrary.Collections
             fixed (byte* dstPtr = dst)
             fixed (byte* srcPtr = src)
             {
-                CopyFromCore(dstPtr, srcPtr, factor, length);
+                CopyFromCore(dstPtr, srcPtr, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -7805,7 +7805,7 @@ namespace LivreNoirLibrary.Collections
             fixed (byte* dstPtr = dst)
             fixed (byte* srcPtr = src)
             {
-                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, length);
+                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -7817,7 +7817,7 @@ namespace LivreNoirLibrary.Collections
             fixed (sbyte* dstPtr = dst)
             fixed (sbyte* srcPtr = src)
             {
-                CopyFromCore(dstPtr, srcPtr, factor, length);
+                CopyFromCore(dstPtr, srcPtr, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -7829,7 +7829,7 @@ namespace LivreNoirLibrary.Collections
             fixed (sbyte* dstPtr = dst)
             fixed (sbyte* srcPtr = src)
             {
-                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, length);
+                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -7841,7 +7841,7 @@ namespace LivreNoirLibrary.Collections
             fixed (short* dstPtr = dst)
             fixed (short* srcPtr = src)
             {
-                CopyFromCore(dstPtr, srcPtr, factor, length);
+                CopyFromCore(dstPtr, srcPtr, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -7853,7 +7853,7 @@ namespace LivreNoirLibrary.Collections
             fixed (short* dstPtr = dst)
             fixed (short* srcPtr = src)
             {
-                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, length);
+                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -7865,7 +7865,7 @@ namespace LivreNoirLibrary.Collections
             fixed (ushort* dstPtr = dst)
             fixed (ushort* srcPtr = src)
             {
-                CopyFromCore(dstPtr, srcPtr, factor, length);
+                CopyFromCore(dstPtr, srcPtr, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -7877,7 +7877,7 @@ namespace LivreNoirLibrary.Collections
             fixed (ushort* dstPtr = dst)
             fixed (ushort* srcPtr = src)
             {
-                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, length);
+                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -7889,7 +7889,7 @@ namespace LivreNoirLibrary.Collections
             fixed (int* dstPtr = dst)
             fixed (int* srcPtr = src)
             {
-                CopyFromCore(dstPtr, srcPtr, factor, length);
+                CopyFromCore(dstPtr, srcPtr, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -7901,7 +7901,7 @@ namespace LivreNoirLibrary.Collections
             fixed (int* dstPtr = dst)
             fixed (int* srcPtr = src)
             {
-                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, length);
+                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -7913,7 +7913,7 @@ namespace LivreNoirLibrary.Collections
             fixed (uint* dstPtr = dst)
             fixed (uint* srcPtr = src)
             {
-                CopyFromCore(dstPtr, srcPtr, factor, length);
+                CopyFromCore(dstPtr, srcPtr, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -7925,7 +7925,7 @@ namespace LivreNoirLibrary.Collections
             fixed (uint* dstPtr = dst)
             fixed (uint* srcPtr = src)
             {
-                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, length);
+                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -7937,7 +7937,7 @@ namespace LivreNoirLibrary.Collections
             fixed (nint* dstPtr = dst)
             fixed (nint* srcPtr = src)
             {
-                CopyFromCore(dstPtr, srcPtr, factor, length);
+                CopyFromCore(dstPtr, srcPtr, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -7949,7 +7949,7 @@ namespace LivreNoirLibrary.Collections
             fixed (nint* dstPtr = dst)
             fixed (nint* srcPtr = src)
             {
-                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, length);
+                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -7961,7 +7961,7 @@ namespace LivreNoirLibrary.Collections
             fixed (nuint* dstPtr = dst)
             fixed (nuint* srcPtr = src)
             {
-                CopyFromCore(dstPtr, srcPtr, factor, length);
+                CopyFromCore(dstPtr, srcPtr, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -7973,7 +7973,7 @@ namespace LivreNoirLibrary.Collections
             fixed (nuint* dstPtr = dst)
             fixed (nuint* srcPtr = src)
             {
-                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, length);
+                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -7985,7 +7985,7 @@ namespace LivreNoirLibrary.Collections
             fixed (long* dstPtr = dst)
             fixed (long* srcPtr = src)
             {
-                CopyFromCore(dstPtr, srcPtr, factor, length);
+                CopyFromCore(dstPtr, srcPtr, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -7997,7 +7997,7 @@ namespace LivreNoirLibrary.Collections
             fixed (long* dstPtr = dst)
             fixed (long* srcPtr = src)
             {
-                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, length);
+                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -8009,7 +8009,7 @@ namespace LivreNoirLibrary.Collections
             fixed (ulong* dstPtr = dst)
             fixed (ulong* srcPtr = src)
             {
-                CopyFromCore(dstPtr, srcPtr, factor, length);
+                CopyFromCore(dstPtr, srcPtr, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -8021,7 +8021,7 @@ namespace LivreNoirLibrary.Collections
             fixed (ulong* dstPtr = dst)
             fixed (ulong* srcPtr = src)
             {
-                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, length);
+                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -8033,7 +8033,7 @@ namespace LivreNoirLibrary.Collections
             fixed (float* dstPtr = dst)
             fixed (float* srcPtr = src)
             {
-                CopyFromCore(dstPtr, srcPtr, factor, length);
+                CopyFromCore(dstPtr, srcPtr, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -8045,7 +8045,7 @@ namespace LivreNoirLibrary.Collections
             fixed (float* dstPtr = dst)
             fixed (float* srcPtr = src)
             {
-                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, length);
+                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -8057,7 +8057,7 @@ namespace LivreNoirLibrary.Collections
             fixed (double* dstPtr = dst)
             fixed (double* srcPtr = src)
             {
-                CopyFromCore(dstPtr, srcPtr, factor, length);
+                CopyFromCore(dstPtr, srcPtr, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -8069,7 +8069,7 @@ namespace LivreNoirLibrary.Collections
             fixed (double* dstPtr = dst)
             fixed (double* srcPtr = src)
             {
-                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, length);
+                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -8081,7 +8081,7 @@ namespace LivreNoirLibrary.Collections
             fixed (byte* dstPtr = dst)
             fixed (byte* srcPtr = src)
             {
-                CopyFromCore(dstPtr, srcPtr, factor, length);
+                CopyFromCore(dstPtr, srcPtr, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -8093,7 +8093,7 @@ namespace LivreNoirLibrary.Collections
             fixed (byte* dstPtr = dst)
             fixed (byte* srcPtr = src)
             {
-                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, length);
+                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -8105,7 +8105,7 @@ namespace LivreNoirLibrary.Collections
             fixed (sbyte* dstPtr = dst)
             fixed (sbyte* srcPtr = src)
             {
-                CopyFromCore(dstPtr, srcPtr, factor, length);
+                CopyFromCore(dstPtr, srcPtr, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -8117,7 +8117,7 @@ namespace LivreNoirLibrary.Collections
             fixed (sbyte* dstPtr = dst)
             fixed (sbyte* srcPtr = src)
             {
-                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, length);
+                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -8129,7 +8129,7 @@ namespace LivreNoirLibrary.Collections
             fixed (short* dstPtr = dst)
             fixed (short* srcPtr = src)
             {
-                CopyFromCore(dstPtr, srcPtr, factor, length);
+                CopyFromCore(dstPtr, srcPtr, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -8141,7 +8141,7 @@ namespace LivreNoirLibrary.Collections
             fixed (short* dstPtr = dst)
             fixed (short* srcPtr = src)
             {
-                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, length);
+                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -8153,7 +8153,7 @@ namespace LivreNoirLibrary.Collections
             fixed (ushort* dstPtr = dst)
             fixed (ushort* srcPtr = src)
             {
-                CopyFromCore(dstPtr, srcPtr, factor, length);
+                CopyFromCore(dstPtr, srcPtr, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -8165,7 +8165,7 @@ namespace LivreNoirLibrary.Collections
             fixed (ushort* dstPtr = dst)
             fixed (ushort* srcPtr = src)
             {
-                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, length);
+                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -8177,7 +8177,7 @@ namespace LivreNoirLibrary.Collections
             fixed (int* dstPtr = dst)
             fixed (int* srcPtr = src)
             {
-                CopyFromCore(dstPtr, srcPtr, factor, length);
+                CopyFromCore(dstPtr, srcPtr, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -8189,7 +8189,7 @@ namespace LivreNoirLibrary.Collections
             fixed (int* dstPtr = dst)
             fixed (int* srcPtr = src)
             {
-                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, length);
+                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -8201,7 +8201,7 @@ namespace LivreNoirLibrary.Collections
             fixed (uint* dstPtr = dst)
             fixed (uint* srcPtr = src)
             {
-                CopyFromCore(dstPtr, srcPtr, factor, length);
+                CopyFromCore(dstPtr, srcPtr, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -8213,7 +8213,7 @@ namespace LivreNoirLibrary.Collections
             fixed (uint* dstPtr = dst)
             fixed (uint* srcPtr = src)
             {
-                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, length);
+                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -8225,7 +8225,7 @@ namespace LivreNoirLibrary.Collections
             fixed (nint* dstPtr = dst)
             fixed (nint* srcPtr = src)
             {
-                CopyFromCore(dstPtr, srcPtr, factor, length);
+                CopyFromCore(dstPtr, srcPtr, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -8237,7 +8237,7 @@ namespace LivreNoirLibrary.Collections
             fixed (nint* dstPtr = dst)
             fixed (nint* srcPtr = src)
             {
-                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, length);
+                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -8249,7 +8249,7 @@ namespace LivreNoirLibrary.Collections
             fixed (nuint* dstPtr = dst)
             fixed (nuint* srcPtr = src)
             {
-                CopyFromCore(dstPtr, srcPtr, factor, length);
+                CopyFromCore(dstPtr, srcPtr, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -8261,7 +8261,7 @@ namespace LivreNoirLibrary.Collections
             fixed (nuint* dstPtr = dst)
             fixed (nuint* srcPtr = src)
             {
-                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, length);
+                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -8273,7 +8273,7 @@ namespace LivreNoirLibrary.Collections
             fixed (long* dstPtr = dst)
             fixed (long* srcPtr = src)
             {
-                CopyFromCore(dstPtr, srcPtr, factor, length);
+                CopyFromCore(dstPtr, srcPtr, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -8285,7 +8285,7 @@ namespace LivreNoirLibrary.Collections
             fixed (long* dstPtr = dst)
             fixed (long* srcPtr = src)
             {
-                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, length);
+                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -8297,7 +8297,7 @@ namespace LivreNoirLibrary.Collections
             fixed (ulong* dstPtr = dst)
             fixed (ulong* srcPtr = src)
             {
-                CopyFromCore(dstPtr, srcPtr, factor, length);
+                CopyFromCore(dstPtr, srcPtr, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -8309,7 +8309,7 @@ namespace LivreNoirLibrary.Collections
             fixed (ulong* dstPtr = dst)
             fixed (ulong* srcPtr = src)
             {
-                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, length);
+                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -8321,7 +8321,7 @@ namespace LivreNoirLibrary.Collections
             fixed (float* dstPtr = dst)
             fixed (float* srcPtr = src)
             {
-                CopyFromCore(dstPtr, srcPtr, factor, length);
+                CopyFromCore(dstPtr, srcPtr, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -8333,7 +8333,7 @@ namespace LivreNoirLibrary.Collections
             fixed (float* dstPtr = dst)
             fixed (float* srcPtr = src)
             {
-                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, length);
+                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -8345,7 +8345,7 @@ namespace LivreNoirLibrary.Collections
             fixed (double* dstPtr = dst)
             fixed (double* srcPtr = src)
             {
-                CopyFromCore(dstPtr, srcPtr, factor, length);
+                CopyFromCore(dstPtr, srcPtr, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -8357,7 +8357,7 @@ namespace LivreNoirLibrary.Collections
             fixed (double* dstPtr = dst)
             fixed (double* srcPtr = src)
             {
-                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, length);
+                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -8369,7 +8369,7 @@ namespace LivreNoirLibrary.Collections
             fixed (byte* dstPtr = dst)
             fixed (byte* srcPtr = src)
             {
-                CopyFromCore(dstPtr, srcPtr, factor, length);
+                CopyFromCore(dstPtr, srcPtr, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -8381,7 +8381,7 @@ namespace LivreNoirLibrary.Collections
             fixed (byte* dstPtr = dst)
             fixed (byte* srcPtr = src)
             {
-                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, length);
+                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -8393,7 +8393,7 @@ namespace LivreNoirLibrary.Collections
             fixed (sbyte* dstPtr = dst)
             fixed (sbyte* srcPtr = src)
             {
-                CopyFromCore(dstPtr, srcPtr, factor, length);
+                CopyFromCore(dstPtr, srcPtr, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -8405,7 +8405,7 @@ namespace LivreNoirLibrary.Collections
             fixed (sbyte* dstPtr = dst)
             fixed (sbyte* srcPtr = src)
             {
-                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, length);
+                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -8417,7 +8417,7 @@ namespace LivreNoirLibrary.Collections
             fixed (short* dstPtr = dst)
             fixed (short* srcPtr = src)
             {
-                CopyFromCore(dstPtr, srcPtr, factor, length);
+                CopyFromCore(dstPtr, srcPtr, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -8429,7 +8429,7 @@ namespace LivreNoirLibrary.Collections
             fixed (short* dstPtr = dst)
             fixed (short* srcPtr = src)
             {
-                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, length);
+                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -8441,7 +8441,7 @@ namespace LivreNoirLibrary.Collections
             fixed (ushort* dstPtr = dst)
             fixed (ushort* srcPtr = src)
             {
-                CopyFromCore(dstPtr, srcPtr, factor, length);
+                CopyFromCore(dstPtr, srcPtr, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -8453,7 +8453,7 @@ namespace LivreNoirLibrary.Collections
             fixed (ushort* dstPtr = dst)
             fixed (ushort* srcPtr = src)
             {
-                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, length);
+                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -8465,7 +8465,7 @@ namespace LivreNoirLibrary.Collections
             fixed (int* dstPtr = dst)
             fixed (int* srcPtr = src)
             {
-                CopyFromCore(dstPtr, srcPtr, factor, length);
+                CopyFromCore(dstPtr, srcPtr, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -8477,7 +8477,7 @@ namespace LivreNoirLibrary.Collections
             fixed (int* dstPtr = dst)
             fixed (int* srcPtr = src)
             {
-                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, length);
+                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -8489,7 +8489,7 @@ namespace LivreNoirLibrary.Collections
             fixed (uint* dstPtr = dst)
             fixed (uint* srcPtr = src)
             {
-                CopyFromCore(dstPtr, srcPtr, factor, length);
+                CopyFromCore(dstPtr, srcPtr, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -8501,7 +8501,7 @@ namespace LivreNoirLibrary.Collections
             fixed (uint* dstPtr = dst)
             fixed (uint* srcPtr = src)
             {
-                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, length);
+                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -8513,7 +8513,7 @@ namespace LivreNoirLibrary.Collections
             fixed (nint* dstPtr = dst)
             fixed (nint* srcPtr = src)
             {
-                CopyFromCore(dstPtr, srcPtr, factor, length);
+                CopyFromCore(dstPtr, srcPtr, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -8525,7 +8525,7 @@ namespace LivreNoirLibrary.Collections
             fixed (nint* dstPtr = dst)
             fixed (nint* srcPtr = src)
             {
-                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, length);
+                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -8537,7 +8537,7 @@ namespace LivreNoirLibrary.Collections
             fixed (nuint* dstPtr = dst)
             fixed (nuint* srcPtr = src)
             {
-                CopyFromCore(dstPtr, srcPtr, factor, length);
+                CopyFromCore(dstPtr, srcPtr, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -8549,7 +8549,7 @@ namespace LivreNoirLibrary.Collections
             fixed (nuint* dstPtr = dst)
             fixed (nuint* srcPtr = src)
             {
-                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, length);
+                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -8561,7 +8561,7 @@ namespace LivreNoirLibrary.Collections
             fixed (long* dstPtr = dst)
             fixed (long* srcPtr = src)
             {
-                CopyFromCore(dstPtr, srcPtr, factor, length);
+                CopyFromCore(dstPtr, srcPtr, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -8573,7 +8573,7 @@ namespace LivreNoirLibrary.Collections
             fixed (long* dstPtr = dst)
             fixed (long* srcPtr = src)
             {
-                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, length);
+                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -8585,7 +8585,7 @@ namespace LivreNoirLibrary.Collections
             fixed (ulong* dstPtr = dst)
             fixed (ulong* srcPtr = src)
             {
-                CopyFromCore(dstPtr, srcPtr, factor, length);
+                CopyFromCore(dstPtr, srcPtr, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -8597,7 +8597,7 @@ namespace LivreNoirLibrary.Collections
             fixed (ulong* dstPtr = dst)
             fixed (ulong* srcPtr = src)
             {
-                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, length);
+                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -8609,7 +8609,7 @@ namespace LivreNoirLibrary.Collections
             fixed (float* dstPtr = dst)
             fixed (float* srcPtr = src)
             {
-                CopyFromCore(dstPtr, srcPtr, factor, length);
+                CopyFromCore(dstPtr, srcPtr, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -8621,7 +8621,7 @@ namespace LivreNoirLibrary.Collections
             fixed (float* dstPtr = dst)
             fixed (float* srcPtr = src)
             {
-                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, length);
+                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -8633,7 +8633,7 @@ namespace LivreNoirLibrary.Collections
             fixed (double* dstPtr = dst)
             fixed (double* srcPtr = src)
             {
-                CopyFromCore(dstPtr, srcPtr, factor, length);
+                CopyFromCore(dstPtr, srcPtr, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -8645,7 +8645,7 @@ namespace LivreNoirLibrary.Collections
             fixed (double* dstPtr = dst)
             fixed (double* srcPtr = src)
             {
-                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, length);
+                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -8657,7 +8657,7 @@ namespace LivreNoirLibrary.Collections
             fixed (byte* dstPtr = dst)
             fixed (byte* srcPtr = src)
             {
-                CopyFromCore(dstPtr, srcPtr, factor, length);
+                CopyFromCore(dstPtr, srcPtr, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -8669,7 +8669,7 @@ namespace LivreNoirLibrary.Collections
             fixed (byte* dstPtr = dst)
             fixed (byte* srcPtr = src)
             {
-                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, length);
+                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -8681,7 +8681,7 @@ namespace LivreNoirLibrary.Collections
             fixed (sbyte* dstPtr = dst)
             fixed (sbyte* srcPtr = src)
             {
-                CopyFromCore(dstPtr, srcPtr, factor, length);
+                CopyFromCore(dstPtr, srcPtr, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -8693,7 +8693,7 @@ namespace LivreNoirLibrary.Collections
             fixed (sbyte* dstPtr = dst)
             fixed (sbyte* srcPtr = src)
             {
-                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, length);
+                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -8705,7 +8705,7 @@ namespace LivreNoirLibrary.Collections
             fixed (short* dstPtr = dst)
             fixed (short* srcPtr = src)
             {
-                CopyFromCore(dstPtr, srcPtr, factor, length);
+                CopyFromCore(dstPtr, srcPtr, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -8717,7 +8717,7 @@ namespace LivreNoirLibrary.Collections
             fixed (short* dstPtr = dst)
             fixed (short* srcPtr = src)
             {
-                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, length);
+                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -8729,7 +8729,7 @@ namespace LivreNoirLibrary.Collections
             fixed (ushort* dstPtr = dst)
             fixed (ushort* srcPtr = src)
             {
-                CopyFromCore(dstPtr, srcPtr, factor, length);
+                CopyFromCore(dstPtr, srcPtr, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -8741,7 +8741,7 @@ namespace LivreNoirLibrary.Collections
             fixed (ushort* dstPtr = dst)
             fixed (ushort* srcPtr = src)
             {
-                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, length);
+                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -8753,7 +8753,7 @@ namespace LivreNoirLibrary.Collections
             fixed (int* dstPtr = dst)
             fixed (int* srcPtr = src)
             {
-                CopyFromCore(dstPtr, srcPtr, factor, length);
+                CopyFromCore(dstPtr, srcPtr, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -8765,7 +8765,7 @@ namespace LivreNoirLibrary.Collections
             fixed (int* dstPtr = dst)
             fixed (int* srcPtr = src)
             {
-                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, length);
+                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -8777,7 +8777,7 @@ namespace LivreNoirLibrary.Collections
             fixed (uint* dstPtr = dst)
             fixed (uint* srcPtr = src)
             {
-                CopyFromCore(dstPtr, srcPtr, factor, length);
+                CopyFromCore(dstPtr, srcPtr, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -8789,7 +8789,7 @@ namespace LivreNoirLibrary.Collections
             fixed (uint* dstPtr = dst)
             fixed (uint* srcPtr = src)
             {
-                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, length);
+                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -8801,7 +8801,7 @@ namespace LivreNoirLibrary.Collections
             fixed (nint* dstPtr = dst)
             fixed (nint* srcPtr = src)
             {
-                CopyFromCore(dstPtr, srcPtr, factor, length);
+                CopyFromCore(dstPtr, srcPtr, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -8813,7 +8813,7 @@ namespace LivreNoirLibrary.Collections
             fixed (nint* dstPtr = dst)
             fixed (nint* srcPtr = src)
             {
-                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, length);
+                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -8825,7 +8825,7 @@ namespace LivreNoirLibrary.Collections
             fixed (nuint* dstPtr = dst)
             fixed (nuint* srcPtr = src)
             {
-                CopyFromCore(dstPtr, srcPtr, factor, length);
+                CopyFromCore(dstPtr, srcPtr, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -8837,7 +8837,7 @@ namespace LivreNoirLibrary.Collections
             fixed (nuint* dstPtr = dst)
             fixed (nuint* srcPtr = src)
             {
-                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, length);
+                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -8849,7 +8849,7 @@ namespace LivreNoirLibrary.Collections
             fixed (long* dstPtr = dst)
             fixed (long* srcPtr = src)
             {
-                CopyFromCore(dstPtr, srcPtr, factor, length);
+                CopyFromCore(dstPtr, srcPtr, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -8861,7 +8861,7 @@ namespace LivreNoirLibrary.Collections
             fixed (long* dstPtr = dst)
             fixed (long* srcPtr = src)
             {
-                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, length);
+                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -8873,7 +8873,7 @@ namespace LivreNoirLibrary.Collections
             fixed (ulong* dstPtr = dst)
             fixed (ulong* srcPtr = src)
             {
-                CopyFromCore(dstPtr, srcPtr, factor, length);
+                CopyFromCore(dstPtr, srcPtr, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -8885,7 +8885,7 @@ namespace LivreNoirLibrary.Collections
             fixed (ulong* dstPtr = dst)
             fixed (ulong* srcPtr = src)
             {
-                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, length);
+                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -8897,7 +8897,7 @@ namespace LivreNoirLibrary.Collections
             fixed (float* dstPtr = dst)
             fixed (float* srcPtr = src)
             {
-                CopyFromCore(dstPtr, srcPtr, factor, length);
+                CopyFromCore(dstPtr, srcPtr, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -8909,7 +8909,7 @@ namespace LivreNoirLibrary.Collections
             fixed (float* dstPtr = dst)
             fixed (float* srcPtr = src)
             {
-                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, length);
+                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -8921,7 +8921,7 @@ namespace LivreNoirLibrary.Collections
             fixed (double* dstPtr = dst)
             fixed (double* srcPtr = src)
             {
-                CopyFromCore(dstPtr, srcPtr, factor, length);
+                CopyFromCore(dstPtr, srcPtr, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -8933,7 +8933,7 @@ namespace LivreNoirLibrary.Collections
             fixed (double* dstPtr = dst)
             fixed (double* srcPtr = src)
             {
-                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, length);
+                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -8945,7 +8945,7 @@ namespace LivreNoirLibrary.Collections
             fixed (byte* dstPtr = dst)
             fixed (byte* srcPtr = src)
             {
-                CopyFromCore(dstPtr, srcPtr, factor, length);
+                CopyFromCore(dstPtr, srcPtr, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -8957,7 +8957,7 @@ namespace LivreNoirLibrary.Collections
             fixed (byte* dstPtr = dst)
             fixed (byte* srcPtr = src)
             {
-                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, length);
+                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -8969,7 +8969,7 @@ namespace LivreNoirLibrary.Collections
             fixed (sbyte* dstPtr = dst)
             fixed (sbyte* srcPtr = src)
             {
-                CopyFromCore(dstPtr, srcPtr, factor, length);
+                CopyFromCore(dstPtr, srcPtr, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -8981,7 +8981,7 @@ namespace LivreNoirLibrary.Collections
             fixed (sbyte* dstPtr = dst)
             fixed (sbyte* srcPtr = src)
             {
-                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, length);
+                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -8993,7 +8993,7 @@ namespace LivreNoirLibrary.Collections
             fixed (short* dstPtr = dst)
             fixed (short* srcPtr = src)
             {
-                CopyFromCore(dstPtr, srcPtr, factor, length);
+                CopyFromCore(dstPtr, srcPtr, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -9005,7 +9005,7 @@ namespace LivreNoirLibrary.Collections
             fixed (short* dstPtr = dst)
             fixed (short* srcPtr = src)
             {
-                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, length);
+                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -9017,7 +9017,7 @@ namespace LivreNoirLibrary.Collections
             fixed (ushort* dstPtr = dst)
             fixed (ushort* srcPtr = src)
             {
-                CopyFromCore(dstPtr, srcPtr, factor, length);
+                CopyFromCore(dstPtr, srcPtr, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -9029,7 +9029,7 @@ namespace LivreNoirLibrary.Collections
             fixed (ushort* dstPtr = dst)
             fixed (ushort* srcPtr = src)
             {
-                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, length);
+                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -9041,7 +9041,7 @@ namespace LivreNoirLibrary.Collections
             fixed (int* dstPtr = dst)
             fixed (int* srcPtr = src)
             {
-                CopyFromCore(dstPtr, srcPtr, factor, length);
+                CopyFromCore(dstPtr, srcPtr, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -9053,7 +9053,7 @@ namespace LivreNoirLibrary.Collections
             fixed (int* dstPtr = dst)
             fixed (int* srcPtr = src)
             {
-                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, length);
+                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -9065,7 +9065,7 @@ namespace LivreNoirLibrary.Collections
             fixed (uint* dstPtr = dst)
             fixed (uint* srcPtr = src)
             {
-                CopyFromCore(dstPtr, srcPtr, factor, length);
+                CopyFromCore(dstPtr, srcPtr, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -9077,7 +9077,7 @@ namespace LivreNoirLibrary.Collections
             fixed (uint* dstPtr = dst)
             fixed (uint* srcPtr = src)
             {
-                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, length);
+                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -9089,7 +9089,7 @@ namespace LivreNoirLibrary.Collections
             fixed (nint* dstPtr = dst)
             fixed (nint* srcPtr = src)
             {
-                CopyFromCore(dstPtr, srcPtr, factor, length);
+                CopyFromCore(dstPtr, srcPtr, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -9101,7 +9101,7 @@ namespace LivreNoirLibrary.Collections
             fixed (nint* dstPtr = dst)
             fixed (nint* srcPtr = src)
             {
-                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, length);
+                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -9113,7 +9113,7 @@ namespace LivreNoirLibrary.Collections
             fixed (nuint* dstPtr = dst)
             fixed (nuint* srcPtr = src)
             {
-                CopyFromCore(dstPtr, srcPtr, factor, length);
+                CopyFromCore(dstPtr, srcPtr, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -9125,7 +9125,7 @@ namespace LivreNoirLibrary.Collections
             fixed (nuint* dstPtr = dst)
             fixed (nuint* srcPtr = src)
             {
-                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, length);
+                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -9137,7 +9137,7 @@ namespace LivreNoirLibrary.Collections
             fixed (long* dstPtr = dst)
             fixed (long* srcPtr = src)
             {
-                CopyFromCore(dstPtr, srcPtr, factor, length);
+                CopyFromCore(dstPtr, srcPtr, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -9149,7 +9149,7 @@ namespace LivreNoirLibrary.Collections
             fixed (long* dstPtr = dst)
             fixed (long* srcPtr = src)
             {
-                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, length);
+                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -9161,7 +9161,7 @@ namespace LivreNoirLibrary.Collections
             fixed (ulong* dstPtr = dst)
             fixed (ulong* srcPtr = src)
             {
-                CopyFromCore(dstPtr, srcPtr, factor, length);
+                CopyFromCore(dstPtr, srcPtr, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -9173,7 +9173,7 @@ namespace LivreNoirLibrary.Collections
             fixed (ulong* dstPtr = dst)
             fixed (ulong* srcPtr = src)
             {
-                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, length);
+                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -9185,7 +9185,7 @@ namespace LivreNoirLibrary.Collections
             fixed (float* dstPtr = dst)
             fixed (float* srcPtr = src)
             {
-                CopyFromCore(dstPtr, srcPtr, factor, length);
+                CopyFromCore(dstPtr, srcPtr, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -9197,7 +9197,7 @@ namespace LivreNoirLibrary.Collections
             fixed (float* dstPtr = dst)
             fixed (float* srcPtr = src)
             {
-                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, length);
+                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -9209,7 +9209,7 @@ namespace LivreNoirLibrary.Collections
             fixed (double* dstPtr = dst)
             fixed (double* srcPtr = src)
             {
-                CopyFromCore(dstPtr, srcPtr, factor, length);
+                CopyFromCore(dstPtr, srcPtr, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -9221,7 +9221,7 @@ namespace LivreNoirLibrary.Collections
             fixed (double* dstPtr = dst)
             fixed (double* srcPtr = src)
             {
-                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, length);
+                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -9233,7 +9233,7 @@ namespace LivreNoirLibrary.Collections
             fixed (byte* dstPtr = dst)
             fixed (byte* srcPtr = src)
             {
-                CopyFromCore(dstPtr, srcPtr, factor, length);
+                CopyFromCore(dstPtr, srcPtr, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -9245,7 +9245,7 @@ namespace LivreNoirLibrary.Collections
             fixed (byte* dstPtr = dst)
             fixed (byte* srcPtr = src)
             {
-                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, length);
+                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -9257,7 +9257,7 @@ namespace LivreNoirLibrary.Collections
             fixed (sbyte* dstPtr = dst)
             fixed (sbyte* srcPtr = src)
             {
-                CopyFromCore(dstPtr, srcPtr, factor, length);
+                CopyFromCore(dstPtr, srcPtr, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -9269,7 +9269,7 @@ namespace LivreNoirLibrary.Collections
             fixed (sbyte* dstPtr = dst)
             fixed (sbyte* srcPtr = src)
             {
-                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, length);
+                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -9281,7 +9281,7 @@ namespace LivreNoirLibrary.Collections
             fixed (short* dstPtr = dst)
             fixed (short* srcPtr = src)
             {
-                CopyFromCore(dstPtr, srcPtr, factor, length);
+                CopyFromCore(dstPtr, srcPtr, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -9293,7 +9293,7 @@ namespace LivreNoirLibrary.Collections
             fixed (short* dstPtr = dst)
             fixed (short* srcPtr = src)
             {
-                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, length);
+                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -9305,7 +9305,7 @@ namespace LivreNoirLibrary.Collections
             fixed (ushort* dstPtr = dst)
             fixed (ushort* srcPtr = src)
             {
-                CopyFromCore(dstPtr, srcPtr, factor, length);
+                CopyFromCore(dstPtr, srcPtr, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -9317,7 +9317,7 @@ namespace LivreNoirLibrary.Collections
             fixed (ushort* dstPtr = dst)
             fixed (ushort* srcPtr = src)
             {
-                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, length);
+                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -9329,7 +9329,7 @@ namespace LivreNoirLibrary.Collections
             fixed (int* dstPtr = dst)
             fixed (int* srcPtr = src)
             {
-                CopyFromCore(dstPtr, srcPtr, factor, length);
+                CopyFromCore(dstPtr, srcPtr, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -9341,7 +9341,7 @@ namespace LivreNoirLibrary.Collections
             fixed (int* dstPtr = dst)
             fixed (int* srcPtr = src)
             {
-                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, length);
+                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -9353,7 +9353,7 @@ namespace LivreNoirLibrary.Collections
             fixed (uint* dstPtr = dst)
             fixed (uint* srcPtr = src)
             {
-                CopyFromCore(dstPtr, srcPtr, factor, length);
+                CopyFromCore(dstPtr, srcPtr, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -9365,7 +9365,7 @@ namespace LivreNoirLibrary.Collections
             fixed (uint* dstPtr = dst)
             fixed (uint* srcPtr = src)
             {
-                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, length);
+                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -9377,7 +9377,7 @@ namespace LivreNoirLibrary.Collections
             fixed (nint* dstPtr = dst)
             fixed (nint* srcPtr = src)
             {
-                CopyFromCore(dstPtr, srcPtr, factor, length);
+                CopyFromCore(dstPtr, srcPtr, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -9389,7 +9389,7 @@ namespace LivreNoirLibrary.Collections
             fixed (nint* dstPtr = dst)
             fixed (nint* srcPtr = src)
             {
-                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, length);
+                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -9401,7 +9401,7 @@ namespace LivreNoirLibrary.Collections
             fixed (nuint* dstPtr = dst)
             fixed (nuint* srcPtr = src)
             {
-                CopyFromCore(dstPtr, srcPtr, factor, length);
+                CopyFromCore(dstPtr, srcPtr, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -9413,7 +9413,7 @@ namespace LivreNoirLibrary.Collections
             fixed (nuint* dstPtr = dst)
             fixed (nuint* srcPtr = src)
             {
-                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, length);
+                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -9425,7 +9425,7 @@ namespace LivreNoirLibrary.Collections
             fixed (long* dstPtr = dst)
             fixed (long* srcPtr = src)
             {
-                CopyFromCore(dstPtr, srcPtr, factor, length);
+                CopyFromCore(dstPtr, srcPtr, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -9437,7 +9437,7 @@ namespace LivreNoirLibrary.Collections
             fixed (long* dstPtr = dst)
             fixed (long* srcPtr = src)
             {
-                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, length);
+                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -9449,7 +9449,7 @@ namespace LivreNoirLibrary.Collections
             fixed (ulong* dstPtr = dst)
             fixed (ulong* srcPtr = src)
             {
-                CopyFromCore(dstPtr, srcPtr, factor, length);
+                CopyFromCore(dstPtr, srcPtr, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -9461,7 +9461,7 @@ namespace LivreNoirLibrary.Collections
             fixed (ulong* dstPtr = dst)
             fixed (ulong* srcPtr = src)
             {
-                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, length);
+                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -9473,7 +9473,7 @@ namespace LivreNoirLibrary.Collections
             fixed (float* dstPtr = dst)
             fixed (float* srcPtr = src)
             {
-                CopyFromCore(dstPtr, srcPtr, factor, length);
+                CopyFromCore(dstPtr, srcPtr, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -9485,7 +9485,7 @@ namespace LivreNoirLibrary.Collections
             fixed (float* dstPtr = dst)
             fixed (float* srcPtr = src)
             {
-                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, length);
+                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -9497,7 +9497,7 @@ namespace LivreNoirLibrary.Collections
             fixed (double* dstPtr = dst)
             fixed (double* srcPtr = src)
             {
-                CopyFromCore(dstPtr, srcPtr, factor, length);
+                CopyFromCore(dstPtr, srcPtr, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -9509,7 +9509,7 @@ namespace LivreNoirLibrary.Collections
             fixed (double* dstPtr = dst)
             fixed (double* srcPtr = src)
             {
-                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, length);
+                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -9521,7 +9521,7 @@ namespace LivreNoirLibrary.Collections
             fixed (byte* dstPtr = dst)
             fixed (byte* srcPtr = src)
             {
-                CopyFromCore(dstPtr, srcPtr, factor, length);
+                CopyFromCore(dstPtr, srcPtr, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -9533,7 +9533,7 @@ namespace LivreNoirLibrary.Collections
             fixed (byte* dstPtr = dst)
             fixed (byte* srcPtr = src)
             {
-                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, length);
+                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -9545,7 +9545,7 @@ namespace LivreNoirLibrary.Collections
             fixed (sbyte* dstPtr = dst)
             fixed (sbyte* srcPtr = src)
             {
-                CopyFromCore(dstPtr, srcPtr, factor, length);
+                CopyFromCore(dstPtr, srcPtr, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -9557,7 +9557,7 @@ namespace LivreNoirLibrary.Collections
             fixed (sbyte* dstPtr = dst)
             fixed (sbyte* srcPtr = src)
             {
-                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, length);
+                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -9569,7 +9569,7 @@ namespace LivreNoirLibrary.Collections
             fixed (short* dstPtr = dst)
             fixed (short* srcPtr = src)
             {
-                CopyFromCore(dstPtr, srcPtr, factor, length);
+                CopyFromCore(dstPtr, srcPtr, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -9581,7 +9581,7 @@ namespace LivreNoirLibrary.Collections
             fixed (short* dstPtr = dst)
             fixed (short* srcPtr = src)
             {
-                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, length);
+                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -9593,7 +9593,7 @@ namespace LivreNoirLibrary.Collections
             fixed (ushort* dstPtr = dst)
             fixed (ushort* srcPtr = src)
             {
-                CopyFromCore(dstPtr, srcPtr, factor, length);
+                CopyFromCore(dstPtr, srcPtr, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -9605,7 +9605,7 @@ namespace LivreNoirLibrary.Collections
             fixed (ushort* dstPtr = dst)
             fixed (ushort* srcPtr = src)
             {
-                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, length);
+                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -9617,7 +9617,7 @@ namespace LivreNoirLibrary.Collections
             fixed (int* dstPtr = dst)
             fixed (int* srcPtr = src)
             {
-                CopyFromCore(dstPtr, srcPtr, factor, length);
+                CopyFromCore(dstPtr, srcPtr, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -9629,7 +9629,7 @@ namespace LivreNoirLibrary.Collections
             fixed (int* dstPtr = dst)
             fixed (int* srcPtr = src)
             {
-                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, length);
+                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -9641,7 +9641,7 @@ namespace LivreNoirLibrary.Collections
             fixed (uint* dstPtr = dst)
             fixed (uint* srcPtr = src)
             {
-                CopyFromCore(dstPtr, srcPtr, factor, length);
+                CopyFromCore(dstPtr, srcPtr, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -9653,7 +9653,7 @@ namespace LivreNoirLibrary.Collections
             fixed (uint* dstPtr = dst)
             fixed (uint* srcPtr = src)
             {
-                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, length);
+                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -9665,7 +9665,7 @@ namespace LivreNoirLibrary.Collections
             fixed (nint* dstPtr = dst)
             fixed (nint* srcPtr = src)
             {
-                CopyFromCore(dstPtr, srcPtr, factor, length);
+                CopyFromCore(dstPtr, srcPtr, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -9677,7 +9677,7 @@ namespace LivreNoirLibrary.Collections
             fixed (nint* dstPtr = dst)
             fixed (nint* srcPtr = src)
             {
-                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, length);
+                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -9689,7 +9689,7 @@ namespace LivreNoirLibrary.Collections
             fixed (nuint* dstPtr = dst)
             fixed (nuint* srcPtr = src)
             {
-                CopyFromCore(dstPtr, srcPtr, factor, length);
+                CopyFromCore(dstPtr, srcPtr, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -9701,7 +9701,7 @@ namespace LivreNoirLibrary.Collections
             fixed (nuint* dstPtr = dst)
             fixed (nuint* srcPtr = src)
             {
-                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, length);
+                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -9713,7 +9713,7 @@ namespace LivreNoirLibrary.Collections
             fixed (long* dstPtr = dst)
             fixed (long* srcPtr = src)
             {
-                CopyFromCore(dstPtr, srcPtr, factor, length);
+                CopyFromCore(dstPtr, srcPtr, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -9725,7 +9725,7 @@ namespace LivreNoirLibrary.Collections
             fixed (long* dstPtr = dst)
             fixed (long* srcPtr = src)
             {
-                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, length);
+                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -9737,7 +9737,7 @@ namespace LivreNoirLibrary.Collections
             fixed (ulong* dstPtr = dst)
             fixed (ulong* srcPtr = src)
             {
-                CopyFromCore(dstPtr, srcPtr, factor, length);
+                CopyFromCore(dstPtr, srcPtr, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -9749,7 +9749,7 @@ namespace LivreNoirLibrary.Collections
             fixed (ulong* dstPtr = dst)
             fixed (ulong* srcPtr = src)
             {
-                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, length);
+                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -9761,7 +9761,7 @@ namespace LivreNoirLibrary.Collections
             fixed (float* dstPtr = dst)
             fixed (float* srcPtr = src)
             {
-                CopyFromCore(dstPtr, srcPtr, factor, length);
+                CopyFromCore(dstPtr, srcPtr, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -9773,7 +9773,7 @@ namespace LivreNoirLibrary.Collections
             fixed (float* dstPtr = dst)
             fixed (float* srcPtr = src)
             {
-                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, length);
+                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -9785,7 +9785,7 @@ namespace LivreNoirLibrary.Collections
             fixed (double* dstPtr = dst)
             fixed (double* srcPtr = src)
             {
-                CopyFromCore(dstPtr, srcPtr, factor, length);
+                CopyFromCore(dstPtr, srcPtr, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -9797,7 +9797,7 @@ namespace LivreNoirLibrary.Collections
             fixed (double* dstPtr = dst)
             fixed (double* srcPtr = src)
             {
-                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, length);
+                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -9809,7 +9809,7 @@ namespace LivreNoirLibrary.Collections
             fixed (byte* dstPtr = dst)
             fixed (byte* srcPtr = src)
             {
-                CopyFromCore(dstPtr, srcPtr, factor, length);
+                CopyFromCore(dstPtr, srcPtr, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -9821,7 +9821,7 @@ namespace LivreNoirLibrary.Collections
             fixed (byte* dstPtr = dst)
             fixed (byte* srcPtr = src)
             {
-                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, length);
+                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -9833,7 +9833,7 @@ namespace LivreNoirLibrary.Collections
             fixed (sbyte* dstPtr = dst)
             fixed (sbyte* srcPtr = src)
             {
-                CopyFromCore(dstPtr, srcPtr, factor, length);
+                CopyFromCore(dstPtr, srcPtr, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -9845,7 +9845,7 @@ namespace LivreNoirLibrary.Collections
             fixed (sbyte* dstPtr = dst)
             fixed (sbyte* srcPtr = src)
             {
-                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, length);
+                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -9857,7 +9857,7 @@ namespace LivreNoirLibrary.Collections
             fixed (short* dstPtr = dst)
             fixed (short* srcPtr = src)
             {
-                CopyFromCore(dstPtr, srcPtr, factor, length);
+                CopyFromCore(dstPtr, srcPtr, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -9869,7 +9869,7 @@ namespace LivreNoirLibrary.Collections
             fixed (short* dstPtr = dst)
             fixed (short* srcPtr = src)
             {
-                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, length);
+                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -9881,7 +9881,7 @@ namespace LivreNoirLibrary.Collections
             fixed (ushort* dstPtr = dst)
             fixed (ushort* srcPtr = src)
             {
-                CopyFromCore(dstPtr, srcPtr, factor, length);
+                CopyFromCore(dstPtr, srcPtr, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -9893,7 +9893,7 @@ namespace LivreNoirLibrary.Collections
             fixed (ushort* dstPtr = dst)
             fixed (ushort* srcPtr = src)
             {
-                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, length);
+                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -9905,7 +9905,7 @@ namespace LivreNoirLibrary.Collections
             fixed (int* dstPtr = dst)
             fixed (int* srcPtr = src)
             {
-                CopyFromCore(dstPtr, srcPtr, factor, length);
+                CopyFromCore(dstPtr, srcPtr, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -9917,7 +9917,7 @@ namespace LivreNoirLibrary.Collections
             fixed (int* dstPtr = dst)
             fixed (int* srcPtr = src)
             {
-                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, length);
+                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -9929,7 +9929,7 @@ namespace LivreNoirLibrary.Collections
             fixed (uint* dstPtr = dst)
             fixed (uint* srcPtr = src)
             {
-                CopyFromCore(dstPtr, srcPtr, factor, length);
+                CopyFromCore(dstPtr, srcPtr, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -9941,7 +9941,7 @@ namespace LivreNoirLibrary.Collections
             fixed (uint* dstPtr = dst)
             fixed (uint* srcPtr = src)
             {
-                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, length);
+                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -9953,7 +9953,7 @@ namespace LivreNoirLibrary.Collections
             fixed (nint* dstPtr = dst)
             fixed (nint* srcPtr = src)
             {
-                CopyFromCore(dstPtr, srcPtr, factor, length);
+                CopyFromCore(dstPtr, srcPtr, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -9965,7 +9965,7 @@ namespace LivreNoirLibrary.Collections
             fixed (nint* dstPtr = dst)
             fixed (nint* srcPtr = src)
             {
-                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, length);
+                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -9977,7 +9977,7 @@ namespace LivreNoirLibrary.Collections
             fixed (nuint* dstPtr = dst)
             fixed (nuint* srcPtr = src)
             {
-                CopyFromCore(dstPtr, srcPtr, factor, length);
+                CopyFromCore(dstPtr, srcPtr, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -9989,7 +9989,7 @@ namespace LivreNoirLibrary.Collections
             fixed (nuint* dstPtr = dst)
             fixed (nuint* srcPtr = src)
             {
-                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, length);
+                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -10001,7 +10001,7 @@ namespace LivreNoirLibrary.Collections
             fixed (long* dstPtr = dst)
             fixed (long* srcPtr = src)
             {
-                CopyFromCore(dstPtr, srcPtr, factor, length);
+                CopyFromCore(dstPtr, srcPtr, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -10013,7 +10013,7 @@ namespace LivreNoirLibrary.Collections
             fixed (long* dstPtr = dst)
             fixed (long* srcPtr = src)
             {
-                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, length);
+                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -10025,7 +10025,7 @@ namespace LivreNoirLibrary.Collections
             fixed (ulong* dstPtr = dst)
             fixed (ulong* srcPtr = src)
             {
-                CopyFromCore(dstPtr, srcPtr, factor, length);
+                CopyFromCore(dstPtr, srcPtr, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -10037,7 +10037,7 @@ namespace LivreNoirLibrary.Collections
             fixed (ulong* dstPtr = dst)
             fixed (ulong* srcPtr = src)
             {
-                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, length);
+                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -10049,7 +10049,7 @@ namespace LivreNoirLibrary.Collections
             fixed (float* dstPtr = dst)
             fixed (float* srcPtr = src)
             {
-                CopyFromCore(dstPtr, srcPtr, factor, length);
+                CopyFromCore(dstPtr, srcPtr, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -10061,7 +10061,7 @@ namespace LivreNoirLibrary.Collections
             fixed (float* dstPtr = dst)
             fixed (float* srcPtr = src)
             {
-                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, length);
+                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -10073,7 +10073,7 @@ namespace LivreNoirLibrary.Collections
             fixed (double* dstPtr = dst)
             fixed (double* srcPtr = src)
             {
-                CopyFromCore(dstPtr, srcPtr, factor, length);
+                CopyFromCore(dstPtr, srcPtr, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -10085,32 +10085,32 @@ namespace LivreNoirLibrary.Collections
             fixed (double* dstPtr = dst)
             fixed (double* srcPtr = src)
             {
-                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, length);
+                CopyFromCore(dstPtr + dstOffset, srcPtr + srcOffset, factor, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static void CopyFrom(byte* destination, byte* source, Vector<byte> factor, int length) => CopyFromCore(destination, source, factor, length);
+        public static void CopyFrom(byte* destination, byte* source, Vector<byte> factor, nuint length) => CopyFromCore(destination, source, factor, length);
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static void CopyFrom(sbyte* destination, sbyte* source, Vector<sbyte> factor, int length) => CopyFromCore(destination, source, factor, length);
+        public static void CopyFrom(sbyte* destination, sbyte* source, Vector<sbyte> factor, nuint length) => CopyFromCore(destination, source, factor, length);
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static void CopyFrom(short* destination, short* source, Vector<short> factor, int length) => CopyFromCore(destination, source, factor, length);
+        public static void CopyFrom(short* destination, short* source, Vector<short> factor, nuint length) => CopyFromCore(destination, source, factor, length);
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static void CopyFrom(ushort* destination, ushort* source, Vector<ushort> factor, int length) => CopyFromCore(destination, source, factor, length);
+        public static void CopyFrom(ushort* destination, ushort* source, Vector<ushort> factor, nuint length) => CopyFromCore(destination, source, factor, length);
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static void CopyFrom(int* destination, int* source, Vector<int> factor, int length) => CopyFromCore(destination, source, factor, length);
+        public static void CopyFrom(int* destination, int* source, Vector<int> factor, nuint length) => CopyFromCore(destination, source, factor, length);
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static void CopyFrom(uint* destination, uint* source, Vector<uint> factor, int length) => CopyFromCore(destination, source, factor, length);
+        public static void CopyFrom(uint* destination, uint* source, Vector<uint> factor, nuint length) => CopyFromCore(destination, source, factor, length);
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static void CopyFrom(nint* destination, nint* source, Vector<nint> factor, int length) => CopyFromCore(destination, source, factor, length);
+        public static void CopyFrom(nint* destination, nint* source, Vector<nint> factor, nuint length) => CopyFromCore(destination, source, factor, length);
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static void CopyFrom(nuint* destination, nuint* source, Vector<nuint> factor, int length) => CopyFromCore(destination, source, factor, length);
+        public static void CopyFrom(nuint* destination, nuint* source, Vector<nuint> factor, nuint length) => CopyFromCore(destination, source, factor, length);
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static void CopyFrom(long* destination, long* source, Vector<long> factor, int length) => CopyFromCore(destination, source, factor, length);
+        public static void CopyFrom(long* destination, long* source, Vector<long> factor, nuint length) => CopyFromCore(destination, source, factor, length);
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static void CopyFrom(ulong* destination, ulong* source, Vector<ulong> factor, int length) => CopyFromCore(destination, source, factor, length);
+        public static void CopyFrom(ulong* destination, ulong* source, Vector<ulong> factor, nuint length) => CopyFromCore(destination, source, factor, length);
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static void CopyFrom(float* destination, float* source, Vector<float> factor, int length) => CopyFromCore(destination, source, factor, length);
+        public static void CopyFrom(float* destination, float* source, Vector<float> factor, nuint length) => CopyFromCore(destination, source, factor, length);
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static void CopyFrom(double* destination, double* source, Vector<double> factor, int length) => CopyFromCore(destination, source, factor, length);
+        public static void CopyFrom(double* destination, double* source, Vector<double> factor, nuint length) => CopyFromCore(destination, source, factor, length);
     }
 }

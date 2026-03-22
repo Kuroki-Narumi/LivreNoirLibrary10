@@ -7,6 +7,7 @@ using System.Numerics;
 using System.Runtime.Intrinsics;
 using LivreNoirLibrary.Numerics;
 using LivreNoirLibrary.Text;
+using System.Diagnostics;
 
 namespace LivreNoirLibrary.Benchmark
 {
@@ -47,30 +48,28 @@ namespace LivreNoirLibrary.Benchmark
             //BenchmarkRunner.Run<IfTest>();
             //IfTest.Validate();
 
-            RangeSet<int> set = [];
-            void MatchTest(string text)
+            /*
+            var random = Random.Shared;
+            var t0 = Stopwatch.GetTimestamp();
+            for (var i = 0L; ; i++)
             {
-                Console.WriteLine($"MatchTest text: \"{text}\"");
-                if (BasedNumber.TryParseRangeSet(text, set, 10))
-                {
-                    Console.Write($"  Parse successed: ");
-                    foreach (var range in set)
-                    {
-                        Console.Write($"{range}, ");
-                    }
-                    Console.WriteLine();
-                }
-                else
-                {
-                    Console.WriteLine($"  Parse failed!");
-                }
-            }
+                var value = random.NextDouble();
 
-            ReadOnlySpan<string> texts = ["1 2 3 5 6 7", "1-6 3,4", "-9 4-15", "36-5 3 6 9", "1 5 2 4 3", "6 6 6 9..2"];
-            foreach (var text in texts)
-            {
-                MatchTest(text);
+                var (num, den) = Rational.Rationalize(value);
+
+                if ((i & 32767) is 0)
+                {
+                    var t = Stopwatch.GetElapsedTime(t0);
+                    Console.Write($"i={i}, period={t.TotalMicroseconds / i:F10}us/op\r");
+                }
             }
+            */
+
+            //BenchmarkRunner.Run<ShuffleTest>();
+            //ShuffleTest.Validate();
+
+            BenchmarkRunner.Run<BiQuadFilterTest>();
+            BiQuadFilterTest.Validate();
         }
     }
 }

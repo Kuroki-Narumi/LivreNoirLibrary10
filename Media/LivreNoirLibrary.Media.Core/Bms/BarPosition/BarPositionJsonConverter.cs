@@ -1,9 +1,8 @@
-using LivreNoirLibrary.Numerics;
 using System;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 
-namespace LivreNoirLibrary.Media
+namespace LivreNoirLibrary.Media.Bms
 {
     public sealed class BarPositionJsonConverter : JsonConverter<BarPosition>
     {
@@ -16,14 +15,10 @@ namespace LivreNoirLibrary.Media
                 {
                     return result;
                 }
-                else if (Rational.TryParse(text, out var offset))
-                {
-                    return new(-1, offset);
-                }
             }
             else if (reader.TokenType is JsonTokenType.Number)
             {
-                return new(-1, Rational.ConvertBySBT(reader.GetDouble()));
+                return new(reader.GetDouble());
             }
             throw new JsonException();
         }

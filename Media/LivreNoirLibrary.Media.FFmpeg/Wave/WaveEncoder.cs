@@ -170,7 +170,7 @@ namespace LivreNoirLibrary.Media.Wave
                 var srcPtr = _buffer.Pointer;
                 fixed (byte* dstPtr = streamBuffer)
                 {
-                    converter.ConvertWrite(srcPtr, dstPtr, totalSamples);
+                    converter.ConvertWrite(srcPtr, dstPtr, (nuint)totalSamples);
                 }
                 stream.Write(streamBuffer, 0, bytesToWrite);
                 return true;
@@ -202,7 +202,7 @@ namespace LivreNoirLibrary.Media.Wave
                         return false;
                     }
                     var totalSamples = outSamples * outCh;
-                    converter.ConvertWrite(convPtr, dstPtr, totalSamples);
+                    converter.ConvertWrite(convPtr, dstPtr, (nuint)totalSamples);
                     stream.Write(streamBuffer, 0, totalSamples * converter.BytesPerSample);
                     return true;
                 }

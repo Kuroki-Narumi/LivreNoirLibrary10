@@ -12,7 +12,6 @@ namespace LivreNoirLibrary.Media.Bms
         public const double DefaultBarLength = 1;
         public const double StopUnit = 1d / 192d;
         public const int MaxBarNumber = 999;
-        public static readonly BarPosition MaxBarPosition = new(MaxBarNumber + 1, Rational.Zero);
         public const long MaxInnerResolution = 432000;
 
         public const int MaxKeyLane = 72;

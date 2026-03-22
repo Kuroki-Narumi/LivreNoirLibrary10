@@ -1,3 +1,4 @@
+using LivreNoirLibrary.IO;
 using LivreNoirLibrary.Numerics;
 using LivreNoirLibrary.Text;
 using System;
@@ -35,6 +36,12 @@ namespace LivreNoirLibrary.Media.Bms
         }
 
         public static string GetBarText(this int number) => string.Format(BmsConstants.BarTextFormat, number);
+
+        public static string GetOffsetText(this double offset)
+        {
+            var (num, den) = Rational.RationalizeUnsafe(offset, BmsConstants.MaxInnerResolution);
+            return $"{num}/{den}";
+        }
 
         public static bool IsConductor(this Channel channel) => _conductor.Contains(channel);
 
@@ -145,8 +152,6 @@ namespace LivreNoirLibrary.Media.Bms
 
         public static bool IsConductor(this DefType type) => type is >= DefType.Bpm and <= DefType.Speed;
         public static bool NeedsBpmDef(this double value) => value != double.Truncate(value) || value is <= 0 || value is > 255;
-
-        public static Rational ToInnerOffset(this double value) => Rational.ConvertBySBT(value, BmsConstants.MaxInnerResolution);
 
         private static readonly SortedSet<Channel> _hex = 
         [

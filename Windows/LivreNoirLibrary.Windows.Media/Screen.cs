@@ -74,7 +74,7 @@ namespace LivreNoirLibrary.Windows.Media
             try
             {
                 bitmap.Lock();
-                SimdOperations.CopyFrom((byte*)bitmap.BackBuffer, (byte*)data.Scan0, bitmap.BackBufferStride * h);
+                SimdOperations.CopyFrom((byte*)bitmap.BackBuffer, (byte*)data.Scan0, (nuint)(bitmap.BackBufferStride * h));
                 bitmap.AddDirtyRect(new(0, 0, w, h));
             }
             finally

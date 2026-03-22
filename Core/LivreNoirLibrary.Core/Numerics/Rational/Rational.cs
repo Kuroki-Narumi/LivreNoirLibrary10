@@ -75,11 +75,13 @@ namespace LivreNoirLibrary.Numerics
             {
                 _numerator = numerator;
                 _denominatorMinusOne = 0;
-                return;
             }
-            var gcd = numerator.GCD(denominator);
-            _numerator = numerator / gcd;
-            _denominatorMinusOne = denominator / gcd - 1;
+            else
+            {
+                var gcd = numerator.GCD(denominator);
+                _numerator = numerator / gcd;
+                _denominatorMinusOne = denominator / gcd - 1;
+            }
         }
 
         /// <summary>

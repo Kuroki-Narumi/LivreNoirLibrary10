@@ -14,12 +14,17 @@ namespace LivreNoirLibrary.Windows.Media
     public static class MinimumText
     {
         private const string ResourcePath = "pack://application:,,,/LivreNoirLibrary.Windows.Media;component/Resources/IndexLetters.png";
+        private const string ResourcePath2 = "pack://application:,,,/LivreNoirLibrary.Windows.Media;component/Resources/IndexLetters2.png";
         private const int HorizontalCount = 10;
         private const int CharWidth = 7;
         private const int CharHeight = 9;
+        private const int CharWidth2 = 12;
+        private const int CharHeight2 = 18;
 
         private static readonly WriteableBitmap _letterBitmap;
         private static readonly Dictionary<char, Rectangle> _rects = [];
+        private static readonly WriteableBitmap _letterBitmap2;
+        private static readonly Dictionary<char, Rectangle> _rects2 = [];
 
         private static readonly LnColor _defaultColor = LnColor.FromRgb(255, 255, 255);
         private static readonly Dictionary<string, WriteableBitmap> _whiteCache = [];
@@ -27,9 +32,15 @@ namespace LivreNoirLibrary.Windows.Media
 
         static MinimumText()
         {
-            _letterBitmap = Bitmap.FromResource(ResourcePath);
-            _letterBitmap.Freeze();
-            var rects = _rects;
+            (_letterBitmap, _rects) = CreateSource1();
+            (_letterBitmap2, _rects2) = CreateSource2();
+        }
+
+        private static (WriteableBitmap, Dictionary<char, Rectangle>) CreateSource1()
+        {
+            var bitmap = Bitmap.FromResource(ResourcePath);
+            bitmap.Freeze();
+            Dictionary<char, Rectangle> rects = [];
             void Add(char c, int x, int y, int w = CharWidth)
             {
                 rects.Add(c, new(x, y, w, CharHeight));
@@ -64,6 +75,50 @@ namespace LivreNoirLibrary.Windows.Media
             Add2('!');
             Add2('?');
             Add2('#');
+            return (bitmap, rects);
+        }
+
+        private static (WriteableBitmap, Dictionary<char, Rectangle>) CreateSource2()
+        {
+            var bitmap = Bitmap.FromResource(ResourcePath2);
+            bitmap.Freeze();
+            Dictionary<char, Rectangle> rects = [];
+            void Add(char c, int x, int y, int w = CharWidth2)
+            {
+                rects.Add(c, new(x, y, w, CharHeight2));
+            }
+            for (int i = 0; i < 62; i++)
+            {
+                var x = (i % HorizontalCount) * CharWidth2;
+                var y = (i / HorizontalCount) * CharHeight2;
+                var c = i.ToBased(62, 1)[0];
+                Add(c, x, y);
+            }
+            var xx = CharWidth2 * 2;
+            var yy = CharHeight2 * 6;
+            void Add2(char c, int w = CharWidth2)
+            {
+                Add(c, xx, yy, w);
+                xx += w;
+            }
+            Add2('.', 4);
+            Add2(':', 4);
+            xx += 4;
+            Add2('/', 11);
+            xx += 1;
+            Add2('(', 6);
+            Add2(')', 6);
+            Add2('+');
+            Add2('-');
+            Add2('*');
+            Add2('^');
+            Add2('%');
+            xx = 0;
+            yy += CharHeight2;
+            Add2('!');
+            Add2('?');
+            Add2('#');
+            return (bitmap, rects);
         }
 
         public static WriteableBitmap GetBitmap(string text) => _whiteCache.GetOrAdd(text, CreateBitmap);

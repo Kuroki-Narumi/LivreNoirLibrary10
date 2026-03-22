@@ -7,10 +7,14 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <UseWPF>true</UseWPF>
     <AllowUnsafeBlocks>True</AllowUnsafeBlocks>
+    <SignAssembly>False</SignAssembly>
+    <GenerateDocumentationFile>False</GenerateDocumentationFile>
+    <IncludeSymbols>False</IncludeSymbols>
   </PropertyGroup>
 
   <ItemGroup>
     <Compile Include="..\..\Media\LivreNoirLibrary.Media.Bitmap\Structs\DoubleRect.cs" Link="src\DoubleRect.cs" />
+    <Compile Include="..\..\Media\LivreNoirLibrary.Media.Wave\Analytics\BiQuadFilter.cs" Link="src\BiQuadFilter.cs" />
   </ItemGroup>
 
   <ItemGroup>

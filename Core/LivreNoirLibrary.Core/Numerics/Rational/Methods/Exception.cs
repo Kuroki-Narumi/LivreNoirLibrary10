@@ -7,7 +7,7 @@ namespace LivreNoirLibrary.Numerics
         private const string DenominatorMustBeNonZero = "Denominator must be non-zero.";
         private static void ThrowDivideByZeroException(string? message = null) => throw new DivideByZeroException(message);
 
-        private const string TooLargeForRational = "Value was either too large or too small for a Rational.";
+        private const string TooLargeForRational = "Value is either too large or too small for a Rational.";
         private static void ThrowOverflowException(string message = TooLargeForRational) => throw new OverflowException(message);
 
         private static void ThrowFormatException(string message = "") => throw new FormatException(message);

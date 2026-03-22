@@ -63,7 +63,7 @@ namespace LivreNoirLibrary.Windows.Controls.Wave
             }
             data.Update(_owner.SamplePosition);
             using var bitmap = b.BeginWrite();
-            var w = (int)RequiredWidth;
+            var w = (nuint)RequiredWidth;
             var stride = bitmap.Width;
             var count = 0;
             var channels = Math.Min(data.Channels, 2);

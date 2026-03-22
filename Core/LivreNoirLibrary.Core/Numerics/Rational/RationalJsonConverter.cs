@@ -22,8 +22,7 @@ namespace LivreNoirLibrary.Text
                 var v = reader.GetDecimal();
                 try
                 {
-                    var value = Rational.ConvertBySBT(v);
-                    return value;
+                    return v.ToRational();
                 }
                 catch { }
             }

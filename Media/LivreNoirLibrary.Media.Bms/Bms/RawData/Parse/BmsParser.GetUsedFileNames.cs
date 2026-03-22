@@ -5,11 +5,11 @@ using System.IO;
 namespace LivreNoirLibrary.Media.Bms
 {
     public readonly record struct UsedFileInfo(string Filename, bool IsImage);
-    public partial class BmsTextReader
+    public partial class BmsParser
     {
         public static List<UsedFileInfo> GetUsedFileNames(string path, List<UsedFileInfo>? result = null)
         {
-            BmsTextReader reader;
+            BmsParser reader;
             using (var file = File.OpenRead(path))
             {
                 reader = new(file);

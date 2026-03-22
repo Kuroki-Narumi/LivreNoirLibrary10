@@ -89,16 +89,16 @@ namespace LivreNoirLibrary.Media
 
         static void CopyToCore(nint source, int sourceStride, bool sourceIsFloat, nint destination, int destStride, bool destIsFloat, int width, int height)
         {
+            var w = (nuint)width * 4;
             if (sourceIsFloat)
             {
-                width *= 4;
                 if (destIsFloat)
                 {
                     Parallel.For(0, height, y =>
                     {
                         var srcPtr = (float*)(source + y * sourceStride);
                         var destPtr = (float*)(destination + y * destStride);
-                        SimdOperations.CopyFrom(destPtr, srcPtr, width);
+                        SimdOperations.CopyFrom(destPtr, srcPtr, w);
                     });
                 }
                 else
@@ -127,7 +127,7 @@ namespace LivreNoirLibrary.Media
                 {
                     var srcPtr = (uint*)(source + y * sourceStride);
                     var destPtr = (uint*)(destination + y * destStride);
-                    SimdOperations.CopyFrom(destPtr, srcPtr, width);
+                    SimdOperations.CopyFrom(destPtr, srcPtr, w);
                 });
             }
         }
@@ -138,12 +138,12 @@ namespace LivreNoirLibrary.Media
             {
                 if (destIsFloat)
                 {
-                    width *= 4;
+                    var w = (nuint)width * 4;
                     Parallel.For(0, height, y =>
                     {
                         var srcPtr = (float*)(source + y * sourceStride);
                         var destPtr = (float*)(destination + y * destStride);
-                        SimdOperations.CopyFrom(destPtr, srcPtr, colorCorrection, width);
+                        SimdOperations.CopyFrom(destPtr, srcPtr, colorCorrection, w);
                     });
                 }
                 else

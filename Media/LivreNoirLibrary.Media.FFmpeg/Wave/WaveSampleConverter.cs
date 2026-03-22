@@ -6,8 +6,8 @@ namespace LivreNoirLibrary.Media.Wave
     internal unsafe interface IWaveSampleConverter
     {
         int BytesPerSample { get; }
-        void ConvertRead(byte* source, float* target, int bytes);
-        void ConvertWrite(float* source, byte* target, int totalSamples);
+        void ConvertRead(byte* source, float* target, nuint bytes);
+        void ConvertWrite(float* source, byte* target, nuint totalSamples);
 
         static IWaveSampleConverter? GetConverter(SampleFormat format) => format switch
         {
@@ -27,13 +27,13 @@ namespace LivreNoirLibrary.Media.Wave
         public int BytesPerSample => sizeof(float);
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public void ConvertRead(byte* source, float* target, int bytes)
+        public void ConvertRead(byte* source, float* target, nuint bytes)
         {
             SimdOperations.CopyFrom(target, (float*)source, bytes / sizeof(float));
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public void ConvertWrite(float* source, byte* target, int totalSamples)
+        public void ConvertWrite(float* source, byte* target, nuint totalSamples)
         {
             SimdOperations.CopyFrom((float*)target, source, totalSamples);
         }
@@ -49,21 +49,21 @@ namespace LivreNoirLibrary.Media.Wave
         public abstract void WriteSample(byte* target, float value);
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public void ConvertRead(byte* source, float* target, int bytes)
+        public void ConvertRead(byte* source, float* target, nuint bytes)
         {
-            var bps = BytesPerSample;
-            for (var i = 0; i < bytes; i += bps, target++)
+            var bps = (nuint)BytesPerSample;
+            for (nuint i = 0; i < bytes; i += bps, target++)
             {
                 *target = ReadSample(source + i);
             }
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public void ConvertWrite(float* source, byte* target, int totalSamples)
+        public void ConvertWrite(float* source, byte* target, nuint totalSamples)
         {
-            var bps = BytesPerSample;
+            var bps = (nuint)BytesPerSample;
             var bytes = totalSamples * bps;
-            for (var i = 0; i < bytes; i += bps, source++)
+            for (nuint i = 0; i < bytes; i += bps, source++)
             {
                 WriteSample(target + i, *source);
             }

@@ -16,7 +16,7 @@ namespace LivreNoirLibrary.Media.Bms
 
             public double Length { get; internal set; } = 1;
 
-            public void AddBgm(Channel channel, Rational position, int value, ref int offset)
+            public void AddBgm(Channel channel, double position, int value, ref int offset)
             {
                 var lane = channel - Channel.Bgm_Start + offset;
                 var bgm = _bgm;
@@ -32,7 +32,7 @@ namespace LivreNoirLibrary.Media.Bms
                 }
             }
 
-            public void Add(Channel channel, Rational position, int value)
+            public void Add(Channel channel, double position, int value)
             {
                 var list = _channels.GetOrAdd(channel);
                 if (!list.Any(l => l.TryAdd(position, value)))

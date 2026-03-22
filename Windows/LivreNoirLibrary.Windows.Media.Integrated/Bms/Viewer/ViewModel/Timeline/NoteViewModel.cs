@@ -6,6 +6,7 @@ using LivreNoirLibrary.Media;
 using LivreNoirLibrary.Media.Bms;
 using LivreNoirLibrary.Media.Wave;
 using LivreNoirLibrary.ObjectModel;
+using BarPosition = LivreNoirLibrary.Media.Bms.BarPosition;
 
 namespace LivreNoirLibrary.Windows.Media.Bms
 {
@@ -34,8 +35,8 @@ namespace LivreNoirLibrary.Windows.Media.Bms
         public Color Color { get; set; }
         public Color LongBody { get; set; }
 
-        public string BarText => Position.Bar.GetBarText();
-        public string OffsetText => Position.Offset.ToString();
+        public string BarText => Position.GetBarText();
+        public string OffsetText => Position.GetOffsetText();
         public string? LaneText => Note?.GetLaneText();
         public string ValueText => _valueText;
 

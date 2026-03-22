@@ -138,11 +138,12 @@ namespace LivreNoirLibrary.Media
                     var stride = rect.Width;
                     if (vertical)
                     {
+                        var s = (nuint)stride;
                         var y = 0;
                         GradientColorProvider g = new(color1, color2, rect.Height);
                         foreach (var (p, _) in bitmap.EnumerateLines(rect))
                         {
-                            SimdOperations.CopyFrom((uint*)p, g.Get(y), stride);
+                            SimdOperations.CopyFrom((uint*)p, g.Get(y), s);
                             y++;
                         }
                     }
@@ -184,7 +185,7 @@ namespace LivreNoirLibrary.Media
                         {
                             var x = Math.Clamp(left, 0, width - 1);
                             var w = Math.Clamp(right, 0, width - 1) - x + 1;
-                            SimdOperations.CopyFrom(pointer + x + y * width, c, w);
+                            SimdOperations.CopyFrom(pointer + x + y * width, c, (nuint)w);
                         }
                     }
                 }
@@ -313,7 +314,7 @@ namespace LivreNoirLibrary.Media
                         {
                             var max = dxCache[dy];
                             var left = Math.Max(x - max, 0);
-                            var dWidth = Math.Min(x + max, width - 1) - left + 1;
+                            var dWidth = (nuint)(Math.Min(x + max, width - 1) - left + 1);
                             if (y - dy >= 0)
                             {
                                 alpha = Math.Max(alpha, SimdOperations.Max(pointer + (y - dy) * width + left, dWidth));
@@ -332,7 +333,7 @@ namespace LivreNoirLibrary.Media
                 {
                     BlendCore((nint)bufferPtr, width * 4, false, width, height, ColorBlend.Alpha, Vector<float>.One);
                 }
-                SimdOperations.CopyFrom(pointer, buffer.Pointer, width * height);
+                SimdOperations.CopyFrom(pointer, buffer.Pointer, (nuint)(width * height));
 
                 if (needDispose)
                 {
@@ -344,8 +345,8 @@ namespace LivreNoirLibrary.Media
             {
                 AssertType(bitmap, false);
                 var pointer = (uint*)bitmap.Pointer;
-                var width = bitmap.Width;
-                var height = bitmap.Height;
+                var width = (nuint)bitmap.Width;
+                var height = (nuint)bitmap.Height;
                 var size = width * height;
                 // アルファは無視
                 var c = (uint)color & ColorUtils.GetMask(ColorFlags.RGB);
@@ -359,27 +360,27 @@ namespace LivreNoirLibrary.Media
                 // 全体のコピー
                 SimdOperations.CopyFrom(bufferPtr, pointer, size);
                 // パス1: 水平方向のA最大値をチェック
-                for (var y = 0; y < height; y++)
+                for (nuint y = 0; y < height; y++)
                 {
                     var src = pointer + y * width;
                     var dst = bufferPtr + y * width;
                     for (var dx = 1; dx <= thickness; dx++)
                     {
-                        var len = width - dx;
+                        var len = width - (nuint)dx;
                         SimdOperations.Max(dst, src + dx, len);
                         SimdOperations.Max(dst + dx, src, len);
                     }
                 }
                 SimdOperations.CopyFrom(pointer, bufferPtr, size);
                 // パス2: 垂直方向のA最大値をチェック
-                for (var y = 0; y < height; y++)
+                for (nuint y = 0; y < height; y++)
                 {
                     var dst = pointer + y * width;
-                    for (var dy = Math.Max(-y, -thickness); dy < 0; dy++)
+                    for (var dy = Math.Min(y, (nuint)thickness); dy > 0; dy--)
                     {
-                        SimdOperations.Max(dst, bufferPtr + (y + dy) * width, width);
+                        SimdOperations.Max(dst, bufferPtr + (y - dy) * width, width);
                     }
-                    for (var dy = Math.Min(height - y - 1, thickness); dy > 0; dy--)
+                    for (var dy = Math.Min(height - y - 1, (nuint)thickness); dy > 0; dy--)
                     {
                         SimdOperations.Max(dst, bufferPtr + (y + dy) * width, width);
                     }

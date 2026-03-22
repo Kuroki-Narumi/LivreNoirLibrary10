@@ -6,7 +6,7 @@ using LivreNoirLibrary.IO;
 
 namespace LivreNoirLibrary.Media.Midi
 {
-    public sealed class SignatureTimeline : RationalTimeline<TimeSignature>, IDumpable, ILoadable<SignatureTimeline>, IBarPositionProvider<Rational>
+    public sealed class SignatureTimeline : RationalTimeline<TimeSignature>, IDumpable, ILoadable<SignatureTimeline>, IBarPositionProvider
     {
         public const string Chid = "LNMdSg";
 

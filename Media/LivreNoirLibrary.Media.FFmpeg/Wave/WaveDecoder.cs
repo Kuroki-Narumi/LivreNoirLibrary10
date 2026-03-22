@@ -172,7 +172,7 @@ namespace LivreNoirLibrary.Media.Wave
             var destPtr = _buffer.Pointer;
             fixed (byte* srcPtr = streamBuffer)
             {
-                converter.ConvertRead(srcPtr, destPtr, bytesToRead);
+                converter.ConvertRead(srcPtr, destPtr, (nuint)bytesToRead);
             }
             _buffer_length = bytesToRead / block;
             return false;
@@ -204,7 +204,7 @@ namespace LivreNoirLibrary.Media.Wave
             fixed (byte* srcPtr = streamBuffer)
             fixed (float* convPtr = convertBuffer)
             {
-                converter.ConvertRead(srcPtr, convPtr, bytesToRead);
+                converter.ConvertRead(srcPtr, convPtr, (nuint)bytesToRead);
                 var convBytePtr = (byte*)convPtr;
                 var outSamples = this.SwrConvertToRead(&convBytePtr, bytesToRead / block);
                 _buffer_length = outSamples;

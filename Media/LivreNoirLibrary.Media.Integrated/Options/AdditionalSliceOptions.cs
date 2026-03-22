@@ -14,7 +14,7 @@ namespace LivreNoirLibrary.Media.Integrated
         public bool Detect_ShowGuide { get; set => SetValue(ref field, value); }
 
         public Note? Note { get; set => SetValue(ref field, value, [nameof(IsReplaceEnabled), nameof(IsReplaceAllEnabled)]); }
-        public BarPosition NotePosition { get; set => SetValue(ref field, value); }
+        public Bms.BarPosition NotePosition { get; set => SetValue(ref field, value); }
         public int ReferenceIndex { get; set => SetValue(ref field, value, [nameof(IsReplaceAllEnabled)]); }
         public int DefStart { get; set => SetValue(ref field, value); }
 
@@ -52,7 +52,7 @@ namespace LivreNoirLibrary.Media.Integrated
             ReplaceMode = SliceReplaceMode.Add;
         }
 
-        public void SetNote(BarPosition position, Note note)
+        public void SetNote(Bms.BarPosition position, Note note)
         {
             Note = note;
             NotePosition = position;

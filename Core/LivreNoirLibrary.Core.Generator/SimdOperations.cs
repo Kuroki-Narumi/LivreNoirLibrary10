@@ -263,7 +263,7 @@ namespace LivreNoirLibrary.Collections
         {
             var dst = {{PH_DestinationConvert}};
             var src = {{PH_SourceConvert}};
-            var length = Math.Min(dst.Length, src.Length);
+            var length = (nuint)Math.Min(dst.Length, src.Length);
             fixed ({{PH_Type}}* dstPtr = dst)
             fixed ({{PH_Type}}* srcPtr = src)
             {
@@ -279,14 +279,14 @@ namespace LivreNoirLibrary.Collections
             fixed ({{PH_Type}}* dstPtr = dst)
             fixed ({{PH_Type}}* srcPtr = src)
             {
-                {{PH_Method}}Core(dstPtr + dstOffset, srcPtr + srcOffset, length);
+                {{PH_Method}}Core(dstPtr + dstOffset, srcPtr + srcOffset, (nuint)length);
             }
         }
 """;
 
     private const string Code_Vector_Ptr = $$"""
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static void {{PH_Method}}({{PH_Type}}* destination, {{PH_Type}}* source, int length) => {{PH_Method}}Core(destination, source, length);
+        public static void {{PH_Method}}({{PH_Type}}* destination, {{PH_Type}}* source, nuint length) => {{PH_Method}}Core(destination, source, length);
 """;
 
     private const string Code_Vector_Factor_Overload = $$"""
@@ -295,7 +295,7 @@ namespace LivreNoirLibrary.Collections
         {
             var dst = {{PH_DestinationConvert}};
             var src = {{PH_SourceConvert}};
-            var length = Math.Min(dst.Length, src.Length);
+            var length = (nuint)Math.Min(dst.Length, src.Length);
             fixed ({{PH_Type}}* dstPtr = dst)
             fixed ({{PH_Type}}* srcPtr = src)
             {
@@ -311,14 +311,14 @@ namespace LivreNoirLibrary.Collections
             fixed ({{PH_Type}}* dstPtr = dst)
             fixed ({{PH_Type}}* srcPtr = src)
             {
-                {{PH_Method}}Core(dstPtr + dstOffset, srcPtr + srcOffset, factor, length);
+                {{PH_Method}}Core(dstPtr + dstOffset, srcPtr + srcOffset, factor, (nuint)length);
             }
         }
 """;
 
     private const string Code_Vector_Factor_Ptr = $$"""
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static void {{PH_Method}}({{PH_Type}}* destination, {{PH_Type}}* source, {{PH_Type}} factor, int length) => {{PH_Method}}Core(destination, source, factor, length);
+        public static void {{PH_Method}}({{PH_Type}}* destination, {{PH_Type}}* source, {{PH_Type}} factor, nuint length) => {{PH_Method}}Core(destination, source, factor, length);
 """;
 
     private const string Code_Vector_Factor_Overload2 = $$"""
@@ -327,7 +327,7 @@ namespace LivreNoirLibrary.Collections
         {
             var dst = {{PH_DestinationConvert}};
             var src = {{PH_SourceConvert}};
-            var length = Math.Min(dst.Length, src.Length);
+            var length = (nuint)Math.Min(dst.Length, src.Length);
             fixed ({{PH_Type}}* dstPtr = dst)
             fixed ({{PH_Type}}* srcPtr = src)
             {
@@ -343,14 +343,14 @@ namespace LivreNoirLibrary.Collections
             fixed ({{PH_Type}}* dstPtr = dst)
             fixed ({{PH_Type}}* srcPtr = src)
             {
-                {{PH_Method}}Core(dstPtr + dstOffset, srcPtr + srcOffset, factor, length);
+                {{PH_Method}}Core(dstPtr + dstOffset, srcPtr + srcOffset, factor, (nuint)length);
             }
         }
 """;
 
     private const string Code_Vector_Factor_Ptr2 = $$"""
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static void {{PH_Method}}({{PH_Type}}* destination, {{PH_Type}}* source, Vector<{{PH_Type}}> factor, int length) => {{PH_Method}}Core(destination, source, factor, length);
+        public static void {{PH_Method}}({{PH_Type}}* destination, {{PH_Type}}* source, Vector<{{PH_Type}}> factor, nuint length) => {{PH_Method}}Core(destination, source, factor, length);
 """;
 
     private const string Code_Scalar_Overload = $$"""
@@ -360,7 +360,7 @@ namespace LivreNoirLibrary.Collections
             var dst = {{PH_DestinationConvert}};
             fixed ({{PH_Type}}* dstPtr = dst)
             {
-                {{PH_Method}}Core(dstPtr, value, dst.Length);
+                {{PH_Method}}Core(dstPtr, value, (nuint)dst.Length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -370,14 +370,14 @@ namespace LivreNoirLibrary.Collections
             AdjustArgs(dst.Length, ref offset, ref length);
             fixed ({{PH_Type}}* dstPtr = dst)
             {
-                {{PH_Method}}Core(dstPtr + offset, value, length);
+                {{PH_Method}}Core(dstPtr + offset, value, (nuint)length);
             }
         }
 """;
 
     private const string Code_Scalar_Ptr = $$"""
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static void {{PH_Method}}({{PH_Type}}* destination, {{PH_Type}} value, int length) => {{PH_Method}}Core(destination, value, length);
+        public static void {{PH_Method}}({{PH_Type}}* destination, {{PH_Type}} value, nuint length) => {{PH_Method}}Core(destination, value, length);
 """;
 
     private const string Code_2Scalar_Overload = $$"""
@@ -387,7 +387,7 @@ namespace LivreNoirLibrary.Collections
             var dst = {{PH_DestinationConvert}};
             fixed ({{PH_Type}}* dstPtr = dst)
             {
-                {{PH_Method}}Core(dstPtr, min, max, dst.Length);
+                {{PH_Method}}Core(dstPtr, min, max, (nuint)dst.Length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -397,14 +397,14 @@ namespace LivreNoirLibrary.Collections
             AdjustArgs(dst.Length, ref offset, ref length);
             fixed ({{PH_Type}}* dstPtr = dst)
             {
-                {{PH_Method}}Core(dstPtr + offset, min, max, length);
+                {{PH_Method}}Core(dstPtr + offset, min, max, (nuint)length);
             }
         }
 """;
 
     private const string Code_2Scalar_Ptr = $$"""
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static void {{PH_Method}}({{PH_Type}}* destination, {{PH_Type}} min, {{PH_Type}} max, int length) => {{PH_Method}}Core(destination, min, max, length);
+        public static void {{PH_Method}}({{PH_Type}}* destination, {{PH_Type}} min, {{PH_Type}} max, nuint length) => {{PH_Method}}Core(destination, min, max, length);
 """;
 
     private const string Code_Unary_Overload = $$"""
@@ -414,7 +414,7 @@ namespace LivreNoirLibrary.Collections
             var dst = {{PH_DestinationConvert}};
             fixed ({{PH_Type}}* dstPtr = dst)
             {
-                {{PH_Method}}Core(dstPtr, dst.Length);
+                {{PH_Method}}Core(dstPtr, (nuint)dst.Length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -424,14 +424,14 @@ namespace LivreNoirLibrary.Collections
             AdjustArgs(dst.Length, ref offset, ref length);
             fixed ({{PH_Type}}* dstPtr = dst)
             {
-                {{PH_Method}}Core(dstPtr + offset, length);
+                {{PH_Method}}Core(dstPtr + offset, (nuint)length);
             }
         }
 """;
 
     private const string Code_Unary_Ptr = $$"""
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static void {{PH_Method}}({{PH_Type}}* destination, int length) => {{PH_Method}}Core(destination, length);
+        public static void {{PH_Method}}({{PH_Type}}* destination, nuint length) => {{PH_Method}}Core(destination, length);
 """;
 
     private const string Code_Unary_Readonly_Overload = $$"""
@@ -441,7 +441,7 @@ namespace LivreNoirLibrary.Collections
             var src = {{PH_SourceConvert}};
             fixed ({{PH_Type}}* srcPtr = src)
             {
-                return {{PH_Method}}Core(srcPtr, src.Length);
+                return {{PH_Method}}Core(srcPtr, (nuint)src.Length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -451,14 +451,14 @@ namespace LivreNoirLibrary.Collections
             AdjustArgs(src.Length, ref offset, ref length);
             fixed ({{PH_Type}}* srcPtr = src)
             {
-                return {{PH_Method}}Core(srcPtr + offset, length);
+                return {{PH_Method}}Core(srcPtr + offset, (nuint)length);
             }
         }
 """;
 
     private const string Code_Unary_Readonly_Ptr = $$"""
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static {{PH_Return}} {{PH_Method}}({{PH_Type}}* source, int length) => {{PH_Method}}Core(source, length);
+        public static {{PH_Return}} {{PH_Method}}({{PH_Type}}* source, nuint length) => {{PH_Method}}Core(source, length);
 """;
 
     private const string Code_Shift_Overload = $$"""
@@ -468,7 +468,7 @@ namespace LivreNoirLibrary.Collections
             var dst = {{PH_DestinationConvert}};
             fixed ({{PH_Type}}* dstPtr = dst)
             {
-                {{PH_Method}}Core(dstPtr, shiftCount, dst.Length);
+                {{PH_Method}}Core(dstPtr, shiftCount, (nuint)dst.Length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -478,14 +478,14 @@ namespace LivreNoirLibrary.Collections
             AdjustArgs(dst.Length, ref offset, ref length);
             fixed ({{PH_Type}}* dstPtr = dst)
             {
-                {{PH_Method}}Core(dstPtr + offset, shiftCount, length);
+                {{PH_Method}}Core(dstPtr + offset, shiftCount, (nuint)length);
             }
         }
 """;
 
     private const string Code_Shift_Ptr = $$"""
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static void {{PH_Method}}({{PH_Type}}* destination, int shiftCount, int length) => {{PH_Method}}Core(destination, shiftCount, length);
+        public static void {{PH_Method}}({{PH_Type}}* destination, int shiftCount, nuint length) => {{PH_Method}}Core(destination, shiftCount, length);
 """;
 
     private const string Code_EqualsAll_Overload = $$"""
@@ -501,7 +501,7 @@ namespace LivreNoirLibrary.Collections
             fixed ({{PH_Type}}* leftPtr = l)
             fixed ({{PH_Type}}* rightPtr = r)
             {
-                return EqualsCore(leftPtr, rightPtr, l.Length);
+                return EqualsCore(leftPtr, rightPtr, (nuint)l.Length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -513,7 +513,7 @@ namespace LivreNoirLibrary.Collections
             fixed ({{PH_Type}}* leftPtr = l)
             fixed ({{PH_Type}}* rightPtr = r)
             {
-                return EqualsCore(leftPtr, rightPtr, length);
+                return EqualsCore(leftPtr, rightPtr, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -525,13 +525,13 @@ namespace LivreNoirLibrary.Collections
             fixed ({{PH_Type}}* leftPtr = l)
             fixed ({{PH_Type}}* rightPtr = r)
             {
-                return EqualsCore(leftPtr, rightPtr, length);
+                return EqualsCore(leftPtr, rightPtr, (nuint)length);
             }
         }
 """;
 
     private const string Code_EqualsAll_Ptr = $$"""
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static bool EqualsAll({{PH_Type}}* left, {{PH_Type}}* right, int length) => EqualsCore(left, right, length);
+        public static bool EqualsAll({{PH_Type}}* left, {{PH_Type}}* right, nuint length) => EqualsCore(left, right, length);
 """;
 }

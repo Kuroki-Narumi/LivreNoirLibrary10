@@ -72,7 +72,7 @@ namespace LivreNoirLibrary.Media.Bms.ViewModels
             }
         }
 
-        public void RefreshTimeline(IBarPositionProvider<double> provider, ITimelineViewModel target, double initialTempo, bool abortIfInvalidTempo)
+        public void RefreshTimeline(IBarPositionProvider provider, ITimelineViewModel target, double initialTempo, bool abortIfInvalidTempo)
         {
             TimingInfoState state = new(initialTempo);
             target.BeginTimelineRefresh(initialTempo);

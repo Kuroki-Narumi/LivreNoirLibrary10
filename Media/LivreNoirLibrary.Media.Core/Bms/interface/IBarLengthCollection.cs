@@ -1,45 +1,43 @@
 ﻿using LivreNoirLibrary.IO;
 using System;
 using System.Collections.Generic;
-using System.IO;
 using LivreNoirLibrary.ObjectModel;
 
 namespace LivreNoirLibrary.Media.Bms
 {
-    public interface IBarLengthCollection : IBarLengthProvider<double>, IEnumerable<(int, double)>, ICount, IClear, IDumpable, ILoadable
+    public interface IBarLengthCollection : IEnumerable<(short, double)>, IClear, IDumpable, ILoadable
     {
+        /// <summary>
+        /// Attempts to retrieve the length of the specified bar.
+        /// </summary>
+        /// <param name="number">The bar number to get the length.</param>
+        /// <param name="value">When this method returns, contains the length of the specified bar, if defined;
+        /// otherwise, default value of <see langword="double"/>.</param>
+        /// <returns><see langword="true"/> if the length of the specified bar is defined; otherwise, <see langword="false"/>.</returns>
         bool TryGetValue(int number, out double value);
+
+        /// <summary>
+        /// Sets the length of the specified bar to the specified value.
+        /// </summary>
+        /// <param name="number">The bar number to set the length.</param>
+        /// <param name="value">The length to set. If 0, remove the definition of the length of the specified bar.</param>
+        /// <returns><see langword="true"/> if the length of the specified bar is changed; otherwise, <see langword="false"/>.</returns>
+        /// <exception cref="ArgumentOutOfRangeException"/>
         bool Set(int number, double value);
+
+        /// <summary>
+        /// Removes the definition of the length of the specified bar.
+        /// </summary>
+        /// <param name="number">The bar number to remove the definition.</param>
+        /// <returns><see langword="true"/> if the definition of the specified bar is successfully removed; otherwise, <see langword="false"/>.</returns>
+        /// <exception cref="ArgumentOutOfRangeException"/>
         bool Remove(int number);
 
         void Insert(int number, int count);
+
         void Delete(int number, int count);
+
         void Merge(IBarLengthCollection source);
-
-        void IDumpable.Dump(BinaryWriter writer)
-        {
-            var c = Count;
-            writer.Write((ushort)c);
-            foreach (var (number, value) in this)
-            {
-                writer.Write((short)number);
-                writer.Write(value);
-            }
-        }
-
-        void ILoadable.ProcessLoad(BinaryReader reader)
-        {
-            Clear();
-            var count = (int)reader.ReadUInt16();
-            for (var i = 0; i < count; i++)
-            {
-                var number = reader.ReadInt16();
-                var value = reader.ReadDouble();
-                Set(number, value);
-            }
-        }
-
-        double IBarLengthProvider<double>.GetBarLength(int number) => TryGetValue(number, out var value) ? value : BmsConstants.DefaultBarLength;
 
         System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator() => GetEnumerator();
     }

@@ -6,8 +6,6 @@ using LivreNoirLibrary.Numerics;
 using LivreNoirLibrary.ObjectModel;
 using LivreNoirLibrary.Windows.Media;
 using System;
-using System.Numerics;
-using System.Windows;
 
 namespace LivreNoirLibrary.Windows.Controls.Bms
 {
@@ -115,7 +113,7 @@ namespace LivreNoirLibrary.Windows.Controls.Bms
                 var width = source.Width;
                 var height = source.Height;
                 _bitmap.Resize(width, height);
-                SimdOperations.CopyFrom((uint*)_bitmap.Pointer, (uint*)source.Pointer, width * height);
+                SimdOperations.CopyFrom((uint*)_bitmap.Pointer, (uint*)source.Pointer, (nuint)(width * height));
                 _bitmap.SetTransparent(transparent);
             }
 

@@ -21,7 +21,7 @@ namespace LivreNoirLibrary.Media.Bms.ViewModels
         IBmsData IBmsViewModel.Root => Root;
         public IBmsDataUnit CurrentData => _inheritanceList[^1];
         public IListEnumerable<BarPosition, Note> CurrentTimeline => _timeline;
-        public DoubleBarLengthCache BarLengthCache { get; } = new();
+        public BarLengthCache BarLengthCache { get; } = new();
         public FlowViewModelCollection FlowViewModel { get; }
         public ITimeCounter TimeCounter { get; set => SetValue(ref field, value); }
 

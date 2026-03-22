@@ -4,11 +4,11 @@
 		<IncludeSource Key="common_textures_number" Source="common_textures_number"/>
 	</Skin.Includes>
 	<Skin.Variables>
-		<Variable Key="title_x" Source="$Options.StageFile Defined" DefaultValue="24">
+		<Variable Key="title_x" Source="$Options.StageFile Defined" DefaultValue="12">
 			<Convert From="True" To="244"/>
 		</Variable>
 		
-		<Variable Key="title_width" Source="$Options.StageFile Defined" DefaultValue="1252">
+		<Variable Key="title_width" Source="$Options.StageFile Defined" DefaultValue="1264">
 			<Convert From="True" To="1032"/>
 		</Variable>
 

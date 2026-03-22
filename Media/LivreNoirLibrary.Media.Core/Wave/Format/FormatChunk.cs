@@ -9,40 +9,25 @@ using LivreNoirLibrary.Collections;
 
 namespace LivreNoirLibrary.Media.Wave
 {
-    public readonly struct FormatChunk(FormatType tag, ushort channels, uint sampleRate, uint bytesPerSecond, ushort blockAlign, ushort bits) : 
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="Tag">format type</param>
+    /// <param name="Channels">number of channels</param>
+    /// <param name="SampleRate">sample rate</param>
+    /// <param name="BytesPerSecond">for buffer estimation</param>
+    /// <param name="BlockAlign">bytes per (sample * channels)</param>
+    /// <param name="Bits">number of bits per sample of mono data</param>
+    public readonly record struct FormatChunk(FormatType Tag, ushort Channels, uint SampleRate, uint BytesPerSecond, ushort BlockAlign, ushort Bits) : 
         IRiffChunk<FormatChunk>, IDumpable, ILoadable<FormatChunk>, IJsonWriter
     {
         public string Chid => ChunkIds.Format;
         public uint ByteSize => HasExtension ? 40u : Tag is FormatType.PCM ? 16u : 18u;
 
-        /// <summary>
-        /// format type
-        /// </summary>
-        public readonly FormatType Tag = tag;
-        /// <summary>
-        /// number of channels
-        /// </summary>
-        public readonly ushort Channels = channels;
-        /// <summary>
-        /// sample rate
-        /// </summary>
-        public readonly uint SampleRate = sampleRate;
-        /// <summary>
-        /// for buffer estimation
-        /// </summary>
-        public readonly uint BytesPerSecond = bytesPerSecond;
-        /// <summary>
-        /// bytes per (sample * channels)
-        /// </summary>
-        public readonly ushort BlockAlign = blockAlign;
-        /// <summary>
-        /// number of bits per sample of mono data
-        /// </summary>
-        public readonly ushort Bits = bits;
-        public readonly bool HasExtension;
-        public readonly ushort ValidBits;
-        public readonly uint ChannelMask;
-        public readonly Guid SubFormat;
+        public bool HasExtension { get; }
+        public ushort ValidBits { get; }
+        public uint ChannelMask { get; }
+        public Guid SubFormat { get; }
 
         public FormatChunk(FormatType tag, ushort channels, uint sampleRate, uint bytesPerSecond, ushort blockAlign, ushort bits, ushort validBits, uint channelMask, Guid subFormat) : 
             this(tag, channels, sampleRate, bytesPerSecond, blockAlign, bits)

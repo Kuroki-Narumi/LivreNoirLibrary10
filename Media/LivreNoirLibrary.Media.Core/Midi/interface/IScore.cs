@@ -7,7 +7,7 @@ using LivreNoirLibrary.ObjectModel;
 
 namespace LivreNoirLibrary.Media.Midi
 {
-    public interface IScore : IBarPositionProvider<Rational>, IClear
+    public interface IScore : IBarPositionProvider, IClear
     {
         string? Title { get; set; }
         string? Copyright { get; set; }

@@ -64,25 +64,25 @@ namespace LivreNoirLibrary.Numerics
             if (typeof(TOther) == typeof(Half))
             {
                 var actualValue = (Half)(object)value;
-                result = ConvertBySBT(actualValue);
+                result = actualValue.ToRational();
                 return true;
             }
             else if (typeof(TOther) == typeof(float))
             {
                 var actualValue = (float)(object)value;
-                result = ConvertBySBT(actualValue);
+                result = actualValue.ToRational();
                 return true;
             }
             else if (typeof(TOther) == typeof(double))
             {
                 var actualValue = (double)(object)value;
-                result = ConvertBySBT(actualValue);
+                result = actualValue.ToRational();
                 return true;
             }
             else if (typeof(TOther) == typeof(decimal))
             {
                 var actualValue = (decimal)(object)value;
-                result = ConvertBySBT(actualValue);
+                result = actualValue.ToRational();
                 return true;
             }
             else if (typeof(TOther) == typeof(byte))
@@ -176,7 +176,7 @@ namespace LivreNoirLibrary.Numerics
                 var actualValue = (Half)(object)value;
                 result = Half.IsPositiveInfinity(actualValue) ? MaxValue :
                          Half.IsNegativeInfinity(actualValue) ? MinValue :
-                         ConvertBySBT(actualValue);
+                         actualValue.ToRational();
                 return true;
             }
             else if (typeof(TOther) == typeof(float))
@@ -184,7 +184,7 @@ namespace LivreNoirLibrary.Numerics
                 var actualValue = (float)(object)value;
                 result = actualValue is <= long.MinValue ? MaxValue :
                          actualValue is >= long.MaxValue ? MinValue :
-                         ConvertBySBT(actualValue);
+                         actualValue.ToRational();
                 return true;
             }
             else if (typeof(TOther) == typeof(double))
@@ -192,7 +192,7 @@ namespace LivreNoirLibrary.Numerics
                 var actualValue = (double)(object)value;
                 result = actualValue is <= long.MinValue ? MaxValue :
                          actualValue is >= long.MaxValue ? MinValue :
-                         ConvertBySBT(actualValue);
+                         actualValue.ToRational();
                 return true;
             }
             else if (typeof(TOther) == typeof(decimal))
@@ -200,7 +200,7 @@ namespace LivreNoirLibrary.Numerics
                 var actualValue = (decimal)(object)value;
                 result = actualValue is <= long.MinValue ? MaxValue :
                          actualValue is >= long.MaxValue ? MinValue :
-                         ConvertBySBT(actualValue);
+                         actualValue.ToRational();
                 return true;
             }
             else if (typeof(TOther) == typeof(byte))
@@ -300,7 +300,7 @@ namespace LivreNoirLibrary.Numerics
                 var actualValue = (Half)(object)value;
                 result = Half.IsPositiveInfinity(actualValue) ? MaxValue :
                          Half.IsNegativeInfinity(actualValue) ? MinValue :
-                         ConvertBySBT(actualValue);
+                         actualValue.ToRational();
                 return true;
             }
             else if (typeof(TOther) == typeof(float))
@@ -308,7 +308,7 @@ namespace LivreNoirLibrary.Numerics
                 var actualValue = (float)(object)value;
                 result = actualValue is <= long.MinValue ? MaxValue :
                          actualValue is >= long.MaxValue ? MinValue :
-                         ConvertBySBT(actualValue);
+                         actualValue.ToRational();
                 return true;
             }
             else if (typeof(TOther) == typeof(double))
@@ -316,7 +316,7 @@ namespace LivreNoirLibrary.Numerics
                 var actualValue = (double)(object)value;
                 result = actualValue is <= long.MinValue ? MaxValue :
                          actualValue is >= long.MaxValue ? MinValue :
-                         ConvertBySBT(actualValue);
+                         actualValue.ToRational();
                 return true;
             }
             else if (typeof(TOther) == typeof(decimal))
@@ -324,7 +324,7 @@ namespace LivreNoirLibrary.Numerics
                 var actualValue = (decimal)(object)value;
                 result = actualValue is <= long.MinValue ? MaxValue :
                          actualValue is >= long.MaxValue ? MinValue :
-                         ConvertBySBT(actualValue);
+                         actualValue.ToRational();
                 return true;
             }
             else if (typeof(TOther) == typeof(byte))

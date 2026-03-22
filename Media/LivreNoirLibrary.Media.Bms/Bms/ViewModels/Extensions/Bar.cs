@@ -196,7 +196,7 @@ namespace LivreNoirLibrary.Media.Bms
                         {
                             foreach (var note in list.Where(IsTempo))
                             {
-                                if (pos.Offset.IsZero())
+                                if (pos.Offset is 0)
                                 {
                                     changes.Remove(pos);
                                     needSetHeadTempo = false;
@@ -240,7 +240,7 @@ namespace LivreNoirLibrary.Media.Bms
             {
                 var (bar, offset) = position;
                 var current = vm.GetBarLength(bar);
-                if (offset.IsZero() || offset >= current)
+                if (offset is 0 || offset >= current)
                 {
                     return;
                 }
@@ -254,8 +254,8 @@ namespace LivreNoirLibrary.Media.Bms
                 {
                     var timeline = data.Timeline;
                     data.InsertBar(bar, 1);
-                    timeline.Move(p => new(p.Bar, ((p.Offset - offset) * current / second).ToInnerOffset()), RangeUtils.Get(position, new(bar + 2)));
-                    timeline.Move(p => new(p.Bar - 1, (p.Offset * current / first).ToInnerOffset()), RangeUtils.Get(newHead, position));
+                    timeline.Move(p => new(p.Bar, (p.Offset - offset) * current / second), RangeUtils.Get(position, new(bar + 2)));
+                    timeline.Move(p => new(p.Bar - 1, p.Offset * current / first), RangeUtils.Get(newHead, position));
                 }
                 currentData.BarDefs.Set(bar, first);
                 currentData.BarDefs.Set(bar + 1, second);

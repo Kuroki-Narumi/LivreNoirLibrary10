@@ -7,7 +7,7 @@ namespace LivreNoirLibrary.Media.Bms
     {
         public override void Load(IBmsViewModel source) => Load(source.Bpm, source, source.CurrentTimeline);
 
-        public void Load(double initialTempo, IBarPositionProvider<double> provider, IListEnumerable<BarPosition, Note> timeline)
+        public void Load(double initialTempo, IBarPositionProvider provider, IListEnumerable<BarPosition, Note> timeline)
         {
             BeginInit(initialTempo);
             TimingInfoState state = new(initialTempo);

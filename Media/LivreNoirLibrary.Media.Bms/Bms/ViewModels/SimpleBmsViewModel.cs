@@ -56,7 +56,7 @@ namespace LivreNoirLibrary.Media.Bms.ViewModels
             return Random.Shared.Next(max) + 1;
         }
 
-        public DoubleBarLengthCache BarLengthCache { get; } = new();
+        public BarLengthCache BarLengthCache { get; } = new();
         public ITimeCounter TimeCounter { get; } = timeCounter ?? new TimeCounter();
     }
 }

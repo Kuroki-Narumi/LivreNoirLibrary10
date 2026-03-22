@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
-using System.Reflection;
 using System.Runtime.CompilerServices;
 using IEble = System.Collections.IEnumerable;
 using IEtor = System.Collections.IEnumerator;
@@ -10,9 +9,32 @@ namespace LivreNoirLibrary.Collections
 {
     public static partial class SortedList
     {
+        /// <summary>
+        /// Determines whether the specified key exists in a sorted list using a binary search algorithm.
+        /// </summary>
+        /// <remarks>The list must be sorted in ascending order prior to calling this method. 
+        /// If the list is not sorted, the result is undefined.</remarks>
+        /// <typeparam name="TKey">The type of the keys in the list.</typeparam>
+        /// <param name="keys">A list of keys, which must be sorted in ascending order.</param>
+        /// <param name="key">The key to locate in the list.</param>
+        /// <param name="comparer">The comparer to use when comparing keys, or <see langword="null"/> to use the default comparer for the <typeparamref name="TKey"/>.</param>
+        /// <returns><see langword="true"/> if the key is found in the list; otherwise, <see langword="false"/>.</returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static bool ContainsKey<TKey>(List<TKey> keys, TKey key, IComparer<TKey>? comparer = null) => keys.BinarySearch(key, comparer) is >= 0;
 
+        /// <summary>
+        /// Attempts to find the index of the specified key in a sorted list using binary search.
+        /// </summary>
+        /// <remarks>The list must be sorted in ascending order prior to calling this method. 
+        /// If the list is not sorted, the result is undefined.</remarks>
+        /// <typeparam name="TKey">The type of the keys in the list.</typeparam>
+        /// <param name="keys">A list of keys, which must be sorted in ascending order.</param>
+        /// <param name="key">The key to locate in the list.</param>
+        /// <param name="index">When this method returns, contains the zero-based index of the key if found; otherwise, a negative number
+        /// that is the bitwise complement of the index of the next element that is larger than key, or, if there is no
+        /// larger element, the bitwise complement of Count.</param>
+        /// <param name="comparer">The comparer to use when comparing keys, or <see langword="null"/> to use the default comparer for <typeparamref name="TKey"/>.</param>
+        /// <returns><see langword="true"/> if the key is found in the list; otherwise, <see langword="false"/>.</returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static bool TryGetIndex<TKey>(List<TKey> keys, TKey key, out int index, IComparer<TKey>? comparer = null)
         {
@@ -20,6 +42,21 @@ namespace LivreNoirLibrary.Collections
             return index >= 0;
         }
 
+        /// <summary>
+        /// Attempts to retrieve the value associated with the specified key from the provided sorted key and value lists.
+        /// </summary>
+        /// <remarks>The keys list must be sorted in ascending order prior to calling this method. 
+        /// If the list is not sorted, the result is undefined.
+        /// The values list must be the same length as the keys list, with each value corresponding to the key at the same index.</remarks>
+        /// <typeparam name="TKey">The type of the keys in the list.</typeparam>
+        /// <typeparam name="TValue">The type of the values in the list.</typeparam>
+        /// <param name="keys">A list of keys, which must be sorted in ascending order.</param>
+        /// <param name="values">A list of values corresponding to the keys. Must have the same number of elements as the keys list.</param>
+        /// <param name="key">The key to locate in the keys list.</param>
+        /// <param name="value">When this method returns, contains the value associated with the specified key, if the key is found;
+        /// otherwise, the default value for <typeparamref name="TValue"/></param>
+        /// <param name="comparer">The comparer to use when comparing keys, or <see langword="null"/> to use the default comparer for <typeparamref name="TKey"/>.</param>
+        /// <returns><see langword="true"/> if the key is found in the list; otherwise, <see langword="false"/>.</returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static bool TryGetValue<TKey, TValue>(List<TKey> keys, List<TValue> values, TKey key, [MaybeNullWhen(false)]out TValue value, IComparer<TKey>? comparer = null)
         {
@@ -33,6 +70,47 @@ namespace LivreNoirLibrary.Collections
             return false;
         }
 
+        /// <summary>
+        /// Retrieves the value associated with the specified key from the provided sorted key and value lists.
+        /// or returns a default value if the key is not found.
+        /// </summary>
+        /// <remarks>The keys list must be sorted in ascending order prior to calling this method. 
+        /// If the list is not sorted, the result is undefined.
+        /// The values list must be the same length as the keys list, with each value corresponding to the key at the same index.</remarks>
+        /// <typeparam name="TKey">The type of the keys in the list.</typeparam>
+        /// <typeparam name="TValue">The type of the values in the list.</typeparam>
+        /// <param name="keys">A list of keys, which must be sorted in ascending order.</param>
+        /// <param name="values">A list of values corresponding to the keys. Must have the same number of elements as the keys list.</param>
+        /// <param name="key">The key to locate in the keys list.</param>
+        /// <param name="defaultValue">The value to return if the specified key is not found in the keys list.</param>
+        /// <param name="comparer">The comparer to use when comparing keys, or <see langword="null"/> to use the default comparer for <typeparamref name="TKey"/>.</param>
+        /// <returns>The value associated with the specified key if found; otherwise, the specified default value.</returns>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static TValue GetOrDefault<TKey, TValue>(List<TKey> keys, List<TValue> values, TKey key, TValue defaultValue, IComparer<TKey>? comparer = null)
+        {
+            var index = keys.BinarySearch(key, comparer);
+            if (index is >= 0)
+            {
+                return values[index];
+            }
+            return defaultValue;
+        }
+
+        /// <summary>
+        /// Attempts to find the key associated with the specified value in the provided key and value lists.
+        /// </summary>
+        /// <remarks>The keys and values lists must be of equal length, and each key at a given index is
+        /// associated with the value at the same index. If the specified value occurs multiple times in the values
+        /// list, the key corresponding to its first occurrence is returned.</remarks>
+        /// <typeparam name="TKey">The type of the keys in the list.</typeparam>
+        /// <typeparam name="TValue">The type of the values in the list.</typeparam>
+        /// <param name="keys">A list of keys.</param>
+        /// <param name="values">A list of values corresponding to the keys. Must have the same number of elements as the keys list.</param>
+        /// <param name="value">The value to locate in the values list.</param>
+        /// <param name="key">When this method returns, contains the key associated with the specified value, if the value is found;
+        /// otherwise, the default value for <typeparamref name="TKey"/></param>
+        /// <returns><see langword="true"/> if the value is found and the associated key is returned in <paramref name="key"/>;
+        /// otherwise, <see langword="false"/>.</returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static bool TryGetKey<TKey, TValue>(List<TKey> keys, List<TValue> values, TValue value, [MaybeNullWhen(false)] out TKey key)
         {
@@ -46,6 +124,21 @@ namespace LivreNoirLibrary.Collections
             return false;
         }
 
+        /// <summary>
+        /// Retrieves the value associated with the specified key, or adds a new key and value if the key does not
+        /// exist. The value is created using the default constructor of the value type.
+        /// </summary>
+        /// <remarks>The keys list must be sorted in ascending order prior to calling this method. 
+        /// If the list is not sorted, the result is undefined.
+        /// The values list must be the same length as the keys list, with each value corresponding to the key at the same index.</remarks>
+        /// <typeparam name="TKey">The type of the keys in the list.</typeparam>
+        /// <typeparam name="TValue">The type of the values in the list.</typeparam>
+        /// <param name="keys">A list of keys, which must be sorted in ascending order.</param>
+        /// <param name="values">A list of values corresponding to the keys. Must have the same number of elements as the keys list.</param>
+        /// <param name="key">The key to locate in the keys list. If not found, a new entry is added.</param>
+        /// <param name="comparer">The comparer to use when comparing keys, or <see langword="null"/> to use the default comparer for <typeparamref name="TKey"/>.</param>
+        /// <returns>The value associated with the specified key if it exists; 
+        /// otherwise, a new value created using the default constructor and added to the lists.</returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static TValue GetOrAdd<TKey, TValue>(List<TKey> keys, List<TValue> values, TKey key, IComparer<TKey>? comparer = null)
             where TValue : new()
@@ -65,6 +158,22 @@ namespace LivreNoirLibrary.Collections
             }
         }
 
+        /// <summary>
+        /// Retrieves the value associated with the specified key, or adds a new key and value if the key does not
+        /// exist. The value is created using the provided factory function.
+        /// </summary>
+        /// <remarks>The keys list must be sorted in ascending order prior to calling this method. 
+        /// If the list is not sorted, the result is undefined.
+        /// The values list must be the same length as the keys list, with each value corresponding to the key at the same index.</remarks>
+        /// <typeparam name="TKey">The type of the keys in the list.</typeparam>
+        /// <typeparam name="TValue">The type of the values in the list.</typeparam>
+        /// <param name="keys">A list of keys, which must be sorted in ascending order.</param>
+        /// <param name="values">A list of values corresponding to the keys. Must have the same number of elements as the keys list.</param>
+        /// <param name="key">The key to locate in the keys list. If not found, a new entry is added.</param>
+        /// <param name="valueFactory">A function that is called to produce a value when the specified key does not exist in the keys list.</param>
+        /// <param name="comparer">The comparer to use when comparing keys, or <see langword="null"/> to use the default comparer for <typeparamref name="TKey"/>.</param>
+        /// <returns>The value associated with the specified key if it exists; 
+        /// otherwise, a new value created using the provided factory function constructor and added to the lists.</returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static TValue GetOrAdd<TKey, TValue>(List<TKey> keys, List<TValue> values, TKey key, Func<TKey, TValue> valueFactory, IComparer<TKey>? comparer = null)
         {
@@ -83,31 +192,37 @@ namespace LivreNoirLibrary.Collections
             }
         }
 
+        /// <summary>
+        /// Adds a key-value pair to the specified lists or replaces the value for an existing key. 
+        /// Returns a value indicating whether the operation resulted in an addition or replacement.
+        /// </summary>
+        /// <remarks>The keys list must be sorted in ascending order prior to calling this method. 
+        /// If the list is not sorted, the result is undefined.
+        /// The values list must be the same length as the keys list, with each value corresponding to the key at the same index.</remarks>
+        /// <typeparam name="TKey">The type of the keys in the list.</typeparam>
+        /// <typeparam name="TValue">The type of the values in the list.</typeparam>
+        /// <param name="keys">A list of keys, which must be sorted in ascending order.</param>
+        /// <param name="values">A list of values corresponding to the keys. Must have the same number of elements as the keys list.</param>
+        /// <param name="key">The key to add or whose value to replace.</param>
+        /// <param name="value">The value to associate with the specified key.</param>
+        /// <param name="oldValue">When replacing an existing value, contains the previous value associated with the key; 
+        /// otherwise, contains the default value for <typeparamref name="TValue"/>.</param>
+        /// <param name="comparer">The comparer to use when comparing keys, or <see langword="null"/> to use the default comparer for <typeparamref name="TKey"/>.</param>
+        /// <param name="valueComparer">The equality comparer used to determine whether the existing value is equal to the new value. 
+        /// If <see langword="null"/>, the default equality comparer for <typeparamref name="TValue"/> is used.</param>
+        /// <returns><see langword="true"/> if the key-value pair was added or the value was replaced; 
+        /// <see langword="false"/> if the existing value was equal to the new value and no change was made.</returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static bool AddOrReplace<TKey, TValue>(List<TKey> keys, List<TValue> values, TKey key, TValue value, IComparer<TKey>? comparer = null)
-        {
-            var index = keys.BinarySearch(key, comparer);
-            if (index is >= 0)
-            {
-                values[index] = value;
-                return true;
-            }
-            else
-            {
-                index = ~index;
-                keys.Insert(index, key);
-                values.Insert(index, value);
-                return false;
-            }
-        }
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static bool AddOrReplace<TKey, TValue>(List<TKey> keys, List<TValue> values, TKey key, TValue value, [MaybeNullWhen(false)]out TValue oldValue, IComparer<TKey>? comparer = null)
+        public static bool AddOrReplace<TKey, TValue>(List<TKey> keys, List<TValue> values, TKey key, TValue value, [MaybeNullWhen(true)]out TValue oldValue, IComparer<TKey>? comparer = null, IEqualityComparer<TValue>? valueComparer = null)
         {
             var index = keys.BinarySearch(key, comparer);
             if (index is >= 0)
             {
                 oldValue = values[index];
+                if ((valueComparer ?? EqualityComparer<TValue>.Default).Equals(oldValue, value))
+                {
+                    return false;
+                }
                 values[index] = value;
                 return true;
             }
@@ -117,26 +232,30 @@ namespace LivreNoirLibrary.Collections
                 keys.Insert(index, key);
                 values.Insert(index, value);
                 oldValue = default;
-                return false;
-            }
-        }
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static bool Remove<TKey, TValue>(List<TKey> keys, List<TValue> values, TKey key, IComparer<TKey>? comparer = null)
-        {
-            var index = keys.BinarySearch(key, comparer);
-            if (index is >= 0)
-            {
-                keys.RemoveAt(index);
-                values.RemoveAt(index);
                 return true;
             }
-            else
-            {
-                return false;
-            }
         }
 
+        /// <inheritdoc cref="AddOrReplace{TKey, TValue}(List{TKey}, List{TValue}, TKey, TValue, out TValue, IComparer{TKey}?, IEqualityComparer{TValue}?)"/>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static bool AddOrReplace<TKey, TValue>(List<TKey> keys, List<TValue> values, TKey key, TValue value, IComparer<TKey>? keyComparer = null, IEqualityComparer<TValue>? valueComparer = null)
+            => AddOrReplace(keys, values, key, value, out _, keyComparer, valueComparer);
+
+        /// <summary>
+        /// Removes the element with the specified key from the provided key and value lists.
+        /// </summary>
+        /// <remarks>The keys list must be sorted in ascending order prior to calling this method. 
+        /// If the list is not sorted, the result is undefined.
+        /// The values list must be the same length as the keys list, with each value corresponding to the key at the same index.</remarks>
+        /// <typeparam name="TKey">The type of the keys in the list.</typeparam>
+        /// <typeparam name="TValue">The type of the values in the list.</typeparam>
+        /// <param name="keys">A list of keys, which must be sorted in ascending order.</param>
+        /// <param name="values">A list of values corresponding to the keys. Must have the same number of elements as the keys list.</param>
+        /// <param name="key">The key of the element to remove.</param>
+        /// <param name="removed">If the element removed, contains the previous value associated with the key; 
+        /// otherwise, contains the default value for <typeparamref name="TValue"/>.</param>
+        /// <param name="comparer">The comparer to use when comparing keys, or <see langword="null"/> to use the default comparer for <typeparamref name="TKey"/>.</param>
+        /// <returns><see langword="true"/> if the element with the specified key was found and removed; otherwise, <see langword="false"/>.</returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static bool Remove<TKey, TValue>(List<TKey> keys, List<TValue> values, TKey key, [MaybeNullWhen(false)]out TValue removed, IComparer<TKey>? comparer = null)
         {
@@ -155,17 +274,15 @@ namespace LivreNoirLibrary.Collections
             }
         }
 
+        /// <inheritdoc cref="Remove{TKey, TValue}(List{TKey}, List{TValue}, TKey, out TValue, IComparer{TKey}?)"/>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static bool Remove<TKey, TValue>(List<TKey> keys, List<TValue> values, TKey key, Predicate<TValue> removePredicate, IComparer<TKey>? comparer = null)
+        public static bool Remove<TKey, TValue>(List<TKey> keys, List<TValue> values, TKey key, IComparer<TKey>? comparer = null)
         {
             var index = keys.BinarySearch(key, comparer);
             if (index is >= 0)
             {
-                if (removePredicate(values[index]))
-                {
-                    keys.RemoveAt(index);
-                    values.RemoveAt(index);
-                }
+                keys.RemoveAt(index);
+                values.RemoveAt(index);
                 return true;
             }
             else
@@ -174,6 +291,21 @@ namespace LivreNoirLibrary.Collections
             }
         }
 
+        /// <summary>
+        /// Copies key-value pairs from the source lists to the target lists, merging them in sorted order and updating
+        /// or inserting entries as needed.
+        /// </summary>
+        /// <remarks>This method merges the source key-value pairs into the target lists, updating values
+        /// for matching keys and inserting new key-value pairs in sorted order. 
+        /// Both the source and target key lists must be sorted in ascending order. 
+        /// The target lists are modified in place.</remarks>
+        /// <typeparam name="TKey">The type of the keys in the list.</typeparam>
+        /// <typeparam name="TValue">The type of the values in the list.</typeparam>
+        /// <param name="sourceKeys">The list of keys to copy from. Must be sorted in ascending order.</param>
+        /// <param name="sourceValues">The list of values to copy from. Each value corresponds to the key at the same index in <paramref name="sourceKeys"/>.</param>
+        /// <param name="targetKeys">The list of target keys to merge into. Must be sorted in ascending order.</param>
+        /// <param name="targetValues">The list of target values to merge into. Each value corresponds to the key at the same index in <paramref name="targetKeys"/>.</param>
+        /// <param name="comparer">The comparer to use when comparing keys, or <see langword="null"/> to use the default comparer for <typeparamref name="TKey"/>.</param>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static void CopyTo<TKey, TValue>(List<TKey> sourceKeys, List<TValue> sourceValues, List<TKey> targetKeys, List<TValue> targetValues, IComparer<TKey>? comparer = null)
         {
