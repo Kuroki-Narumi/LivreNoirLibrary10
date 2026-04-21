@@ -36,7 +36,7 @@ namespace LivreNoirLibrary.ObjectModel
             }
         }
 
-        protected static T Load<T>(string appName, params string[] settingNames)
+        protected static T Load<T>(string appName, params ReadOnlySpan<string> settingNames)
             where T : AppSettingsBase, new()
         {
             foreach (var name in settingNames)

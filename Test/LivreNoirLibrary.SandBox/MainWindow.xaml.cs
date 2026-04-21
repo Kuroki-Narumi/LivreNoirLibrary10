@@ -3,6 +3,7 @@ using LivreNoirLibrary.IO;
 using LivreNoirLibrary.Media;
 using LivreNoirLibrary.Media.Bms;
 using LivreNoirLibrary.Media.Wave;
+using LivreNoirLibrary.Windows;
 using LivreNoirLibrary.Windows.Controls;
 using System.ComponentModel;
 using System.IO;
@@ -85,6 +86,14 @@ namespace LivreNoirLibrary.SandBox
         private void RadioContainer_MouseWheel(object sender, MouseWheelEventArgs e)
         {
             (sender as Panel)?.ChangeRadioButtonByWheel(e);
+        }
+
+        private void OnClick_TestOut(object sender, RoutedEventArgs e)
+        {
+            if (this.SaveFileDialog(null, Filters.Wave) is { } path)
+            {
+                SineWave.Generate(path, 20, 20000);
+            }
         }
     }
 }

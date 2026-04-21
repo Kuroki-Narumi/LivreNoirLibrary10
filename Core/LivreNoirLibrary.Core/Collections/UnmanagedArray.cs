@@ -41,13 +41,17 @@ namespace LivreNoirLibrary.Collections
         ///<inheritdoc cref="UnmanagedArray(nuint)"/>
         public UnmanagedArray(long length) => Realloc(length);
 
-        ///<inheritdoc cref="UnmanagedArray(nuint)"/>
-        public UnmanagedArray(int length) => Realloc(length);
-
         /// <summary>
         /// Create an instance of <see cref="UnmanagedArray{T}"/> from an existing buffer.
         /// </summary>
         /// <param name="source">the buffer to be copied into as the initial state of the instance.</param>
+        public UnmanagedArray(UnmanagedArray<T> source)
+        {
+            Realloc(source.Length);
+            CopyFrom(source);
+        } 
+
+        /// <inheritdoc cref="UnmanagedArray(UnmanagedArray{T})"/>
         public UnmanagedArray(ReadOnlySpan<T> source)
         {
             Realloc(source.Length);
@@ -75,16 +79,6 @@ namespace LivreNoirLibrary.Collections
         /// <returns>a reference to the element of specified index.</returns>
         /// <exception cref="IndexOutOfRangeException"></exception>
         public ref T this[nuint index] => ref GetRefByIndex(index);
-
-        /// <inheritdoc cref="this[nuint]"/>
-        public ref T this[int index]
-        {
-            get
-            {
-                ArgumentOutOfRangeException.ThrowIfNegative(index);
-                return ref GetRefByIndex((nuint)index);
-            }
-        }
 
         /// <inheritdoc cref="this[nuint]"/>
         public ref T this[long index]
@@ -122,63 +116,40 @@ namespace LivreNoirLibrary.Collections
         /// <summary>
         /// Reallocates memory to be the specified size.
         /// </summary>
-        /// <param name="newCount">the new number of elements.</param>
+        /// <param name="newLength">the new number of elements.</param>
         /// <param name="clear">if <see langword="true"/>, when reallocating a larger area, the enlarged area will be set to 0; 
         /// if <see langword="false"/>, the enlarged area will remain as is.</param>
         /// <exception cref="ArgumentOutOfRangeException"/>
         /// <exception cref="OutOfMemoryException"/>
-        public void Realloc(nuint newCount, bool clear = true) => ReallocImpl(newCount, clear);
+        public void Realloc(nuint newLength, bool clear = true) => ReallocImpl(newLength, clear);
 
         /// <inheritdoc cref="Realloc(nuint, bool)"/>
-        public void Realloc(int newCount, bool clear = true)
+        public void Realloc(long newLength, bool clear = true)
         {
-            ArgumentOutOfRangeException.ThrowIfNegative(newCount);
-            ReallocImpl((nuint)newCount, clear);
-        }
-
-        /// <inheritdoc cref="Realloc(nuint, bool)"/>
-        public void Realloc(long newCount, bool clear = true)
-        {
-            ArgumentOutOfRangeException.ThrowIfNegative(newCount);
-            ReallocImpl((nuint)newCount, clear);
+            ArgumentOutOfRangeException.ThrowIfNegative(newLength);
+            ReallocImpl((nuint)newLength, clear);
         }
 
         /// <summary>
         /// Reallocates memory so that its size is a power of 2 greater than or equal to the specified size.
         /// </summary>
-        /// <param name="requiredCount">the minimum number of elements.</param>
+        /// <param name="requiredLength">the minimum number of elements.</param>
         /// <param name="clear">if <see langword="true"/>, when reallocating a larger area, the enlarged area will be set to 0; 
         /// if <see langword="false"/>, the enlarged area will remain as is.</param>
         /// <exception cref="ArgumentOutOfRangeException"/>
         /// <exception cref="OutOfMemoryException"/>
-        public void ReallocToPowerOf2(nuint requiredCount, bool clear = true)
+        public void ReallocToPowerOf2(nuint requiredLength, bool clear = true)
         {
-            nuint size;
-            if (sizeof(nuint) == sizeof(ulong))
-            {
-                var r = (ulong)requiredCount;
-                size = r is > 0x8000_0000_0000_0000 ? nuint.MaxValue : (nuint)BitOperations.RoundUpToPowerOf2(r);
-            }
-            else
-            {
-                var r = (uint)requiredCount;
-                size = r is > 0x8000_0000 ? nuint.MaxValue : BitOperations.RoundUpToPowerOf2(r);
-            }
+            var r = (ulong)requiredLength;
+            var size = r is > 0x8000_0000_0000_0000 ? nuint.MaxValue : (nuint)BitOperations.RoundUpToPowerOf2(r);
             Realloc(size, clear);
         }
 
         /// <inheritdoc cref="ReallocToPowerOf2(nuint, bool)"/>
-        public void ReallocToPowerOf2(int requiredCount, bool clear = true)
+        public void ReallocToPowerOf2(long requiredLength, bool clear = true)
         {
-            ArgumentOutOfRangeException.ThrowIfNegative(requiredCount);
-            ReallocToPowerOf2((nuint)requiredCount, clear);
-        }
-
-        /// <inheritdoc cref="ReallocToPowerOf2(nuint, bool)"/>
-        public void ReallocToPowerOf2(long requiredCount, bool clear = true)
-        {
-            ArgumentOutOfRangeException.ThrowIfNegative(requiredCount);
-            ReallocToPowerOf2((nuint)requiredCount, clear);
+            ArgumentOutOfRangeException.ThrowIfNegative(requiredLength);
+            ReallocToPowerOf2((nuint)requiredLength, clear);
         }
 
         /// <summary>
@@ -205,13 +176,6 @@ namespace LivreNoirLibrary.Collections
         }
 
         /// <inheritdoc cref="EnsureSize(nuint, bool)"/>
-        public bool EnsureSize(int size, bool clear = true)
-        {
-            ArgumentOutOfRangeException.ThrowIfNegative(size);
-            return EnsureSize((nuint)size, clear);
-        }
-
-        /// <inheritdoc cref="EnsureSize(nuint, bool)"/>
         public bool EnsureSize(long size, bool clear = true)
         {
             ArgumentOutOfRangeException.ThrowIfNegative(size);
@@ -224,10 +188,6 @@ namespace LivreNoirLibrary.Collections
         /// <exception cref="OverflowException"/>
         public Span<T> AsSpan()
         {
-            if (_ptr is null)
-            {
-                return [];
-            }
             var length = checked((int)_size);
             return new(_ptr, length);
         }
@@ -242,18 +202,13 @@ namespace LivreNoirLibrary.Collections
         /// <exception cref="OverflowException"/>
         public Span<T> Slice(nuint start, nuint count)
         {
-            ThrowIfIndexOutOfRange(start, nameof(start));
-            ThrowIfCountOutOfRange(start, count);
+            if (count is > 0)
+            {
+                ThrowIfIndexOutOfRange(start, nameof(start));
+                ThrowIfCountOutOfRange(start, count);
+            }
             var length = checked((int)count);
             return new(_ptr + start, length);
-        }
-
-        /// <inheritdoc cref="Slice(nuint, nuint)"/>
-        public Span<T> Slice(int start, int count)
-        {
-            ArgumentOutOfRangeException.ThrowIfNegative(start);
-            ArgumentOutOfRangeException.ThrowIfNegative(count);
-            return Slice((nuint)start, (nuint)count);
         }
 
         /// <inheritdoc cref="Slice(nuint, nuint)"/>
@@ -267,16 +222,9 @@ namespace LivreNoirLibrary.Collections
         /// <inheritdoc cref="Slice(nuint, nuint)"/>
         public Span<T> Slice(nuint start)
         {
-            ThrowIfIndexOutOfRange(start, nameof(start));
-            var length = checked((int)_size);
+            start = Math.Min(start, _size);
+            var length = checked((int)(_size - start));
             return new(_ptr + start, length);
-        }
-
-        /// <inheritdoc cref="Slice(nuint)"/>
-        public Span<T> Slice(int start)
-        {
-            ArgumentOutOfRangeException.ThrowIfNegative(start);
-            return Slice((nuint)start);
         }
 
         /// <inheritdoc cref="Slice(nuint)"/>
@@ -302,9 +250,6 @@ namespace LivreNoirLibrary.Collections
             return new(_ptr + start, checked((int)length));
         }
 
-        public static implicit operator Span<T>(UnmanagedArray<T> obj) => obj.AsSpan();
-        public static implicit operator ReadOnlySpan<T>(UnmanagedArray<T> obj) => obj.AsSpan();
-
         /// <summary>
         /// Sets all elements of this <see cref="UnmanagedArray{T}"/> to 0.
         /// </summary>
@@ -318,17 +263,12 @@ namespace LivreNoirLibrary.Collections
         /// <exception cref="ArgumentOutOfRangeException"/>
         public void Clear(nuint start, nuint count)
         {
-            ThrowIfIndexOutOfRange(start, nameof(start));
-            ThrowIfCountOutOfRange(start, count);
+            if (count is > 0)
+            {
+                ThrowIfIndexOutOfRange(start, nameof(start));
+                ThrowIfCountOutOfRange(start, count);
+            }
             ClearImpl(_ptr + start, count);
-        }
-
-        /// <inheritdoc cref="Clear(nuint, nuint)"/>
-        public void Clear(int start, int count)
-        {
-            ArgumentOutOfRangeException.ThrowIfNegative(start);
-            ArgumentOutOfRangeException.ThrowIfNegative(count);
-            Clear((nuint)start, (nuint)count);
         }
 
         /// <inheritdoc cref="Clear(nuint, nuint)"/>
@@ -342,15 +282,8 @@ namespace LivreNoirLibrary.Collections
         /// <inheritdoc cref="Clear(nuint, nuint)"/>
         public void Clear(nuint start)
         {
-            ThrowIfIndexOutOfRange(start, nameof(start));
+            start = Math.Min(start, _size);
             ClearImpl(_ptr + start, _size - start);
-        }
-
-        /// <inheritdoc cref="Clear(nuint)"/>
-        public void Clear(int start)
-        {
-            ArgumentOutOfRangeException.ThrowIfNegative(start);
-            Clear((nuint)start);
         }
 
         /// <inheritdoc cref="Clear(nuint)"/>
@@ -385,17 +318,12 @@ namespace LivreNoirLibrary.Collections
         /// <param name="count">The number of elements to fill.</param>
         public void Fill(T value, nuint start, nuint count)
         {
-            ThrowIfIndexOutOfRange(start, nameof(start));
-            ThrowIfCountOutOfRange(start, count);
+            if (count is > 0)
+            {
+                ThrowIfIndexOutOfRange(start, nameof(start));
+                ThrowIfCountOutOfRange(start, count);
+            }
             FillImpl(value, _ptr + start, count);
-        }
-
-        /// <inheritdoc cref="Fill(T, nuint, nuint)"/>
-        public void Fill(T value, int start, int count)
-        {
-            ArgumentOutOfRangeException.ThrowIfNegative(start);
-            ArgumentOutOfRangeException.ThrowIfNegative(count);
-            Fill(value, (nuint)start, (nuint)count);
         }
 
         /// <inheritdoc cref="Fill(T, nuint, nuint)"/>
@@ -409,15 +337,8 @@ namespace LivreNoirLibrary.Collections
         /// <inheritdoc cref="Fill(T, nuint, nuint)"/>
         public void Fill(T value, nuint start)
         {
-            ThrowIfIndexOutOfRange(start, nameof(start));
+            start = Math.Min(start, _size);
             FillImpl(value, _ptr + start, _size - start);
-        }
-
-        /// <inheritdoc cref="Fill(T, nuint)"/>
-        public void Fill(T value, int start)
-        {
-            ArgumentOutOfRangeException.ThrowIfNegative(start);
-            Fill(value, (nuint)start);
         }
 
         /// <inheritdoc cref="Fill(T, nuint)"/>
@@ -434,30 +355,14 @@ namespace LivreNoirLibrary.Collections
         /// If the source is longer than this <see cref="UnmanagedArray{T}"/>, the excess elements are not copied.
         /// </remarks>
         /// <param name="source">The source of values.</param>
+        public void CopyFrom(UnmanagedArray<T> source) => CopyFromImpl(_ptr, source._ptr, Math.Min(_size, source._size));
+
+        /// <inheritdoc cref="CopyFrom(UnmanagedArray{T})"/>
         public void CopyFrom(ReadOnlySpan<T> source)
         {
             fixed (T* src = source)
             {
                 CopyFromImpl(_ptr, src, Math.Min(_size, (nuint)source.Length));
-            }
-        }
-
-        /// <inheritdoc cref="CopyFrom(ReadOnlySpan{T})"/>
-        public void CopyFrom(T[] source)
-        {
-            fixed (T* src = source)
-            {
-                CopyFromImpl(_ptr, src, Math.Min(_size, (nuint)source.Length));
-            }
-        }
-
-        /// <inheritdoc cref="CopyFrom(ReadOnlySpan{T})"/>
-        public void CopyFrom(List<T> source)
-        {
-            var span = source.AsSpan();
-            fixed (T* src = span)
-            {
-                CopyFromImpl(_ptr, src, Math.Min(_size, (nuint)source.Count));
             }
         }
 
@@ -470,23 +375,30 @@ namespace LivreNoirLibrary.Collections
         /// <param name="source">The source of values.</param>
         /// <param name="offset">The starting index of the destination.</param>
         /// <exception cref="ArgumentOutOfRangeException"/>
+        public void CopyFrom(UnmanagedArray<T> source, nuint offset)
+        {
+            offset = Math.Min(offset, _size);
+            CopyFromImpl(_ptr + offset, source._ptr, Math.Min(_size - offset, source.Length));
+        }
+
+        /// <inheritdoc cref="CopyFrom(UnmanagedArray{T}, nuint)"/>
         public void CopyFrom(ReadOnlySpan<T> source, nuint offset)
         {
-            ThrowIfIndexOutOfRange(offset, nameof(offset));
+            offset = Math.Min(offset, _size);
             fixed (T* src = source)
             {
                 CopyFromImpl(_ptr + offset, src, Math.Min(_size - offset, (nuint)source.Length));
             }
         }
 
-        /// <inheritdoc cref="CopyFrom(ReadOnlySpan{T}, nuint)"/>
-        public void CopyFrom(ReadOnlySpan<T> source, int offset)
+        /// <inheritdoc cref="CopyFrom(UnmanagedArray{T}, nuint)"/>
+        public void CopyFrom(UnmanagedArray<T> source, long offset)
         {
             ArgumentOutOfRangeException.ThrowIfNegative(offset);
             CopyFrom(source, (nuint)offset);
         }
 
-        /// <inheritdoc cref="CopyFrom(ReadOnlySpan{T}, nuint)"/>
+        /// <inheritdoc cref="CopyFrom(UnmanagedArray{T}, nuint)"/>
         public void CopyFrom(ReadOnlySpan<T> source, long offset)
         {
             ArgumentOutOfRangeException.ThrowIfNegative(offset);
@@ -603,48 +515,62 @@ namespace LivreNoirLibrary.Collections
             }
             else
             {
-                nuint index = 0;
                 foreach (var srcSpan in new ChunkEnumerator(src, count))
                 {
-                    var dstSpan = new Span<T>(ptr + index, srcSpan.Length);
+                    var dstSpan = new Span<T>(ptr, srcSpan.Length);
                     srcSpan.CopyTo(dstSpan);
-                    index += (nuint)srcSpan.Length;
+                    ptr += srcSpan.Length;
                 }
             }
         }
 
+        /// <summary>
+        /// Returns an enumerator that iterates over the data in sequential chunks of the specified size.
+        /// </summary>
+        /// <param name="chunkSize">
+        /// The maximum number of elements in each chunk. Must be a positive integer. <br/>
+        /// The last chunk may contain fewer elements if the total size is not a multiple of the chunk size.
+        /// </param>
+        /// <returns>A <see cref="ChunkEnumerator"/> that provides access to each chunk of data in sequence.</returns>
         public ChunkEnumerator EnumerateChunks(int chunkSize = int.MaxValue)
         {
             ArgumentOutOfRangeException.ThrowIfNegativeOrZero(chunkSize);
             return new ChunkEnumerator(_ptr, _size, (nuint)chunkSize);
         }
 
-        public ref struct ChunkEnumerator
-        {
-            private readonly T* _ptr;
-            private readonly nuint _size;
-            private readonly nuint _chunkSize;
-            private nuint _index;
-            private Span<T> _current;
+        /// <summary>
+        /// Returns an enumerator that iterates through the collection of chunks.
+        /// </summary>
+        /// <returns>A <see cref="ChunkEnumerator"/> that provides access to each chunk of data in sequence.</returns>
+        public ChunkEnumerator GetEnumerator() => EnumerateChunks();
 
-            public readonly Span<T> Current => _current;
+        public struct ChunkEnumerator
+        {
+            private readonly nuint _chunkSize;
+            private T* _ptr;
+            private nuint _rest;
+            private int _spanSize;
+
+            public readonly Span<T> Current => new(_ptr, _spanSize);
 
             internal ChunkEnumerator(T* ptr, nuint size, nuint chunkSize = int.MaxValue)
             {
-                _ptr = ptr;
-                _size = size;
                 _chunkSize = chunkSize;
+                _ptr = ptr;
+                _rest = size;
             }
 
             public bool MoveNext()
             {
-                if (_index < _size)
+                if (_rest is > 0)
                 {
-                    var currentChunkSize = Math.Min(_chunkSize, _size - _index);
-                    _current = new Span<T>(_ptr + _index, (int)currentChunkSize);
-                    _index += currentChunkSize;
+                    _ptr += _spanSize;
+                    var spanSize = Math.Min(_chunkSize, _rest);
+                    _spanSize = (int)spanSize;
+                    _rest -= spanSize;
                     return true;
                 }
+                _spanSize = 0;
                 return false;
             }
 

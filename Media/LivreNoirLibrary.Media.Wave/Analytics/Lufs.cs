@@ -46,7 +46,7 @@ namespace LivreNoirLibrary.Media.Wave
                 // 1. フィルタ
                 // ステージ1: 頭部の音響効果（剛体球モデル）をシミュレート
                 var filter = BiQuadFilter.HighShelf(sampleRate, 1500, gain: 4);
-                buffer.Transpose(splitBuffer, channels);
+                buffer.Transpose(splitBuffer.AsSpan(), channels);
                 for (var c = 0; c < channels; c++)
                 {
                     filter.Apply(splitBuffer.Slice(c * sampleLength, sampleLength));

@@ -181,31 +181,32 @@ namespace LivreNoirLibrary.Media.Integrated
                     var bufferSize = srcSlice.Length;
                     buffer.EnsureSize(bufferSize + crossfade * ch, false);
                     buffer.CopyFrom(srcSlice);
+                    var span = buffer.Slice(0, bufferSize);
                     if (needCrossfade)
                     {
-                        WaveBuffer.FadeIn(buffer, 0, crossfade, fiFactor, ch);
+                        WaveBuffer.FadeIn(span, 0, crossfade, fiFactor, ch);
                         needCrossfade = false;
                     }
                     else if (fadein is > 0)
                     {
-                        WaveBuffer.FadeIn(buffer, 0, fadein, fiFactor, ch);
+                        WaveBuffer.FadeIn(span, 0, fadein, fiFactor, ch);
                     }
                     if (crossfade is > 0 && ao + al >= ro + rl)
                     {
                         var crossSpan = source.Slice(ao + al, crossfade);
                         buffer.CopyFrom(crossSpan, bufferSize);
                         bufferSize += crossfade * ch;
-                        WaveBuffer.FadeOut(buffer, -crossfade, crossfade, foFactor, ch);
+                        WaveBuffer.FadeOut(span, -crossfade, crossfade, foFactor, ch);
                         needCrossfade = true;
                     }
                     else if (fadeout is > 0)
                     {
-                        WaveBuffer.FadeOut(buffer, -fadeout, fadeout, foFactor, ch);
+                        WaveBuffer.FadeOut(span, -fadeout, fadeout, foFactor, ch);
                     }
                     using (WaveEncoder encoder = new($"{fullPath}.wav", new(rate, ch, format)))
                     {
                         encoder.Software = nameof(LivreNoirLibrary);
-                        encoder.Write(buffer.Slice(0, bufferSize));
+                        encoder.Write(span);
                     }
                     ExConsole.Write($"Saved slice: {fullPath} in {Stopwatch.GetElapsedTime(t0).TotalMilliseconds:F3}ms");
                 }

@@ -12,6 +12,16 @@ namespace LivreNoirLibrary.Media
     {
         extension<T> (T bitmap) where T : IBitmap
         {
+            public void SetPixel<TElement>(int x, int y, TElement value)
+                where TElement : unmanaged
+            {
+                if (bitmap.IsValid && (uint)x < (uint)bitmap.Width && (uint)y < (uint)bitmap.Height)
+                {
+                    var pointer = (TElement*)bitmap.Offset(x, y);
+                    *pointer = value;
+                }
+            }
+
             public void Fill<TElement>(TElement value)
                 where TElement: unmanaged
             {

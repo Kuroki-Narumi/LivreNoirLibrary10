@@ -71,7 +71,7 @@ namespace LivreNoirLibrary.Media.Wave
             Clear();
             SetLayout(sampleRate, channels);
             SetTotalSample(source.Length, false);
-            source.CopyTo(_data);
+            source.CopyTo(_data.AsSpan());
         }
 
         public void Load(IWaveBuffer source, int sampleOffset = 0, int sampleCount = 0)
@@ -83,7 +83,7 @@ namespace LivreNoirLibrary.Media.Wave
             span = span.Slice(sampleOffset * channels, sampleCount * channels);
             SetLayout(source.SampleRate, channels);
             SetTotalSample(span.Length, false);
-            span.CopyTo(_data);
+            span.CopyTo(_data.AsSpan());
             LoadMetaData(source);
         }
 
@@ -143,7 +143,7 @@ namespace LivreNoirLibrary.Media.Wave
             var channels = decoder.OutputChannels;
             SetLayout(rate, channels);
             SetTotalSample((int)decoder.TotalSample, false);
-            TotalSample = decoder.Read(_data);
+            TotalSample = decoder.Read(_data.AsSpan());
             LoadMetaData(decoder);
         }
 

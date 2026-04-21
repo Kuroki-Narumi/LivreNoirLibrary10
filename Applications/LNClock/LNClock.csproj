@@ -1,17 +1,19 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <OutputType>Exe</OutputType>
+    <OutputType>WinExe</OutputType>
     <TargetFramework>net10.0-windows</TargetFramework>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
     <UseWPF>true</UseWPF>
-    <AllowUnsafeBlocks>True</AllowUnsafeBlocks>
+	  <AllowUnsafeBlocks>True</AllowUnsafeBlocks>
+	  <BaseOutputPath>..\..\bin</BaseOutputPath>
+	  <Authors>Kuroki-Narumi</Authors>
+	  <Company>LivreNoir</Company>
 	  <AllowedReferenceRelatedFileExtensions>
 		  *.xml;
 		  *.pdb
 	  </AllowedReferenceRelatedFileExtensions>
-	  <BaseOutputPath>..\..\bin</BaseOutputPath>
   </PropertyGroup>
 
 	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
@@ -22,10 +24,8 @@
 		<DebugType>none</DebugType>
 	</PropertyGroup>
 
-  <ItemGroup>
-    <ProjectReference Include="..\..\Media\LivreNoirLibrary.Media.Integrated\LivreNoirLibrary.Media.Integrated.csproj" />
+	<ItemGroup>
     <ProjectReference Include="..\..\Windows\LivreNoirLibrary.Windows.Controls\LivreNoirLibrary.Windows.Controls.csproj" />
-    <ProjectReference Include="..\..\Windows\LivreNoirLibrary.Windows.Media.Integrated\LivreNoirLibrary.Windows.Media.Integrated.csproj" />
   </ItemGroup>
 
 </Project>
