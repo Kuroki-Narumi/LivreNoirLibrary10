@@ -1,20 +1,28 @@
-﻿using LivreNoirLibrary.Collections;
-using LivreNoirLibrary.Debug;
+﻿using LivreNoirLibrary.Debug;
 using LivreNoirLibrary.IO;
 using LivreNoirLibrary.Media;
 using LivreNoirLibrary.Windows;
 using LivreNoirLibrary.Windows.Controls;
 using LivreNoirLibrary.Windows.Media;
 using System;
-using System.IO;
+using System.Collections.Generic;
+using System.Text;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Data;
+using System.Windows.Documents;
 using System.Windows.Input;
+using System.Windows.Media;
 using System.Windows.Media.Imaging;
+using System.Windows.Navigation;
+using System.Windows.Shapes;
 
 namespace LivreNoirLibrary.SandBox
 {
-    public partial class MainWindow
+    /// <summary>
+    /// Unit_Image.xaml の相互作用ロジック
+    /// </summary>
+    public partial class Unit_Image : UserControl
     {
         public static readonly BlendMode[] BlendModes =
         [
@@ -26,6 +34,11 @@ namespace LivreNoirLibrary.SandBox
         private readonly FloatBitmap _buffer1 = new(0, 0);
         private WriteableBitmap? _result;
 
+        public Unit_Image()
+        {
+            InitializeComponent();
+        }
+
         private void OnDragOver_Image(object sender, DragEventArgs e)
         {
             e.ApplyEffect(acceptExt: ExtRegs.Image);
@@ -35,7 +48,7 @@ namespace LivreNoirLibrary.SandBox
         {
             if (e.TryGetAvailable(ExtRegs.Image, out var path) && sender is FrameworkElement f)
             {
-                WriteableBitmap bitmap = Bitmap.FromFile(path); 
+                WriteableBitmap bitmap = Bitmap.FromFile(path);
                 if (f.TryGetFirstDescendant<ImageRectSelectorView>(out var selector))
                 {
                     selector.Source = bitmap;

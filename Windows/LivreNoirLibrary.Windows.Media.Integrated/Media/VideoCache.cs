@@ -1,12 +1,13 @@
 ﻿using LivreNoirLibrary.Collections;
 using LivreNoirLibrary.Media;
 using LivreNoirLibrary.Media.FFmpeg;
+using LivreNoirLibrary.Numerics;
 using LivreNoirLibrary.ObjectModel;
 using System;
 
 namespace LivreNoirLibrary.Windows.Media
 {
-    public unsafe class VideoCache : DisposableBase
+    public class VideoCache : DisposableBase
     {
         private VideoDecoder _decoder;
         private bool _needInitialize;
@@ -16,16 +17,18 @@ namespace LivreNoirLibrary.Windows.Media
 
         public int Width { get; }
         public int Height { get; }
+        public double Duration { get; }
+        public Rational FrameRate { get; }
 
         public VideoCache(string path)
         {
             var decoder = new VideoDecoder(path);
             _decoder = decoder;
-            var width = decoder.OutputWidth;
-            var height = decoder.OutputHeight;
-            Width = width;
-            Height = height;
-            Rewind();
+            Width = decoder.OutputWidth;
+            Height = decoder.OutputHeight;
+            Duration = decoder.TotalSeconds;
+            FrameRate = decoder.FrameRate;
+            Seek(0);
         }
 
         protected override void DisposeManaged()
@@ -36,20 +39,20 @@ namespace LivreNoirLibrary.Windows.Media
             _canRead = false;
         }
 
-        private void Rewind()
+        public void Seek(double time)
         {
-            _decoder?.SeekByTick(0);
+            _decoder?.SeekByTick(TimeUtils.Seconds2Ticks(time));
             _needInitialize = true;
             _canRead = _decoder is not null;
-            _lastPosition = 0;
-            _nextPosition = 0;
+            _lastPosition = time;
+            _nextPosition = time;
         }
 
         public void GetBitmap(double time, Span<byte> span)
         {
             if (time < _lastPosition)
             {
-                Rewind();
+                Seek(time);
             }
             if (_canRead)
             {

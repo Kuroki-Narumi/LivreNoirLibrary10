@@ -96,6 +96,7 @@ namespace LivreNoirLibrary.IO
         public static readonly Regex Avi = Create(Exts.Avi);
         public static readonly Regex Wmv = Create(Exts.Wmv);
         public static readonly Regex Video = Create(Exts.VideoExts);
+        public static readonly Regex Visual = Create(Exts.VisualExts);
         public static readonly Regex Media = Create(Exts.MediaExts);
 
         public static readonly Regex Midi = Create(Exts.Mid, Exts.Midi);

@@ -13,12 +13,43 @@ namespace LivreNoirLibrary.Windows
 {
     public static partial class DependencyObjectExtensions
     {
-        public static void SetDispatcher(this DispatcherObject obj, Action action, DispatcherPriority timing = DispatcherPriority.Loaded)
+        extension(Window)
         {
-            obj.Dispatcher.BeginInvoke(action, timing);
+            public static bool TryGetWindow(object? obj, [NotNullWhen(true)] out Window? window)
+            {
+                if (obj is DependencyObject d)
+                {
+                    window = Window.GetWindow(d);
+                    return window is not null;
+                }
+                else
+                {
+                    window = null;
+                    return false;
+                }
+            }
         }
 
-        public static DependencyObject? GetParent(this DependencyObject obj) => (obj is Visual or Visual3D ? VisualTreeHelper.GetParent(obj) : null) ?? LogicalTreeHelper.GetParent(obj);
+        public static void SetDispatcher(this DispatcherObject? obj, Action action, DispatcherPriority timing = DispatcherPriority.Loaded)
+        {
+            obj?.Dispatcher.BeginInvoke(action, timing);
+        }
+
+        public static DependencyObject? GetParent(this DependencyObject? obj)
+        {
+            if (obj is Visual or Visual3D)
+            {
+                return VisualTreeHelper.GetParent(obj);
+            }
+            else if (obj is not null)
+            {
+                return LogicalTreeHelper.GetParent(obj);
+            }
+            else
+            {
+                return null;
+            }
+        }
 
         public static bool IsAncestorOf(this DependencyObject? ancestor, object? descendant)
         {
@@ -32,6 +63,17 @@ namespace LivreNoirLibrary.Windows
                 obj = parent;
             }
             return false;
+        }
+
+        public static bool TryGetSelfOrAncestor<T>(this DependencyObject? obj, [NotNullWhen(true)] out T? element)
+            where T : DependencyObject
+        {
+            if (obj is T target)
+            {
+                element = target;
+                return true;
+            }
+            return TryGetAncestor(obj, out element);
         }
 
         public static bool TryGetAncestor(this DependencyObject? obj, Predicate<DependencyObject> predicate, [MaybeNullWhen(false)] out DependencyObject ancestor)
@@ -168,11 +210,14 @@ namespace LivreNoirLibrary.Windows
             return false;
         }
 
-        public static void WaitForUpdate()
+        extension(Dispatcher)
         {
-            DispatcherFrame frame = new();
-            Dispatcher.CurrentDispatcher.BeginInvoke(DispatcherPriority.Background, default(object).WFU_Continue, frame);
-            Dispatcher.PushFrame(frame);
+            public static void WaitForUpdate()
+            {
+                DispatcherFrame frame = new();
+                Dispatcher.CurrentDispatcher.BeginInvoke(DispatcherPriority.Background, (null as object).WFU_Continue, frame);
+                Dispatcher.PushFrame(frame);
+            }
         }
 
         private static object? WFU_Continue(this object? o, object obj)
@@ -180,7 +225,5 @@ namespace LivreNoirLibrary.Windows
             (obj as DispatcherFrame)!.Continue = false;
             return null;
         }
-
-        public static void WaitForUpdate(this DispatcherObject obj) => WaitForUpdate();
     }
 }

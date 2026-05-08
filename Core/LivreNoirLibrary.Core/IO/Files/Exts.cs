@@ -131,7 +131,8 @@ namespace LivreNoirLibrary.IO
         public static readonly string[] ImageExts = [Png, Bmp, Dib, Gif, Tif, Tiff, Jpg, Jpeg];
         public static readonly string[] ExImageExts = [Png, Bmp, Dib, Gif, Tif, Tiff, Jpg, Jpeg, Wmf, Ras, Eps, Pcs, Pcd, Tga];
         public static readonly string[] VideoExts = [MP4, Mpg, Mpeg, Avi, Wmv, AV1];
-        public static readonly string[] MediaExts = [..ImageExts, ..VideoExts];
+        public static readonly string[] VisualExts = [..ImageExts, ..VideoExts];
+        public static readonly string[] MediaExts = [..ImageExts, ..VideoExts, ..ExAudioExts];
         public static readonly string[] BeMusicExts = [Bms, Bme, Bml, Pms, Pml, Bmg, B];
         public static readonly string[] BmKindExts = [Bms, Bme, Bml, Pms, Pml, Bmson];
         public static readonly string[] BmMediaExts = [Png, Bmp, Gif, Jpg, Jpeg, MP4, Mpg, Mpeg, Avi];

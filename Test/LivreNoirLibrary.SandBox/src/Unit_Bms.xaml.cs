@@ -1,30 +1,32 @@
 ﻿using LivreNoirLibrary.Collections;
 using LivreNoirLibrary.IO;
 using LivreNoirLibrary.Media;
+using LivreNoirLibrary.Media.Wave;
 using LivreNoirLibrary.Media.Bms;
 using LivreNoirLibrary.Media.Bms.Play;
-using LivreNoirLibrary.Media.Wave;
 using LivreNoirLibrary.Numerics;
 using LivreNoirLibrary.Windows;
 using LivreNoirLibrary.Windows.Controls;
 using LivreNoirLibrary.Windows.Controls.Bms;
 using LivreNoirLibrary.Windows.Media.Bms;
 using LivreNoirLibrary.Windows.Media.Bms.SkinInfo;
+using System;
 using System.ComponentModel;
-using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Windows;
+using System.Windows.Controls;
 using System.Windows.Input;
-using System.Xml.Linq;
+using Button = LivreNoirLibrary.Windows.Controls.Button;
+using LivreNoirLibrary.Windows.Media;
 
 namespace LivreNoirLibrary.SandBox
 {
-    public partial class MainWindow : ISkinOptionProvider
+    /// <summary>
+    /// Unit_Bms.xaml の相互作用ロジック
+    /// </summary>
+    public partial class Unit_Bms : UserControl, IProgressReporter, ISkinOptionProvider
     {
         public static BmsVideoCreatorOptions BmsOptions => AppSettings.Instance.BmsVideoCreatorOptions;
-        public BmsScreen BmsScreen { get; }
-        public BmsVideoCreator BmsVideoCreator { get; }
-        public SkinCollection BmsSkins { get; }
 
         public static HsCorrectionMode[] HsCorrectionModes { get; } =
         [
@@ -39,7 +41,37 @@ namespace LivreNoirLibrary.SandBox
         public static Rational[] FpsList { get; } = [FrameRates.Fps24, FrameRates.Fps30, FrameRates.Fps60, FrameRates.Fps120];
         public static int[] SampleRateList { get; } = [22050, 24000, 44100, 48000, 96000];
 
-        public IDictionary<string, string>? GetSkinOptions(Skin? skin) => skin?.Name is { } name ? AppSettings.Instance.BmsSkinOptions.GetOrAdd(name) : null;
+        public BmsScreen BmsScreen { get; }
+        public BmsVideoCreator BmsVideoCreator { get; }
+        public SkinCollection BmsSkins { get; }
+
+        UIElement IProgressReporter.MainElement => MainUI;
+        TaskProgressBar IProgressReporter.ProgressBar => TaskProgressBar;
+        Task? IProgressReporter.WorkingTask { get; set; }
+
+        IDictionary<string, string>? ISkinOptionProvider.GetSkinOptions(Skin? skin) => skin?.Name is { } name ? AppSettings.Instance.BmsSkinOptions.GetOrAdd(name) : null;
+
+        public Unit_Bms()
+        {
+            BmsScreen = new(BmsOptions)
+            {
+                SkinOptionProvider = this
+            };
+            BmsVideoCreator = new(BmsScreen, BmsOptions);
+            DataContext = this;
+
+            InitializeComponent();
+
+            this.RegisterCommand(ApplicationCommands.Open, OnExecuted_Open);
+            this.RegisterCommand(ApplicationCommands.Save, OnExecuted_Save);
+
+            BmsSkins = new();
+            BmsSkins.Load(Path.GetFullPath(@"Themes\BmsSkin\", General.GetAssemblyDir()));
+            ComboBox_Skin.ItemsSource = BmsSkins.PlaySkins[0];
+            ComboBox_Skin.SelectedIndex = AppSettings.Instance.SkinIndex;
+
+            BmsOptions.PropertyChanged += BmsOptions_PropertyChanged;
+        }
 
         private void OnClick_SkinOptions(object sender, RoutedEventArgs e)
         {
@@ -50,13 +82,12 @@ namespace LivreNoirLibrary.SandBox
             SkinOptionView.Open(BmsScreen.Skin, BmsScreen.SkinOptions);
         }
 
-        private void OnDragOver_Bms(object sender, DragEventArgs e)
+        protected override void OnDragOver(DragEventArgs e)
         {
-            //e.ApplyEffect(DragDropEffects.Copy, ExtRegs.BeMusic);
             e.Effects = DragDropEffects.Copy;
         }
 
-        private void OnDrop_Bms(object sender, DragEventArgs e)
+        protected override void OnDrop(DragEventArgs e)
         {
             if (BmsVideoCreator.IsPlaying)
             {

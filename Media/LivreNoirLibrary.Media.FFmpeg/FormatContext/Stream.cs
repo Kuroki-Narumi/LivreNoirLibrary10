@@ -38,6 +38,10 @@ namespace LivreNoirLibrary.Media.FFmpeg
             return false;
         }
 
+        public bool ContainsStream(AVMediaType type, int index = -1) => TryGetStream(out _, type, index);
+        public bool ContainsVideo(int index = -1) => ContainsStream(AVMediaType.AVMEDIA_TYPE_VIDEO, index);
+        public bool ContainsAudio(int index = -1) => ContainsStream(AVMediaType.AVMEDIA_TYPE_AUDIO, index);
+
         public bool TryGetStreamInfo(int index, out StreamInfo info)
         {
             var fmt = _format_context;
@@ -69,6 +73,22 @@ namespace LivreNoirLibrary.Media.FFmpeg
                 result[i] = new(s);
             }
             return result;
+        }
+
+        public int GetStreamInfo(Span<StreamInfo> span)
+        {
+            var fmt = _format_context;
+            if (fmt is null)
+            {
+                return 0;
+            }
+            var count = Math.Min(span.Length, (int)fmt->nb_streams);
+            for (var i = 0; i < count; i++)
+            {
+                var s = fmt->streams[i];
+                span[i] = new(s);
+            }
+            return count;
         }
 
         public StreamInfoEnumerable EnumStreamInfo(AVMediaType type = AVMediaType.AVMEDIA_TYPE_UNKNOWN) => new(_format_context, type);

@@ -42,7 +42,7 @@ namespace LivreNoirLibrary.Media.FFmpeg
         {
             if (_video_streams.Count is <= 0)
             {
-                FFmpegUtils.ThrowIndexOutOfRangeException($"No video streams exists.");
+                return;
             }
             var context = streamIndex is < 0 ? _video_streams[0] : _video_streams.Find(s => s._stream->index == streamIndex);
             if (context is null)
@@ -59,7 +59,7 @@ namespace LivreNoirLibrary.Media.FFmpeg
         {
             if (_audio_streams.Count is <= 0)
             {
-                FFmpegUtils.ThrowIndexOutOfRangeException($"No audio streams exists.");
+                return;
             }
             var context = streamIndex is < 0 ? _audio_streams[0] : _audio_streams.Find(s => s._stream->index == streamIndex);
             if (context is null)

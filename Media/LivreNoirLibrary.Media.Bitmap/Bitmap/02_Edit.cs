@@ -10,6 +10,8 @@ namespace LivreNoirLibrary.Media
     {
         extension<T>(T bitmap) where T : IBitmap
         {
+            public Span<byte> AsByteSpan() => new((byte*)bitmap.Pointer, bitmap.Height * bitmap.Stride);
+
             public void Clear()
             {
                 SimdOperations.Clear((byte*)bitmap.Pointer, (nuint)(bitmap.Height * bitmap.Stride));

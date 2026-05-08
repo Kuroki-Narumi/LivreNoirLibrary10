@@ -30,7 +30,7 @@ namespace LivreNoirLibrary.Windows.Media
             private readonly UIntBitmap? _bitmap;
             private readonly VideoCache? _video;
 
-            public unsafe MediaCacheItem(string path)
+            public MediaCacheItem(string path)
             {
                 ExConsole.Write($"Create MediaBuffer from \"{path}\"");
                 if (File.Exists(path))

@@ -76,14 +76,14 @@ namespace LivreNoirLibrary.Media.Wave
             fixed (byte* ptr = buffer)
             {
                 var span = new Span<float>(ptr, count / sizeof(float));
-                var read = ReadCore(span);
+                var read = ReadToSpan(span);
                 return read * sizeof(float);
             }
         }
 
-        public int Read(float[] buffer, int offset, int count) => ReadCore(buffer.AsSpan(offset, count));
+        public int Read(float[] buffer, int offset, int count) => ReadToSpan(buffer.AsSpan(offset, count));
 
-        private int ReadCore(Span<float> span)
+        public int ReadToSpan(Span<float> span)
         {
             var read = _decoder.Read(span);
             if (_volume is not 1)

@@ -34,7 +34,7 @@ namespace LivreNoirLibrary.Windows.Controls
         public static void PrepareTask(this IProgressReporter ip, in ProgressReport report, bool abortable = false)
         {
             ip.MainElement.IsEnabled = false;
-            if (ip is Window window)
+            if (Window.TryGetWindow(ip, out var window))
             {
                 window.Closing += CancelClosing;
             }
@@ -44,7 +44,7 @@ namespace LivreNoirLibrary.Windows.Controls
         public static void FinishTask(this IProgressReporter ip)
         {
             ip.ProgressBar.Terminate();
-            if (ip is Window window)
+            if (Window.TryGetWindow(ip, out var window))
             {
                 window.Closing -= CancelClosing;
             }

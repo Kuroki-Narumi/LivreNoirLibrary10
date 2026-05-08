@@ -21,7 +21,7 @@ using System.Windows.Media;
 
 namespace LivreNoirLibrary.Windows.Media.Bms
 {
-    public class BmsVideoCreator(IBmsScreen screen, IBmsVideoCreatorOptions options) : ObservableObjectBase
+    public partial class BmsVideoCreator(IBmsScreen screen, IBmsVideoCreatorOptions options) : ObservableObjectBase
     {
         private WaveOutEvent? _waveOut;
 
@@ -105,7 +105,7 @@ namespace LivreNoirLibrary.Windows.Media.Bms
             }
         }
 
-        public void CreateVideo(string path, ProgressReporter? p = null, CancellationToken c = default)
+        public void CreateVideo2(string path, ProgressReporter? p = null, CancellationToken c = default)
         {
             var screen = Screen;
             if (screen.SkinRoot is IPlaySkinRoot skin && screen.IsBmsReady)

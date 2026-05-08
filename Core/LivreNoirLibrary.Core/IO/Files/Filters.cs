@@ -132,6 +132,8 @@ namespace LivreNoirLibrary.IO
         public static readonly string Video = Create(nameof(Video), "Video File", Exts.VideoExts);
         public static readonly string Video_Save = Join(MP4, Mpeg, Avi, Wmv);
 
+        public static readonly string Media_Open = Create(nameof(Media_Open), "Media File", Exts.MediaExts);
+
         public static readonly string Midi = Create(nameof(Midi), "Standard MIDI File", Exts.Mid, Exts.Midi);
         public static readonly string Bms = Create(nameof(Bms), "Be Music Script", Exts.BeMusicExts);
         public static readonly string Bms_Save = Create(nameof(Bms_Save), "Be Music Script", Exts.Bms, Exts.Bml, Exts.Bme);
