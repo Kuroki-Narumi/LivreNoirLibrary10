@@ -12,6 +12,7 @@ namespace LivreNoirLibrary.Windows.Media
         private VideoDecoder _decoder;
         private bool _needInitialize;
         private bool _canRead;
+        private double _seekThreshold;
         private double _lastPosition;
         private double _nextPosition;
 
@@ -19,6 +20,7 @@ namespace LivreNoirLibrary.Windows.Media
         public int Height { get; }
         public double Duration { get; }
         public Rational FrameRate { get; }
+        public long Bitrate { get; }
 
         public VideoCache(string path)
         {
@@ -28,6 +30,8 @@ namespace LivreNoirLibrary.Windows.Media
             Height = decoder.OutputHeight;
             Duration = decoder.TotalSeconds;
             FrameRate = decoder.FrameRate;
+            Bitrate = decoder.Bitrate;
+            _seekThreshold = TimeUtils.Ticks2Seconds(decoder.MaxKeyframeInterval);
             Seek(0);
         }
 
@@ -58,6 +62,10 @@ namespace LivreNoirLibrary.Windows.Media
             {
                 while (_needInitialize || (_nextPosition < time))
                 {
+                    if (time - _nextPosition > _seekThreshold)
+                    {
+                        _decoder.SeekByTick(TimeUtils.Seconds2Ticks(time));
+                    }
                     if (_decoder.ReadOneFrame(span, out var pos, out var duration))
                     {
                         _needInitialize = false;

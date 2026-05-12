@@ -29,7 +29,7 @@ namespace LivreNoirLibrary.Windows.Media
             }
         }
 
-        public static WriteableBitmap FromClipboard()
+        public static WriteableBitmap CreateFromClipboard()
         {
             if (Clipboard.GetImage() is BitmapSource source)
             {
@@ -38,11 +38,11 @@ namespace LivreNoirLibrary.Windows.Media
             return Empty();
         }
 
-        public static WriteableBitmap FromResource(string uri) => FromResource(new Uri(uri));
+        public static WriteableBitmap CreateFromUri(string uri) => CreateFromUri(new Uri(uri));
 
-        public static WriteableBitmap FromResource(Uri uri) => Create(new BitmapImage(uri));
+        public static WriteableBitmap CreateFromUri(Uri uri) => Create(new BitmapImage(uri));
 
-        public static WriteableBitmap FromFile(string path)
+        public static WriteableBitmap CreateFromFile(string path)
         {
             if (GetSourceFromFile(path) is BitmapSource source)
             {
@@ -54,7 +54,7 @@ namespace LivreNoirLibrary.Windows.Media
             }
         }
 
-        public static WriteableBitmap FromVisual(Visual visual, VisualConvertOptions? options = null) => Create(GetSourceFromVisual(visual, options));
+        public static WriteableBitmap CreateFromVisual(Visual visual, in RenderVisualOptions options = default) => Create(GetSourceFromVisual(visual, options));
 
         public static BitmapImage? GetSourceFromFile(string path)
         {
@@ -72,9 +72,8 @@ namespace LivreNoirLibrary.Windows.Media
             return null;
         }
 
-        private static void PrepareRender(Visual visual, [NotNull]ref VisualConvertOptions? options, out Rect bounds, out DrawingVisual dv)
+        private static void PrepareRender(Visual visual, in RenderVisualOptions options, out Rect bounds, out DrawingVisual dv)
         {
-            options ??= VisualConvertOptions.Default;
             if (options.WaitForUpdate)
             {
                 DependencyObjectExtensions.WaitForUpdate();
@@ -96,16 +95,16 @@ namespace LivreNoirLibrary.Windows.Media
             dc.DrawRectangle(brush, null, bounds);
         }
 
-        public static void RenderVisual(this RenderTargetBitmap bitmap, Visual visual, VisualConvertOptions? options = null)
+        public static void RenderVisual(this RenderTargetBitmap bitmap, Visual visual, in RenderVisualOptions options = default)
         {
-            PrepareRender(visual, ref options, out _, out var dv);
+            PrepareRender(visual, options, out _, out var dv);
             bitmap.Clear();
             bitmap.Render(dv);
         }
 
-        public static BitmapSource GetSourceFromVisual(Visual visual, VisualConvertOptions? options = null)
+        public static BitmapSource GetSourceFromVisual(Visual visual, in RenderVisualOptions options = default)
         {
-            PrepareRender(visual, ref options, out var bounds, out var dv);
+            PrepareRender(visual, options, out var bounds, out var dv);
             if (bounds.Width is <= 0 || bounds.Height is <= 0)
             {
                 return Empty();
@@ -127,9 +126,9 @@ namespace LivreNoirLibrary.Windows.Media
             }
         }
 
-        public static unsafe void CopyPixelsFromVisual(this RenderTargetBitmap bitmap, Visual source, Span<byte> destination, VisualConvertOptions? options = null)
+        public static unsafe void CopyPixelsFromVisual(this RenderTargetBitmap bitmap, Visual source, Span<byte> destination, in RenderVisualOptions options = default)
         {
-            PrepareRender(source, ref options, out var bounds, out var dv);
+            PrepareRender(source, options, out var bounds, out var dv);
             if (bounds.Width is <= 0 || bounds.Height is <= 0)
             {
                 return;

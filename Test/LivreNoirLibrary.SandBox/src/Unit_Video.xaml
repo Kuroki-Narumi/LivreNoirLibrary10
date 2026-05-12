@@ -6,28 +6,52 @@
              xmlns:local="clr-namespace:LivreNoirLibrary.SandBox"
              xmlns:ct="clr-namespace:LivreNoirLibrary.Windows.Controls;assembly=LivreNoirLibrary.Windows.Controls"
              mc:Ignorable="d" d:DataContext="{d:DesignInstance Type=local:Unit_Video}"
-             d:DesignHeight="450" d:DesignWidth="800"
+             d:DesignHeight="450" d:DesignWidth="800" Background="White"
              AllowDrop="True">
     <Grid>
         <Grid x:Name="MainUI" RowDefinitions="Auto, *">
             <Grid.Resources>
                 <Style TargetType="ct:LabeledSlider" BasedOn="{StaticResource LabeledSliderStyle}"/>
                 <Style TargetType="ct:Button" BasedOn="{StaticResource MenuButton}"/>
-                <Style TargetType="Border" x:Key="Separator">
-                    <Setter Property="Width" Value="1"/>
-                    <Setter Property="Margin" Value="2,4"/>
-                    <Setter Property="Background" Value="Gray"/>
+                <Style TargetType="ct:ToggleButton" BasedOn="{StaticResource MenuToggleButton}"/>
+                <Style x:Key="PlayButton" TargetType="ct:ToggleButton" BasedOn="{StaticResource MenuToggleButton}">
+                    <Setter Property="ToolTip" Value="Play/Pause"/>
+                    <Setter Property="Icon" Value="{x:Static ct:Icons.Play}"/>
+                    <Style.Triggers>
+                        <Trigger Property="IsChecked" Value="True">
+                            <Setter Property="Icon" Value="{x:Static ct:Icons.Stop}"/>
+                        </Trigger>
+                    </Style.Triggers>
+                </Style>
+                <Style TargetType="TextBlock" x:Key="Header">
+                    <Setter Property="VerticalAlignment" Value="Center"/>
+                    <Setter Property="Margin" Value="4,0,2,0"/>
+                </Style>
+                <Style TargetType="TextBlock" x:Key="Footer">
+                    <Setter Property="VerticalAlignment" Value="Center"/>
+                    <Setter Property="Margin" Value="2,0,4,0"/>
+                </Style>
+                <Style TargetType="ct:IntTextBox">
+                    <Setter Property="Margin" Value="0,4"/>
+                    <Setter Property="VerticalContentAlignment" Value="Center"/>
+                    <Setter Property="HorizontalContentAlignment" Value="Right"/>
+                    <Setter Property="Width" Value="32"/>
+                    <Setter Property="FontSize" Value="14"/>
                 </Style>
             </Grid.Resources>
             <Grid ColumnDefinitions="Auto, *, Auto, Auto">
                 <WrapPanel Orientation="Horizontal">
                     <ct:Button Icon="{x:Static ct:Icons.Open}" Content="{Binding Player.FileName}" ToolTip="Open" Command="ApplicationCommands.Open"/>
+                    <Border Style="{StaticResource Separator}"/>
+                    <TextBlock Style="{StaticResource Header}" Text="分割"/>
+                    <ct:IntTextBox x:Name="TextBox_Split" Minimum="1" Maximum="600" WheelStep="1" Value="10"/>
+                    <TextBlock Style="{StaticResource Footer}" Text="min"/>
                     <ct:Button Icon="{x:Static ct:Icons.Save}" ToolTip="Save" Command="ApplicationCommands.Save"/>
                     <Border Style="{StaticResource Separator}"/>
-                    <ct:Button Icon="{x:Static ct:Icons.Play}" ToolTip="Play" Click="OnClick_Play" IsEnabled="{Binding Player.IsPlayable, Mode=OneWay}"/>
+                    <ct:ToggleButton Style="{StaticResource PlayButton}" IsEnabled="{Binding Player.IsPlayable, Mode=OneWay}" IsChecked="{Binding Player.IsPlaying, Mode=TwoWay}"/>
                 </WrapPanel>
 
-                <Slider x:Name="VideoSeekbar" Grid.Column="1" Margin="4,0,0,0" VerticalAlignment="Center" PreviewMouseWheel="OnMouseWheel_VideoSeekbar"
+                <Slider x:Name="VideoSeekbar" Grid.Column="1" Margin="4,0,4,0" VerticalAlignment="Center" PreviewMouseWheel="OnMouseWheel_VideoSeekbar"
                                 TickFrequency="1" IsSnapToTickEnabled="True"
                                 SmallChange="1" LargeChange="10"
                                 Value="{Binding Player.Position, Mode=TwoWay}"

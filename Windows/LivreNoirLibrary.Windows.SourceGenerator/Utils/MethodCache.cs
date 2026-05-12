@@ -3,121 +3,124 @@ using System.Collections.Generic;
 using System.Text.RegularExpressions;
 using Microsoft.CodeAnalysis;
 
-public enum CoerceType
+namespace LivreNoirLibrary.Windows.SourceGenerator
 {
-    None,
-    Static,
-    Instance,
-}
-
-internal class MethodCacheItem
-{
-    private readonly Dictionary<(string, string), bool> _validate_methods = [];
-    private bool _changed_noArgs;
-    private readonly Dictionary<string, int> _changed_methods = [];
-
-    public void AddCoerce(string propertyType, string fieldType, bool isStatic) => _validate_methods.Add((propertyType, fieldType), isStatic);
-    public void AddOnChanged() => _changed_noArgs = true;
-    public void AddOnChanged(string fieldType, int argCount)
+    public enum CoerceType
     {
-        if (!_changed_methods.TryGetValue(fieldType, out var current) || current < argCount)
-        {
-            _changed_methods[fieldType] = argCount;
-        }
+        None,
+        Static,
+        Instance,
     }
 
-    public bool ContainsCoerce(string propertyType, string fieldType, out bool isStatic) => _validate_methods.TryGetValue((propertyType, fieldType), out isStatic);
-    public bool ContainsOnChangedNoArgs => _changed_noArgs;
-    public bool ContainsOnChanged(string fieldType, out int argCount) => _changed_methods.TryGetValue(fieldType, out argCount);
-}
-
-internal class MethodCache : Dictionary<string, MethodCacheItem>
-{
-    private static readonly Regex Regex_Coerce = new(@"^Coerce(.+?)$");
-    private static readonly Regex Regex_OnChanged = new(@"^On(.+?)Changed$");
-
-    private MethodCacheItem GetItem(string propertyName)
+    internal class MethodCacheItem
     {
-        if (!TryGetValue(propertyName, out var cache))
-        {
-            cache = new();
-            Add(propertyName, cache);
-        }
-        return cache;
-    }
+        private readonly Dictionary<(string, string), bool> _validate_methods = [];
+        private bool _changed_noArgs;
+        private readonly Dictionary<string, int> _changed_methods = [];
 
-    public void AddCoerceMethod(string propertyName, IMethodSymbol method)
-    {
-        if (method.Parameters.Length is 1 && !method.ReturnsVoid)
+        public void AddCoerce(string propertyType, string fieldType, bool isStatic) => _validate_methods.Add((propertyType, fieldType), isStatic);
+        public void AddOnChanged() => _changed_noArgs = true;
+        public void AddOnChanged(string fieldType, int argCount)
         {
-            var propertyType = Utils.GetTypeFullname(method.Parameters[0].Type);
-            var fieldType = Utils.GetTypeFullname(method.ReturnType);
-            GetItem(propertyName).AddCoerce(propertyType, fieldType, method.IsStatic);
-        }
-    }
-
-    public void AddOnChangedMethod(string propertyName, IMethodSymbol method)
-    {
-        var @params = method.Parameters;
-        if (method.ReturnsVoid && !method.IsStatic)
-        {
-            if (@params.Length is 1 || @params.Length is 2 && @params[0].Type.Equals(@params[1].Type, SymbolEqualityComparer.Default))
+            if (!_changed_methods.TryGetValue(fieldType, out var current) || current < argCount)
             {
-                var fieldType = Utils.GetTypeFullname(@params[0].Type);
-                GetItem(propertyName).AddOnChanged(fieldType, @params.Length);
-            }
-            else if (@params.Length is 0)
-            {
-                GetItem(propertyName).AddOnChanged();
+                _changed_methods[fieldType] = argCount;
             }
         }
+
+        public bool ContainsCoerce(string propertyType, string fieldType, out bool isStatic) => _validate_methods.TryGetValue((propertyType, fieldType), out isStatic);
+        public bool ContainsOnChangedNoArgs => _changed_noArgs;
+        public bool ContainsOnChanged(string fieldType, out int argCount) => _changed_methods.TryGetValue(fieldType, out argCount);
     }
 
-    public CoerceType CheckCoerce(string methodName, string propertyType, string fieldType) => 
-        TryGetValue(methodName, out var cache) && cache.ContainsCoerce(propertyType, fieldType, out var isStatic) 
-        ? (isStatic ? CoerceType.Static : CoerceType.Instance)
-        : CoerceType.None;
-
-    public int CheckOnChange(string methodName, string fieldType)
+    internal class MethodCache : Dictionary<string, MethodCacheItem>
     {
-        if (TryGetValue(methodName, out var cache))
+        private static readonly Regex Regex_Coerce = new(@"^Coerce(.+?)$");
+        private static readonly Regex Regex_OnChanged = new(@"^On(.+?)Changed$");
+
+        private MethodCacheItem GetItem(string propertyName)
         {
-            if (cache.ContainsOnChanged(fieldType, out var argCount))
+            if (!TryGetValue(propertyName, out var cache))
             {
-                return argCount;
+                cache = new();
+                Add(propertyName, cache);
             }
-            if (cache.ContainsOnChangedNoArgs)
+            return cache;
+        }
+
+        public void AddCoerceMethod(string propertyName, IMethodSymbol method)
+        {
+            if (method.Parameters.Length is 1 && !method.ReturnsVoid)
             {
-                return 0;
+                var propertyType = Utils.GetTypeFullname(method.Parameters[0].Type);
+                var fieldType = Utils.GetTypeFullname(method.ReturnType);
+                GetItem(propertyName).AddCoerce(propertyType, fieldType, method.IsStatic);
             }
         }
-        return -1;
-    }
 
-    private static readonly Dictionary<INamedTypeSymbol, MethodCache> _method_cache = [];
-
-    public static MethodCache Get(INamedTypeSymbol typeSymbol)
-    {
-        if (!_method_cache.TryGetValue(typeSymbol, out var methods))
+        public void AddOnChangedMethod(string propertyName, IMethodSymbol method)
         {
-            methods = [];
-            foreach (var method in typeSymbol.GetMembers().OfType<IMethodSymbol>())
+            var @params = method.Parameters;
+            if (method.ReturnsVoid && !method.IsStatic)
             {
-                var match = Regex_Coerce.Match(method.Name);
-                if (match.Success)
+                if (@params.Length is 1 || @params.Length is 2 && @params[0].Type.Equals(@params[1].Type, SymbolEqualityComparer.Default))
                 {
-                    methods.AddCoerceMethod(match.Groups[1].Value, method);
-                    continue;
+                    var fieldType = Utils.GetTypeFullname(@params[0].Type);
+                    GetItem(propertyName).AddOnChanged(fieldType, @params.Length);
                 }
-                match = Regex_OnChanged.Match(method.Name);
-                if (match.Success)
+                else if (@params.Length is 0)
                 {
-                    methods.AddOnChangedMethod(match.Groups[1].Value, method);
-                    continue;
+                    GetItem(propertyName).AddOnChanged();
                 }
             }
-            _method_cache.Add(typeSymbol, methods);
         }
-        return methods;
+
+        public CoerceType CheckCoerce(string methodName, string propertyType, string fieldType) =>
+            TryGetValue(methodName, out var cache) && cache.ContainsCoerce(propertyType, fieldType, out var isStatic)
+            ? (isStatic ? CoerceType.Static : CoerceType.Instance)
+            : CoerceType.None;
+
+        public int CheckOnChange(string methodName, string fieldType)
+        {
+            if (TryGetValue(methodName, out var cache))
+            {
+                if (cache.ContainsOnChanged(fieldType, out var argCount))
+                {
+                    return argCount;
+                }
+                if (cache.ContainsOnChangedNoArgs)
+                {
+                    return 0;
+                }
+            }
+            return -1;
+        }
+
+        private static readonly Dictionary<INamedTypeSymbol, MethodCache> _method_cache = [];
+
+        public static MethodCache Get(INamedTypeSymbol typeSymbol)
+        {
+            if (!_method_cache.TryGetValue(typeSymbol, out var methods))
+            {
+                methods = [];
+                foreach (var method in typeSymbol.GetMembers().OfType<IMethodSymbol>())
+                {
+                    var match = Regex_Coerce.Match(method.Name);
+                    if (match.Success)
+                    {
+                        methods.AddCoerceMethod(match.Groups[1].Value, method);
+                        continue;
+                    }
+                    match = Regex_OnChanged.Match(method.Name);
+                    if (match.Success)
+                    {
+                        methods.AddOnChangedMethod(match.Groups[1].Value, method);
+                        continue;
+                    }
+                }
+                _method_cache.Add(typeSymbol, methods);
+            }
+            return methods;
+        }
     }
 }

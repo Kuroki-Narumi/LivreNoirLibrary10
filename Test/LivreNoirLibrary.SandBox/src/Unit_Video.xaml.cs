@@ -9,7 +9,6 @@ using System.Text;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
-using Button = LivreNoirLibrary.Windows.Controls.Button;
 
 namespace LivreNoirLibrary.SandBox
 {
@@ -40,10 +39,6 @@ namespace LivreNoirLibrary.SandBox
 
         protected override void OnDrop(DragEventArgs e)
         {
-            if (Player.IsPlaying)
-            {
-                return;
-            }
             foreach (var path in e.GetFileList())
             {
                 if (ExtRegs.Media.IsMatch(path))
@@ -58,10 +53,7 @@ namespace LivreNoirLibrary.SandBox
         private void OnExecuted_Open(object sender, ExecutedRoutedEventArgs e)
         {
             e.Handled = true;
-            if (Player.IsPlaying)
-            {
-                return;
-            }
+            Player.Stop();
             if (this.OpenFileDialog(FileDialogOptions.WithInitialPath(Player.Path), Filters.Media_Open) is { } path)
             {
                 Player.Path = path;
@@ -70,28 +62,32 @@ namespace LivreNoirLibrary.SandBox
 
         private void OnExecuted_Save(object sender, ExecutedRoutedEventArgs e)
         {
-            if (Player.IsPlaying || !Player.IsPlayable)
+            if (!Player.IsPlayable)
             {
                 return;
             }
+            Player.Stop();
             var path = Path.ChangeExtension(Player.Path, Exts.MP4);
             if (this.SaveFileDialog(FileDialogOptions.WithInitialPath(Player.Path), Filters.MP4) is { } savePath)
             {
-                this.StartTaskSynchronized((p, c) => Player.CreateVideo(savePath, p, c));
-            }
-        }
-
-        private void OnClick_Play(object sender, RoutedEventArgs e)
-        {
-            if (!Player.IsPlaying)
-            {
-                Player.Play();
-                (sender as Button)?.Icon = Icons.Stop;
-            }
-            else
-            {
-                Player.Stop();
-                (sender as Button)?.Icon = Icons.Play;
+                var player = Player;
+                var duration = player.Duration;
+                var saveDuration = TextBox_Split.Value * 60;
+                player.Position = 0;
+                player.SaveDuration = saveDuration;
+                var maxCount = (int)(duration / saveDuration) + 1;
+                savePath = savePath[..^4];
+                this.StartTaskSynchronized((p, c) =>
+                {
+                    var i = 1;
+                    while (duration is > 0)
+                    {
+                        p?.Report($"Encoding {i}/{maxCount}", null);
+                        player.CreateVideo($"{savePath}_{i:D3}.mp4", p, c);
+                        duration -= saveDuration;
+                        i++;
+                    }
+                });
             }
         }
 

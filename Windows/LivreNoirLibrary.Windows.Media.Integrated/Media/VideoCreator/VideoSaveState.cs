@@ -15,7 +15,8 @@ namespace LivreNoirLibrary.Windows.Media
         public required double TotalTime { get; init; }
         public required double AbortDeadline { get; init; }
 
-        public required int ApproximateKbps { get; init; }
+        public required int VideoBitrate { get; init; }
+        public int AudioBitrate { get; init; } = 224000;
         public bool IsHevc { get; init; }
 
         public void OnAbort(ref double time) { }

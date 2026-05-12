@@ -3,6 +3,7 @@ using LivreNoirLibrary.Media;
 using LivreNoirLibrary.Windows.Media;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 
@@ -19,7 +20,9 @@ namespace LivreNoirLibrary.Windows.Media.Bms
 
         static WriteableBitmap CreateCore(in RectKey key, uint leftTop, uint rightBottom)
         {
-            var (width, height, fill) = key;
+            var width = key.Width;
+            var height = key.Height;
+            var fill = key.Color;
             var bitmap = Bitmap.Create(width, height);
             using (var p = bitmap.BeginWrite())
             {
@@ -60,6 +63,17 @@ namespace LivreNoirLibrary.Windows.Media.Bms
             ctx.DrawImage(bitmap, new(x, y, width, height));
         }
 
-        private readonly record struct RectKey(int Width, int Height, Color Color);
+        private readonly struct RectKey(int width, int height, Color color)
+        {
+            public int Width { get; } = width;
+            public int Height { get; } = height;
+            public uint Color { get; } = color.ToUInt();
+
+            public override int GetHashCode() => HashCode.Combine(Width, Height, Color);
+            public override bool Equals([NotNullWhen(true)] object? obj) => obj is RectKey other
+                && Width == other.Width
+                && Height == other.Height
+                && Color == other.Color;
+        }
     }
 }

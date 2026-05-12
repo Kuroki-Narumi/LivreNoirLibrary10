@@ -89,11 +89,12 @@ namespace LivreNoirLibrary.Media
 
         static void CopyToCore(nint source, int sourceStride, bool sourceIsFloat, nint destination, int destStride, bool destIsFloat, int width, int height)
         {
-            var w = (nuint)width * 4;
+            var w = (nuint)width;
             if (sourceIsFloat)
             {
                 if (destIsFloat)
                 {
+                    w *= 4;
                     Parallel.For(0, height, y =>
                     {
                         var srcPtr = (float*)(source + y * sourceStride);
@@ -107,7 +108,7 @@ namespace LivreNoirLibrary.Media
                     {
                         var srcPtr = (float*)(source + y * sourceStride);
                         var destPtr = (byte*)(destination + y * destStride);
-                        BufferToByte(ref destPtr, srcPtr, width);
+                        FloatToByte(ref destPtr, srcPtr, width);
                     });
                 }
             }
@@ -118,7 +119,7 @@ namespace LivreNoirLibrary.Media
                 {
                     var srcPtr = (byte*)(source + y * sourceStride);
                     var destPtr = (float*)(destination + y * destStride);
-                    ByteToBuffer(ref srcPtr, destPtr, width);
+                    ByteToFloat(ref srcPtr, destPtr, width);
                 });
             }
             else
@@ -158,12 +159,12 @@ namespace LivreNoirLibrary.Media
                         for (; w >= count; w -= count)
                         {
                             *(Vector<float>*)buffer = *srcPtr++ * colorCorrection;
-                            BufferToByte(ref destPtr, buffer, count);
+                            FloatToByte(ref destPtr, buffer, count);
                         }
                         if (w is > 0)
                         {
                             *(Vector<float>*)buffer = FillRemain(srcPtr, w) * colorCorrection;
-                            BufferToByte(ref destPtr, buffer, w);
+                            FloatToByte(ref destPtr, buffer, w);
                         }
                     });
                 }
@@ -179,12 +180,12 @@ namespace LivreNoirLibrary.Media
                     var buffer = stackalloc float[count];
                     for (; w >= count; w -= count)
                     {
-                        ByteToBuffer(ref srcPtr, buffer, count);
+                        ByteToFloat(ref srcPtr, buffer, count);
                         *destPtr++ = *(Vector<float>*)buffer * colorCorrection;
                     }
                     if (w is > 0)
                     {
-                        ByteToBuffer(ref srcPtr, buffer, count);
+                        ByteToFloat(ref srcPtr, buffer, count);
                         VectorToFloat(destPtr, *(Vector<float>*)buffer * colorCorrection, w);
                     }
                 });
@@ -200,15 +201,15 @@ namespace LivreNoirLibrary.Media
                     var buffer = stackalloc float[count];
                     for (; w >= count; w -= count)
                     {
-                        ByteToBuffer(ref srcPtr, buffer, count);
+                        ByteToFloat(ref srcPtr, buffer, count);
                         *(Vector<float>*)buffer *= colorCorrection;
-                        BufferToByte(ref destPtr, buffer, count);
+                        FloatToByte(ref destPtr, buffer, count);
                     }
                     if (w is > 0)
                     {
-                        ByteToBuffer(ref srcPtr, buffer, w);
+                        ByteToFloat(ref srcPtr, buffer, w);
                         *(Vector<float>*)buffer *= colorCorrection;
-                        BufferToByte(ref destPtr, buffer, w);
+                        FloatToByte(ref destPtr, buffer, w);
                     }
                 });
             }
@@ -254,16 +255,16 @@ namespace LivreNoirLibrary.Media
                         for (; w >= count; w -= count, srcVector++)
                         {
                             var buffer = *srcVector * fromExtract;
-                            ByteToBuffer(ref destPtr, destBuffer, count, true);
+                            ByteToFloat(ref destPtr, destBuffer, count, true);
                             *destVector = (*destVector * toClear) + buffer;
-                            BufferToByte(ref destPtr, destBuffer, count);
+                            FloatToByte(ref destPtr, destBuffer, count);
                         }
                         if (w is > 0)
                         {
                             var buffer = FillRemain(srcVector, w) * fromExtract;
-                            ByteToBuffer(ref destPtr, destBuffer, w, true);
+                            ByteToFloat(ref destPtr, destBuffer, w, true);
                             *destVector = (*destVector * toClear) + buffer;
-                            BufferToByte(ref destPtr, destBuffer, w);
+                            FloatToByte(ref destPtr, destBuffer, w);
                         }
                     });
                 }
@@ -281,13 +282,13 @@ namespace LivreNoirLibrary.Media
                     var destVector = (Vector<float>*)(destination + y * destStride);
                     for (; w >= count; w -= count, destVector++)
                     {
-                        ByteToBuffer(ref srcPtr, srcBuffer, count);
+                        ByteToFloat(ref srcPtr, srcBuffer, count);
                         var buffer = *srcVector * fromExtract;
                         *destVector = (*destVector * toClear) + buffer;
                     }
                     if (w is > 0)
                     {
-                        ByteToBuffer(ref srcPtr, srcBuffer, w);
+                        ByteToFloat(ref srcPtr, srcBuffer, w);
                         var buffer = *srcVector * fromExtract;
                         var dest = (FillRemain(destVector, w) * toClear) + buffer;
                         VectorToFloat(destVector, dest, w);
@@ -322,7 +323,7 @@ namespace LivreNoirLibrary.Media
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        internal static void ByteToBuffer(ref byte* source, float* buffer, int count, bool rewind = false)
+        internal static void ByteToFloat(ref byte* source, float* buffer, int count, bool rewind = false)
         {
             for (var i = 0; i < count; i += 4)
             {
@@ -338,7 +339,7 @@ namespace LivreNoirLibrary.Media
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        internal static void BufferToByte(ref byte* destination, float* buffer, int count)
+        internal static void FloatToByte(ref byte* destination, float* buffer, int count)
         {
             for (var i = 0; i < count; i += 4)
             {

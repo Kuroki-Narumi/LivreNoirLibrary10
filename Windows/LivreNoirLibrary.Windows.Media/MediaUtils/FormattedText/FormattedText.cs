@@ -7,7 +7,7 @@ namespace LivreNoirLibrary.Windows.Media
 {
     public static partial class MediaUtils
     {
-        public static FormattedText CreateFormattedText(this string text, FormattedTextOption option)
+        public static FormattedText CreateFormattedText(this string text, FormattedTextOptions option)
         {
             return new(
                     text,
@@ -20,12 +20,12 @@ namespace LivreNoirLibrary.Windows.Media
                     );
         }
 
-        public static FormattedText CreateFormattedText(this Control control, string text, FormattedTextOption? option = null)
+        public static FormattedText CreateFormattedText(this Control control, string text, FormattedTextOptions? option = null)
         {
             return CreateFormattedText(text, option ?? new(control));
         }
 
-        public static void RenderText(this Control control, DrawingContext dc, string text, FormattedTextOption? ftOption = null, RenderTextOption? renderOption = null)
+        public static void RenderText(this Control control, DrawingContext dc, string text, FormattedTextOptions? ftOption = null, RenderTextOption? renderOption = null)
         {
             var ft = CreateFormattedText(control, text, ftOption);
             renderOption ??= new() { Foreground = control.Foreground };

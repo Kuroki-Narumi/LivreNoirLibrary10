@@ -22,6 +22,7 @@ namespace LivreNoirLibrary.Windows.Media.Bms
             var options = Options;
             var rate = options.AudioSampleRate;
             const int ch = 2;
+            const int audioBitrate = 224 * 1000;
             var (width, height) = skin.BaseSize;
 
             // タイマー
@@ -47,7 +48,8 @@ namespace LivreNoirLibrary.Windows.Media.Bms
                 AudioSampleRate = rate,
                 AudioChannels = ch,
                 FrameRate = options.FrameRate,
-                ApproximateKbps = options.ApproximateKbps,
+                VideoBitrate = options.ApproximateKbps * 1000,
+                AudioBitrate = audioBitrate,
                 IsHevc = options.IsHevc,
                 TotalTime = totalTime,
                 AbortDeadline = fadeOutStart,
@@ -96,7 +98,8 @@ namespace LivreNoirLibrary.Windows.Media.Bms
             public required int AudioSampleRate { get; init; }
             public required int AudioChannels { get; init; }
             public required Rational FrameRate { get; init;  }
-            public required int ApproximateKbps { get; init;  }
+            public required int VideoBitrate { get; init;  }
+            public required int AudioBitrate { get; init;  }
             public required bool IsHevc { get; init; }
 
             public required double TotalTime { get; init; }

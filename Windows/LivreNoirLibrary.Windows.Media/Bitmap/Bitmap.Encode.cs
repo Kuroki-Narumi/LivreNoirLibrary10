@@ -1,9 +1,10 @@
-﻿using System;
+﻿using LivreNoirLibrary.IO;
+using System;
 using System.IO;
+using System.Threading;
 using System.Windows;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
-using LivreNoirLibrary.IO;
 
 namespace LivreNoirLibrary.Windows.Media
 {
@@ -78,27 +79,51 @@ namespace LivreNoirLibrary.Windows.Media
             return null;
         }
 
-        public static bool SaveImage(this Visual visual, string path, VisualConvertOptions? options = null, BitmapEncodeType encoder = BitmapEncodeType.PNG)
+        public static bool SaveImage(this Visual visual, string path, in RenderVisualOptions options = default, BitmapEncodeType encoder = BitmapEncodeType.PNG)
         {
             return SaveImage(GetSourceFromVisual(visual, options), path, encoder);
         }
 
-        public static void ToClipboard(this BitmapSource bitmap)
+        private static readonly Lock _clipboard_lock = new();
+        private static readonly PngBitmapEncoder _clipboard_encoder = new();
+        private static readonly MemoryStream _clipboard = new(32768);
+
+        private static void ToClipboardImpl(BitmapSource bitmap)
         {
-            Clipboard.SetImage(bitmap);
+            lock (_clipboard_lock)
+            {
+                Clipboard.SetImage(bitmap);
+                DataObject obj = new();
+                var encoder = _clipboard_encoder;
+                encoder.Frames.Add(BitmapFrame.Create(bitmap));
+                _clipboard.SetLength(0);
+                encoder.Save(_clipboard);
+                _clipboard.Position = 0;
+                encoder.Frames.Clear();
+                obj.SetData("PNG", _clipboard, false);
+                AddData(obj, DataFormats.Bitmap);
+                Clipboard.SetDataObject(obj);
+            }
         }
+
+        private static void AddData(DataObject obj, string format)
+        {
+            if (Clipboard.ContainsData(format))
+            {
+                obj.SetData(format, Clipboard.GetData(format));
+            }
+        }
+
+        public static void ToClipboard(this BitmapSource bitmap) => ToClipboardImpl(bitmap);
 
         public static void ToClipboard(string path)
         {
             if (GetSourceFromFile(path) is BitmapSource source)
             {
-                Clipboard.SetImage(source);
+                ToClipboardImpl(source);
             }
         }
 
-        public static void ToClipboard(this Visual visual, VisualConvertOptions? options = null)
-        {
-            Clipboard.SetImage(GetSourceFromVisual(visual, options));
-        }
+        public static void ToClipboard(this Visual visual, in RenderVisualOptions options = default) => ToClipboardImpl(GetSourceFromVisual(visual, options));
     }
 }

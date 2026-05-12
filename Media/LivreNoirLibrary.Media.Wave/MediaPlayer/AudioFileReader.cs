@@ -14,6 +14,7 @@ namespace LivreNoirLibrary.Media.Wave
         private readonly WaveFormat _waveFormat;
         private float _volume = 1;
 
+        public long Bitrate { get; private set; }
         public override WaveFormat WaveFormat => _waveFormat;
         public override long Length => SampleCount * _waveFormat.BlockAlign;
         public override long Position

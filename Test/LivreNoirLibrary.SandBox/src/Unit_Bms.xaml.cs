@@ -157,7 +157,11 @@ namespace LivreNoirLibrary.SandBox
                 if (this.SaveFileDialog(FileDialogOptions.WithInitialPath(path), Filters.MP4) is { } savePath)
                 {
                     BmsScreen.ShowDebugText = true;
-                    this.StartTaskSynchronized((p, c) => BmsVideoCreator.CreateVideo(savePath, p, c));
+                    this.StartTaskSynchronized((p, c) =>
+                    {
+                        p?.Report("Encoding...", null);
+                        BmsVideoCreator.CreateVideo(savePath, p, c);
+                    });
                 }
             }
         }

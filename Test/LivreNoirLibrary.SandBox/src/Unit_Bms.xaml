@@ -20,11 +20,6 @@
             </Grid.Resources>
             <WrapPanel Orientation="Horizontal" UseLayoutRounding="True">
                 <WrapPanel.Resources>
-                    <Style TargetType="Border" x:Key="Separator">
-                        <Setter Property="Width" Value="1"/>
-                        <Setter Property="Margin" Value="2,4"/>
-                        <Setter Property="Background" Value="Gray"/>
-                    </Style>
                     <Style TargetType="TextBlock">
                         <Setter Property="VerticalAlignment" Value="Center"/>
                         <Setter Property="Margin" Value="4,0,2,0"/>

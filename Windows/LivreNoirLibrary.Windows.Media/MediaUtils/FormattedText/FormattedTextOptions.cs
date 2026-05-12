@@ -6,7 +6,7 @@ using System.Windows.Controls;
 
 namespace LivreNoirLibrary.Windows.Media
 {
-    public class FormattedTextOption
+    public class FormattedTextOptions
     {
         public static FontFamily DefaultFontFamily { get; } = new("Yu Gothic UI");
 
@@ -20,7 +20,7 @@ namespace LivreNoirLibrary.Windows.Media
         public Brush? Foreground { get; set; }
         public double PixelsPerDip { get; set; }
 
-        public FormattedTextOption()
+        public FormattedTextOptions()
         {
             CultureInfo = CultureInfo.CurrentCulture;
             FlowDirection = FlowDirection.LeftToRight;
@@ -33,7 +33,7 @@ namespace LivreNoirLibrary.Windows.Media
             PixelsPerDip = 1;
         }
 
-        public FormattedTextOption(Control control)
+        public FormattedTextOptions(Control control)
         {
             CultureInfo = CultureInfo.CurrentCulture;
             FlowDirection = control.FlowDirection;

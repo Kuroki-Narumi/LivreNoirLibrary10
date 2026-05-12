@@ -7,6 +7,7 @@ namespace LivreNoirLibrary.Windows.Media.Bms
     {
         public static Color Background { get; } = Color.FromArgb(255, 0, 0, 0); // エディタ背景
 
+        public static Color NoteText { get; } = Color.FromArgb(255, 255, 255, 255); // ノート 文字色
         public static Color HeaderText { get; } = Color.FromRgb(128, 255, 128); // レーン名 文字色
 
         private const byte Note100 = 255;

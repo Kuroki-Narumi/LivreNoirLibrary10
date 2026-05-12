@@ -46,6 +46,8 @@ namespace LivreNoirLibrary.Windows.Controls.Bms
             var w = Width;
             var length = Length;
             var color = vm.Color;
+            var textScale = provider.TextScale;
+            var textColor = provider.NoteTextColor;
             var isInvisible = false;
             switch (_noteType)
             {
@@ -85,7 +87,7 @@ namespace LivreNoirLibrary.Windows.Controls.Bms
             // インデックス
             if (provider.DisplaysValueText)
             {
-                DrawText(ctx, y, vm.ValueText);
+                ctx.DrawCachedText(x, y, vm.ValueText, textColor, textScale);
             }
             if (isInvisible)
             {

@@ -5,6 +5,7 @@ namespace LivreNoirLibrary.Windows.Controls.Bms
 {
     public interface INoteRectContainer
     {
+        double TextScale { get; }
         int HeadHeight { get; }
         bool DisplaysValueText { get; }
         Color MineColor { get; }
@@ -12,5 +13,6 @@ namespace LivreNoirLibrary.Windows.Controls.Bms
         Color SelectedColor { get; }
         Color SelectedLongColor { get; }
         Color InvalidColor { get; }
+        Color NoteTextColor { get; }
     }
 }

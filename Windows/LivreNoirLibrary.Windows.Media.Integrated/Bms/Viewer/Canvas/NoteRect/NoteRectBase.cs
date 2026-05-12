@@ -46,7 +46,7 @@ namespace LivreNoirLibrary.Windows.Controls.Bms
 
         protected void DrawHead(DrawingContext ctx, int y, int headHeight, Color color) => ctx.DrawNoteRect(X + 1, Y, Width - 1, headHeight, color);
         protected void DrawSelectedHead(DrawingContext ctx, int y, int headHeight, Color color) => ctx.DrawSelectedNoteRect(X + 1, Y, Width - 1, headHeight, color);
-        protected void DrawText(DrawingContext ctx, int y, string? text) => ctx.DrawMinimumText(X + 2, y, text);
-        protected void DrawText(DrawingContext ctx, int y, string? text, Color color) => ctx.DrawMinimumText(X + 2, y, text, color);
+        protected void DrawText(DrawingContext ctx, int y, string? text) => ctx.DrawCachedText(X + 2, y, text);
+        protected void DrawText(DrawingContext ctx, int y, string? text, Color color) => ctx.DrawCachedText(X + 2, y, text, color);
     }
 }

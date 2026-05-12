@@ -16,8 +16,6 @@
 	</PropertyGroup>
 
 	<ItemGroup>
-	  <None Remove="Resources\IndexLetters.png" />
-	  <None Remove="Resources\IndexLetters2.png" />
 	  <None Remove="Resources\NoteIcons.png" />
 	  <None Remove="Resources\sample.bms" />
 	</ItemGroup>
@@ -32,8 +30,6 @@
   </ItemGroup>
 
 	<ItemGroup>
-	  <Resource Include="Resources\IndexLetters.png" />
-	  <Resource Include="Resources\IndexLetters2.png" />
 	  <Resource Include="Resources\NoteIcons.png" />
 	  <Resource Include="Resources\sample.bms" />
 	</ItemGroup>

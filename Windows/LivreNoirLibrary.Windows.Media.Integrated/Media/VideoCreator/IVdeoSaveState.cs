@@ -15,7 +15,8 @@ namespace LivreNoirLibrary.Windows.Media
         double TotalTime { get; }
         double AbortDeadline { get; }
 
-        int ApproximateKbps { get; }
+        int VideoBitrate { get; }
+        int AudioBitrate { get; }
         bool IsHevc { get; }
 
         void OnAbort(ref double time);

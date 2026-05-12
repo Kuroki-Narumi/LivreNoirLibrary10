@@ -4,7 +4,7 @@ using LivreNoirLibrary.Media;
 
 namespace LivreNoirLibrary.Windows.Media
 {
-    public readonly unsafe struct BitmapPointer : IBitmap, IDisposable
+    public readonly struct BitmapPointer : IBitmap, IDisposable
     {
         private readonly WriteableBitmap _bitmap;
         private readonly bool _needFlush;
@@ -16,12 +16,12 @@ namespace LivreNoirLibrary.Windows.Media
 
         internal BitmapPointer(WriteableBitmap bitmap, bool needFlush = true)
         {
+            bitmap.Lock();
             _bitmap = bitmap;
             _needFlush = needFlush;
             Pointer = bitmap.BackBuffer;
             Width = _bitmap.PixelWidth;
             Height = _bitmap.PixelHeight;
-            bitmap.Lock();
         }
 
         public void Dispose()

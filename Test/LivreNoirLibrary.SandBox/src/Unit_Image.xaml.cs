@@ -5,17 +5,9 @@ using LivreNoirLibrary.Windows;
 using LivreNoirLibrary.Windows.Controls;
 using LivreNoirLibrary.Windows.Media;
 using System;
-using System.Collections.Generic;
-using System.Text;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
 using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
 
 namespace LivreNoirLibrary.SandBox
 {
@@ -48,7 +40,7 @@ namespace LivreNoirLibrary.SandBox
         {
             if (e.TryGetAvailable(ExtRegs.Image, out var path) && sender is FrameworkElement f)
             {
-                WriteableBitmap bitmap = Bitmap.FromFile(path);
+                WriteableBitmap bitmap = Bitmap.CreateFromFile(path);
                 if (f.TryGetFirstDescendant<ImageRectSelectorView>(out var selector))
                 {
                     selector.Source = bitmap;
@@ -59,6 +51,17 @@ namespace LivreNoirLibrary.SandBox
                     image.Source = bitmap;
                 }
                 _result = null;
+            }
+        }
+
+        private void OnClick_Maximize(object sender, RoutedEventArgs e)
+        {
+            if (Image_Source.Source is WriteableBitmap source && Image_Target.Source is BitmapSource destination)
+            {
+                var w = Math.Min(source.PixelWidth, destination.PixelHeight);
+                var h = Math.Min(source.PixelHeight, destination.PixelHeight);
+                Image_Source.SetRect(0, 0, w, h);
+                Image_Target.SetRect(0, 0, w, h);
             }
         }
 
@@ -76,9 +79,24 @@ namespace LivreNoirLibrary.SandBox
                     destination.CopyPixels(targetBitmap);
                     sourceBitmap.BlendWithScale(Image_Source.GetRect().ToDoubleRect(),
                         targetBitmap, targetBitmap.DoubleRect, Image_Target.GetRect().ToDoubleRect(),
-                        (BlendMode)ComboBox_BlendMode.SelectedItem, new FloatColor((float)Slider_Opacity.Value * 0.01f, 1, 1, 1), _buffer1, true);
+                        (BlendMode)ComboBox_BlendMode.SelectedItem, new FloatColor((float)Slider_Opacity.Value * 0.01f, 1, 1, 1), _buffer1);
                 }
                 Image_Result.Source = result;
+            }
+        }
+
+        private void OnClick_Image_Copy(object sender, RoutedEventArgs e)
+        {
+            if (Image_Result.Source is BitmapSource bitmap)
+            {
+                try
+                {
+                    bitmap.ToClipboard();
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine(ex);
+                }
             }
         }
 

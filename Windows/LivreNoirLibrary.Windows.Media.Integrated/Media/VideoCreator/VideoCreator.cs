@@ -26,12 +26,11 @@ namespace LivreNoirLibrary.Windows.Media
             var height = state.PixelHeight;
             var fps = state.FrameRate;
             var (fps_num, fps_den) = fps;
-            var kbps = state.ApproximateKbps;
             var sampleRate = state.AudioSampleRate;
             var ch = state.AudioChannels;
             Mpeg4EncodeOptions codecOptions = state.IsHevc ? new HevcEncodeOptions() : new H264EncodeOptions();
             IHardwareEncodeOptions? hardwareOptions = new NvencEncodeOptions();
-            VideoEncodeOptions videoOptions = new(width, height, fps, kbps * 1000, codecOptions, hardwareOptions);
+            VideoEncodeOptions videoOptions = new(width, height, fps, state.VideoBitrate, codecOptions, hardwareOptions);
             f.WaitForUpdate(c);
 
             try
@@ -51,7 +50,7 @@ namespace LivreNoirLibrary.Windows.Media
                 encoder.CreateVideoStream(videoOptions);
                 if (state.AudioExists)
                 {
-                    encoder.CreateAudioStream(new AudioEncodeOptions(sampleRate, ch));
+                    encoder.CreateAudioStream(new AudioEncodeOptions(sampleRate, ch, state.AudioBitrate));
                 }
             }
             catch (Exception e)
@@ -69,7 +68,6 @@ namespace LivreNoirLibrary.Windows.Media
             long totalFrameUnit;
             void UpdateTotalFrameCount(double time) => totalFrameUnit = (long)Math.Ceiling(time * fps_num) + fps_den;
 
-            p?.Report("Encoding...", null);
             // デバッグ用
             var t0 = Stopwatch.GetTimestamp();
             var totalTime = state.TotalTime;

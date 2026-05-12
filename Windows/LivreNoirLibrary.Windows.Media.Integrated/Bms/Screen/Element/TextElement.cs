@@ -20,7 +20,7 @@ namespace LivreNoirLibrary.Windows.Controls.Bms.Elements
         private readonly Media.Bms.SkinInfo.Text _source = source;
         private string? _content;
         private bool _needRefresh;
-        private readonly FormattedTextOption _options = new();
+        private readonly FormattedTextOptions _options = new();
         private Pen? _pen;
         private readonly DrawingVisual _visual = new();
         private RenderTargetBitmap? _renderTarget;

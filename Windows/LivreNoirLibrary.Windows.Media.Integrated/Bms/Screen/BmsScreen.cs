@@ -357,14 +357,12 @@ namespace LivreNoirLibrary.Windows.Controls.Bms
             }
         }
 
-        public unsafe void CopyPixels(Span<byte> destination, int destWidth)
+        public void CopyPixels(Span<byte> destination, int destWidth)
         {
             EnsureRender();
             var (w, h) = _skin!.BaseSize;
-            fixed (byte* buffer = destination)
-            {
-                _bitmap.CopyPixels(new(0, 0, w, h), (nint)buffer, destination.Length, destWidth * 4);
-            }
+            using var p = _bitmap.BeginRead();
+            p.CopyTo(destination, sourceRect: new(0, 0, w, h), destWidth);
         }
 
         void ConstructDebugText()

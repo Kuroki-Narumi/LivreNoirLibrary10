@@ -10,6 +10,8 @@ namespace LivreNoirLibrary.Windows.Controls.Bms
         public const int DefaultHeadHeight = 10;
 
         [DependencyProperty(BindsTwoWayByDefault = true, AffectsRender = true)]
+        private double _textScale = 1.0;
+        [DependencyProperty(BindsTwoWayByDefault = true, AffectsRender = true)]
         private int _headHeight = DefaultHeadHeight;
         [DependencyProperty(BindsTwoWayByDefault = true, AffectsRender = true)]
         private bool _displaysValueText = true;
@@ -23,6 +25,8 @@ namespace LivreNoirLibrary.Windows.Controls.Bms
         private Color _selectedLongColor = Colors.SelectedLong;
         [DependencyProperty(BindsTwoWayByDefault = true, AffectsRender = true)]
         private Color _invalidColor = Colors.Note_Invalid;
+        [DependencyProperty(BindsTwoWayByDefault = true, AffectsRender = true)]
+        private Color _noteTextColor = Colors.NoteText;
 
         public Rect GetLogicalRect(in Rect visualRect)
         {

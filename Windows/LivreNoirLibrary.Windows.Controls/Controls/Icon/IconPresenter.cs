@@ -60,7 +60,7 @@ namespace LivreNoirLibrary.Windows.Controls
         private Visual? _visual;
         private string? _text;
 
-        private readonly FormattedTextOption _option = new() { FontFamily = DefaultFontFamily, FontSize = DefaultSize, Foreground = DefaultForeground };
+        private readonly FormattedTextOptions _option = new() { FontFamily = DefaultFontFamily, FontSize = DefaultSize, Foreground = DefaultForeground };
         private FormattedText? _ft;
 
         private double _src_x = 0;

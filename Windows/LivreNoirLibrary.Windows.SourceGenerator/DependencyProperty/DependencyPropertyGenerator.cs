@@ -1,14 +1,15 @@
 ﻿using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using System;
-using System.Linq;
 using System.Collections.Immutable;
+using System.Diagnostics;
+using System.Linq;
 using System.Runtime.ConstrainedExecution;
 using System.Text;
+using System.Xml.Linq;
 
 namespace LivreNoirLibrary.Windows.SourceGenerator
 {
-    //[Generator]
     public class DependencyPropertyGenerator : IIncrementalGenerator
     {
         public const string DependencyProperty = nameof(DependencyProperty);
@@ -20,16 +21,109 @@ namespace LivreNoirLibrary.Windows.SourceGenerator
         public void Initialize(IncrementalGeneratorInitializationContext context)
         {
             // ObservablePropertyAttribute が付与されたフィールドを収集
-            var fieldProvider = context.SyntaxProvider
-                .ForAttributeWithMetadataName(AttributeName, IsMatch, DependencyPropertyInfo.Create)
+            var provider = context.SyntaxProvider
+                .ForAttributeWithMetadataName(AttributeName, IsMatch, CreatePropertyInfo)
                 .Where(f => f is not null)
                 .Collect();
 
             // 収集したフィールド情報をもとにコードを生成
-            context.RegisterSourceOutput(fieldProvider, Emit);
+            context.RegisterSourceOutput(provider, Emit);
         }
 
         private bool IsMatch(SyntaxNode node, CancellationToken c) => node is PropertyDeclarationSyntax { AttributeLists.Count: > 0 };
+
+        private static readonly List<string> _attr_temp_list = [];
+
+        private static DependencyPropertyInfo? CreatePropertyInfo(GeneratorAttributeSyntaxContext context, CancellationToken c)
+        {
+            INamedTypeSymbol? containingType;
+            // プロパティである
+            if (context.TargetSymbol is not IPropertySymbol propertySymbol ||
+                // 対象のクラスが DependencyObject を継承している
+                !Utils.IsDerivedFrom(containingType = propertySymbol.ContainingType, BaseTypeName))
+            {
+                return null;
+            }
+
+
+            var node = context.TargetNode;
+            var filename = node.GetFilename();
+            var usings = node.GetUsingList();
+            var @namespace = containingType.GetNamespace();
+            var containingTypeName = containingType.ToDisplayString(SymbolDisplayFormat.MinimallyQualifiedFormat);
+            var property = new TypeInfo(propertySymbol);
+            var propertyType = property.Type;
+            var propertyName = property.Name;
+
+            Debug.WriteLine($"owner={containingTypeName}, {property.Type} {property.Name}");
+
+            // メタデータオプション
+            FrameworkPropertyMetadataOptions options = 0;
+            foreach (var arg in context.Attributes[0].NamedArguments)
+            {
+                var key = arg.Key;
+                var value = arg.Value;
+                if (key is nameof(DependencyPropertyInfo.DefaultValue))
+                {
+                    continue;
+                }
+                if (key is "Options" && value.Value is int opt)
+                {
+                    options |= (FrameworkPropertyMetadataOptions)opt;
+                    continue;
+                }
+                if (Enum.TryParse<FrameworkPropertyMetadataOptions>(key, out var enumOpt))
+                {
+                    if (value.Value is false)
+                    {
+                        options &= ~enumOpt;
+                    }
+                    else
+                    {
+                        options |= enumOpt;
+                    }
+                }
+            }
+
+            DependencyPropertyInfo info = new()
+            {
+                Filename = filename,
+                Usings = usings,
+                Namespace = @namespace,
+                ContainingType = containingTypeName,
+                Property = property,
+                FieldName = $"__f__{propertyName}",
+                Options = options,
+            };
+            if (node is PropertyDeclarationSyntax syntax)
+            {
+                // DependencyProperty以外の属性
+                if (syntax.Ancestors().OfType<PropertyDeclarationSyntax>().FirstOrDefault() is { } anscestor)
+                {
+                    var list = _attr_temp_list;
+                    foreach (var attr in anscestor.AttributeLists)
+                    {
+                    }
+                    list.Clear();
+                    info.Attributes = [.. anscestor.AttributeLists
+                                                   .Select(attr => attr.ToString())
+                                                   .Where(attr => !attr.Contains(DependencyProperty))];
+                }
+                // setter スコープ
+                if (syntax.AccessorList?.Accessors.FirstOrDefault(a => a.IsKind(Microsoft.CodeAnalysis.CSharp.SyntaxKind.SetAccessorDeclaration)) is { } setterSyntax)
+                {
+                    info.SetterScope = setterSyntax.Modifiers.ToString();
+                }
+                // デフォルト値
+            }
+
+            // 検証及び変更通知メソッド
+            var methods = MethodCache.Get(containingType);
+            info.CoerceType = methods.CheckCoerce(propertyName, property.Type, propertyType);
+            info.OnChangedArgCount = methods.CheckOnChange(propertyName, propertyType);
+
+            return info;
+        }
 
         const string BasicUsing = "using System.Windows;";
 
@@ -294,123 +388,5 @@ namespace {{@namespace}}
             sb_general.AppendLine(sb_changed.ToString());
             sb_general.Append(sb_clr.ToString());
         }
-    }
-
-    public record DependencyPropertyInfo
-    {
-        public string Filename { get; set; } = "";
-        public string[] Usings { get; set; } = [];
-        public string Namespace { get; set; } = "";
-        public string ContainingType { get; set; } = "";
-        public TypeInfo Property { get; set; } = null!;
-        public string[] Attributes { get; set; } = [];
-        public string? DefaultValue { get; set; }
-        public string? GetterScope { get; set; }
-        public string? SetterScope { get; set; }
-        public string FieldName { get; set; } = "";
-        public CoerceType CoerceType { get; set; }
-        public int OnChangedArgCount { get; set; }
-        public FrameworkPropertyMetadataOptions Options { get; set; }
-
-        public static DependencyPropertyInfo? Create(GeneratorAttributeSyntaxContext context, CancellationToken c)
-        {
-            INamedTypeSymbol? containingType;
-                // プロパティである
-            if (context.TargetSymbol is not IPropertySymbol propertySymbol ||
-                // 対象のクラスが DependencyObject を継承している
-                !Utils.IsDerivedFrom(containingType = propertySymbol.ContainingType, DependencyPropertyGenerator.BaseTypeName))
-            {
-                return null;
-            }
-
-            var node = context.TargetNode;
-            var filename = node.GetFilename();
-            var usings = node.GetUsingList();
-            var @namespace = containingType.GetNamespace();
-            var containingTypeName = containingType.ToDisplayString(SymbolDisplayFormat.MinimallyQualifiedFormat);
-            var property = new TypeInfo(propertySymbol);
-            var propertyType = property.Type;
-            var propertyName = property.Name;
-
-            // メタデータオプション
-            FrameworkPropertyMetadataOptions options = 0;
-            foreach (var arg in context.Attributes[0].NamedArguments)
-            {
-                var key = arg.Key;
-                var value = arg.Value;
-                if (key is "Options" && value.Value is int opt)
-                {
-                    options |= (FrameworkPropertyMetadataOptions)opt;
-                    continue;
-                }
-                if (Enum.TryParse<FrameworkPropertyMetadataOptions>(key, out var enumOpt))
-                {
-                    if (value.Value is false)
-                    {
-                        options &= ~enumOpt;
-                    }
-                    else
-                    {
-                        options |= enumOpt;
-                    }
-                }
-            }
-
-            DependencyPropertyInfo info = new()
-            {
-                Filename = filename,
-                Usings = usings,
-                Namespace = @namespace,
-                ContainingType = containingTypeName,
-                Property = property,
-                FieldName = $"__f__{propertyName}",
-                Options = options,
-            };
-            info.EnsurePropertyOptions(node as PropertyDeclarationSyntax);
-
-            // 検証及び変更通知メソッド
-            var methods = MethodCache.Get(containingType);
-            info.CoerceType = methods.CheckCoerce(propertyName, property.Type, propertyType);
-            info.OnChangedArgCount = methods.CheckOnChange(propertyName, propertyType);
-
-            return info;
-        }
-
-        public void EnsurePropertyOptions(PropertyDeclarationSyntax? syntax)
-        {
-            if (syntax is not null)
-            {
-                if (syntax.Initializer is { } initializer)
-                {
-                    DefaultValue = initializer.Value.ToString();
-                }
-                if (syntax.Ancestors().OfType<PropertyDeclarationSyntax>().FirstOrDefault() is { } anscestor)
-                {
-                    Attributes = [.. anscestor.AttributeLists
-                                          .Select(attr => attr.ToString())
-                                          .Where(attr => !attr.Contains(DependencyPropertyGenerator.DependencyProperty))];
-                }
-                if (syntax.AccessorList?.Accessors.FirstOrDefault(a => a.IsKind(Microsoft.CodeAnalysis.CSharp.SyntaxKind.SetAccessorDeclaration)) is { } setterSyntax)
-                {
-                    SetterScope = setterSyntax.Modifiers.ToString();
-                }
-            }
-        }
-    }
-
-    [Flags]
-    public enum FrameworkPropertyMetadataOptions
-    {
-        AffectsMeasure = 1,
-        AffectsArrange = 2,
-        AffectsParentMeasure = 4,
-        AffectsParentArrange = 8,
-        AffectsRender = 16,
-        Inherits = 32,
-        OverridesInheritanceBehavior = 64,
-        NotDataBindable = 128,
-        BindsTwoWayByDefault = 256,
-        Journal = 1024,
-        SubPropertiesDoNotAffectRender = 2048,
     }
 }

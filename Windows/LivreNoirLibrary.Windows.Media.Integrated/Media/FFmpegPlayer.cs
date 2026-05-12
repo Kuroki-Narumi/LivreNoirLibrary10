@@ -1,17 +1,13 @@
 ﻿using LivreNoirLibrary.Collections;
-using LivreNoirLibrary.Debug;
-using LivreNoirLibrary.IO;
 using LivreNoirLibrary.Media;
 using LivreNoirLibrary.Media.FFmpeg;
 using LivreNoirLibrary.Numerics;
 using LivreNoirLibrary.ObjectModel;
-using LivreNoirLibrary.Windows;
 using LivreNoirLibrary.Windows.Media;
 using NAudio.Wave;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Text;
 using System.Threading;
 using System.Windows;
 using System.Windows.Media;
@@ -19,7 +15,7 @@ using System.Windows.Media.Imaging;
 
 namespace LivreNoirLibrary.Windows.Controls
 {
-    public unsafe partial class FFmpegPlayer : FrameworkElement, IVideoCreator<VideoSaveState>
+    public partial class FFmpegPlayer : FrameworkElement, IVideoCreator<FFmpegPlayer.SaveState>, IPlayer
     {
         private VideoCache? _video;
         private LivreNoirLibrary.Media.Wave.AudioFileReader? _audio;
@@ -48,11 +44,14 @@ namespace LivreNoirLibrary.Windows.Controls
         private TimeSpan _durationTime;
         [DependencyProperty(SetterScope = Scope.Private)]
         private bool _isPlayable;
-        [DependencyProperty(SetterScope = Scope.Private)]
+        [DependencyProperty]
         private bool _isPlaying;
+        [DependencyProperty]
+        private double _saveDuration;
 
         private void OnPathChanged(string? value)
         {
+            this.Stop();
             _video?.Dispose();
             _video = null;
             _audio?.Dispose();
@@ -110,14 +109,38 @@ namespace LivreNoirLibrary.Windows.Controls
             PositionTime = TimeSpan.FromSeconds(Position);
             if (!_notNeedSeek && IsPlaying)
             {
-                Stop();
-                Play();
+                IsPlaying = false;
+                IsPlaying = true;
             }
         }
 
         private void OnDurationChanged()
         {
             DurationTime = TimeSpan.FromSeconds(Duration);
+        }
+
+        private bool CoerceIsPlaying(bool value) => value && IsPlayable;
+
+        private void OnIsPlayingChanged(bool value)
+        {
+            if (value)
+            {
+                if (_audio is { } audio)
+                {
+                    audio.SeekByTicks(TimeUtils.Seconds2Ticks(Position));
+                    _waveOut = new();
+                    _waveOut.Init(audio);
+                }
+                _startTime = Stopwatch.GetTimestamp() - TimeUtils.Seconds2Ticks(Position);
+                CompositionTarget.Rendering += RTP_Update;
+                _waveOut?.Play();
+            }
+            else
+            {
+                CompositionTarget.Rendering -= RTP_Update;
+                _waveOut?.Dispose();
+                _waveOut = null;
+            }
         }
 
         protected override void OnRender(DrawingContext drawingContext)
@@ -147,35 +170,11 @@ namespace LivreNoirLibrary.Windows.Controls
         public void CopyPixels(Span<byte> destination, int destWidth)
         {
             EnsureRender();
-            fixed (byte* buffer = destination)
-            {
-                _bitmap.CopyPixels(new(0, 0, _bitmap.PixelWidth, _bitmap.PixelHeight), (nint)buffer, destination.Length, destWidth * 4);
-            }
+            using var p = _bitmap.BeginRead();
+            p.CopyTo(destination, destWidth);
         }
 
         private long _startTime;
-
-        public void Play()
-        {
-            if (_audio is { } audio)
-            {
-                audio.SeekByTicks(TimeUtils.Seconds2Ticks(Position));
-                _waveOut = new();
-                _waveOut.Init(audio);
-            }
-            IsPlaying = true;
-            _startTime = Stopwatch.GetTimestamp() - TimeUtils.Seconds2Ticks(Position);
-            CompositionTarget.Rendering += RTP_Update;
-            _waveOut?.Play();
-        }
-
-        public void Stop()
-        {
-            IsPlaying = false;
-            CompositionTarget.Rendering -= RTP_Update;
-            _waveOut?.Dispose();
-            _waveOut = null;
-        }
 
         private void RTP_Update(object? sender, EventArgs e)
         {
@@ -183,28 +182,29 @@ namespace LivreNoirLibrary.Windows.Controls
             if (time >= Duration)
             {
                 time = Duration;
-                Stop();
+                IsPlaying = false;
             }
             _notNeedSeek = true;
             Position = time;
             _notNeedSeek = false;
         }
 
-        public VideoSaveState CreateSaveState(ref AntiFreezeUpdater f, ProgressReporter? p, CancellationToken c)
+        public SaveState CreateSaveState(ref AntiFreezeUpdater f, ProgressReporter? p, CancellationToken c)
         {
-            const int kbps = 10000;
-            Position = 0;
-
-            int width, height;
+            this.Stop();
+            var pos = Position;
+            int width, height, bitrate;
             if (_video is { } video)
             {
                 width = video.Width;
                 height = video.Height;
+                bitrate = (int)video.Bitrate;
             }
             else
             {
                 width = 240;
                 height = 240;
+                bitrate = 1000;
             }
 
             int rate, ch;
@@ -212,7 +212,7 @@ namespace LivreNoirLibrary.Windows.Controls
             {
                 rate = audio.WaveFormat.SampleRate;
                 ch = audio.WaveFormat.Channels;
-                audio.SeekByTicks(0);
+                audio.SeekByTicks(TimeUtils.Seconds2Ticks(pos));
             }
             else
             {
@@ -220,8 +220,7 @@ namespace LivreNoirLibrary.Windows.Controls
                 ch = 2;
             }
 
-            var duration = Duration;
-            var fps = FrameRate;
+            var duration = Math.Min(Duration - pos, SaveDuration);
             return new()
             {
                 PixelWidth = width,
@@ -229,21 +228,28 @@ namespace LivreNoirLibrary.Windows.Controls
                 AudioExists = _audio is not null,
                 AudioSampleRate = rate,
                 AudioChannels = ch,
-                FrameRate = fps,
+                FrameRate = FrameRate,
+                StartOffset = pos,
                 TotalTime = duration,
                 AbortDeadline = duration,
-                ApproximateKbps = kbps,
+                VideoBitrate = bitrate,
+                AudioBitrate = 224000,
             };
         }
 
-        public void UpdateSaveState(VideoSaveState state, double time)
+        public void UpdateSaveState(SaveState state, double time)
         {
-            Position = time;
+            Position = time + state.StartOffset;
         }
 
         public void ReadSamples(Span<float> buffer)
         {
             _audio?.ReadToSpan(buffer);
+        }
+
+        public class SaveState : VideoSaveState
+        {
+            public required double StartOffset { get; init; }
         }
     }
 }

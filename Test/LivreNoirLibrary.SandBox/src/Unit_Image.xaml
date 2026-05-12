@@ -11,10 +11,13 @@
         xmlns:conv="clr-namespace:LivreNoirLibrary.Windows.Converters;assembly=LivreNoirLibrary.Windows.Controls"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
-    <Grid Margin="4" ColumnDefinitions="*, 4, *, 4, *">
+    <Grid Margin="4,0,4,4" ColumnDefinitions="*, 4, *, 4, *">
         <Grid.Resources>
             <Style TargetType="TextBlock">
+                <Setter Property="VerticalAlignment" Value="Bottom"/>
+                <Setter Property="Margin" Value="0,0,0,4"/>
             </Style>
+            <Style TargetType="ct:Button" BasedOn="{StaticResource MenuButton}"/>
             <Style TargetType="Grid" x:Key="MainGrid">
                 <Setter Property="Grid.Row" Value="1"/>
                 <Setter Property="Background" Value="Gray"/>
@@ -34,20 +37,29 @@
             </Grid>
         </Grid>
         <Grid Grid.Column="2" RowDefinitions="Auto, *">
-            <TextBlock Text="Target" />
+            <Grid ColumnDefinitions="Auto, *, Auto">
+                <TextBlock Text="Target" />
+                <ct:Button Grid.Column="2" Icon="{x:Static ct:Icons.Maximize}" Click="OnClick_Maximize"/>
+            </Grid>
             <Grid Style="{StaticResource MainGrid}">
                 <Rectangle Width="{Binding ActualWidth, ElementName=Image_Target}" Height="{Binding ActualHeight, ElementName=Image_Target}"/>
                 <ct:ImageRectSelectorView x:Name="Image_Target"/>
             </Grid>
         </Grid>
         <Grid Grid.Column="4" RowDefinitions="Auto, *">
-            <StackPanel Orientation="Horizontal">
-                <TextBlock Text="Result" VerticalAlignment="Bottom"/>
-                <ComboBox Name="ComboBox_BlendMode" ItemsSource="{x:Static local:Unit_Image.BlendModes}" SelectedIndex="0"/>
-                <ct:LabeledSlider x:Name="Slider_Opacity" SliderWidth="50" Minimum="0" Maximum="100" Value="100" TickFrequency="5" IsSnapToTickEnabled="True"/>
-                <ct:Button Icon="{x:Static ct:Icons.Check_Green}" Click="OnClick_Image_Blend"/>
-                <ct:Button Icon="{x:Static ct:Icons.Save}" Click="OnClick_Image_Save"/>
-            </StackPanel>
+            <Grid ColumnDefinitions="Auto, *, Auto">
+                <StackPanel Orientation="Horizontal">
+                    <TextBlock Text="Result"/>
+                    <ComboBox Name="ComboBox_BlendMode" Width="80" ItemsSource="{x:Static local:Unit_Image.BlendModes}" SelectedIndex="0"/>
+                </StackPanel>
+                <ct:LabeledSlider x:Name="Slider_Opacity" Grid.Column="1" Minimum="0" Maximum="100" Value="100" TickFrequency="5" IsSnapToTickEnabled="True"/>
+                <StackPanel Grid.Column="2" Orientation="Horizontal">
+                    <ct:Button Icon="{x:Static ct:Icons.Check_Green}" Click="OnClick_Image_Blend"/>
+                    <Border Style="{StaticResource Separator}"/>
+                    <ct:Button Icon="{x:Static ct:Icons.Copy}" Click="OnClick_Image_Copy"/>
+                    <ct:Button Icon="{x:Static ct:Icons.Save}" Click="OnClick_Image_Save"/>
+                </StackPanel>
+            </Grid>
             <Grid Style="{StaticResource MainGrid}" AllowDrop="False">
                 <Rectangle Width="{Binding ActualWidth, ElementName=Image_Result}" Height="{Binding ActualHeight, ElementName=Image_Result}"/>
                 <Image x:Name="Image_Result"/>
