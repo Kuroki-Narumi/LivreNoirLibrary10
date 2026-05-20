@@ -9,7 +9,7 @@ namespace LivreNoirLibrary.Media.Bms
 {
     public static partial class BmsExtensions
     {
-        extension(IFlowContainer obj)
+        extension(FlowContainer obj)
         {
             public string BmsHeader => $"{(obj.Type is FlowType.Random
                 ? (obj.IsFixed ? Tags.SetRandom : Tags.Random)
@@ -109,7 +109,7 @@ namespace LivreNoirLibrary.Media.Bms
                 }
             }
 
-            public void CopyFrom(IFlowContainer source)
+            public void CopyFrom(FlowContainer source)
             {
                 obj.Note = source.Note;
                 obj.Type = source.Type;

@@ -19,13 +19,14 @@ namespace LivreNoirLibrary.Windows.Controls
 
         public static readonly DependencyProperty SelectedColorProperty = ColorPicker.SelectedColorProperty.AddOwner(typeof(ColorSelector), default(Color));
 
-        public Color SelectedColor { get => (Color)GetValue(SelectedColorProperty); set => SetValue(SelectedColorProperty, value); }
-        public ColorInfo ColorInfo => _color_info;
-
         private readonly ColorInfo _color_info = new();
         private readonly Dictionary<ColorImageIndex, UIElement> _images;
         private readonly Dictionary<object, ColorImageIndex> _radio_indexes;
         private ColorImageIndex _current_image;
+        private bool _colorCodeEditing;
+
+        public Color SelectedColor { get => (Color)GetValue(SelectedColorProperty); set => SetValue(SelectedColorProperty, value); }
+        public ColorInfo ColorInfo => _color_info;
 
         public ColorSelector()
         {
@@ -55,7 +56,7 @@ namespace LivreNoirLibrary.Windows.Controls
             _color_info.PropertyChanged += OnPropertyChanged_ColorInfo;
         }
 
-        public void SetColor(Color color, bool alpha)
+        public void Setup(Color color, bool alpha)
         {
             _color_info.IsAlphaEnabled = alpha;
             _color_info.SetColor(color);
@@ -89,6 +90,10 @@ namespace LivreNoirLibrary.Windows.Controls
             UpdatePalettes();
             UpdateHsvRect();
             UpdateSliderRect();
+            if (!_colorCodeEditing)
+            {
+                TextBox_ColorCode.Text = _color_info.ColorCode;
+            }
         }
 
         private void UpdatePointer()
@@ -267,7 +272,13 @@ namespace LivreNoirLibrary.Windows.Controls
             (sender as Slider)?.ChangeByWheel(e, 5);
         }
 
-        private bool OnVerify_TextBox(string text) => ColorUtils.IsValidColorCode(text);
+        private bool OnVerify_ColorCode(string text)
+        {
+            _colorCodeEditing = true;
+            var result = ColorInfo.SetColorCode(text);
+            _colorCodeEditing = false;
+            return result;
+        }
 
         private void OnModified_InnerPicker(object sender, RoutedEventArgs e)
         {

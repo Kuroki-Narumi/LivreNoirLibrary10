@@ -17,4 +17,8 @@
 	  <ProjectReference Include="..\LivreNoirLibrary.Media.Core\LivreNoirLibrary.Media.Core.csproj" />
 	</ItemGroup>
 
+	<ItemGroup>
+	  <Folder Include="Bms\FlowControl\" />
+	</ItemGroup>
+
 </Project>

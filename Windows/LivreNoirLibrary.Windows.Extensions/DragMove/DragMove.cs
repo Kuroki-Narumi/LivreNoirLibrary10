@@ -19,9 +19,10 @@ namespace LivreNoirLibrary.Windows
         public static Rect GetRect(this Window window) => new(window.Left, window.Top, window.ActualWidth, window.ActualHeight);
         public static Rect GetDisplayRect(this Window window)
         {
-            var (x, y) = window.PointToScreen(new(0, 0));
+            var x = window.Left;
+            var y = window.Top;
             var (sx, sy) = GetDisplayScale(window);
-            return new(x, y, window.ActualWidth * sx, window.ActualHeight * sy);
+            return new(x * sx, y * sy, window.ActualWidth * sx, window.ActualHeight * sy);
         }
 
         public static Rect GetScreenBounds(this Point point)

@@ -22,8 +22,8 @@ namespace LivreNoirLibrary.Media.Bms
         private List<ParseState>? _states;
         private Dictionary<DefType, Dictionary<short, double>>? _conductorDefs;
 
-        private Stack<(ParseState, IFlowContainer?)>? _stack;
-        private IFlowContainer? _currentFlow;
+        private Stack<(ParseState, FlowContainer?)>? _stack;
+        private FlowContainer? _currentFlow;
         private bool _insideBranch;
 
         public BmsParser(Stream stream)

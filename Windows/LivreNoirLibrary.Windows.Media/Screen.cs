@@ -37,7 +37,7 @@ namespace LivreNoirLibrary.Windows.Media
             Bottom = Top + Height;
         }
 
-        public static void SetSize(int width, int height)
+        public static void SetCaptureSize(int width, int height)
         {
             if (width != _buffer.Width || height != _buffer.Height)
             {
@@ -46,7 +46,8 @@ namespace LivreNoirLibrary.Windows.Media
                 _buffer = Bitmap.Create(width, height);
             }
         }
-        public static void SetSize(double width, double height) => SetSize((int)Math.Ceiling(width), (int)Math.Ceiling(height));
+
+        public static void SetCaptureSize(double width, double height) => SetCaptureSize((int)Math.Ceiling(width), (int)Math.Ceiling(height));
 
         public static BitmapSource Snapshot(int x, int y)
         {
@@ -59,7 +60,7 @@ namespace LivreNoirLibrary.Windows.Media
         public static BitmapSource Snapshot(double x, double y) => Snapshot((int)x, (int)y);
         public static BitmapSource Snapshot(int x, int y, int width, int height)
         {
-            SetSize(width, height);
+            SetCaptureSize(width, height);
             return Snapshot(x, y);
         }
         public static BitmapSource Snapshot(double x, double y, double width, double height) => Snapshot((int)x, (int)y, (int)Math.Ceiling(width), (int)Math.Ceiling(height));

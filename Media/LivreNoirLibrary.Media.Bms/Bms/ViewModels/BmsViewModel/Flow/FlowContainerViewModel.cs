@@ -2,8 +2,8 @@
 
 namespace LivreNoirLibrary.Media.Bms.ViewModels
 {
-    public sealed class FlowContainerViewModel(IBmsData root, FlowBranchViewModel parent, int index, IFlowContainer model) : 
-        FlowViewModel<IFlowContainer, FlowBranchViewModel>(root, parent, parent.Address.Append(index), model)
+    public sealed class FlowContainerViewModel(IBmsData root, FlowBranchViewModel parent, int index, FlowContainer model) : 
+        FlowViewModel<FlowContainer, FlowBranchViewModel>(root, parent, parent.Address.Append(index), model)
     {
         public override string? Name => Model.BmsHeader;
 

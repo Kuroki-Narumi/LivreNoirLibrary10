@@ -60,6 +60,31 @@
     <SolidColorBrush po:Freeze="True" x:Key="ComboBox.Pressed.Border" Color="#FF569DE5"/>
     <SolidColorBrush po:Freeze="True" x:Key="ComboBox.Pressed.Glyph" Color="#FF000000"/>
 
+    <SolidColorBrush x:Key="Brush_ListBoxItemBackground" po:Freeze="True" Color="#08000080"/>
+
+    <Style x:Key="Alt2ListBoxItemContainerStyle" TargetType="ListBoxItem">
+        <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
+        <Style.Triggers>
+            <Trigger Property="ItemsControl.AlternationIndex" Value="1">
+                <Setter Property="Background" Value="{StaticResource Brush_ListBoxItemBackground}"/>
+            </Trigger>
+            <Trigger Property="IsSelected" Value="True">
+                <Setter Property="Background" Value="{StaticResource Brush_Background_Checked}"/>
+            </Trigger>
+            <Trigger Property="IsMouseOver" Value="True">
+                <Setter Property="Background" Value="{StaticResource Brush_Background_MouseOver}"/>
+            </Trigger>
+        </Style.Triggers>
+    </Style>
+
+    <Style x:Key="Alt2ListBoxStyle" TargetType="ListBox">
+        <Setter Property="AlternationCount" Value="2"/>
+        <Setter Property="ItemContainerStyle" Value="{StaticResource Alt2ListBoxItemContainerStyle}"/>
+        <Setter Property="ScrollViewer.HorizontalScrollBarVisibility" Value="Disabled"/>
+        <Setter Property="VirtualizingStackPanel.IsVirtualizing" Value="True"/>
+        <Setter Property="VirtualizingStackPanel.VirtualizationMode" Value="Recycling"/>
+    </Style>
+
     <Style x:Key="KeyGestureTextStyle" TargetType="TextBlock">
         <Setter Property="Margin" Value="2,0,0,0"/>
         <Setter Property="Opacity" Value="0.56"/>
@@ -123,6 +148,8 @@
         <Setter Property="VerticalAlignment" Value="Stretch"/>
         <Setter Property="VerticalContentAlignment" Value="Center"/>
         <Setter Property="Background" Value="White"/>
+        <Setter Property="AlternationCount" Value="2"/>
+        <Setter Property="ItemContainerStyle" Value="{StaticResource Alt2ListBoxItemContainerStyle}"/>
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="ComboBox">
@@ -134,7 +161,7 @@
                         <Popup x:Name="PART_Popup" AllowsTransparency="true" Grid.ColumnSpan="2" IsOpen="{Binding IsDropDownOpen, Mode=TwoWay, RelativeSource={RelativeSource Mode=TemplatedParent}}" Margin="1" Placement="Bottom" PopupAnimation="{DynamicResource {x:Static SystemParameters.ComboBoxPopupAnimationKey}}">
                             <theme:SystemDropShadowChrome x:Name="shadow" Color="Transparent" MinWidth="{Binding ActualWidth, ElementName=templateRoot}" MaxHeight="{TemplateBinding MaxDropDownHeight}">
                                 <Border x:Name="dropDownBorder" Style="{StaticResource DDMB_Border}">
-                                    <ScrollViewer x:Name="DropDownScrollViewer">
+                                    <ScrollViewer x:Name="DropDownScrollViewer" HorizontalScrollBarVisibility="Disabled">
                                         <Grid x:Name="grid" RenderOptions.ClearTypeHint="Enabled">
                                             <Canvas x:Name="canvas" HorizontalAlignment="Left" VerticalAlignment="Top" Width="0" Height="0">
                                                 <Rectangle x:Name="opaqueRect" Fill="{Binding Background, ElementName=dropDownBorder}" Height="{Binding ActualHeight, ElementName=dropDownBorder}" Width="{Binding ActualWidth, ElementName=dropDownBorder}"/>
@@ -251,6 +278,43 @@
                 </ControlTemplate>
             </Setter.Value>
         </Setter>
+    </Style>
+
+    <Style x:Key="TextBlockStyle_FontName" TargetType="TextBlock">
+        <Setter Property="Text" Value="{Binding FriendlyName}"/>
+        <Setter Property="FontFamily" Value="{Binding FontFamily}"/>
+        <Setter Property="VerticalAlignment" Value="Bottom"/>
+    </Style>
+
+    <Style x:Key="TextBlockStyle_FontSource" TargetType="TextBlock">
+        <Setter Property="Text" Value="{Binding Source, StringFormat=({0})}"/>
+        <Setter Property="FontFamily" Value="Consolas"/>
+        <Setter Property="Margin" Value="2,0,0,0"/>
+        <Setter Property="FontSize" Value="10"/>
+        <Setter Property="Foreground" Value="Gray"/>
+        <Setter Property="VerticalAlignment" Value="Bottom"/>
+    </Style>
+    
+    <DataTemplate x:Key="FontSelectorTemplate_NoSource" DataType="local:FontSelectorItem">
+        <TextBlock Style="{StaticResource TextBlockStyle_FontName}" Margin="0,2" VerticalAlignment="Center" HorizontalAlignment="Left"/>
+    </DataTemplate>
+
+    <DataTemplate x:Key="FontSelectorTemplate_WithSource" DataType="local:FontSelectorItem">
+        <StackPanel Orientation="Horizontal" Margin="0,2" VerticalAlignment="Center" HorizontalAlignment="Left">
+            <TextBlock Style="{StaticResource TextBlockStyle_FontName}"/>
+            <TextBlock Style="{StaticResource TextBlockStyle_FontSource}"/>
+        </StackPanel>
+    </DataTemplate>
+
+    <Style TargetType="local:FontSelector" BasedOn="{StaticResource ComboBoxBase}">
+        <Setter Property="BorderBrush" Value="{StaticResource Brush_Border}"/>
+        <Setter Property="BorderThickness" Value="1"/>
+        <Setter Property="ItemTemplate" Value="{StaticResource FontSelectorTemplate_NoSource}"/>
+        <Style.Triggers>
+            <Trigger Property="DisplayFontSource" Value="True">
+                <Setter Property="ItemTemplate" Value="{StaticResource FontSelectorTemplate_WithSource}"/>
+            </Trigger>
+        </Style.Triggers>
     </Style>
 
     <Style TargetType="local:Button">
@@ -469,6 +533,23 @@
         </Setter>
     </Style>
 
+    <Style x:Key="HelpToggleButton" TargetType="local:ToggleButton">
+        <Setter Property="VerticalContentAlignment" Value="Center"/>
+        <Setter Property="HorizontalContentAlignment" Value="Center"/>
+        <Setter Property="Icon" Value="{x:Static local:Icons.Help}"/>
+        <Setter Property="IsOptionMarkVisible" Value="False"/>
+        <Setter Property="BorderThickness" Value="0"/>
+        <Setter Property="BorderBrush" Value="{x:Null}"/>
+    </Style>
+
+    <Style x:Key="HelpPopupContent" TargetType="Border">
+        <Setter Property="BorderThickness" Value="1"/>
+        <Setter Property="BorderBrush" Value="{StaticResource Brush_Popup_Border}"/>
+        <Setter Property="Background" Value="{StaticResource Brush_Popup_Background}"/>
+        <Setter Property="Control.Foreground" Value="{StaticResource Brush_Popup_Foreground}"/>
+        <Setter Property="Padding" Value="4"/>
+    </Style>
+
     <Style TargetType="local:PopupHelpButton">
         <Setter Property="Padding" Value="4,0"/>
         <Setter Property="IconSize" Value="16"/>
@@ -490,7 +571,7 @@
                             <local:IconPresenter Margin="{TemplateBinding IconPadding}" VerticalAlignment="{TemplateBinding VerticalContentAlignment}" HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}" Width="{TemplateBinding IconSize}" Source="{x:Static local:Icons.Help}"/>
                         </Border>
                         <Popup x:Name="popup" PlacementTarget="{Binding ElementName=templateRoot}" Placement="{TemplateBinding PopupPlacement}">
-                            <Border BorderThickness="1" BorderBrush="{StaticResource Brush_Popup_Border}" Background="{StaticResource Brush_Popup_Background}">
+                            <Border Style="{StaticResource HelpPopupContent}">
                                 <Grid Margin="{TemplateBinding Padding}">
                                     <Grid.RowDefinitions>
                                         <RowDefinition Height="Auto"/>
@@ -1592,35 +1673,28 @@
         </Setter>
     </Style>
 
-    <SolidColorBrush x:Key="Brush_ListBoxItemBackground" po:Freeze="True" Color="#08000080"/>
-
-    <Style x:Key="Alt2ListBoxItemContainerStyle" TargetType="ListBoxItem">
-        <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
-        <Style.Triggers>
-            <Trigger Property="ItemsControl.AlternationIndex" Value="1">
-                <Setter Property="Background" Value="{StaticResource Brush_ListBoxItemBackground}"/>
-            </Trigger>
-            <Trigger Property="IsSelected" Value="True">
-                <Setter Property="Background" Value="{StaticResource Brush_Background_Checked}"/>
-            </Trigger>
-            <Trigger Property="IsMouseOver" Value="True">
-                <Setter Property="Background" Value="{StaticResource Brush_Background_MouseOver}"/>
-            </Trigger>
-        </Style.Triggers>
-    </Style>
-
-    <Style x:Key="Alt2ListBoxStyle" TargetType="ListBox">
-        <Setter Property="AlternationCount" Value="2"/>
-        <Setter Property="ItemContainerStyle" Value="{StaticResource Alt2ListBoxItemContainerStyle}"/>
-        <Setter Property="ScrollViewer.HorizontalScrollBarVisibility" Value="Disabled"/>
-        <Setter Property="VirtualizingStackPanel.IsVirtualizing" Value="True"/>
-        <Setter Property="VirtualizingStackPanel.VirtualizationMode" Value="Recycling"/>
-    </Style>
-
     <Style TargetType="local:ImageRectSelectorView">
         <Setter Property="Background" Value="Gray"/>
         <Setter Property="HorizontalContentAlignment" Value="Center"/>
         <Setter Property="VerticalContentAlignment" Value="Center"/>
         <Setter Property="Padding" Value="32"/>
+    </Style>
+
+    <Style TargetType="Border" x:Key="SeparatorBase">
+        <Setter Property="Background" Value="Gray"/>
+        <Setter Property="BorderThickness" Value="0"/>
+        <Setter Property="Opacity" Value="0.5"/>
+    </Style>
+
+    <Style TargetType="Border" x:Key="HorizontalSeparator" BasedOn="{StaticResource SeparatorBase}">
+        <Setter Property="Margin" Value="4,2"/>
+        <Setter Property="Height" Value="1"/>
+        <Setter Property="Grid.ColumnSpan" Value="10"/>
+    </Style>
+
+    <Style TargetType="Border" x:Key="VerticalSeparator" BasedOn="{StaticResource SeparatorBase}">
+        <Setter Property="Margin" Value="2,4"/>
+        <Setter Property="Width" Value="1"/>
+        <Setter Property="Grid.RowSpan" Value="10"/>
     </Style>
 </ResourceDictionary>

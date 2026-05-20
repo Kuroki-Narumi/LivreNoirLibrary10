@@ -6,6 +6,7 @@
              xmlns:PresentationOptions="http://schemas.microsoft.com/winfx/2006/xaml/presentation/options"
              xmlns:local="clr-namespace:LivreNoirLibrary.Windows.Controls"
              xmlns:lwin="clr-namespace:LivreNoirLibrary.Windows.Converters"
+             xmlns:media="clr-namespace:LivreNoirLibrary.Windows.Media;assembly=LivreNoirLibrary.Windows.Media"
              mc:Ignorable="d PresentationOptions" d:DataContext="{d:DesignInstance Type=local:ColorSelector}"
              UseLayoutRounding="True" SnapsToDevicePixels="True" 
              FontSize="14" Background="White">
@@ -214,10 +215,19 @@
                     </Style>
                 </Grid.Resources>
 
-                <local:ColorPicker
-                    Grid.ColumnSpan="3" HorizontalAlignment="Center" IsPickerEnabled="False"
-                    SelectedColor="{Binding ColorInfo.Color}" IsAlphaEnabled="{Binding ColorInfo.IsAlphaEnabled}"
-                    Modified="OnModified_InnerPicker"/>
+                <Grid Grid.ColumnSpan="3" ColumnDefinitions="72, 4, Auto" HorizontalAlignment="Center">
+                    <Grid>
+                        <Rectangle Fill="{x:Static media:MediaUtils.TransparentCheckerBrush}" IsHitTestVisible="False"/>
+                        <Rectangle x:Name="rect" Stroke="Black" StrokeThickness="1">
+                            <Rectangle.Fill>
+                                <SolidColorBrush x:Name="PART_Indicator" Color="{Binding ColorInfo.Color}"/>
+                            </Rectangle.Fill>
+                        </Rectangle>
+                    </Grid>
+                    <local:DefaultTextBox x:Name="TextBox_ColorCode" Grid.Column="2" FontSize="14" FontFamily="Consolas" InputMethod.IsInputMethodEnabled="False" 
+                                          Padding="0,2" VerticalContentAlignment="Center" Width="76"
+                                          Verify="OnVerify_ColorCode"/>
+                </Grid>
 
                 <RadioButton Grid.Row="2" x:Name="Radio_R" Content="R"/>
                 <RadioButton Grid.Row="3" x:Name="Radio_G" Content="G"/>

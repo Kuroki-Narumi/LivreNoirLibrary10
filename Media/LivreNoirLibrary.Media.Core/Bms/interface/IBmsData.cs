@@ -12,7 +12,7 @@ namespace LivreNoirLibrary.Media.Bms
         IBmsDataUnit Root { get; }
 
         IBmsDataUnit GetBranchData(FlowBranch branch);
-        bool TryGetBranch(FlowAddress address, [MaybeNullWhen(false)] out IFlowContainer flow, [MaybeNullWhen(false)] out IBmsDataUnit data);
+        bool TryGetBranch(FlowAddress address, [MaybeNullWhen(false)] out FlowContainer flow, [MaybeNullWhen(false)] out IBmsDataUnit data);
         bool InsulateBranch(FlowBranch branch);
 
         void WriteHistoryData(Stream stream);

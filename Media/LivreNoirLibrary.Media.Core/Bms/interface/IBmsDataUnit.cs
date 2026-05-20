@@ -10,7 +10,7 @@ namespace LivreNoirLibrary.Media.Bms
         IDefListCollection DefLists { get; }
         IBarLengthCollection BarDefs { get; }
         ITimeline Timeline { get; }
-        List<IFlowContainer> Flows { get; }
+        List<FlowContainer> Flows { get; }
 
         double IBarLengthProvider.GetBarLength(int number) => BarDefs.TryGetValue(number, out var value) ? value : BmsConstants.DefaultBarLength;
     }

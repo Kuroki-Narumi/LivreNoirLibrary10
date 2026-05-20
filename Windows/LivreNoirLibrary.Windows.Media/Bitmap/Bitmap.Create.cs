@@ -16,6 +16,9 @@ namespace LivreNoirLibrary.Windows.Media
 
         public static WriteableBitmap Create(int width, int height, double dpiX = DefaultDpi, double dpiY = DefaultDpi) => new(width, height, dpiX, dpiY, PixelFormat, null);
 
+        public static RenderTargetBitmap CreateRenderTarget(int width, int height, double dpiX = DefaultDpi, double dpiY = DefaultDpi) => new(width, height, dpiX, dpiY, PixelFormats.Pbgra32);
+        public static RenderTargetBitmap CreateRenderTarget(double width, double height, double dpiX = DefaultDpi, double dpiY = DefaultDpi) => new((int)width, (int)height, dpiX, dpiY, PixelFormats.Pbgra32);
+
         public static WriteableBitmap Create(BitmapSource source)
         {
             if (source.Format != PixelFormat)
@@ -55,6 +58,24 @@ namespace LivreNoirLibrary.Windows.Media
         }
 
         public static WriteableBitmap CreateFromVisual(Visual visual, in RenderVisualOptions options = default) => Create(GetSourceFromVisual(visual, options));
+
+        public static BitmapImage? GetSourceFromUri(Uri uri)
+        {
+            try
+            {
+                BitmapImage src = new();
+                src.BeginInit();
+                src.CacheOption = BitmapCacheOption.OnLoad;
+                src.CreateOptions = BitmapCreateOptions.None;
+                src.UriSource = uri;
+                src.EndInit();
+                return src;
+            }
+            catch
+            {
+                return null;
+            }
+        }
 
         public static BitmapImage? GetSourceFromFile(string path)
         {
@@ -112,7 +133,7 @@ namespace LivreNoirLibrary.Windows.Media
             var unit = Math.Max(options.SizeUnit, 1);
             var w = Math.Ceiling(bounds.Width / unit) * unit;
             var h = Math.Ceiling(bounds.Height / unit) * unit;
-            RenderTargetBitmap buffer = new((int)w, (int)h, 96, 96, PixelFormat);
+            var buffer = CreateRenderTarget(w, h);
             buffer.Render(dv);
             var r = options.Rect;
             if (r.Width is <= 0 || r.Height is <= 0)
@@ -194,7 +215,7 @@ namespace LivreNoirLibrary.Windows.Media
                 dc.DrawDrawing(drawing);
                 dc.Pop();
             }
-            RenderTargetBitmap buffer = new((int)width, (int)height, 96, 96, PixelFormat);
+            var buffer = CreateRenderTarget(width, height);
             buffer.Render(dv);
             return buffer;
         }

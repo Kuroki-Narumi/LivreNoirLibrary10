@@ -11,6 +11,6 @@ namespace LivreNoirLibrary.Media.Bms
         public IDefListCollection DefLists { get; } = new DefListCollection();
         public IBarLengthCollection BarDefs { get; } = new BarLengthCollection();
         public ITimeline Timeline { get; } = new Timeline();
-        public List<IFlowContainer> Flows { get; } = [];
+        public List<FlowContainer> Flows { get; } = [];
     }
 }

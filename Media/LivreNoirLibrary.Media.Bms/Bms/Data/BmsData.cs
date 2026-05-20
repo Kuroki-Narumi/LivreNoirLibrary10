@@ -66,7 +66,7 @@ namespace LivreNoirLibrary.Media.Bms
             return list[index];
         }
 
-        public bool TryGetBranch(FlowAddress address, [MaybeNullWhen(false)]out IFlowContainer flow, [MaybeNullWhen(false)]out IBmsDataUnit data)
+        public bool TryGetBranch(FlowAddress address, [MaybeNullWhen(false)]out FlowContainer flow, [MaybeNullWhen(false)]out IBmsDataUnit data)
         {
             var span = address.AsSpan();
             data = Root;

@@ -14,7 +14,7 @@ namespace LivreNoirLibrary.Media.Bms
 
         extension (IBmsData root)
         {
-            public (FlowBranch Branch, IBmsDataUnit Data) GetOrCreateBranch(IFlowContainer container, int condition)
+            public (FlowBranch Branch, IBmsDataUnit Data) GetOrCreateBranch(FlowContainer container, int condition)
             {
                 var branch = container.GetOrAddBranch(condition);
                 return (branch, root.GetBranchData(branch));

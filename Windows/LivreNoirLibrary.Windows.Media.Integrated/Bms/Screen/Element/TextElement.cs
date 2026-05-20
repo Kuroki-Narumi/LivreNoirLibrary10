@@ -90,7 +90,7 @@ namespace LivreNoirLibrary.Windows.Controls.Bms.Elements
             var height = (int)Math.Ceiling(ft.Height);
             if (renderTarget is null || renderTarget.PixelWidth < width || renderTarget.PixelHeight < height)
             {
-                renderTarget = new RenderTargetBitmap(Math.Max(width, 1), Math.Max(height, 1), 96, 96, PixelFormats.Pbgra32);
+                renderTarget = Bitmap.CreateRenderTarget(Math.Max(width, 1), Math.Max(height, 1));
                 _renderTarget = renderTarget;
             }
             else

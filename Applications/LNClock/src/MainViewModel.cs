@@ -12,44 +12,70 @@ namespace LNClock
 {
     public class MainViewModel : AppSettingsBase
     {
+        public const double MinWidth = 128;
+        public const double MaxWidth = 1280;
+        public const double MinHeight = 16;
+        public const double MaxHeight = 960;
+
+        public const bool DefaultTopMost = true;
+        public const bool DefaultShowInTaskbar = false;
+        public static Color DefaultBackground { get; } = "#80000077".ToColor();
+        public static Color DefaultForeground { get; } = "#FFFFFF".ToColor();
+        public const string DefaultStringFormat = "MM月dd日(ddd) HH:mm:ss";
+        public const int DefaultUpdateInterval = 1000;
+        public static FontFamily DefaultFontFamily { get; } = new("Meiryo UI");
+
         public event EventHandler<int>? UpdateIntervalChanged;
 
         public static MainViewModel Instance { get; } = Load<MainViewModel>(nameof(LNClock));
         public static void Save() => Instance.SaveInstance(nameof(LNClock));
 
-        public WindowInfo WindowInfo { get => field; set => SetValue(ref field, value); } = new();
-        public bool Topmost { get => field; set => SetValue(ref field, value); }
-        public bool ShowInTaskbar { get => field; set => SetValue(ref field, value); }
+        public double Left { get; set => SetValue(ref field, value); } = double.NaN;
+        public double Top { get; set => SetValue(ref field, value); } = double.NaN;
+        public double Width { get; set => SetValue(ref field, value); } = double.NaN;
+        public double Height { get; set => SetValue(ref field, value); } = double.NaN;
+        public bool Topmost { get; set => SetValue(ref field, value); } = DefaultTopMost;
+        public bool ShowInTaskbar { get; set => SetValue(ref field, value); } = DefaultShowInTaskbar;
 
         [JsonConverter(typeof(ColorJsonConverter))]
-        public Color Background { get => field; set => SetValue(ref field, value); } = "#FF000077".ToColor();
-        public double BackgroundOpacity { get => field; set => SetValue(ref field, value); } = 0.5;
+        public Color Background { get; set => SetValue(ref field, value); } = DefaultBackground;
         [JsonConverter(typeof(ColorJsonConverter))]
-        public Color Foreground { get => field; set => SetValue(ref field, value); } = "#FFFFFF".ToColor();
-
-        public string FontName { get => field; set => SetValue(ref field, value, OnFontNameChanged); } = "Meiryo UI";
-        public string StringFormat { get => field; set => SetValue(ref field, value); } = "MM月dd日(ddd) HH:mm:ss";
-        public int UpdateInterval { get => field; set => SetValue(ref field, value, OnUpdateIntervalChanged); } = 1000;
+        public Color Foreground { get; set => SetValue(ref field, value); } = DefaultForeground;
 
         [JsonIgnore]
-        public FontFamily? FontFamily { get => field; set => SetValue(ref field, value); }
-        [JsonIgnore]
-        public string CurrentText { get => field; set => SetValue(ref field, value); } = "";
-
-        protected override void OnLoad()
+        public FontFamily? FontFamily { get; set => SetValue(ref field, value, [nameof(FontName)]); } = DefaultFontFamily;
+        public string? FontName
         {
-            base.OnLoad();
-            OnFontNameChanged("", FontName);
+            get => FontFamily?.Source;
+            set
+            {
+                if (value != FontFamily?.Source)
+                {
+                    FontFamily = new(value);
+                }
+            }
         }
+
+        public string StringFormat { get; set => SetValue(ref field, value); } = DefaultStringFormat;
+        public int UpdateInterval { get; set => SetValue(ref field, value, OnUpdateIntervalChanged); } = DefaultUpdateInterval;
+
+        [JsonIgnore]
+        public string CurrentText { get; set => SetValue(ref field, value); } = "";
 
         private void OnUpdateIntervalChanged(int _, int value)
         {
             UpdateIntervalChanged?.Invoke(this, value);
         }
 
-        private void OnFontNameChanged(string _, string value)
+        public void SetDefault()
         {
-            FontFamily = new FontFamily(value);
+            Topmost = DefaultTopMost;
+            ShowInTaskbar = DefaultShowInTaskbar;
+            Background = DefaultBackground;
+            Foreground = DefaultForeground;
+            FontFamily = DefaultFontFamily;
+            StringFormat = DefaultStringFormat;
+            UpdateInterval = DefaultUpdateInterval;
         }
     }
 }

@@ -25,7 +25,7 @@ namespace LivreNoirLibrary.Windows.Media
 
         private static RenderTargetBitmap CreateRenderTarget(int width, int height, Visual visual)
         {
-            RenderTargetBitmap bitmap = new(width, height, 96, 96, PixelFormats.Pbgra32);
+            var bitmap = Bitmap.CreateRenderTarget(width, height);
             bitmap.Render(visual);
             bitmap.Freeze();
             return bitmap;

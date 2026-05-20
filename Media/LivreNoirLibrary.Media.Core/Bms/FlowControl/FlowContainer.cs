@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace LivreNoirLibrary.Media.Bms
 {
-    public class FlowContainer() : ObjectBase, IFlowContainer
+    public class FlowContainer() : ObjectBase
     {
         public FlowType Type { get; set; }
         public int Max { get; set; }

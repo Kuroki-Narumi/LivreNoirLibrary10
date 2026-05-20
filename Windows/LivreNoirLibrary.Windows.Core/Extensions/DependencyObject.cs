@@ -39,7 +39,7 @@ namespace LivreNoirLibrary.Windows
         {
             if (obj is Visual or Visual3D)
             {
-                return VisualTreeHelper.GetParent(obj);
+                return VisualTreeHelper.GetParent(obj) ?? LogicalTreeHelper.GetParent(obj);
             }
             else if (obj is not null)
             {

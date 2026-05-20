@@ -12,17 +12,5 @@ namespace LivreNoirLibrary.Windows.Media
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static Color ToColor(this uint value) => unchecked(Color.FromArgb((byte)(value >> 24), (byte)(value >> 16), (byte)(value >> 8), (byte)value));
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static uint Multiply(uint left, uint right) => left * right / byte.MaxValue;
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static uint Divide(uint left, uint right) => right is 0 ? left : left * byte.MaxValue / right;
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static byte LimitMinimum(int value) => value is < byte.MinValue ? byte.MinValue : (byte)value;
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static byte LimitMaximum(uint value) => value is > byte.MaxValue ? byte.MaxValue : (byte)value;
     }
 }

@@ -6,24 +6,22 @@
         xmlns:local="clr-namespace:LNClock"
         xmlns:ct="clr-namespace:LivreNoirLibrary.Windows.Controls;assembly=LivreNoirLibrary.Windows.Controls"
         mc:Ignorable="d"
-        Title="MainWindow"
+        Title="LN Clock"
         AllowsTransparency="True" WindowStyle="None" ResizeMode="NoResize"
         d:DataContext="{d:DesignInstance local:MainViewModel}" Background="{ct:BrushProvider Color=#01000000}"
-        Topmost="{Binding Topmost}" ShowInTaskbar="{Binding ShowInTaskbar}" MinWidth="128" MinHeight="16"
+        Topmost="{Binding Topmost}" ShowInTaskbar="{Binding ShowInTaskbar}" MinWidth="{x:Static local:MainViewModel.MinWidth}" MinHeight="{x:Static local:MainViewModel.MinHeight}"
         Width="{x:Static local:MainWindow.DefaultWidth}" Height="{x:Static local:MainWindow.DefaultHeight}"
         >
     <Window.ContextMenu>
         <ContextMenu>
-            <MenuItem Header="最前面に表示" IsCheckable="True" IsChecked="{Binding Topmost}"/>
-            <MenuItem Header="タスクバーに表示" IsCheckable="True" IsChecked="{Binding ShowInTaskbar}"/>
-            <MenuItem Header="サイズリセット" Click="OnClick_Reset"/>
+            <MenuItem Header="設定" Click="OnClick_Config"/>
             <MenuItem Header="終了" Click="OnClick_Close"/>
         </ContextMenu>
     </Window.ContextMenu>
     <Grid>
         <Rectangle>
             <Rectangle.Fill>
-                <SolidColorBrush Color="{Binding Background}" Opacity="{Binding BackgroundOpacity}"/>
+                <SolidColorBrush Color="{Binding Background}"/>
             </Rectangle.Fill>
         </Rectangle>
         <Viewbox>

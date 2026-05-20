@@ -21,5 +21,8 @@
         <TabItem Header="Video">
             <local:Unit_Video x:Name="Unit_Video"/>
         </TabItem>
+        <TabItem Header="Icon" Visibility="Collapsed">
+            <Button Content="GO" Click="OnClick_Icon"/>
+        </TabItem>
     </TabControl>
 </Window>
