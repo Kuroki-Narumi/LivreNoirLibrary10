@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
+using System.Threading;
 using System.Windows.Media.Imaging;
 using LivreNoirLibrary.ObjectModel;
 
@@ -9,6 +10,8 @@ namespace LivreNoirLibrary.Windows.Media
 {
     public class IconBitmapEncoder : IClear
     {
+        private static readonly MemoryStream _ms = new();
+
         private readonly List<IconData> _data = [];
 
         public IconBitmapEncoder() { }
@@ -79,16 +82,17 @@ namespace LivreNoirLibrary.Windows.Media
             public readonly byte _height;
             public readonly ushort _bitsPerPixel;
             public readonly uint _byteSize;
-            private byte[]? _buffer;
+            private byte[] _buffer;
 
             public IconData(BitmapSource source)
             {
                 _width = (byte)source.PixelWidth;
                 _height = (byte)source.PixelHeight;
                 _bitsPerPixel = (ushort)source.Format.BitsPerPixel;
-                MemoryStream ms = new();
                 PngBitmapEncoder encoder = new();
                 encoder.Frames.Add(BitmapFrame.Create(source));
+                var ms = _ms;
+                ms.SetLength(0);
                 encoder.Save(ms);
                 _buffer = ms.ToArray();
                 _byteSize = (uint)_buffer.Length;
@@ -105,12 +109,12 @@ namespace LivreNoirLibrary.Windows.Media
                 writer.Write(_byteSize);
             }
 
-            public void WriteContent(Stream target) => target.Write(_buffer!, 0, _buffer!.Length);
+            public void WriteContent(Stream target) => target.Write(_buffer, 0, _buffer.Length);
 
             protected override void DisposeUnmanaged()
             {
                 base.DisposeUnmanaged();
-                _buffer = null;
+                _buffer = null!;
             }
         }
     }

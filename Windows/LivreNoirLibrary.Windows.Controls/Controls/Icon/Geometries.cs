@@ -93,7 +93,7 @@ namespace LivreNoirLibrary.Windows.Controls.IconContent
         public static SG Stop { get; } = CreateGeometry("M1,1 H31 V31 H1 Z");
         public static SG Repeat { get; } = CreateGeometry("M2,18 a14,14,0,0,0,28,0 h-6 a8,8,0,0,1,-16,0 a8,8,0,0,1,8,-8 v4 l10,-7 -10,-7 v4 a14,14,0,0,0,-14,14 Z");
         public static SG SkipLeft { get; } = CreateGeometry("M0,0 v32 h4 V0 M4,16 18,32 18,0 M 18,16 32,32 32,0 Z");
-        public static SG SkipRight { get; } = CreateGeometry("M28,0 v32 h32 V0 M28,16 14,32 14,0 M 14,16 0,32 0,0 Z");
+        public static SG SkipRight { get; } = CreateGeometry("M28,0 v32 h4 V0 M28,16 14,32 14,0 M 14,16 0,32 0,0 Z");
 
         public static SG NewWindow_Background { get; } = CreateGeometry("M0,4 H30 V32 H0 Z");
         public static SG NewWindow_Frame { get; } = CreateGeometry("M0,4 H18 v2 H2 v4 H14 v2 H2 V30 H28 V14 h2 V32 H0 Z");

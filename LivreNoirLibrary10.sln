@@ -61,6 +61,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Applications", "Application
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LivreNoirLibrary.GameOfLife", "Test\LivreNoirLibrary.GameOfLife\LivreNoirLibrary.GameOfLife.csproj", "{40EEB7B6-93F4-46F2-9654-0D64490F923C}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LivreNoirLibrary.Updater", "Windows\LivreNoirLibrary.Updater\LivreNoirLibrary.Updater.csproj", "{D68A1A1B-4A1E-4CDE-9DB8-DF5F54D0C06A}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -159,6 +161,10 @@ Global
 		{40EEB7B6-93F4-46F2-9654-0D64490F923C}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{40EEB7B6-93F4-46F2-9654-0D64490F923C}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{40EEB7B6-93F4-46F2-9654-0D64490F923C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D68A1A1B-4A1E-4CDE-9DB8-DF5F54D0C06A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D68A1A1B-4A1E-4CDE-9DB8-DF5F54D0C06A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D68A1A1B-4A1E-4CDE-9DB8-DF5F54D0C06A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D68A1A1B-4A1E-4CDE-9DB8-DF5F54D0C06A}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -187,6 +193,7 @@ Global
 		{B7592E8D-D02C-42B4-AA77-CA218C12E8DC} = {DDB4EF12-CC4E-5E88-E6FC-71A802F4DE97}
 		{28560B02-4DF0-434D-BBF5-68AAD1EF9728} = {91D8486E-F2AC-455C-BB54-37AA9D6AFC42}
 		{40EEB7B6-93F4-46F2-9654-0D64490F923C} = {AE37215D-7D57-4F37-AFBD-A9F4BBCDFCA0}
+		{D68A1A1B-4A1E-4CDE-9DB8-DF5F54D0C06A} = {FAE50CAA-58F4-4889-8A49-AF066B7E3E20}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {E9E77D05-4DB4-4801-B31A-B18084065C39}

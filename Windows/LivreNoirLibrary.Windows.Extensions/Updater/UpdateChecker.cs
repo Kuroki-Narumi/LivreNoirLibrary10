@@ -3,6 +3,7 @@ using System.Diagnostics;
 using System.Windows;
 using System.IO;
 using LivreNoirLibrary.IO;
+using LivreNoirLibrary.Text;
 
 namespace LivreNoirLibrary.Windows
 {
@@ -31,7 +32,6 @@ namespace LivreNoirLibrary.Windows
                 {
                     if (window.ShowMessage_YesNo(string.Format(window.GetMessage_NewVersion(), info.Version), MessageBoxImage.Information) is MessageBoxResult.Yes)
                     {
-                        window.CheckUpdate = true;
                         window.SetDispatcher(() => ExecuteUpdate(window, updater, info));
                     }
                     else
@@ -56,6 +56,14 @@ namespace LivreNoirLibrary.Windows
                 IOExtensions.Deflate(file, ms);
                 target.Updater = ms.ToArray();
             }
+        }
+
+        public static UpdateInfo CreateUpdateInfo(string infoPath, string updaterPath, UpdateInfo? info = null)
+        {
+            info ??= new();
+            SaveUpdater(info, updaterPath);
+            Json.Save(infoPath, info, true);
+            return info;
         }
 
         public static void ExecuteUpdate(this Window window, string updaterPath, UpdateInfo info)

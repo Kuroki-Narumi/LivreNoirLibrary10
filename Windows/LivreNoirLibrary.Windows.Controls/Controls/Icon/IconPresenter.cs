@@ -1,9 +1,13 @@
-﻿using System;
+﻿using LivreNoirLibrary.Debug;
+using LivreNoirLibrary.Numerics;
+using LivreNoirLibrary.Windows.Media;
+using System;
+using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Markup;
 using System.Windows.Media;
-using LivreNoirLibrary.Windows.Media;
 
 namespace LivreNoirLibrary.Windows.Controls
 {
@@ -18,6 +22,7 @@ namespace LivreNoirLibrary.Windows.Controls
         public static readonly FontFamily DefaultFontFamily = new("Segoe MDL2 Assets");
         public static Brush DefaultForeground => Brushes.Black;
         public const Stretch DefaultStretch = Stretch.Uniform;
+        public const StretchDirection DefaultStretchDirection = StretchDirection.Both;
         public const double DefaultSize = 32;
 
         public static readonly DependencyProperty FontFamilyProperty = PropertyUtils.RegisterTwoWay(typeof(IconPresenter), DefaultFontFamily, OnFontFamilyChanged);
@@ -68,10 +73,12 @@ namespace LivreNoirLibrary.Windows.Controls
         private double _src_w = double.NaN;
         private double _src_h = double.NaN;
 
-        [DependencyProperty(BindsTwoWayByDefault = true)]
+        [DependencyProperty(AffectsMeasure = true)]
         private object? _source;
-        [DependencyProperty(BindsTwoWayByDefault = true, AffectsMeasure = true)]
+        [DependencyProperty(AffectsMeasure = true)]
         private Stretch _stretch = DefaultStretch;
+        [DependencyProperty(AffectsMeasure = true)]
+        private StretchDirection _stretchDirection = DefaultStretchDirection;
 
         public FontFamily? FontFamily
         {
@@ -139,6 +146,10 @@ namespace LivreNoirLibrary.Windows.Controls
 
         protected override Size MeasureOverride(Size availableSize)
         {
+            (Source as UIElement)?.Measure(new(double.PositiveInfinity, double.PositiveInfinity));
+            return MeasureArrangeHelper(availableSize);
+
+                /*
             var w = Width;
             var h = Height;
             var w_infinite = !double.IsFinite(w);
@@ -174,12 +185,104 @@ namespace LivreNoirLibrary.Windows.Controls
                 }
             }
             return new(w, h);
+            if (Source is Drawing d && Icons.IconList.FirstOrDefault(i => i.Drawing == d) is { } info)
+            {
+                ExConsole.Write($"IconPresenter Measure: Source={info.Name}, Size=({w},{h})");
+            }
+            return new(0, 0);
+                */
         }
 
         protected override Size ArrangeOverride(Size finalSize)
         {
-            RenderSize = finalSize;
-            return finalSize;
+            var size = MeasureArrangeHelper(finalSize);
+            RenderSize = size;
+            return size;
+        }
+
+        private Size MeasureArrangeHelper(Size inputSize, [CallerMemberName]string? caller = null)
+        {
+            Size desiredSize;
+            switch (Source)
+            {
+                case UIElement element:
+                    desiredSize = element.DesiredSize;
+                    break;
+                case MediaPlayer mp:
+                    desiredSize = new(mp.NaturalVideoWidth, mp.NaturalVideoHeight);
+                    break;
+                case ImageSource image:
+                    desiredSize = new(image.Width, image.Height);
+                    break;
+                case Drawing drawing:
+                    var bounds = drawing.Bounds;
+                    desiredSize = new(bounds.Width, bounds.Height);
+                    break;
+                default:
+                    if (_ft is { } ft)
+                    {
+                        desiredSize = new(ft.Width, ft.Height);
+                        break;
+                    }
+                    else
+                    {
+                        return new(0, 0);
+                    }
+            }
+            var scale = ComputeScaleFactor(inputSize, desiredSize, Stretch, StretchDirection);
+            var w = desiredSize.Width * scale.Width;
+            var h = desiredSize.Height * scale.Height;
+            if (UseLayoutRounding)
+            {
+                w = Math.Round(w);
+                h = Math.Round(h);
+            }
+            ExConsole.Write($"{caller}: ({w}, {h})");
+            return new(w, h);
+        }
+
+        internal static Size ComputeScaleFactor(Size availableSize, Size contentSize, Stretch stretch, StretchDirection stretchDirection)
+        {
+            double sx = 1, sy = 1;
+            var isWidthFinite = double.IsFinite(availableSize.Width);
+            var isHeightFinite = double.IsFinite(availableSize.Height);
+            if (stretch is Stretch.Fill or Stretch.Uniform or Stretch.UniformToFill & (isWidthFinite || isHeightFinite))
+            {
+                sx = contentSize.Width == 0 ? 0 : availableSize.Width / contentSize.Width;
+                sy = contentSize.Height == 0 ? 0 : availableSize.Height / contentSize.Height;
+                if (!isWidthFinite)
+                {
+                    sx = sy;
+                }
+                else if (!isHeightFinite)
+                {
+                    sy = sx;
+                }
+                else
+                {
+                    switch (stretch)
+                    {
+                        case Stretch.Uniform:
+                            sx = sy = Math.Min(sx, sy);
+                            break;
+                        case Stretch.UniformToFill:
+                            sx = sy = Math.Max(sx, sy);
+                            break;
+                    }
+                }
+                switch (stretchDirection)
+                {
+                    case StretchDirection.UpOnly:
+                        sx = Math.Max(sx, 1);
+                        sy = Math.Max(sy, 1);
+                        break;
+                    case StretchDirection.DownOnly:
+                        sx = Math.Min(sx, 1);
+                        sy = Math.Min(sy, 1);
+                        break;
+                }
+            }
+            return new(sx, sy);
         }
 
         private static (double ScaleX, double ScaleY) GetScale(double dstW, double dstH, double srcW, double srcH, Stretch stretch, StretchDirection direction = StretchDirection.Both)
@@ -222,6 +325,51 @@ namespace LivreNoirLibrary.Windows.Controls
         protected override void OnRender(DrawingContext dc)
         {
             base.OnRender(dc);
+            var (w, h) = RenderSize;
+            switch (Source)
+            {
+                case UIElement element:
+                    VisualBrush brush = new(element)
+                    {
+                        Stretch = Stretch,
+                        AlignmentX = AlignmentX.Center,
+                        AlignmentY = AlignmentY.Center,
+                    };
+                    ExConsole.Write((element.RenderSize, (w, h)));
+                    dc.DrawRectangle(brush, null, new(0, 0, w, h));
+                    break;
+                case MediaPlayer player:
+                    dc.DrawVideo(player, new(0, 0, w, h));
+                    return;
+                case ImageSource image:
+                    dc.DrawImage(image, new(0, 0, w, h));
+                    return;
+                case Drawing drawing:
+                    var bounds = drawing.Bounds;
+                    var m = Matrix.Identity;
+                    m.Translate(-bounds.X, -bounds.Y);
+                    m.Scale(w / bounds.Width, h / bounds.Height);
+                    MatrixTransform transform = new(m);
+                    transform.Freeze();
+                    dc.PushTransform(transform);
+                    dc.DrawDrawing(drawing);
+                    dc.Pop();
+                    return;
+                default:
+                    if (_ft is { } ft)
+                    {
+                        m = Matrix.Identity;
+                        m.Scale(w / ft.Width, h / ft.Height);
+                        transform = new(m);
+                        transform.Freeze();
+                        dc.PushTransform(transform);
+                        dc.DrawText(ft, new(0, 0));
+                        dc.Pop();
+                    }
+                    return;
+            }
+
+            /*
             var (dstW, dstH) = RenderSize;
             Action renderAction;
             if (_drawing is not null)
@@ -251,7 +399,9 @@ namespace LivreNoirLibrary.Windows.Controls
             {
                 return;
             }
-            var (scaleX, scaleY) = GetScale(dstW, dstH, _src_w, _src_h, _stretch);
+            //var (scaleX, scaleY) = GetScale(dstW, dstH, _src_w, _src_h, _stretch);
+            var scaleX = dstW / _src_w;
+            var scaleY = dstH / _src_h;
             var ox = (dstW - _src_w * scaleX) * 0.5;
             var oy = (dstH - _src_h * scaleY) * 0.5;
             if (UseLayoutRounding)
@@ -268,6 +418,7 @@ namespace LivreNoirLibrary.Windows.Controls
             dc.PushTransform(mt);
             renderAction();
             dc.Pop();
+             */
         }
     }
 }

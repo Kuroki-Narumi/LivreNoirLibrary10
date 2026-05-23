@@ -31,7 +31,7 @@ namespace LivreNoirLibrary.Media.Integrated
                 {
                     remove.Add((pos, obj));
                 }
-                else if (obj is Midi.INote note && track.IsNormalNote(note))
+                else if (obj is INote note && track.IsNormalNote(note))
                 {
                     foreach (var (p, _) in note.EachNote(pos))
                     {

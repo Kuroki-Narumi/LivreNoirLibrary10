@@ -1,11 +1,12 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Windows;
 using System.Windows.Media;
 
 namespace LivreNoirLibrary.Windows.Controls
 {
-    using Dr = IconContent.Drawings;
     using DG = DrawingGroup;
+    using Dr = IconContent.Drawings;
 
     public static class Icons
     {
@@ -175,5 +176,25 @@ namespace LivreNoirLibrary.Windows.Controls
         public static DG Metronome { get; } = Get(Dr.Metronome_Outer, Dr.Metronome_Inner, Dr.Metronome_Scale, Dr.Metronome_Bar);
 
         public static DG Browse { get; } = Get(Dr.Browse_BackTab, Dr.Browse_FrontTab, Dr.Browse_Content, Dr.Browse_Outline);
+
+        private static readonly List<IconInfo> _iconList = CreateIconList();
+
+        public static IEnumerable<IconInfo> IconList => _iconList;
+
+        private static List<IconInfo> CreateIconList()
+        {
+            List<IconInfo> list = [];
+            foreach (var prop in typeof(Icons).GetProperties())
+            {
+                if (prop.PropertyType.IsAssignableTo(typeof(Drawing)))
+                {
+                    var icon = (prop.GetValue(null) as Drawing)!;
+                    list.Add(new(prop.Name, icon));
+                }
+            }
+            return list;
+        }
     }
+
+    public record IconInfo(string Name, Drawing Drawing);
 }
