@@ -11,51 +11,39 @@ namespace LivreNoirLibrary.Media.Bms
         private class Line
         {
             private readonly SortedList<Rational, ushort> _list = [];
-            internal long _den = 1;
+            internal long _resol = 1;
 
             public Line() { }
-            public Line(double pos, int value)
+            public Line(Rational pos, int value)
             {
-                var rPos = Rationalize(pos);
-                _list[rPos] = (ushort)value;
-                _den = rPos.Denominator;
+                _list[pos] = (ushort)value;
+                _resol = pos.Denominator;
             }
 
-            private static Rational Rationalize(double position) => Rational.RationalizeUnsafe(position, BmsConstants.MaxInnerResolution);
-
-            public bool TryAdd(double position, int value)
+            public bool TryAdd(Rational position, int value, long resolutionLimit)
             {
-                var rPos = Rationalize(position);
-                if (_list.ContainsKey(rPos))
+                if (_list.ContainsKey(position))
                 {
                     return false;
                 }
-                _den = NumberExtensions.LCM(_den, rPos.Denominator);
-                _list.Add(rPos, (ushort)value);
+                var resol = _resol;
+                var den = position.Denominator;
+                if (den != resol)
+                {
+                    var newResol = NumberExtensions.LCM(resol, den);
+                    if (newResol > resolutionLimit)
+                    {
+                        return false;
+                    }
+                    _resol = newResol;
+                }
+                _list.Add(position, (ushort)value);
                 return true;
-            }
-
-            public void ReductDenominator(long limit)
-            {
-                var list = _list;
-                using var o = ObjectPool.Rent<List<(Rational, ushort)>>();
-                var newList = o.Value;
-                foreach (var ((n, d), value) in list)
-                {
-                    var newPos = new Rational(n * limit / d, limit);
-                    newList.Add((newPos, value));
-                }
-                list.Clear();
-                foreach (var (pos, value) in newList.AsSpan())
-                {
-                    list[pos] = value;
-                }
-                _den = limit;
             }
 
             public void WriteText(BmsTextWriter writer, int radix)
             {
-                var den = _den;
+                var den = _resol;
                 var index = 0;
                 foreach (var ((n, d), value) in _list)
                 {

@@ -17,7 +17,7 @@ namespace LivreNoirLibrary.YuGiOh
         public static Order[] Orders { get; } = [Order.First, Order.Second, Order.CFirst, Order.CSecond];
         public static Result[] Results { get; } = Enum.GetValues<Result>();
 
-        public static bool IsMonster(this CardType type) => (type & CardType.Type_Filter) is 0;
+        public static bool IsMonster(this CardType type) => type is not 0 && (type & CardType.Type_Filter) is 0;
         public static bool IsSpell(this CardType type) => (type & CardType.Type_Filter) is CardType.Normal_Spell;
         public static bool IsTrap(this CardType type) => (type & CardType.Type_Filter) is CardType.Normal_Trap;
         public static bool IsMainDeck(this CardType type) => type is CardType.Main_Monster or CardType.Ritual_Monster or >= CardType.Normal_Spell;

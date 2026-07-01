@@ -20,7 +20,7 @@ namespace LivreNoirLibrary.Numerics
             }
             else
             {
-                exception = new OverflowException("result must be a finite number.");
+                exception = ExpressionExceptions.ResultInfinite;
                 return false;
             }
         }

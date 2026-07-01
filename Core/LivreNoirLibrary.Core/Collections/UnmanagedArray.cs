@@ -235,6 +235,13 @@ namespace LivreNoirLibrary.Collections
         }
 
         /// <inheritdoc cref="Slice(nuint)"/>
+        public Span<T> Slice(int start)
+        {
+            ArgumentOutOfRangeException.ThrowIfNegative(start);
+            return Slice((nuint)start);
+        }
+
+        /// <inheritdoc cref="Slice(nuint)"/>
         public Span<T> Slice(Index start)
         {
             var index = ConvertIndexSafe(start);
@@ -288,6 +295,13 @@ namespace LivreNoirLibrary.Collections
 
         /// <inheritdoc cref="Clear(nuint)"/>
         public void Clear(long start)
+        {
+            ArgumentOutOfRangeException.ThrowIfNegative(start);
+            Clear((nuint)start);
+        }
+
+        /// <inheritdoc cref="Clear(nuint)"/>
+        public void Clear(int start)
         {
             ArgumentOutOfRangeException.ThrowIfNegative(start);
             Clear((nuint)start);
@@ -360,6 +374,10 @@ namespace LivreNoirLibrary.Collections
         /// <inheritdoc cref="CopyFrom(UnmanagedArray{T})"/>
         public void CopyFrom(ReadOnlySpan<T> source)
         {
+            if (source.Length is <= 0)
+            {
+                return;
+            }
             fixed (T* src = source)
             {
                 CopyFromImpl(_ptr, src, Math.Min(_size, (nuint)source.Length));
@@ -377,6 +395,10 @@ namespace LivreNoirLibrary.Collections
         /// <exception cref="ArgumentOutOfRangeException"/>
         public void CopyFrom(UnmanagedArray<T> source, nuint offset)
         {
+            if (source._size is <= 0 || offset >= _size)
+            {
+                return;
+            }
             offset = Math.Min(offset, _size);
             CopyFromImpl(_ptr + offset, source._ptr, Math.Min(_size - offset, source.Length));
         }
@@ -384,7 +406,10 @@ namespace LivreNoirLibrary.Collections
         /// <inheritdoc cref="CopyFrom(UnmanagedArray{T}, nuint)"/>
         public void CopyFrom(ReadOnlySpan<T> source, nuint offset)
         {
-            offset = Math.Min(offset, _size);
+            if (source.Length is <= 0 || offset >= _size)
+            {
+                return;
+            }
             fixed (T* src = source)
             {
                 CopyFromImpl(_ptr + offset, src, Math.Min(_size - offset, (nuint)source.Length));
@@ -480,6 +505,10 @@ namespace LivreNoirLibrary.Collections
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private static void ClearImpl(T* ptr, nuint count)
         {
+            if (count is 0)
+            {
+                return;
+            }
             if (IsHardwareAccelerated)
             {
                 SimdOperations.Clear(ptr, count);
@@ -493,6 +522,10 @@ namespace LivreNoirLibrary.Collections
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private static void FillImpl(T value, T* ptr, nuint count)
         {
+            if (count is 0)
+            {
+                return;
+            }
             if (IsHardwareAccelerated)
             {
                 SimdOperations.CopyFrom(ptr, value, count);
@@ -509,6 +542,10 @@ namespace LivreNoirLibrary.Collections
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private static void CopyFromImpl(T* ptr, T* src, nuint count)
         {
+            if (count is 0)
+            {
+                return;
+            }
             if (IsHardwareAccelerated)
             {
                 SimdOperations.CopyFrom(ptr, src, count);

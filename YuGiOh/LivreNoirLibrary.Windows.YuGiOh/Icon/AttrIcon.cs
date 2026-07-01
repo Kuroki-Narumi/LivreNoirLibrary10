@@ -1,7 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Windows.Media;
 using LivreNoirLibrary.YuGiOh;
-using LivreNoirLibrary.Windows.Media;
 
 namespace LivreNoirLibrary.Windows.YuGiOh
 {
@@ -18,13 +17,14 @@ namespace LivreNoirLibrary.Windows.YuGiOh
             { Attribute.Wind, CreateAttrBrush("#dfd", "#8f8", "#080") },
             { Attribute.Divine, CreateAttrBrush("#fff", "#8ff", "#888") },
         };
+
         private static RadialGradientBrush CreateAttrBrush(string c1, string c2, string c3)
         {
             RadialGradientBrush brush = new()
             {
                 GradientOrigin = new(0.25, 0.25),
             };
-            GradientStop g = new(StructExtensions.ToColor(c1), 0.0);
+            GradientStop g = new(c1.ToColor(), 0.0);
             g.Freeze();
             brush.GradientStops.Add(g);
             g = new(c2.ToColor(), 0.6);
@@ -37,12 +37,13 @@ namespace LivreNoirLibrary.Windows.YuGiOh
             return brush;
         }
 
-        private static readonly Dictionary<Attribute, DrawingImage> _attr_cache = [];
-        public static DrawingImage GetAttrIcon(Attribute attr)
+        private static readonly Dictionary<Attribute, DrawingGroup> _attr_cache = [];
+
+        public static DrawingGroup GetAttrIcon(Attribute attr)
         {
-            if (!_attr_cache.TryGetValue(attr, out var di))
+            if (!_attr_cache.TryGetValue(attr, out var dg))
             {
-                DrawingGroup dg = new();
+                dg = new();
                 using (var ctx = dg.Open())
                 {
                     double s = IconWidth / 2;
@@ -53,11 +54,9 @@ namespace LivreNoirLibrary.Windows.YuGiOh
                     }
                 }
                 dg.Freeze();
-                di = new(dg);
-                di.Freeze();
-                _attr_cache.Add(attr, di);
+                _attr_cache.Add(attr, dg);
             }
-            return di;
+            return dg;
         }
     }
 }

@@ -2,6 +2,7 @@
 using System.Text.Json.Serialization;
 using LivreNoirLibrary.ObjectModel;
 using LivreNoirLibrary.YuGiOh.Converters;
+using LivreNoirLibrary.YuGiOh.Search;
 
 namespace LivreNoirLibrary.YuGiOh.Data
 {
@@ -11,15 +12,15 @@ namespace LivreNoirLibrary.YuGiOh.Data
         public static Card Dummy { get; } = new();
 
         public int Id { get; set => SetValue(ref field, value); }
-        public string Name { get; set => SetValue(ref field, value); } = "";
-        public string Ruby { get; set => SetValue(ref field, value); } = "";
-        public string EnName { get; set => SetValue(ref field, value); } = "";
+        public string Name { get; set => SetValue(ref field, value, ClearTextCache); } = "";
+        public string Ruby { get; set => SetValue(ref field, value, ClearTextCache); } = "";
+        public string EnName { get; set => SetValue(ref field, value, ClearTextCache); } = "";
         public CardType CardType
         { 
             get; 
             set => SetValue(ref field, value, [nameof(CardTypeText), nameof(AbilityTextWithType), nameof(DefText), nameof(FullText)]); 
         }
-        public string Text { get; set => SetValue(ref field, value.ReplaceLineEndings("\n"), [nameof(FullText)]); } = "";
+        public string Text { get; set => SetValue(ref field, value.ReplaceLineEndings("\n"), [nameof(FullText)], OnTextChanged); } = "";
         public bool Unusable { get; set => SetValue(ref field, value, [nameof(Usable)]); }
 
         public Attribute Attribute { get; set => SetValue(ref field, value, [nameof(AttributeText), nameof(AttrText), nameof(MonsterInfoText), nameof(FullText)]); }
@@ -31,9 +32,9 @@ namespace LivreNoirLibrary.YuGiOh.Data
         public int Def { get; set => SetValue(ref field, value, [nameof(LinkDirection), nameof(DefText), nameof(StatusText), nameof(FullText)]); } = -1;
 
         public int PendulumScale { get; set => SetValue(ref field, value, [nameof(FullText)]); } = -1;
-        public string PendulumText { get; set => SetValue(ref field, value.ReplaceLineEndings("\n"), [nameof(FullText)]); } = "";
+        public string PendulumText { get; set => SetValue(ref field, value.ReplaceLineEndings("\n"), [nameof(FullText)], OnTextChanged); } = "";
 
-        public PackInfoCollection PackInfo { get; set => SetValue(ref field, value); } = [];
+        public PackInfoCollection PackInfo { get; } = [];
 
         public Card(Serializable.Card card) : this()
         {
@@ -59,12 +60,16 @@ namespace LivreNoirLibrary.YuGiOh.Data
                 PendulumScale = pinfo.Scale;
                 PendulumText = pinfo.Text ?? "";
             }
-            PackInfo = new(card.PackInfo);
+        }
+
+        private Card(PackInfoCollection packInfos) : this()
+        {
+            PackInfo.Load(packInfos);
         }
 
         public int CompareTo(Card? other) => other is not null ? Id.CompareTo(other.Id) : 1;
 
-        public Card Clone() => new()
+        public Card Clone() => new(PackInfo)
         {
             Id = Id,
             Name = Name,
@@ -82,7 +87,6 @@ namespace LivreNoirLibrary.YuGiOh.Data
             Def = Def,
             PendulumScale = PendulumScale,
             PendulumText = PendulumText,
-            PackInfo = PackInfo,
         };
 
         public void Update(Card source)
@@ -103,15 +107,19 @@ namespace LivreNoirLibrary.YuGiOh.Data
             Def = source.Def;
             PendulumScale = source.PendulumScale;
             PendulumText = source.PendulumText;
-            PackInfo = source.PackInfo;
+            PackInfo.Load(source.PackInfo);
+        }
+
+        private void ClearTextCache()
+        {
+            TextSearchConditions.RemoveTextCache(this);
         }
 
         private void OnTextChanged()
         {
-            _related_created = false;
+            _related = null;
             SendPropertyChanged(nameof(RelatedList));
-            TextConvert.RemoveTextCache(this);
+            ClearTextCache();
         }
-        private void OnPendulumTextChanged() => OnTextChanged();
     }
 }

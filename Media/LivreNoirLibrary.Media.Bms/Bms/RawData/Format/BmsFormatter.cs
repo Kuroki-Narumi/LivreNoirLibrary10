@@ -11,11 +11,15 @@ namespace LivreNoirLibrary.Media.Bms
 
     public partial class BmsFormatter(IBmsData data)
     {
+        public const long DefaultResolutionLimit = 768;
+
         private readonly IBmsData _data = data;
         private readonly ConductorDefCollection _conductorDefs = [];
         private readonly Dictionary<IBmsDataUnit, SaveState> _states = [];
         private Encoding? _encoding = null;
         private int _radix;
+
+        public long ResolutionLimit { get; set; } = DefaultResolutionLimit;
 
         public long Prepare(IBmsDataUnit? root = null)
         {
@@ -35,28 +39,21 @@ namespace LivreNoirLibrary.Media.Bms
 
             var lnObj = data.LnObj;
             var radix = BmsConstants.Base_Legacy;
-            var maxDen = 0L;
-            foreach (var unit in _data.EnumerateChildren(root))
+            var resoLimit = ResolutionLimit;
+            var maxResol = 0L;
+            foreach (var (_, unit) in _data.EnumerateChildren(root))
             {
-                SaveState state = new(unit, lnObj, conductorDefs, ref radix);
+                SaveState state = new(unit, lnObj, conductorDefs, ref radix, resoLimit);
                 states.Add(unit, state);
-                maxDen = Math.Max(maxDen, state.MaxDenominator);
+                maxResol = Math.Max(maxResol, state.MaxResolution);
             }
             _radix = radix;
-            return maxDen;
-        }
-
-        public void ReductDenominator(long limit)
-        {
-            foreach (var (_, state) in _states)
-            {
-                state.ReductDenominator(limit);
-            }
+            return maxResol;
         }
 
         private static void TryEncode(IBmsData data, Encoding encoding)
         {
-            foreach (var unit in data.EnumerateAllData())
+            foreach (var (_, unit) in data.EnumerateAllData())
             {
                 CheckNote(unit);
                 unit.MainHeaders.TryEncode(encoding);

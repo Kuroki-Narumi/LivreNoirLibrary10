@@ -26,7 +26,7 @@ namespace LivreNoirLibrary.Media.Bms
             public void InsertBar(IBmsDataUnit start, int number) => InsertBar(root, start, number, 1);
             public void InsertBar(IBmsDataUnit start, int number, int count)
             {
-                foreach (var data in root.EnumerateChildren(start, true))
+                foreach (var (_, data) in root.EnumerateChildren(start, true))
                 {
                     data.InsertBar(number, count);
                 }
@@ -37,7 +37,7 @@ namespace LivreNoirLibrary.Media.Bms
             public void DeleteBar(IBmsDataUnit start, int number) => DeleteBar(root, start, number, 1);
             public void DeleteBar(IBmsDataUnit start, int number, int count)
             {
-                foreach (var data in root.EnumerateChildren(start, true))
+                foreach (var (_, data) in root.EnumerateChildren(start, true))
                 {
                     data.DeleteBar(number, count);
                 }
@@ -47,7 +47,7 @@ namespace LivreNoirLibrary.Media.Bms
             {
                 var first = BarPosition.MaxValue;
                 var last = BarPosition.Zero;
-                foreach (var data in root.EnumerateAllData())
+                foreach (var (_, data) in root.EnumerateAllData())
                 {
                     var poss = data.Timeline.GetPositions();
                     if (poss.Length is > 0)
@@ -67,7 +67,7 @@ namespace LivreNoirLibrary.Media.Bms
             {
                 var first = BarPosition.MaxValue;
                 var last = BarPosition.Zero;
-                foreach (var data in root.EnumerateAllData())
+                foreach (var (_, data) in root.EnumerateAllData())
                 {
                     var timeline = data.Timeline;
                     if (timeline.Find((_, note) => predicate(note), out var pos, out _))

@@ -257,7 +257,7 @@ namespace LivreNoirLibrary.Media.BM3
             // path 2 : identify
             var packedList = _packed;
             MemoryStream ms = new(32768);
-            Dictionary<byte[], int> packed2id = new(new ByteArrayEqualityComparer());
+            Dictionary<byte[], int> packed2id = new(ByteArrayEqualityComparer.Default);
             Dictionary<int, List<Rational>> packedPosList = [];
             var ksKeys = ksTimeline.GetKeyList();
             foreach (var packed in notes.AsSpan())

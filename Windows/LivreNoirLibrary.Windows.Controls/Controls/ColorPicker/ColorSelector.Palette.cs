@@ -65,7 +65,6 @@ namespace LivreNoirLibrary.Windows.Controls
 
         private unsafe void UpdatePalettes()
         {
-            var (r, g, b) = _color_info.GetBytes();
             LockPalettes();
             var span_r = new Span<uint>((uint*)_src_r.BackBuffer, PixelSize);
             var span_g = new Span<uint>((uint*)_src_g.BackBuffer, PixelSize);
@@ -73,9 +72,10 @@ namespace LivreNoirLibrary.Windows.Controls
             span_r.And(0xff00ffff);
             span_g.And(0xffff00ff);
             span_b.And(0xffffff00);
-            span_r.Or((uint)r << 16);
-            span_g.Or((uint)g << 8);
-            span_b.Or((uint)b);
+            var info = ColorInfo;
+            span_r.Or((uint)info.IntR << 16);
+            span_g.Or((uint)info.IntG << 8);
+            span_b.Or((uint)info.IntB);
             UnlockPalettes();
         }
     }

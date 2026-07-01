@@ -12,10 +12,6 @@ namespace LivreNoirLibrary.YuGiOh.Converters
             {
                 case JsonTokenType.String:
                     var str = reader.GetString();
-                    if (Enum.TryParse<CardType>(str, out var value))
-                    {
-                        return value;
-                    }
                     return Vocab.GetCardType(str);
                 case JsonTokenType.Number:
                     return (CardType)reader.GetInt32();

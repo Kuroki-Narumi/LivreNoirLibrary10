@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using LivreNoirLibrary.Collections;
+using LivreNoirLibrary.Text;
 
 namespace LivreNoirLibrary.YuGiOh.Data
 {
@@ -9,7 +10,7 @@ namespace LivreNoirLibrary.YuGiOh.Data
     {
         protected override int GetKey(Card item) => item.Id;
 
-        public void Load(List<Serializable.Card> source, CardPackCollection? packs)
+        public void Load(List<Serializable.Card> source)
         {
             ClearWithoutNotify();
             var c = source.Count;
@@ -20,14 +21,6 @@ namespace LivreNoirLibrary.YuGiOh.Data
                 Card card = new(item);
                 _list.Add(card);
                 _key_list.Add(card.Id);
-                if (packs is not null)
-                {
-                    foreach (var info in card.PackInfo)
-                    {
-                        var pack = packs.Get(info.ProductId);
-                        pack.AddWithoutNotify(new NumberedCard(card, info.Number));
-                    }
-                }
             }
             NotifyCollectionReset();
         }
@@ -52,7 +45,7 @@ namespace LivreNoirLibrary.YuGiOh.Data
 
         public Card Get(string name)
         {
-            if (!string.IsNullOrEmpty(name) && CheckUpdate().TryGetValue(TextConvert.Wide2Half(name), out var index))
+            if (!string.IsNullOrEmpty(name) && CheckUpdate().TryGetValue(name.ToHalf(), out var index))
             {
                 return _list[index];
             }
@@ -80,12 +73,21 @@ namespace LivreNoirLibrary.YuGiOh.Data
 
         public bool TryGet(string name, [MaybeNullWhen(false)] out Card card)
         {
-            if (!string.IsNullOrEmpty(name) && CheckUpdate().TryGetValue(TextConvert.Wide2Half(name), out var index))
+            if (!string.IsNullOrEmpty(name) && CheckUpdate().TryGetValue(name.ToHalf(), out var index))
             {
                 card = _list[index];
                 return true;
             }
             card = null;
+            return false;
+        }
+
+        public bool Remove(int id)
+        {
+            if (TryGet(id, out var card))
+            {
+                return Remove(card);
+            }
             return false;
         }
 
@@ -105,7 +107,7 @@ namespace LivreNoirLibrary.YuGiOh.Data
         {
             if (!string.IsNullOrEmpty(name))
             {
-                name = TextConvert.Wide2Half(name);
+                name = name.ToHalf();
                 if (_name2idx.TryGetValue(name, out var current))
                 {
                     if (current > index)

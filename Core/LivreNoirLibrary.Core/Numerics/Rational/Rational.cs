@@ -6,6 +6,9 @@ using LivreNoirLibrary.Text;
 
 namespace LivreNoirLibrary.Numerics
 {
+    /// <summary>
+    /// Represents a rational number as a fraction of two <see cref="long"/> values: a numerator and a denominator.
+    /// </summary>
     [JsonConverter(typeof(RationalJsonConverter))]
     [TypeConverter(typeof(RationalTypeConverter))]
     public readonly partial struct Rational : INumber<Rational>

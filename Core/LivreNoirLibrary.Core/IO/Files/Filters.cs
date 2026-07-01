@@ -48,8 +48,7 @@ namespace LivreNoirLibrary.IO
         public static string Get(string description, params string[] exts)
         {
             var extStr = string.Join(';', exts.Select(e => $"*.{e}"));
-            using var o = ObjectPool.Rent<StringBuilder>();
-            var sb = o.Value;
+            using var o = ObjectPool.Rent<StringBuilder>(out var sb);
             sb.Append(description);
             sb.Append(" (");
             sb.Append(extStr);
@@ -60,8 +59,7 @@ namespace LivreNoirLibrary.IO
 
         public static string Get(string description, params ReadOnlySpan<IEnumerable<string>> extLists)
         {
-            using var o = ObjectPool.Rent<StringBuilder>();
-            var sb = o.Value;
+            using var o = ObjectPool.Rent<StringBuilder>(out var sb);
             for (int i = 0; i < extLists.Length; i++)
             {
                 if (i > 0)
@@ -85,8 +83,7 @@ namespace LivreNoirLibrary.IO
 
         public static string Join(params ReadOnlySpan<IEnumerable<string>> filterLists)
         {
-            using var o = ObjectPool.Rent<StringBuilder>();
-            var sb = o.Value;
+            using var o = ObjectPool.Rent<StringBuilder>(out var sb);
             for (int i = 0; i < filterLists.Length; i++)
             {
                 if (i > 0)

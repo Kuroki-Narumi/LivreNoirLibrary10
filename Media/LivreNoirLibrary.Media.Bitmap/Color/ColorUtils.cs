@@ -137,8 +137,8 @@ namespace LivreNoirLibrary.Media
 
         public static string GetColorCode(byte r, byte g, byte b) => $"#{r:X2}{g:X2}{b:X2}";
         public static string GetColorCode(byte a, byte r, byte g, byte b) => $"#{a:X2}{r:X2}{g:X2}{b:X2}";
-        public static string GetColorCode(float r, float g, float b) => $"#{GetByte(r):X2}{GetByte(g):X2}{GetByte(b):X2}";
-        public static string GetColorCode(float a, float r, float g, float b) => $"#{GetByte(a):X2}{GetByte(r):X2}{GetByte(g):X2}{GetByte(b):X2}";
+        public static string GetColorCode(float r, float g, float b) => $"#{GetInt(r):X2}{GetInt(g):X2}{GetInt(b):X2}";
+        public static string GetColorCode(float a, float r, float g, float b) => $"#{GetInt(a):X2}{GetInt(r):X2}{GetInt(g):X2}{GetInt(b):X2}";
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static bool IsValidColorCode(string? text)

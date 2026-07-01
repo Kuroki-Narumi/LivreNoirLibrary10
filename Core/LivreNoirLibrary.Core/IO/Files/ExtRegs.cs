@@ -32,8 +32,7 @@ namespace LivreNoirLibrary.IO
 
         public static Regex CreateJoin(params ReadOnlySpan<IEnumerable<string>> exts)
         {
-            using var o = ObjectPool.Rent<StringBuilder>();
-            var sb = o.Value;
+            using var o = ObjectPool.Rent<StringBuilder>(out var sb);
             sb.Append(Prefix);
             for (int i = 0; i < exts.Length; i++)
             {

@@ -77,7 +77,7 @@ namespace LivreNoirLibrary.Media.Bms
                                 continue;
                             }
                             range = new(new(number), new(number + 1));
-                            foreach (var data in root.EnumerateChildren(currentData, true))
+                            foreach (var (_, data) in root.EnumerateChildren(currentData, true))
                             {
                                 var timeline = data.Timeline;
                                 foreach (var (pos, list) in timeline.EnumerateList(range))
@@ -119,7 +119,7 @@ namespace LivreNoirLibrary.Media.Bms
                         break;
                     case BarResizeMode.Slide:
                         range = new(new(numbers.Min), new(numbers.Max + 1));
-                        foreach (var data in root.EnumerateChildren(currentData, true))
+                        foreach (var (_, data) in root.EnumerateChildren(currentData, true))
                         {
                             var timeline = data.Timeline;
                             foreach (var (pos, list) in timeline.EnumerateList(range))
@@ -250,7 +250,7 @@ namespace LivreNoirLibrary.Media.Bms
                 var second = current - first;
                 var newHead = new BarPosition(bar + 1);
                 position = new BarPosition(bar + 1, offset);
-                foreach (var data in root.EnumerateChildren(currentData, true))
+                foreach (var (_, data) in root.EnumerateChildren(currentData, true))
                 {
                     var timeline = data.Timeline;
                     data.InsertBar(bar, 1);
@@ -277,7 +277,7 @@ namespace LivreNoirLibrary.Media.Bms
                 var length = vm.GetAbsolutePosition(last) - vm.GetAbsolutePosition(first);
                 var range = RangeUtils.Get(first, last);
                 var moves = _moves;
-                foreach (var data in root.EnumerateChildren(currentData, true))
+                foreach (var (_, data) in root.EnumerateChildren(currentData, true))
                 {
                     var timeline = data.Timeline;
                     foreach (var (pos, list) in timeline.EnumerateList(range))
@@ -319,7 +319,7 @@ namespace LivreNoirLibrary.Media.Bms
 
                 // 変更前のノートを退避
                 var movesList = new Dictionary<IBmsDataUnit, Dictionary<double, List<Note>>>();
-                foreach (var data in root.EnumerateChildren(currentData, true))
+                foreach (var (_, data) in root.EnumerateChildren(currentData, true))
                 {
                     var timeline = data.Timeline;
                     var moves = new Dictionary<double, List<Note>>();

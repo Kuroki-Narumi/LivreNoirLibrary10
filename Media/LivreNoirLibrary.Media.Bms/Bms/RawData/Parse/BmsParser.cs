@@ -2,6 +2,7 @@ using LivreNoirLibrary.Collections;
 using LivreNoirLibrary.Text;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.IO;
 using System.Text;
@@ -15,18 +16,14 @@ namespace LivreNoirLibrary.Media.Bms
         public int Radix { get; }
         public short LnObj { get; }
 
-        private IBmsData? _root;
-        private StringBuilder? _comments;
-        private ParseState? _current;
+        private IBmsData _root = null!;
+        private StringBuilder _comments = null!;
 
-        private List<ParseState>? _states;
-        private Dictionary<DefType, Dictionary<short, double>>? _conductorDefs;
+        private ParseState _current = null!;
 
-        private Stack<(ParseState, FlowContainer?)>? _stack;
-        private FlowContainer? _currentFlow;
-        private bool _insideBranch;
+        private List<ParseState> _states = null!;
 
-        public BmsParser(Stream stream)
+        public static string ReadRawText(Stream stream)
         {
             string text;
             var pos = stream.Position;
@@ -41,6 +38,28 @@ namespace LivreNoirLibrary.Media.Bms
                 using StreamReader reader = new(stream, BmsConstants.DefaultEncoding, false, -1, true);
                 text = reader.ReadToEnd();
             }
+            return text;
+        }
+
+        public static bool TryGetBase(ReadOnlySpan<char> line, out int radix)
+        {
+            if (Regex_Radix.IsMatch(line))
+            {
+                // "#BASE" より後ろの部分
+                line = line[5..].Trim();
+                if (int.TryParse(line, out var value))
+                {
+                    radix = value;
+                    return true;
+                }
+            }
+            radix = 0;
+            return false;
+        }
+
+        public BmsParser(Stream stream)
+        {
+            var text = ReadRawText(stream);
             RawText = text;
             // #BASE と #LNOBJ は一度だけ適用する
             var radix = BmsConstants.Base_Default;
@@ -48,14 +67,9 @@ namespace LivreNoirLibrary.Media.Bms
             foreach (var line in text.EnumerateLines())
             {
                 var span = line.TrimStart();
-                if (Regex_Radix.IsMatch(span))
+                if (TryGetBase(span, out var value))
                 {
-                    // "#BASE" より後ろの部分
-                    span = span[5..].Trim();
-                    if (int.TryParse(span, out var value))
-                    {
-                        radix = value;
-                    }
+                    radix = value;
                 }
                 else if (Regex_LnObj.IsMatch(span))
                 {
@@ -74,21 +88,9 @@ namespace LivreNoirLibrary.Media.Bms
         {
             BeginConstruct(target);
 
-            (string, Action<int>)[] flowActions = [
-                    (Tags.Random, StartRandom),
-                    ("#RONDAM", StartRandom), // for typo
-                    (Tags.SetRandom, StartSetRandom),
-                    ("#SET RANDOM", StartSetRandom), // fallback
-                    (Tags.Switch, StartSwitch),
-                    (Tags.SetSwitch, StartSetSwitch),
-                    ("#SET SWITCH", StartSetSwitch), // fallback
-                    (Tags.If, StartIf),
-                    (Tags.ElseIf, StartElseIf),
-                    ("#ELIF", StartElseIf), // fallback
-                    ("#ELSE IF", StartElseIf), // fallback
-                    (Tags.Case, StartCase),
-                ];
             var radix = Radix;
+            var flowActions = _flowActions;
+            var endFlowActions = _endFlowActions;
 
             var lineNumber = 0;
             foreach (var line in RawText.EnumerateLines())
@@ -104,45 +106,24 @@ namespace LivreNoirLibrary.Media.Bms
                             // Process Random
                             foreach (var (expr, action) in flowActions)
                             {
-                                if (TryGetFlow(line, expr, out var value))
+                                if (TryGetFlow(span, expr, out var value))
                                 {
-                                    action(value);
+                                    action(this, value);
                                     goto AfterProcess;
                                 }
                             }
-                            if (Regex_EndRandom.IsMatch(line))
+                            foreach (var (expr, action) in endFlowActions)
                             {
-                                EndRandom();
+                                if (IsMatch(span, expr))
+                                {
+                                    action(this);
+                                    goto AfterProcess;
+                                }
                             }
-                            else if (Regex_EndSwitch.IsMatch(line))
-                            {
-                                EndSwitch();
-                            }
-                            else if (Regex_Else.IsMatch(line))
-                            {
-                                StartElse();
-                            }
-                            else if (Regex_EndIf.IsMatch(line))
-                            {
-                                EndIf();
-                            }
-                            else if (Regex_Default.IsMatch(line))
-                            {
-                                StartDefault();
-                            }
-                            else if (Regex_Skip.IsMatch(line))
-                            {
-                                Skip();
-                            }
-                            else
-                            {
-                                goto ProcessDef;
-                            }
-                            goto AfterProcess;
-                        ProcessDef:
+                            // Process Definitions
                             foreach (var (tag, type) in DefTags)
                             {
-                                if (TryGetDef(line, tag, radix, out var key, out var value))
+                                if (TryGetDef(span, tag, radix, out var key, out var value))
                                 {
                                     if (type is >= DefType.Bpm and <= DefType.Speed)
                                     {
@@ -156,7 +137,7 @@ namespace LivreNoirLibrary.Media.Bms
                                 }
                             }
                             // Process Channel
-                            if (TryGetChannel(line, out var number, out var channel, out var valueSpan))
+                            if (TryGetChannel(span, out var number, out var channel, out var valueSpan))
                             {
                                 if (channel is Channel.Bar)
                                 {
@@ -172,7 +153,7 @@ namespace LivreNoirLibrary.Media.Bms
                                 }
                             }
                             // Process Header
-                            else if (TryGetHeader(line, out var key, out var value))
+                            else if (TryGetHeader(span, out var key, out var value))
                             {
                                 AddHeader(key, value);
                             }
@@ -184,7 +165,7 @@ namespace LivreNoirLibrary.Media.Bms
                             OnLineProcessed(lineNumber);
                         }
                         // フィールド区切りではない
-                        else if (!FieldSeparators.IsMatch(span))
+                        else if (!FieldSeparators.IsMatch(line))
                         {
                             AddComment(line);
                         }
@@ -211,20 +192,22 @@ namespace LivreNoirLibrary.Media.Bms
             _root = target;
             target.Clear();
             target.LnObj = LnObj;
-            _comments = new();
-            _stack = [];
-            _states = [];
-            _conductorDefs = [];
-            _current = new(target.Root);
+            _current = new(FlowAddress.Empty, target.Root, null);
+
+            _comments ??= new();
+            _comments.Clear();
+
+            _states ??= [];
+            _states.Clear();
             _states.Add(_current);
         }
 
         private void OnLineProcessed(int lineNumber)
         {
-            var comments = _comments!;
+            var comments = _comments;
             if (comments.Length is > 0)
             {
-                _current!.Comments.Add(comments.ToString());
+                _current.Comments.Add(comments.ToString());
                 comments.Clear();
             }
         }
@@ -233,21 +216,82 @@ namespace LivreNoirLibrary.Media.Bms
         {
             foreach (var state in _states.AsSpan())
             {
-                ResolveConductor(state);
+                state.Data.Note = string.Join(Environment.NewLine, state.Comments);
+                var radix = Radix;
+                var tl = state.Data.Timeline;
+                foreach (var (channel, list) in state.UnProcessedLines)
+                {
+                    var defType = channel switch
+                    {
+                        Channel.Bpm => DefType.Bpm,
+                        Channel.Stop => DefType.Stop,
+                        Channel.Scroll => DefType.Scroll,
+                        Channel.Speed => DefType.Speed,
+                        _ => DefType.None,
+                    };
+                    if (!CanResolveConductor(state, defType))
+                    {
+                        continue;
+                    }
+                    foreach (var (number, line) in list.AsSpan())
+                    {
+                        var span = line.AsSpan();
+                        var den = span.Length / 2;
+                        for (var i = 0; i < den; i++)
+                        {
+                            if (BasedNumber.TryParseToShort(span[..2], radix, out var key) && TryGetConductorDef(state, defType, key, out var value))
+                            {
+                                tl.Add(new(number + (double)i / den), new Note(channel, value));
+                            }
+                            span = span[2..];
+                        }
+                    }
+                }
+            }
+        }
+
+        static bool CanResolveConductor(ParseState state, DefType type)
+        {
+            if (state.ConductorDefs.ContainsKey(type))
+            {
+                return true;
+            }
+            if (state.Parent is { } parent)
+            {
+                return CanResolveConductor(parent, type);
+            }
+            return false;
+        }
+
+        static bool TryGetConductorDef(ParseState state, DefType type, short key, out double value)
+        {
+            if (state.ConductorDefs.TryGetValue(type, out var dic) && 
+                dic.TryGetValue(key, out value))
+            {
+                return true;
+            }
+            if (state.Parent is { } parent)
+            {
+                return TryGetConductorDef(parent, type, key, out value);
+            }
+            else
+            {
+                value = default;
+                return false;
             }
         }
 
         private void AddComment(ReadOnlySpan<char> line)
         {
-            if (line.Length is > 0 && !line.IsWhiteSpace())
+            if (!line.IsWhiteSpace())
             {
-                _comments!.AppendLine(new(line));
+                _comments.AppendLine(new(line));
             }
         }
 
         private void AddHeader(ReadOnlySpan<char> key, ReadOnlySpan<char> value)
         {
-            var data = _current!.Data;
+            var data = _current.Data;
             if (Enum.TryParse<HeaderType>(key, true, out var type))
             {
                 if (type is HeaderType.Base or HeaderType.LnObj)
@@ -262,51 +306,16 @@ namespace LivreNoirLibrary.Media.Bms
             }
         }
 
-        private void AddDef(DefType type, short key, ReadOnlySpan<char> value) => _current!.Data.DefLists.Set(type, key, new(value));
-        private void AddConductorDef(DefType type, short key, double value) => _conductorDefs!.GetOrAdd(type)[key] = value;
-        private void SetBarLength(int number, double value) => _current!.Data.BarDefs.Set(number, value);
+        private void AddDef(DefType type, short key, ReadOnlySpan<char> value) => _current.Data.DefLists.Set(type, key, new(value));
+        private void AddConductorDef(DefType type, short key, double value) => _current.ConductorDefs.GetOrAdd(type)[key] = value;
+        private void SetBarLength(int number, double value) => _current.Data.BarDefs.Set(number, value);
 
-        private void AddConductorLine(int number, Channel channel, ReadOnlySpan<char> value) => _current!.UnProcessedLines.GetOrAdd(channel).Add((number, new(value)));
-
-        private void ResolveConductor(ParseState state)
-        {
-            state.Data.Note = string.Join(Environment.NewLine, state.Comments);
-            var radix = Radix;
-            var tl = state.Data.Timeline;
-            var defs = _conductorDefs!;
-            foreach (var (channel, list) in state.UnProcessedLines)
-            {
-                var defType = channel switch
-                {
-                    Channel.Bpm => DefType.Bpm,
-                    Channel.Stop => DefType.Stop,
-                    Channel.Scroll => DefType.Scroll,
-                    Channel.Speed => DefType.Speed,
-                    _ => DefType.None,
-                };
-                if (!defs.TryGetValue(defType, out var def))
-                {
-                    continue;
-                }
-                foreach (var (number, line) in list.AsSpan())
-                {
-                    var span = line.AsSpan();
-                    var den = span.Length / 2;
-                    for (var i = 0; i < den; i++)
-                    {
-                        if (BasedNumber.TryParseToShort(span[..2], radix, out var key) && def.TryGetValue(key, out var value))
-                        {
-                            tl.Add(new(number + (double)i / den), new Note(channel, value));
-                        }
-                        span = span[2..];
-                    }
-                }
-            }
-        }
+        private void AddConductorLine(int number, Channel channel, ReadOnlySpan<char> value) => _current.UnProcessedLines.GetOrAdd(channel).Add((number, new(value)));
 
         private void AddNormalLine(int number, Channel channel, ReadOnlySpan<char> value)
         {
-            var tl = _current!.Data.Timeline;
+            var state = _current;
+            var tl = state.Data.Timeline;
             Func<short, Note> noteCreator;
             if (channel is Channel.Bpm_Base)
             {
@@ -314,7 +323,7 @@ namespace LivreNoirLibrary.Media.Bms
             }
             else if (channel is Channel.Bgm)
             {
-                var counts = _current.BgmLaneCounts;
+                var counts = state.BgmLaneCounts;
                 if (!counts.TryGetValue(number, out var count))
                 {
                     count = 0;
@@ -331,13 +340,13 @@ namespace LivreNoirLibrary.Media.Bms
                 {
                     NoteType.LongEnd => v =>
                     {
-                        if (_current.LastLongNotes.Remove(lane))
+                        if (state.LastLongNotes.Remove(lane))
                         {
                             return new(lane, NoteType.LongEnd, v);
                         }
                         else
                         {
-                            _current.LastLongNotes.Add(lane);
+                            state.LastLongNotes.Add(lane);
                             return new(lane, v);
                         }
                     }
@@ -364,7 +373,7 @@ namespace LivreNoirLibrary.Media.Bms
 
         private void ApplyComment(INoteObject obj)
         {
-            var comments = _comments!;
+            var comments = _comments;
             if (comments.Length is > 0)
             {
                 obj.Note = comments.ToString();
@@ -372,7 +381,9 @@ namespace LivreNoirLibrary.Media.Bms
             }
         }
 
-        private void StartFlow(FlowType type, int max, bool isFixed)
+        private static string GetIndented(FlowAddress address) => new(' ', (address.Length - 1) * 2);
+
+        private static void StartFlow(BmsParser parser, FlowType type, int max, bool isFixed)
         {
             // 想定される構造
             // 01 #RANDOM 3
@@ -380,112 +391,218 @@ namespace LivreNoirLibrary.Media.Bms
             // 03     (contents)
             // 04   #ENDIF
             // 06 #RANDOM 3
+
             // - 05 #ENDRANDOMが省略されている
-            //   - 現在のフローを終了する
-            if (_currentFlow is not null)
-            {
-                EndFlow();
-            }
-            var data = _current!.Data;
+            // 現在のフローを強制終了(記述が正確な場合、StartFlowはフローの外で起こるはず)
+            parser.TryEndFlow(out _);
+
+            var current = parser._current;
+            var data = current.Data;
             var flow = new FlowContainer
             {
                 Type = type,
                 Max = max,
                 IsFixed = isFixed
             };
-            ApplyComment(flow);
+            parser.ApplyComment(flow);
             data.Flows.Add(flow);
-            _currentFlow = flow;
-            _insideBranch = false;
+            var address = current.Address.Append(data.Flows.Count);
+            current.CurrentFlow = flow;
+            current.CurrentFlowAddress = address;
+            //Console.WriteLine($"{GetIndented(address)}Start{type} address={address}, max={max}, isFixed={isFixed}");
         }
 
-        private void EndFlow()
+        private bool TryEndFlow([MaybeNullWhen(false)]out FlowContainer flow)
+        {
+            var current = _current;
+            if (current.CurrentFlow is { } f)
+            {
+                current.CurrentFlow = null;
+                //var address = current.CurrentFlowAddress;
+                //Console.WriteLine($"{GetIndented(address)}End{f.Type} address={address}");
+                flow = f;
+                return true;
+            }
+            flow = default;
+            return false;
+        }
+
+        private static void EndFlow(BmsParser parser, FlowType type)
         {
             // 想定される構造
-            // 06 #RANDOM 3
-            // 07  #IF 2
-            // 08    (contents)
-            // 10 #ENDRANDOM
-            // - 09 #ENDIFが省略されている
-            //   - 現在のブランチでフローが開始していないにも関わらず、フローを終了しようとしている
-            if (_currentFlow is null)
+            // 01 #RANDOM 3
+            // 02  #IF 2
+            // 03    (contents)
+            // 04    #SWITCH
+            // 07 #ENDRANDOM
+
+            // 正常終了
+            if (parser.TryEndFlow(out var flow))
             {
-                EndBranch();
+                // - 05 #ENDSWが省略されている
+                // 期待した種類ではないフローを終了した
+                if (flow.Type != type)
+                {
+                    // 改めてフロー終了を試みる
+                    EndFlow(parser, type);
+                }
             }
-            _currentFlow = null;
+            // - 06 #ENDIFが省略されている
+            // フローの外側でフローを終了しようとしている場合、ブランチの終了を試みる
+            else if (parser.TryEndBranch(out _))
+            {
+                // 改めてフロー終了を試みる
+                EndFlow(parser, type);
+            }
         }
 
-        private void StartBranch(int value)
+        private static void StartBranch(BmsParser parser, FlowType type, int value)
         {
             // 想定される構造
             // 01 #RANDOM 3
             // 02   #IF 1
             // 03     (contents)
-            // 04   #IF 2
-            // 05     (contents)
-            // 07   #ENDIF
-            // 08 #ENDRANDOM
-            // - 04 フローの外でブランチが開始している
-            //   - ブランチの終了タグが省略されているとみなして、現在のブランチを終了
-            if (_insideBranch)
+            // 04     #SWITCH 3
+            // 05       #CASE 1
+            // 07       #CASE 2
+            // 08       #SKIP
+            // 10   #IF 2
+            // 11     (contents)
+            // 12   #ENDIF
+            // 13 #ENDRANDOM
+
+            var current = parser._current;
+            // フローの内側
+            if (current.CurrentFlow is { } flow)
             {
-                EndBranch();
+                // フローの種類と始めようとしているブランチの種類が一致(正常な開始)
+                if (flow.Type == type)
+                {
+                    var branch = flow.GetOrAddBranch(value);
+                    var data = parser._root.GetBranchData(branch);
+                    var address = current.CurrentFlowAddress.Append(value);
+                    //Console.WriteLine($"{GetIndented(address)}StartBranch address={address}, cond={branch.Condition}, dataIndex={branch.DataIndex}");
+                    parser.ApplyComment(branch);
+                    var newState = new ParseState(address, data, current);
+                    parser._states.Add(newState);
+                    parser._current = newState;
+                }
+                // フローとは異なる種類のブランチを開始しようとしている場合
+                else
+                {
+                    // 現在のフローを強制終了
+                    parser.TryEndFlow(out _);
+                    // 改めてブランチ開始を試みる
+                    StartBranch(parser, type, value);
+                }
             }
-            if (_currentFlow is { } flow)
+            // フローの外側でブランチを開始しようとしている場合、ブランチの終了を試みる
+            else if (parser.TryEndBranch(out _))
             {
-                _stack!.Push((_current!, flow));
-                var branch = flow.GetOrAddBranch(value);
-                var data = _root!.GetBranchData(branch);
-                ApplyComment(branch);
-                _current = new(data);
-                _states!.Add(_current);
-                _currentFlow = null;
-                _insideBranch = true;
+                // 改めてブランチ開始を試みる
+                StartBranch(parser, type, value);
             }
         }
 
-        private void EndBranch()
+        private bool TryEndBranch(out FlowType type)
         {
-            if (_insideBranch && _stack!.TryPop(out var item))
+            var current = _current;
+            if (current.Parent is { } parent)
             {
-                (_current, _currentFlow) = item;
+                //var address = current.Address;
+                type = current.ParentFlowType;
+                //Console.WriteLine($"{GetIndented(address)}EndBranch of {type} address={address}");
+                _current = parent;
+                return true;
+            }
+            type = FlowType.None;
+            return false;
+        }
+
+        private static void EndBranch(BmsParser parser, FlowType type)
+        {
+            // 想定される構造
+            // 01 #RANDOM 3
+            // 02  #IF 2
+            // 03    (contents)
+            // 04    #SWITCH
+            // 05    #CASE 1
+            // 08 #ENDIF
+
+            // 正常終了
+            if (parser.TryEndBranch(out var actualType))
+            {
+                // -06 #SKIPが省略されている
+                // 期待した種類ではないブランチを終了した
+                if (actualType != type)
+                {
+                    // 改めてブランチ終了を試みる
+                    EndBranch(parser, type);
+                }
+            }
+            // -07 #ENDSWが省略されている
+            // ブランチの外側でブランチを終了しようとしている場合、フローの終了を試みる
+            else if (parser.TryEndFlow(out _))
+            {
+                // 改めてブランチ終了を試みる
+                EndBranch(parser, type);
             }
         }
 
-        private void StartRandom(int value) => StartFlow(FlowType.Random, value, false);
-        private void StartSetRandom(int value) => StartFlow(FlowType.Random, value, true);
-        private void StartIf(int value) => StartBranch(value);
-        private void StartElseIf(int value) => StartBranch(value);
-        private void StartElse() => StartBranch(BmsConstants.DefaultCondition);
-        private void EndIf() => EndBranch();
-        private void EndRandom() => EndFlow();
+        private static void StartRandom(BmsParser parser, int value) => StartFlow(parser, FlowType.Random, value, false);
+        private static void StartSetRandom(BmsParser parser, int value) => StartFlow(parser, FlowType.Random, value, true);
+        private static void StartIf(BmsParser parser, int value) => StartBranch(parser, FlowType.Random, value);
+        private static void StartElseIf(BmsParser parser, int value) => StartBranch(parser, FlowType.Random, value);
+        private static void StartElse(BmsParser parser) => StartBranch(parser, FlowType.Random, BmsConstants.DefaultCondition);
+        private static void EndIf(BmsParser parser) => EndBranch(parser, FlowType.Random);
+        private static void EndRandom(BmsParser parser) => EndFlow(parser, FlowType.Random);
 
-        private void StartSwitch(int value) => StartFlow(FlowType.Switch, value, false);
-        private void StartSetSwitch(int value) => StartFlow(FlowType.Switch, value, true);
-        private void StartCase(int value) => StartBranch(value);
-        private void StartDefault() => StartBranch(BmsConstants.DefaultCondition);
-        private void Skip() => EndBranch();
-        private void EndSwitch() => EndFlow();
+        private static void StartSwitch(BmsParser parser, int value) => StartFlow(parser, FlowType.Switch, value, false);
+        private static void StartSetSwitch(BmsParser parser, int value) => StartFlow(parser, FlowType.Switch, value, true);
+        private static void StartCase(BmsParser parser, int value) => StartBranch(parser, FlowType.Switch, value);
+        private static void StartDefault(BmsParser parser) => StartBranch(parser, FlowType.Switch, BmsConstants.DefaultCondition);
+        private static void Skip(BmsParser parser) => EndBranch(parser, FlowType.Switch);
+        private static void EndSwitch(BmsParser parser) => EndFlow(parser, FlowType.Switch);
+
+        private static readonly (string, Action<BmsParser, int>)[] _flowActions =
+        [
+            (Tags.Random, StartRandom),
+            ("#RONDAM", StartRandom), // for typo
+            ("#RANDON", StartRandom), // for typo
+            (Tags.SetRandom, StartSetRandom),
+            ("#SET RANDOM", StartSetRandom), // fallback
+            (Tags.Switch, StartSwitch),
+            (Tags.SetSwitch, StartSetSwitch),
+            ("#SET SWITCH", StartSetSwitch), // fallback
+            (Tags.If, StartIf),
+            (Tags.ElseIf, StartElseIf),
+            ("#ELIF", StartElseIf), // fallback
+            ("#ELSE IF", StartElseIf), // fallback
+            (Tags.Case, StartCase),
+        ];
+
+        private static readonly (string, Action<BmsParser>)[] _endFlowActions =
+        [
+            (Tags.EndRandom, EndRandom),
+            ("#END RANDOM", EndRandom), // fallback
+            (Tags.EndSwitch, EndSwitch),
+            ("#ENDSWITCH", EndSwitch), // fallback
+            ("#END SWITCH", EndSwitch), // fallback
+            (Tags.EndIf, EndIf),
+            (Tags.Skip, Skip),
+            (Tags.Else, StartElse),
+            (Tags.Default, StartDefault),
+            ("#DEFAULT", StartDefault), // fallback
+        ];
 
         [GeneratedRegex(@"^#BASE\s+(\d+)", RegexOptions.IgnoreCase)]
         private static partial Regex Regex_Radix { get; }
+
         [GeneratedRegex(@"^#LNOBJ\s+(\w+)", RegexOptions.IgnoreCase)]
         private static partial Regex Regex_LnObj { get; }
+
         [GeneratedRegex(@"^#\d{3}[0-9a-zA-Z]{2}.")]
         private static partial Regex Regex_Channel { get; }
-
-        [GeneratedRegex(@"^#END\s*RANDOM\s*$", RegexOptions.IgnoreCase)]
-        private static partial Regex Regex_EndRandom { get; }
-        [GeneratedRegex(@"^#END\s*SW(?:ITCH)?\s*$", RegexOptions.IgnoreCase)]
-        private static partial Regex Regex_EndSwitch { get; }
-        [GeneratedRegex(@"^#ELSE\s*$", RegexOptions.IgnoreCase)]
-        private static partial Regex Regex_Else { get; }
-        [GeneratedRegex(@"^#END\s*IF\s*$", RegexOptions.IgnoreCase)]
-        private static partial Regex Regex_EndIf { get; }
-        [GeneratedRegex(@"^#DEF(?:AULT)?\s*$", RegexOptions.IgnoreCase)]
-        private static partial Regex Regex_Default { get; }
-        [GeneratedRegex(@"^#SKIP\s*$", RegexOptions.IgnoreCase)]
-        private static partial Regex Regex_Skip { get; }
 
         private static readonly (string, DefType)[] DefTags = [
             (Tags.Wav, DefType.Wav),
@@ -508,9 +625,12 @@ namespace LivreNoirLibrary.Media.Bms
 
         private static bool IsDelimiter(char c) => char.GetUnicodeCategory(c) is UnicodeCategory.SpaceSeparator or UnicodeCategory.OtherPunctuation;
 
+        private static bool IsMatch(ReadOnlySpan<char> line, ReadOnlySpan<char> expression)
+            => line.StartsWith(expression, StringComparison.OrdinalIgnoreCase);
+
         private static bool TryGetFlow(ReadOnlySpan<char> line, ReadOnlySpan<char> flowExpression, out int value)
         {
-            if (line.StartsWith(flowExpression, StringComparison.OrdinalIgnoreCase))
+            if (IsMatch(line, flowExpression))
             {
                 if (int.TryParse(line[flowExpression.Length..].Trim(), out value))
                 {
@@ -531,7 +651,7 @@ namespace LivreNoirLibrary.Media.Bms
             {
                 return false;
             }
-            if (line.StartsWith(defExpression, StringComparison.InvariantCultureIgnoreCase) && 
+            if (IsMatch(line, defExpression) && 
                 // インデックスは2桁で固定
                 BasedNumber.TryParseToShort(line.Slice(defLength, 2), radix, out key))
             {

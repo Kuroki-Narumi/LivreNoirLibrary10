@@ -294,12 +294,12 @@
         <Setter Property="Foreground" Value="Gray"/>
         <Setter Property="VerticalAlignment" Value="Bottom"/>
     </Style>
-    
-    <DataTemplate x:Key="FontSelectorTemplate_NoSource" DataType="local:FontSelectorItem">
+
+    <DataTemplate x:Key="FontSelectorTemplate_NoSource" DataType="media:FontInfo">
         <TextBlock Style="{StaticResource TextBlockStyle_FontName}" Margin="0,2" VerticalAlignment="Center" HorizontalAlignment="Left"/>
     </DataTemplate>
 
-    <DataTemplate x:Key="FontSelectorTemplate_WithSource" DataType="local:FontSelectorItem">
+    <DataTemplate x:Key="FontSelectorTemplate_WithSource" DataType="media:FontInfo">
         <StackPanel Orientation="Horizontal" Margin="0,2" VerticalAlignment="Center" HorizontalAlignment="Left">
             <TextBlock Style="{StaticResource TextBlockStyle_FontName}"/>
             <TextBlock Style="{StaticResource TextBlockStyle_FontSource}"/>
@@ -337,7 +337,7 @@
                                 <ColumnDefinition Width="Auto"/>
                                 <ColumnDefinition Width="*"/>
                             </Grid.ColumnDefinitions>
-                            <local:IconPresenter x:Name="icon" Grid.Column="0" VerticalAlignment="Center" Width="{TemplateBinding IconSize}" Source="{TemplateBinding Icon}" Stretch="{TemplateBinding IconStretch}" FontFamily="{TemplateBinding IconFontFamily}" Foreground="{TemplateBinding Foreground}"/>
+                            <local:IconPresenter x:Name="icon" Grid.Column="0" VerticalAlignment="Center" Height="{TemplateBinding IconSize}" Source="{TemplateBinding Icon}" Stretch="{TemplateBinding IconStretch}" FontFamily="{TemplateBinding IconFontFamily}" Foreground="{TemplateBinding Foreground}"/>
                             <Rectangle x:Name="padding" Grid.Column="1" Width="{TemplateBinding IconPadding}"/>
                             <StackPanel Orientation="Vertical" Grid.Column="2" VerticalAlignment="Center">
                                 <ContentPresenter x:Name="content"/>
@@ -408,7 +408,7 @@
                                     <Rectangle x:Name="indeterminateMark" Fill="{StaticResource OptionMark.Static.Glyph}" Margin="2" Opacity="0"/>
                                 </Grid>
                             </Border>
-                            <local:IconPresenter x:Name="icon" Grid.Column="1" VerticalAlignment="Center" Width="{TemplateBinding IconSize}" Source="{TemplateBinding Icon}" Stretch="{TemplateBinding IconStretch}" FontFamily="{TemplateBinding IconFontFamily}" Foreground="{TemplateBinding Foreground}"/>
+                            <local:IconPresenter x:Name="icon" Grid.Column="1" VerticalAlignment="Center" Height="{TemplateBinding IconSize}" Source="{TemplateBinding Icon}" Stretch="{TemplateBinding IconStretch}" FontFamily="{TemplateBinding IconFontFamily}" Foreground="{TemplateBinding Foreground}"/>
                             <Rectangle x:Name="padding" Grid.Column="2" Width="{TemplateBinding IconPadding}"/>
                             <StackPanel Orientation="Vertical" Grid.Column="3" VerticalAlignment="Center">
                                 <ContentPresenter x:Name="content"/>
@@ -484,7 +484,7 @@
                             <Border x:Name="border_option" Background="{TemplateBinding Background}" BorderBrush="{StaticResource Brush_Border}" BorderThickness="1" CornerRadius="100" Margin="0,0,2,0" VerticalAlignment="Center">
                                 <Ellipse x:Name="optionMark" Margin="2" Fill="{StaticResource OptionMark.Static.Glyph}" MinWidth="6" MinHeight="6" Opacity="0"/>
                             </Border>
-                            <local:IconPresenter x:Name="icon" Grid.Column="1" VerticalAlignment="Center" Width="{TemplateBinding IconSize}" Source="{TemplateBinding Icon}" Stretch="{TemplateBinding IconStretch}" FontFamily="{TemplateBinding IconFontFamily}" Foreground="{TemplateBinding Foreground}"/>
+                            <local:IconPresenter x:Name="icon" Grid.Column="1" VerticalAlignment="Center" Height="{TemplateBinding IconSize}" Source="{TemplateBinding Icon}" Stretch="{TemplateBinding IconStretch}" FontFamily="{TemplateBinding IconFontFamily}" Foreground="{TemplateBinding Foreground}"/>
                             <Rectangle x:Name="padding" Grid.Column="2" Width="{TemplateBinding IconPadding}"/>
                             <StackPanel Orientation="Vertical" Grid.Column="3" VerticalAlignment="Center">
                                 <ContentPresenter x:Name="content"/>
@@ -568,7 +568,7 @@
                 <ControlTemplate TargetType="local:PopupHelpButton">
                     <Grid>
                         <Border x:Name="templateRoot" CornerRadius="{TemplateBinding CornerRadius}" Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}">
-                            <local:IconPresenter Margin="{TemplateBinding IconPadding}" VerticalAlignment="{TemplateBinding VerticalContentAlignment}" HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}" Width="{TemplateBinding IconSize}" Source="{x:Static local:Icons.Help}"/>
+                            <local:IconPresenter Margin="{TemplateBinding IconPadding}" VerticalAlignment="{TemplateBinding VerticalContentAlignment}" HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}" Height="{TemplateBinding IconSize}" Source="{x:Static local:Icons.Help}"/>
                         </Border>
                         <Popup x:Name="popup" PlacementTarget="{Binding ElementName=templateRoot}" Placement="{TemplateBinding PopupPlacement}">
                             <Border Style="{StaticResource HelpPopupContent}">

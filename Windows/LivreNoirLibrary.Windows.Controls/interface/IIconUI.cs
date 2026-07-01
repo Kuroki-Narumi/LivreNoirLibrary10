@@ -6,7 +6,7 @@ namespace LivreNoirLibrary.Windows.Controls
     public interface IIconUI
     {
         const double DefaultIconSize = 16;
-        const Stretch DefaultIconStretch = Stretch.UniformToFill;
+        const Stretch DefaultIconStretch = Stretch.Uniform;
 
         static readonly DependencyProperty IconProperty = PropertyUtils.RegisterAttachedTwoWay<object>(typeof(PropertyHolder));
         static readonly DependencyProperty IconSizeProperty = PropertyUtils.RegisterAttachedTwoWay(typeof(PropertyHolder), DefaultIconSize);

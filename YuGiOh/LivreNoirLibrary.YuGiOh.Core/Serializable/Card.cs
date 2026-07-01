@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Text.Json.Serialization;
 
 namespace LivreNoirLibrary.YuGiOh.Serializable
@@ -32,8 +31,5 @@ namespace LivreNoirLibrary.YuGiOh.Serializable
 
         [JsonPropertyName(JsonPropertyNames.PendulumInfo)]
         public PendulumInfo? PendulumInfo { get; set; }
-
-        [JsonPropertyName(JsonPropertyNames.PackInfo)]
-        public List<PackInfo>? PackInfo { get; set; }
     }
 }

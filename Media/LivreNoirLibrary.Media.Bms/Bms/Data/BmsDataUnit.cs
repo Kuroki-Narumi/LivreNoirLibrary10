@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace LivreNoirLibrary.Media.Bms
 {
-    public partial class BaseData : INoteObject, IBmsDataUnit
+    public partial class BmsDataUnit : INoteObject, IBmsDataUnit
     {
         public string? Note { get; set; }
         public SortedDictionary<HeaderType, string> MainHeaders { get; } = [];

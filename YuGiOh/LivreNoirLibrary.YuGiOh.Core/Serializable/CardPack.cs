@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Text.Json.Serialization;
 
 namespace LivreNoirLibrary.YuGiOh.Serializable
@@ -14,5 +15,8 @@ namespace LivreNoirLibrary.YuGiOh.Serializable
         [JsonPropertyName(JsonPropertyNames.Date)]
         [JsonConverter(typeof(Converters.DateOnlyJsonConverter))]
         public DateTime Date { get; set; }
+
+        [JsonPropertyName(JsonPropertyNames.Cards)]
+        public List<CardPackItem> Cards { get; set; } = [];
     }
 }

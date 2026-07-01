@@ -10,7 +10,7 @@
         xmlns:media="clr-namespace:LivreNoirLibrary.Windows.Media;assembly=LivreNoirLibrary.Windows.Media"
         xmlns:conv="clr-namespace:LivreNoirLibrary.Windows.Converters;assembly=LivreNoirLibrary.Windows.Controls"
         mc:Ignorable="d" d:DataContext="{d:DesignInstance Type=local:MainWindow}"
-        Title="MainWindow" Height="540" Width="880" FontSize="14">
+        Title="MainWindow" Height="540" Width="880" FontSize="14" UseLayoutRounding="True">
     <TabControl>
         <TabItem Header="BMS">
             <local:Unit_Bms x:Name="Unit_Bms"/>
@@ -23,6 +23,9 @@
         </TabItem>
         <TabItem Header="Icon">
             <local:Unit_Icon x:Name="Unit_Icon"/>
+        </TabItem>
+        <TabItem Header="YuGiOh">
+            <local:Unit_YuGiOh x:Name="Unit_YuGiOh"/>
         </TabItem>
     </TabControl>
 </Window>

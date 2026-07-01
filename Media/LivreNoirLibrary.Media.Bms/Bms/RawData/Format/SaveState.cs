@@ -10,9 +10,9 @@ namespace LivreNoirLibrary.Media.Bms
         private class SaveState
         {
             public readonly SortedDictionary<int, Bar> _bars = [];
-            public long MaxDenominator { get; private set; }
+            public long MaxResolution { get; private set; }
 
-            public SaveState(IBmsDataUnit data, int lnObj, Dictionary<DefType, OrderedDictionary<double, int>> conductorDefs, ref int radix)
+            public SaveState(IBmsDataUnit data, int lnObj, Dictionary<DefType, OrderedDictionary<double, int>> conductorDefs, ref int radix, long resolutionLimit)
             {
                 foreach (var (_, list) in data.DefLists.EnumerateList())
                 {
@@ -43,11 +43,11 @@ namespace LivreNoirLibrary.Media.Bms
                                 dic.Add(value, index);
                                 UpdateRadix(index, ref radix);
                             }
-                            bar.Add(ch, beat, index);
+                            bar.Add(ch, beat, index, resolutionLimit);
                         }
                         else
                         {
-                            bar.Add(Channel.Bpm_Base, beat, (int)value);
+                            bar.Add(Channel.Bpm_Base, beat, (int)value, resolutionLimit);
                         }
                     }
                     else
@@ -59,7 +59,7 @@ namespace LivreNoirLibrary.Media.Bms
                         }
                         if (ch.IsBgm())
                         {
-                            bar.AddBgm(ch, beat, intVal, ref bgmOffset);
+                            bar.AddBgm(ch, beat, intVal, ref bgmOffset, resolutionLimit);
                             continue;
                         }
                         else if (ch.IsKey())
@@ -73,7 +73,7 @@ namespace LivreNoirLibrary.Media.Bms
                                         ch = ch.ToLong();
                                     }
                                     var (pp, pn) = prev;
-                                    bars.GetOrAdd(pp.Bar).Add(ch, pp.Offset, (int)pn.Value);
+                                    bars.GetOrAdd(pp.Bar).Add(ch, pp.Offset, (int)pn.Value, resolutionLimit);
                                 }
                             }
 
@@ -103,19 +103,19 @@ namespace LivreNoirLibrary.Media.Bms
                                     break;
                             }
                         }
-                        bar.Add(ch, beat, intVal);
+                        bar.Add(ch, beat, intVal, resolutionLimit);
                     }
                 }
                 foreach (var (_, (pp, pn)) in lastNote)
                 {
-                    bars.GetOrAdd(pp.Bar).Add(pn.Channel, pp.Offset, (int)pn.Value);
+                    bars.GetOrAdd(pp.Bar).Add(pn.Channel, pp.Offset, (int)pn.Value, resolutionLimit);
                 }
-                var maxDen = 0L;
+                var resol = 0L;
                 foreach (var (_, bar) in bars)
                 {
-                    maxDen = Math.Max(maxDen, bar.GetMaxDenominator());
+                    resol = Math.Max(resol, bar.GetMaxResolution());
                 }
-                MaxDenominator = maxDen;
+                MaxResolution = resol;
             }
 
             private static void UpdateRadix(int value, ref int radix)
@@ -130,18 +130,6 @@ namespace LivreNoirLibrary.Media.Bms
                     {
                         radix = BmsConstants.Base_Default;
                     }
-                }
-            }
-
-            public void ReductDenominator(long limit)
-            {
-                if (MaxDenominator < limit)
-                {
-                    foreach (var (_, bar) in _bars)
-                    {
-                        bar.ReductDenominator(limit);
-                    }
-                    MaxDenominator = limit;
                 }
             }
         }

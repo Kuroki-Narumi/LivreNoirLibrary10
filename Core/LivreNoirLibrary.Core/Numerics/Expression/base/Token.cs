@@ -137,7 +137,7 @@ namespace LivreNoirLibrary.Numerics
                 return true;
             }
             token = null;
-            exception = new NotImplementedException($"unknown operator symbol: {symbol}");
+            exception = ExpressionExceptions.UnknownOperatorSymbol(symbol);
             return false;
         }
 
@@ -149,7 +149,7 @@ namespace LivreNoirLibrary.Numerics
                 return true;
             }
             token = null;
-            exception = new NotImplementedException($"unknown operator symbol: {symbol}");
+            exception = ExpressionExceptions.UnknownOperatorSymbol(symbol);
             return false;
         }
     }

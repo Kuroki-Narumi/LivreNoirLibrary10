@@ -22,8 +22,9 @@
                 </ComboBox.ItemTemplate>
             </ComboBox>
             <ct:Button Icon="{x:Static ct:Icons.Save}" Click="OnClick_Save"/>
+            <ct:ColorPicker Margin="4,0"/>
+            <ct:Button Content="ColorTest" Click="OnClick_ColorTest"/>
         </WrapPanel>
-        <ct:ColorPalette Grid.Row="1" x:Name="ColorPalette"/>
-        <ct:IconPresenter Grid.Row="1" Source="{Binding ElementName=ColorPalette}" Stretch="UniformToFill" FontFamily="Meiryo"/>
+        <ct:ColorPalette Grid.Row="1" x:Name="ColorPalette" Background="{x:Static media:MediaUtils.TransparentCheckerBrush}" Click="OnColorClick"/>
     </Grid>
 </UserControl>

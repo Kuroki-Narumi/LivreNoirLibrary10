@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using LivreNoirLibrary.Collections;
 
 namespace LivreNoirLibrary.YuGiOh
 {
@@ -24,11 +23,6 @@ namespace LivreNoirLibrary.YuGiOh
         public const string Attr_Wind = $"{Wind}{Attribute}";
         public const string Attr_Divine = $"{Divine}{Attribute}";
 
-        public static string GetName(this Attribute value) => GetEnumName(value, _attr2name);
-        public static string GetShortName(this Attribute value) => GetEnumName(value, _attr2name_short);
-        public static Attribute GetAttribute(this string? name) => GetEnumValue(name, _name2attr);
-        public static bool TryGetAttribute(this string name, out Attribute type) => TryGetEnumValue(name, _name2attr, out type);
-
         private static readonly Dictionary<Attribute, string> _attr2name = new()
         {
             { YuGiOh.Attribute.Light,  Attr_Light },
@@ -40,18 +34,6 @@ namespace LivreNoirLibrary.YuGiOh
             { YuGiOh.Attribute.Divine, Attr_Divine },
         };
 
-        private static readonly Dictionary<string, Attribute> _name2attr = CreateName2Attr();
-        private static Dictionary<string, Attribute> CreateName2Attr()
-        {
-            var dic = _attr2name.Invert();
-            foreach (var (attr, name) in _attr2name)
-            {
-                dic.Add(name.Replace(Attribute, ""), attr);
-            }
-            AppendEnglishNames(dic);
-            return dic;
-        }
-
         private static readonly Dictionary<Attribute, string> _attr2name_short = new()
         {
             { YuGiOh.Attribute.Light,  Light },
@@ -62,5 +44,22 @@ namespace LivreNoirLibrary.YuGiOh
             { YuGiOh.Attribute.Wind,   Wind },
             { YuGiOh.Attribute.Divine, Divine },
         };
+
+        private static readonly Dictionary<string, Attribute>.AlternateLookup<ReadOnlySpan<char>> _name2attr = CreateName2Attr();
+
+        private static Dictionary<string, Attribute>.AlternateLookup<ReadOnlySpan<char>> CreateName2Attr()
+        {
+            var dic = CreateInvertedDictionary(_attr2name);
+            // "属性"を除いた表記
+            foreach (var (attr, name) in _attr2name_short)
+            {
+                dic[name] = attr;
+            }
+            return dic;
+        }
+
+        public static string GetName(this Attribute value) => GetEnumName(value, _attr2name);
+        public static string GetShortName(this Attribute value) => GetEnumName(value, _attr2name_short);
+        public static Attribute GetAttribute(this ReadOnlySpan<char> name) => GetEnumValue(name, _name2attr);
     }
 }

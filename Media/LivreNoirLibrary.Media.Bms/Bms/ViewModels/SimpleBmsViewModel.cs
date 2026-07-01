@@ -5,7 +5,7 @@ namespace LivreNoirLibrary.Media.Bms.ViewModels
 {
     public class SimpleBmsViewModel(IBmsData? data = null, ITimeCounter? timeCounter = null) : IBmsViewModel
     {
-        private BaseData? _random;
+        private BmsDataUnit? _random;
 
         public IBmsData Data
         {
@@ -22,13 +22,13 @@ namespace LivreNoirLibrary.Media.Bms.ViewModels
         } = data ?? new BmsData();
 
         IBmsData IBmsViewModel.Root => Data;
-        IBmsDataUnit IBmsViewModel.CurrentData => Data.Root;
+        IBmsDataUnit IBmsViewModel.CurrentData => _random ?? Data.Root;
         IEnumerable<IBmsDataUnit> IBmsViewModel.EnumerateParents() => [Data.Root];
         IEnumerable<IBmsDataUnit> IBmsViewModel.ReverseEnumerateParents() => [Data.Root];
 
         IListEnumerable<BarPosition, Note> IBmsViewModel.CurrentTimeline => EnsureRandom().Timeline;
 
-        private BaseData EnsureRandom()
+        private BmsDataUnit EnsureRandom()
         {
             if (_random is null)
             {
@@ -51,7 +51,7 @@ namespace LivreNoirLibrary.Media.Bms.ViewModels
             Data.DetermineRandom(data, ProvideRandom);
         }
 
-        private int ProvideRandom(int max, string? message = null)
+        private int ProvideRandom(FlowAddress address, int max, string? message = null)
         {
             return Random.Shared.Next(max) + 1;
         }

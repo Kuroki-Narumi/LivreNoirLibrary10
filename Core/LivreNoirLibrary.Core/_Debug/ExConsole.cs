@@ -66,8 +66,7 @@ namespace LivreNoirLibrary.Debug
 
         private static void WriteWithStringBuilder(ReadOnlySpan<object?> obj)
         {
-            using var o1 = ObjectPool.Rent<StringBuilder>();
-            var sb = o1.Value;
+            using var o1 = ObjectPool.Rent<StringBuilder>(out var sb);
             sb.Clear();
             sb.Append('(');
             sb.AppendJoin(", ", obj);

@@ -87,6 +87,31 @@ namespace LivreNoirLibrary.SandBox
             e.Effects = DragDropEffects.Copy;
         }
 
+        //private bool OpenBms(string? path) => File.Exists(path) && BmsScreen.OpenBms(path);
+        private bool OpenBms(string? path)
+        {
+            if (File.Exists(path))
+            {
+                Console.WriteLine($"Opening BMS file: {path}");
+                var t = System.Diagnostics.Stopwatch.GetTimestamp();
+                using (var file = File.OpenRead(path))
+                {
+                    var hash1 = System.Security.Cryptography.MD5.HashData(file);
+                    Console.WriteLine($"Hash by MD5: {System.Convert.ToHexString(hash1)} in {System.Diagnostics.Stopwatch.GetElapsedTime(t).TotalMilliseconds}ms");
+                }
+
+                t = System.Diagnostics.Stopwatch.GetTimestamp();
+                var hash = BmsParser.ComputeHashFromFile(path, new MD5HashFunction());
+                Console.WriteLine($"Hash: {System.Convert.ToHexString(hash)} in {System.Diagnostics.Stopwatch.GetElapsedTime(t).TotalMilliseconds}ms");
+
+                t = System.Diagnostics.Stopwatch.GetTimestamp();
+                var ret = BmsScreen.OpenBms(path);
+                Console.WriteLine($"OpenBms in {System.Diagnostics.Stopwatch.GetElapsedTime(t).TotalMilliseconds}ms");
+                return ret;
+            }
+            return false;
+        }
+
         protected override void OnDrop(DragEventArgs e)
         {
             if (BmsVideoCreator.IsPlaying)
@@ -95,7 +120,7 @@ namespace LivreNoirLibrary.SandBox
             }
             foreach (var path in e.GetFileList())
             {
-                if (ExtRegs.BeMusic.IsMatch(path) && BmsScreen.OpenBms(path))
+                if (ExtRegs.BeMusic.IsMatch(path) && OpenBms(path))
                 {
                     e.Handled = true;
                     return;
@@ -118,10 +143,8 @@ namespace LivreNoirLibrary.SandBox
             {
                 return;
             }
-            if (this.OpenFileDialog(FileDialogOptions.WithInitialPath(BmsScreen.BmsPath), Filters.Bms) is { } path)
-            {
-                BmsScreen.OpenBms(path);
-            }
+            var path = this.OpenFileDialog(FileDialogOptions.WithInitialPath(BmsScreen.BmsPath), Filters.Bms);
+            OpenBms(path);
         }
 
         private void OnExecuted_Save(object sender, ExecutedRoutedEventArgs e)
@@ -134,6 +157,22 @@ namespace LivreNoirLibrary.SandBox
                 this.SaveFileDialog(FileDialogOptions.WithInitialPath(BmsScreen.BmsPath), Filters.Bms_Save) is { } path)
             {
                 data.Save(path, false, true);
+            }
+        }
+
+        private void OnClick_Hash(object sender, RoutedEventArgs e)
+        {
+            if (BmsScreen is { IsBmsReady: true, BmsPath: string path })
+            {
+                var t = System.Diagnostics.Stopwatch.GetTimestamp();
+                var func = new MD5HashFunction();
+                var hash = BmsParser.ComputeHashFromFile(path, func);
+                Console.WriteLine($"hash func in {System.Diagnostics.Stopwatch.GetElapsedTime(t).TotalMilliseconds}ms");
+                foreach (var c in hash)
+                {
+                    Console.Write($"{c:x2}");
+                }
+                Console.WriteLine();
             }
         }
 

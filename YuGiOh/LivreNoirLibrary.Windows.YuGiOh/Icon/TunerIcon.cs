@@ -5,7 +5,7 @@ namespace LivreNoirLibrary.Windows.YuGiOh
 {
     public static partial class Icons
     {
-        private static DrawingImage CreateTunerIcon()
+        private static DrawingGroup CreateTunerIcon()
         {
             DrawingGroup dg = new();
             using (var ctx = dg.Open())
@@ -17,11 +17,9 @@ namespace LivreNoirLibrary.Windows.YuGiOh
                     MediaUtils.CreateGeometry("M5,2 v6 a2,2,0,0,0,2,2 v2 h-1 v2 h4 v-2 h-1 v-2 a2,2,0,0,0,2,-2 V2 h-2 v6 h-2 v-6 Z M4,4 a2,4,0,0,0,0,8 a2,6,0,0,1,0,-8 Z M12,4 a2,4,0,0,1,0,8 a2,6,0,0,0,0,-8 Z"));
             }
             dg.Freeze();
-            DrawingImage di = new(dg);
-            di.Freeze();
-            return di;
+            return dg;
         }
 
-        public static DrawingImage TunerIcon { get; } = CreateTunerIcon();
+        public static DrawingGroup TunerIcon { get; } = CreateTunerIcon();
     }
 }

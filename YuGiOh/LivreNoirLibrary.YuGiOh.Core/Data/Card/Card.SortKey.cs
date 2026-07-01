@@ -25,7 +25,7 @@ namespace LivreNoirLibrary.YuGiOh.Data
         public int PendulumTextLength => (IsMosnter() && IsPendulum) ? PendulumText.LengthWithoutSpace() : Padding;
         public int PendulumTextLengthD => (IsMosnter() && IsPendulum) ? PendulumText.LengthWithoutSpace() : -Padding;
 
-        private readonly Dictionary<CardType, int> Type_index_list = new()
+        private static readonly Dictionary<CardType, int> Type_index_list = new()
         {
             { CardType.Main_Monster, 32 },
             { CardType.Ritual_Monster, 64 },

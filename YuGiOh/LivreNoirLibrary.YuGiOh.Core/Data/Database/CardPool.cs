@@ -34,8 +34,28 @@ namespace LivreNoirLibrary.YuGiOh.Data
         public void Load(Serializable.CardPool source)
         {
             Packs.Load(source.Packs);
-            Cards.Load(source.Cards, Packs);
+            Cards.Load(source.Cards);
+            UpdateCardPackInfo();
             LastUpdate = source.LastUpdate;
+        }
+
+        public void UpdateCardPackInfo()
+        {
+            foreach (var card in Cards.AsSpan())
+            {
+                card.PackInfo.Clear();
+            }
+            foreach (var pack in Packs.AsSpan())
+            {
+                var pid = pack.ProductId;
+                foreach (var info in pack.AsSpan())
+                {
+                    if (TryGet(info.CardId, out var card))
+                    {
+                        card.PackInfo.Add(new(pid, info.Number));
+                    }
+                }
+            }
         }
 
         public void WriteJson(Utf8JsonWriter writer, JsonSerializerOptions options)

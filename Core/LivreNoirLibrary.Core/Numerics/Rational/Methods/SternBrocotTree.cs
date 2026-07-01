@@ -5,7 +5,7 @@ using System.Runtime.CompilerServices;
 
 namespace LivreNoirLibrary.Numerics
 {
-    public readonly partial struct Rational
+    partial struct Rational
     {
         public const ushort HalfDenominatorLimit = 1_000; // 10^3
         public const int FloatDenominatorLimit = 10_000_000; // 10^7

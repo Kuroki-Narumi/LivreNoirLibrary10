@@ -18,50 +18,6 @@ namespace LivreNoirLibrary.YuGiOh
         public const string Direction_8 = "上";
         public const string Direction_9 = "右上";
 
-        public const string Direction_Delim = ",";
-
-        public static string GetName(this LinkDirection value, string delim = Direction_Delim)
-        {
-            List<string> names = [];
-            foreach (var (link, name) in _link2name)
-            {
-                if ((value & link) is not 0)
-                {
-                    names.Add(name);
-                }
-            }
-            return string.Join(delim, names);
-        }
-
-        public static LinkDirection GetDirection(this string? name, string delim = Direction_Delim)
-        {
-            if (name is not null)
-            {
-                if (_name2link.TryGetValue(name, out var value))
-                {
-                    return value;
-                }
-                else
-                {
-                    return GetDirection(name.Split(delim));
-                }
-            }
-            return 0;
-        }
-
-        public static LinkDirection GetDirection(this IEnumerable<string> names)
-        {
-            LinkDirection value = 0;
-            foreach (var name in names)
-            {
-                if (_name2link.TryGetValue(name, out var val))
-                {
-                    value |= val;
-                }
-            }
-            return value;
-        }
-
         private static readonly Dictionary<LinkDirection, string> _link2name = new()
         {
             { LinkDirection.LowerLeft, Direction_1 },
@@ -74,6 +30,41 @@ namespace LivreNoirLibrary.YuGiOh
             { LinkDirection.UpperRight, Direction_9 },
         };
 
-        private static readonly Dictionary<string, LinkDirection> _name2link = _link2name.Invert();
+        private static readonly Dictionary<LinkDirection, List<string>> _link2names = [];
+
+        private static readonly Dictionary<string, LinkDirection>.AlternateLookup<ReadOnlySpan<char>> _name2link = CreateInvertedDictionary(_link2name);
+
+        public static ReadOnlySpan<string> GetNames(this LinkDirection value)
+        {
+            if (!_link2names.TryGetValue(value, out var list))
+            {
+                list = [];
+                foreach (var (link, name) in _link2name)
+                {
+                    if ((value & link) is not 0)
+                    {
+                        list.Add(name);
+                    }
+                }
+                _link2names[value] = list;
+            }
+            return list.AsSpan();
+        }
+
+        public static string GetName(this LinkDirection value) => string.Join('/', GetNames(value));
+
+        public static LinkDirection GetDirection(this ReadOnlySpan<char> text)
+        {
+            var result = LinkDirection.None;
+            foreach (var range in text.Split(Separators))
+            {
+                var name = text[range].Trim();
+                if (TryGetEnumValue(name, _name2link, out var val))
+                {
+                    result |= val;
+                }
+            }
+            return result;
+        }
     }
 }

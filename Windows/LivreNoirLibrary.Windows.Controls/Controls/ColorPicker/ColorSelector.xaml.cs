@@ -5,6 +5,7 @@ using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
 using LivreNoirLibrary.Media;
+using LivreNoirLibrary.Numerics;
 using LivreNoirLibrary.Windows.Media;
 
 namespace LivreNoirLibrary.Windows.Controls
@@ -15,18 +16,16 @@ namespace LivreNoirLibrary.Windows.Controls
     public partial class ColorSelector : UserControl
     {
         public const float HueInvertFactor_Part = 1f / 60f;
-        public const float HueInvertFactor_Full = 1f / 359f; 
 
         public static readonly DependencyProperty SelectedColorProperty = ColorPicker.SelectedColorProperty.AddOwner(typeof(ColorSelector), default(Color));
 
-        private readonly ColorInfo _color_info = new();
-        private readonly Dictionary<ColorImageIndex, UIElement> _images;
-        private readonly Dictionary<object, ColorImageIndex> _radio_indexes;
-        private ColorImageIndex _current_image;
+        private readonly Dictionary<ImageMode, UIElement> _images;
+        private readonly Dictionary<object, ImageMode> _radioMap;
+        private ImageMode _mode;
         private bool _colorCodeEditing;
 
         public Color SelectedColor { get => (Color)GetValue(SelectedColorProperty); set => SetValue(SelectedColorProperty, value); }
-        public ColorInfo ColorInfo => _color_info;
+        public ColorInfo ColorInfo { get; } = new();
 
         public ColorSelector()
         {
@@ -34,104 +33,85 @@ namespace LivreNoirLibrary.Windows.Controls
             InitializeComponent();
             _images = new()
             {
-                { ColorImageIndex.Rgb, Image_RGB },
-                { ColorImageIndex.Grb, Image_GRB },
-                { ColorImageIndex.Brg, Image_BRG },
-                { ColorImageIndex.Hsv, Image_HSV },
-                { ColorImageIndex.Shv, Image_SHV },
-                { ColorImageIndex.Vhs, Image_VHS },
+                { ImageMode.Rgb, Image_RGB },
+                { ImageMode.Grb, Image_GRB },
+                { ImageMode.Brg, Image_BRG },
+                { ImageMode.Hsv, Image_HSV },
+                { ImageMode.Shv, Image_SHV },
+                { ImageMode.Vhs, Image_VHS },
             };
-            _radio_indexes = new()
+            _radioMap = new()
             {
-                { Radio_R, ColorImageIndex.Rgb },
-                { Radio_G, ColorImageIndex.Grb },
-                { Radio_B, ColorImageIndex.Brg },
-                { Radio_H, ColorImageIndex.Hsv },
-                { Radio_S, ColorImageIndex.Shv },
-                { Radio_V, ColorImageIndex.Vhs },
+                { Radio_R, ImageMode.Rgb },
+                { Radio_G, ImageMode.Grb },
+                { Radio_B, ImageMode.Brg },
+                { Radio_H, ImageMode.Hsv },
+                { Radio_S, ImageMode.Shv },
+                { Radio_V, ImageMode.Vhs },
             };
             InitializePalettes();
             UpdateImage(Radio_H);
-            Update();
-            _color_info.PropertyChanged += OnPropertyChanged_ColorInfo;
+            ColorInfo.ColorChanged += OnColorChanged;
         }
 
         public void Setup(Color color, bool alpha)
         {
-            _color_info.IsAlphaEnabled = alpha;
-            _color_info.SetColor(color);
+            ColorInfo.IsAlphaEnabled = alpha;
+            ColorInfo.SetColor(color);
         }
 
-        private void OnPropertyChanged_ColorInfo(object? sender, System.ComponentModel.PropertyChangedEventArgs e)
+        private void OnColorChanged(Color color)
         {
-            if (e.PropertyName is nameof(ColorInfo.Color))
-            {
-                Update();
-            }
+            Update();
         }
 
         private void UpdateImage(object sender)
         {
-            if (_radio_indexes.TryGetValue(sender, out var index))
+            if (_radioMap.TryGetValue(sender, out var index))
             {
-                _images[_current_image].Visibility = Visibility.Collapsed;
-                _current_image = index;
-                _images[_current_image].Visibility = Visibility.Visible;
-                UpdatePointer();
-                UpdateSliderIndicator();
+                _images[_mode].Visibility = Visibility.Collapsed;
+                _mode = index;
+                _images[_mode].Visibility = Visibility.Visible;
+                UpdateCursor();
             }
         }
 
         private void Update()
         {
-            SelectedColor = _color_info.Color;
-            UpdatePointer();
-            UpdateSliderIndicator();
+            SelectedColor = ColorInfo.Color;
+            UpdateCursor();
             UpdatePalettes();
             UpdateHsvRect();
             UpdateSliderRect();
             if (!_colorCodeEditing)
             {
-                TextBox_ColorCode.Text = _color_info.ColorCode;
+                TextBox_ColorCode.Text = ColorInfo.GetColorCode();
             }
         }
 
-        private void UpdatePointer()
+        private void UpdateCursor()
         {
-            var (x, y) = _current_image switch
+            var info = ColorInfo;
+            var (x, y, z) = _mode switch
             {
-                ColorImageIndex.Rgb => (ColorUtils.GetByte(_color_info.G), ColorUtils.GetByte(1 - _color_info.B)),
-                ColorImageIndex.Grb => (ColorUtils.GetByte(_color_info.R), ColorUtils.GetByte(1 - _color_info.B)),
-                ColorImageIndex.Brg => (ColorUtils.GetByte(_color_info.R), ColorUtils.GetByte(1 - _color_info.G)),
-                ColorImageIndex.Hsv => (ColorUtils.GetByte(_color_info.S), ColorUtils.GetByte(1 - _color_info.V)),
-                ColorImageIndex.Shv => (ColorUtils.GetByte(_color_info.H * HueInvertFactor_Full), ColorUtils.GetByte(1 - _color_info.V)),
-                ColorImageIndex.Vhs => (ColorUtils.GetByte(_color_info.H * HueInvertFactor_Full), ColorUtils.GetByte(1 - _color_info.S)),
-                _ => (0, 0),
+                ImageMode.Rgb => (info.IntG, 255 - info.IntB, 255 - info.IntR),
+                ImageMode.Grb => (info.IntR, 255 - info.IntB, 255 - info.IntG),
+                ImageMode.Brg => (info.IntR, 255 - info.IntG, 255 - info.IntB),
+                ImageMode.Hsv => (info.IntS, 255 - info.IntV, info.ScaledIntH),
+                ImageMode.Shv => (info.ScaledIntH, 255 - info.IntV, 255 - info.IntS),
+                ImageMode.Vhs => (info.ScaledIntH, 255 - info.IntS, 255 - info.IntV),
+                _ => (0, 0, 0),
             };
             Canvas.SetLeft(Pointer, x);
             Canvas.SetTop(Pointer, y);
-        }
-
-        private void UpdateSliderIndicator()
-        {
-            int y = _current_image switch
-            {
-                ColorImageIndex.Rgb => ColorUtils.GetByte(1 - _color_info.R),
-                ColorImageIndex.Grb => ColorUtils.GetByte(1 - _color_info.G),
-                ColorImageIndex.Brg => ColorUtils.GetByte(1 - _color_info.B),
-                ColorImageIndex.Hsv => ColorUtils.GetByte(_color_info.H * HueInvertFactor_Full),
-                ColorImageIndex.Shv => ColorUtils.GetByte(1 - _color_info.S),
-                ColorImageIndex.Vhs => ColorUtils.GetByte(1 - _color_info.V),
-                _ => 0,
-            };
-            Canvas.SetTop(SlideIndicator, y);
+            Canvas.SetTop(SlideIndicator, z);
         }
 
         private void UpdateHsvRect()
         {
-            var hue = _color_info.H;
+            var hue = ColorInfo.H;
             byte r, g, b;
-            switch (_color_info.H)
+            switch (hue)
             {
                 case < 60:
                     r = 255;
@@ -169,7 +149,7 @@ namespace LivreNoirLibrary.Windows.Controls
 
         private void UpdateSliderRect()
         {
-            var c = _color_info.GetColor();
+            var c = ColorInfo.Color;
             var brush = Brush_RGB;
             brush.GradientStops[0].Color = Color.FromRgb(255, c.G, c.B);
             brush.GradientStops[1].Color = Color.FromRgb(0, c.G, c.B);
@@ -210,59 +190,61 @@ namespace LivreNoirLibrary.Windows.Controls
         private void OnMouseMove_Main(object sender, MouseEventArgs e)
         {
             var pos = e.GetPosition((sender as IInputElement)!);
-            var x = (float)pos.X * ColorUtils.InvertFactor;
-            var y = (float)pos.Y * ColorUtils.InvertFactor;
-            switch (_current_image)
+            var x = Math.Clamp(pos.X.RoundToInt(), 0, 255);
+            var y = Math.Clamp(255 - pos.Y.RoundToInt(), 0, 255);
+            var info = ColorInfo;
+            switch (_mode)
             {
-                case ColorImageIndex.Rgb:
-                    _color_info.G = x;
-                    _color_info.B = 1 - y ;
+                case ImageMode.Rgb:
+                    info.IntG = x;
+                    info.IntB = y;
                     break;
-                case ColorImageIndex.Grb:
-                    _color_info.R = x ;
-                    _color_info.B = 1 - y;
+                case ImageMode.Grb:
+                    info.IntR = x;
+                    info.IntB = y;
                     break;
-                case ColorImageIndex.Brg:
-                    _color_info.R = x;
-                    _color_info.G = 1 - y;
+                case ImageMode.Brg:
+                    info.IntR = x;
+                    info.IntG = y;
                     break;
-                case ColorImageIndex.Hsv:
-                    _color_info.S = x;
-                    _color_info.V = 1 - y;
+                case ImageMode.Hsv:
+                    info.IntS = x;
+                    info.IntV = y;
                     break;
-                case ColorImageIndex.Shv:
-                    _color_info.H = x * 359;
-                    _color_info.V = 1 - y;
+                case ImageMode.Shv:
+                    info.ScaledIntH = x;
+                    info.IntV = y;
                     break;
-                case ColorImageIndex.Vhs:
-                    _color_info.H = x * 359;
-                    _color_info.S = 1 - y;
+                case ImageMode.Vhs:
+                    info.ScaledIntH = x;
+                    info.IntS = y;
                     break;
             }
         }
 
         private void OnMouseMove_Slider(object sender, MouseEventArgs e)
         {
-            var y = (float)e.GetPosition((sender as IInputElement)!).Y * ColorUtils.InvertFactor;
-            switch (_current_image)
+            var y = Math.Clamp((int)e.GetPosition((sender as IInputElement)!).Y, 0, 255);
+            var info = ColorInfo;
+            switch (_mode)
             {
-                case ColorImageIndex.Rgb:
-                    _color_info.R = 1 - y;
+                case ImageMode.Rgb:
+                    info.IntR = 255 - y;
                     break;
-                case ColorImageIndex.Grb:
-                    _color_info.G = 1 - y;
+                case ImageMode.Grb:
+                    info.IntG = 255 - y;
                     break;
-                case ColorImageIndex.Brg:
-                    _color_info.B = 1 - y;
+                case ImageMode.Brg:
+                    info.IntB = 255 - y;
                     break;
-                case ColorImageIndex.Hsv:
-                    _color_info.H = y * 359;
+                case ImageMode.Hsv:
+                    info.ScaledIntH = y;
                     break;
-                case ColorImageIndex.Shv:
-                    _color_info.S = 1 - y;
+                case ImageMode.Shv:
+                    info.IntS = 255 - y;
                     break;
-                case ColorImageIndex.Vhs:
-                    _color_info.V = 1 - y;
+                case ImageMode.Vhs:
+                    info.IntV = 255 - y;
                     break;
             }
         }
@@ -275,14 +257,9 @@ namespace LivreNoirLibrary.Windows.Controls
         private bool OnVerify_ColorCode(string text)
         {
             _colorCodeEditing = true;
-            var result = ColorInfo.SetColorCode(text);
+            var result = ColorInfo.TrySetColorCode(text);
             _colorCodeEditing = false;
             return result;
-        }
-
-        private void OnModified_InnerPicker(object sender, RoutedEventArgs e)
-        {
-            e.Handled = true;
         }
     }
 }

@@ -24,26 +24,35 @@ namespace LivreNoirLibrary.YuGiOh.Data
 
         public string GetAbilityTextWithType(bool addNone)
         {
+            using var o = ObjectPool.Rent<StringBuilder>(out var sb);
             var list = Vocab.GetNames(Ability);
+            sb.AppendJoin(Vocab.Ability_Separator, list);
             if (HasEffect)
             {
-                list.Add(Vocab.Effect);
+                if (list.Length is > 0)
+                {
+                    sb.Append(Vocab.Ability_Separator);
+                }
+                sb.Append(Vocab.Effect);
             }
             else if (CardType is CardType.Main_Monster)
             {
-                list.Add(Vocab.Normal);
+                if (list.Length is > 0)
+                {
+                    sb.Append(Vocab.Ability_Separator);
+                }
+                sb.Append(Vocab.Normal);
             }
-            else if (addNone && list.Count <= 0)
+            else if (addNone && list.Length is 0)
             {
-                list.Add(Vocab.None);
+                sb.Append(Vocab.None);
             }
-            return string.Join(Vocab.Ability_Separator, list);
+            return sb.ToString();
         }
 
         public string GetMonsterInfoText()
         {
-            using var o = ObjectPool.Rent<StringBuilder>();
-            var sb = o.Value;
+            using var o = ObjectPool.Rent<StringBuilder>(out var sb);
             sb.Append(AttributeText);
             sb.Append(Vocab.Ability_Separator);
             sb.Append(MonsterTypeText);
@@ -63,8 +72,7 @@ namespace LivreNoirLibrary.YuGiOh.Data
 
         public string GetStatusText()
         {
-            using var o = ObjectPool.Rent<StringBuilder>();
-            var sb = o.Value;
+            using var o = ObjectPool.Rent<StringBuilder>(out var sb);
             sb.Append(Vocab.GetLevelName(CardType));
             sb.Append($" {LevelText}");
             sb.Append(Vocab.Ability_Separator);
@@ -85,8 +93,7 @@ namespace LivreNoirLibrary.YuGiOh.Data
 
         public string GetFullText()
         {
-            using var o = ObjectPool.Rent<StringBuilder>();
-            var sb = o.Value;
+            using var o = ObjectPool.Rent<StringBuilder>(out var sb);
             if (IsMosnter())
             {
                 sb.AppendLine(GetMonsterInfoText());

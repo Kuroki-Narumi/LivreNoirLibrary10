@@ -1,7 +1,6 @@
 ﻿using LivreNoirLibrary.ObjectModel;
 using System;
 using System.Collections.Generic;
-using System.Threading.Tasks;
 
 namespace LivreNoirLibrary.Media.Bms
 {
@@ -27,12 +26,11 @@ namespace LivreNoirLibrary.Media.Bms
             public void DetermineRandom(IBmsDataUnit start, IBmsDataUnit combineTarget, RandomProvider provider)
             {
                 combineTarget.Clear();
-                using var obj = ObjectPool.Rent<Stack<(IBmsDataUnit, int)>>();
-                var stack = obj.Value;
-                stack.Push((start, -1));
+                var stack = new Stack<(FlowAddress, IBmsDataUnit, int)>();
+                stack.Push((FlowAddress.Empty, start, -1));
                 while (stack.TryPop(out var state))
                 {
-                    var (data, flowIndex) = state;
+                    var (address, data, flowIndex) = state;
                     if (flowIndex is -1)
                     {
                         combineTarget.Merge(data);
@@ -41,12 +39,13 @@ namespace LivreNoirLibrary.Media.Bms
                     var flows = data.Flows;
                     for (; flowIndex < flows.Count; flowIndex++)
                     {
+                        var newAddress = address.Append(flowIndex + 1);
                         var flow = flows[flowIndex];
-                        var condition = flow.IsFixed ? flow.Max : provider(flow.Max, flow.Note);
+                        var condition = flow.IsFixed ? flow.Max : provider(newAddress, flow.Max, flow.Note);
                         if (flow.GetBranch(condition) is { } branch)
                         {
-                            stack.Push((data, flowIndex + 1));
-                            stack.Push((root.GetBranchData(branch), -1));
+                            stack.Push((address, data, flowIndex + 1));
+                            stack.Push((newAddress.Append(condition), root.GetBranchData(branch), -1));
                             break;
                         }
                     }
@@ -58,18 +57,20 @@ namespace LivreNoirLibrary.Media.Bms
     public struct BranchDataEnumerator
     {
         private readonly IBmsData _root;
-        private readonly Stack<(IBmsDataUnit Data, int ContainerIndex, int BranchIndex)> _stack;
-        private IBmsDataUnit _current;
+        private readonly Stack<(FlowAddress Address, IBmsDataUnit Data, int ContainerIndex, int BranchIndex)> _stack;
+        private FlowAddress _currentAddress;
+        private IBmsDataUnit _currentData;
 
         public BranchDataEnumerator(IBmsData root, IBmsDataUnit start, bool containsSelf)
         {
             _root = root;
+            _currentAddress = FlowAddress.Empty;
             _stack = [];
-            _stack.Push(new(start, 0, containsSelf ? -1 : 0));
-            _current = null!;
+            _stack.Push(new(_currentAddress, start, 0, containsSelf ? -1 : 0));
+            _currentData = null!;
         }
 
-        public readonly IBmsDataUnit Current => _current;
+        public readonly (FlowAddress, IBmsDataUnit) Current => (_currentAddress, _currentData);
 
         public bool MoveNext()
         {
@@ -77,12 +78,13 @@ namespace LivreNoirLibrary.Media.Bms
             var stack = _stack;
             while (stack.TryPop(out var state))
             {
-                var (data, containerIndex, branchIndex) = state;
+                var (address, data, containerIndex, branchIndex) = state;
                 // self
                 if (branchIndex is -1)
                 {
-                    _current = data;
-                    stack.Push(new(data, containerIndex, 0)); // Push back updated state
+                    _currentAddress = address;
+                    _currentData = data;
+                    stack.Push(new(address, data, containerIndex, 0)); // Push back updated state
                     return true;
                 }
                 // children
@@ -90,6 +92,7 @@ namespace LivreNoirLibrary.Media.Bms
                 var flowCount = flows.Count;
                 while (containerIndex < flowCount)
                 {
+                    var newAddress = address.Append(containerIndex + 1);
                     var flow = flows[containerIndex];
                     var branches = flow.Branches;
                     var branch = (branches.Count - branchIndex) switch
@@ -101,8 +104,8 @@ namespace LivreNoirLibrary.Media.Bms
                     if (branch is not null)
                     {
                         branchIndex++;
-                        stack.Push(new(data, containerIndex, branchIndex)); // Push back updated state
-                        stack.Push(new(root.GetBranchData(branch), 0, -1)); // Push new child state
+                        stack.Push(new(address, data, containerIndex, branchIndex)); // Push back updated state
+                        stack.Push(new(newAddress.Append(branch.Condition), root.GetBranchData(branch), 0, -1)); // Push new child state
                         break;
                     }
                     else

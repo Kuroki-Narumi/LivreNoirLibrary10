@@ -70,8 +70,7 @@ namespace LivreNoirLibrary.YuGiOh.Data
             }
         }
 
-        public bool IsOcgReleased() => PackInfo.ContainsOcg();
-        public bool IsTcgReleased() => PackInfo.ContainsTcg();
-        public string GetNumber(string pid) => PackInfo.GetNumber(pid);
+        public bool IsOcgReleased() => PackInfo.ContainsOcg;
+        public bool IsTcgReleased() => PackInfo.ContainsTcg;
     }
 }

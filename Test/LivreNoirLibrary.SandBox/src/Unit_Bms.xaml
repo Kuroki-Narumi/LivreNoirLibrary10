@@ -91,10 +91,11 @@
                 <Border Style="{StaticResource Separator}"/>
                 <ct:Button Icon="{x:Static ct:Icons.Open}" Content="{Binding BmsScreen.BmsBaseName}" ToolTip="Open" Command="ApplicationCommands.Open"/>
                 <ct:Button Icon="{x:Static ct:Icons.Save}" ToolTip="Save" Command="ApplicationCommands.Save"/>
+                <ct:Button Icon="{x:Static ct:Icons.Document}" ToolTip="Hash" Click="OnClick_Hash"/>
 
                 <Border Style="{StaticResource Separator}"/>
                 <ct:DropDownMenuButton>
-                    <ct:IconPresenter Width="16" Source="{x:Static ct:Icons.Volume_3}"/>
+                    <ct:IconPresenter Height="16" Source="{x:Static ct:Icons.Volume_3}"/>
                     <ct:DropDownMenuButton.DropDownContent>
                         <Grid ColumnDefinitions="Auto, *" RowDefinitions="Auto, Auto, Auto, Auto, Auto">
                             <TextBlock Style="{StaticResource Top}" Text="Volume"/>
@@ -110,7 +111,7 @@
                     </ct:DropDownMenuButton.DropDownContent>
                 </ct:DropDownMenuButton>
                 <ct:DropDownMenuButton>
-                    <ct:IconPresenter Width="16" Source="{x:Static ct:Icons.Download}"/>
+                    <ct:IconPresenter Height="16" Source="{x:Static ct:Icons.Download}"/>
                     <ct:DropDownMenuButton.DropDownContent>
                         <StackPanel>
                             <TextBlock Style="{StaticResource Top}" Text="HighSpeed"/>
@@ -129,7 +130,7 @@
                 <Border Style="{StaticResource Separator}"/>
 
                 <ct:DropDownMenuButton>
-                    <ct:IconPresenter Source="{x:Static ct:Icons.Config}" Width="16"/>
+                    <ct:IconPresenter Source="{x:Static ct:Icons.Config}" Height="16"/>
                     <ct:DropDownMenuButton.DropDownContent>
                         <StackPanel>
                             <TextBlock Style="{StaticResource Top}" Text="Video"/>

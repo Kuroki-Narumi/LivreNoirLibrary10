@@ -57,7 +57,9 @@ namespace LivreNoirLibrary.Windows.YuGiOh
             { CardIconType.Trap, Color.FromArgb(255, 255, 128, 216) }, // #ff80d8
             { CardIconType.Token, Color.FromArgb(255, 160, 160, 160) }, // #a0a0a0
         };
+
         private static readonly Dictionary<CardIconType, Brush> _frame_brushes = [];
+
         public static Brush GetFrameBrush(CardIconType type)
         {
             if (!_frame_brushes.TryGetValue(type, out var brush))
@@ -115,12 +117,13 @@ namespace LivreNoirLibrary.Windows.YuGiOh
                 MediaUtils.CreateGeometry("M1,8 l4,-4 v3 h2 l1,-1 l1,-4 l1,5 l-2,2 h-3 v3 Z") },
         };
 
-        private static readonly Dictionary<CardIconType, DrawingImage> _card_cache = [];
-        public static DrawingImage GetCardIcon(CardIconType type)
+        private static readonly Dictionary<CardIconType, DrawingGroup> _card_cache = [];
+
+        public static DrawingGroup GetCardIcon(CardIconType type)
         {
-            if (!_card_cache.TryGetValue(type, out var di))
+            if (!_card_cache.TryGetValue(type, out var dg))
             {
-                DrawingGroup dg = new();
+                dg = new();
                 using (var ctx = dg.Open())
                 {
                     ctx.DrawRectangle(Brush_CardFrame, null, new(0, 0, CardFrameWidth, IconHeight));
@@ -136,12 +139,11 @@ namespace LivreNoirLibrary.Windows.YuGiOh
                     }
                 }
                 dg.Freeze();
-                di = new(dg);
-                di.Freeze();
-                _card_cache.Add(type, di);
+                _card_cache.Add(type, dg);
             }
-            return di;
+            return dg;
         }
-        public static DrawingImage GetCardIcon(CardType type, bool effect = true, bool pendulum = false) => GetCardIcon(GetIconType(type, effect, pendulum));
+
+        public static DrawingGroup GetCardIcon(CardType type, bool effect = true, bool pendulum = false) => GetCardIcon(GetIconType(type, effect, pendulum));
     }
 }

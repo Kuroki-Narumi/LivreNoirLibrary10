@@ -157,7 +157,7 @@ namespace LivreNoirLibrary.Media.Bms
                 {
                     return;
                 }
-                foreach (var data in vm.Root.EnumerateAllData())
+                foreach (var (_, data) in vm.Root.EnumerateAllData())
                 {
                     DefSwapCore(data, type, index1, index2);
                     switch (type)
@@ -202,7 +202,7 @@ namespace LivreNoirLibrary.Media.Bms
                 {
                     return;
                 }
-                foreach (var data in vm.Root.EnumerateAllData())
+                foreach (var (_, data) in vm.Root.EnumerateAllData())
                 {
                     DefMapCore(data, type, map);
                     switch (type)
@@ -347,7 +347,7 @@ namespace LivreNoirLibrary.Media.Bms
         public static void RemoveDefWithBasename(this IBmsData data, DefType type, string basename)
         {
             DefIndexMap map = [];
-            foreach (var d in data.EnumerateAllData())
+            foreach (var (_, d) in data.EnumerateAllData())
             {
                 if (d.DefLists.TryGetList(type, out var list))
                 {

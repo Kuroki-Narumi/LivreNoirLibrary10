@@ -139,8 +139,7 @@ namespace LivreNoirLibrary.Numerics
 
         public string ToString(Func<T, string?> formatter, string rangeSeparator = "..", string setSeparator = ", ")
         {
-            using var obj = ObjectPool.Rent<StringBuilder>();
-            var sb = obj.Value;
+            using var obj = ObjectPool.Rent<StringBuilder>(out var sb);
             sb.Append('{');
             var first = true;
             foreach (var range in _ranges.AsSpan())

@@ -19,4 +19,7 @@
 			<ReferenceOutputAssembly>false</ReferenceOutputAssembly>
 		</ProjectReference>
 	</ItemGroup>
+	<ItemGroup>
+	  <Folder Include="Crypt\" />
+	</ItemGroup>
 </Project>

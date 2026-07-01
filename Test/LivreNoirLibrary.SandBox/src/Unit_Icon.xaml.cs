@@ -87,6 +87,55 @@ namespace LivreNoirLibrary.SandBox
                 }
             }
         }
-    }
 
+        private void OnColorClick(object sender, ColorClickEventArgs e)
+        {
+            Console.WriteLine($"Index={e.Index}, Color={e.Color}, Button={e.MouseButton}, ClickCount={e.ClickCount}");
+        }
+
+        private void OnClick_ColorTest(object sender, RoutedEventArgs e)
+        {
+            var counts = new int[16777216];
+            for (var h = 0; h < 360; h++)
+            {
+                Console.Write($"\rProcessing H={h}");
+                for (var s = 0; s <= 255; s++)
+                {
+                    var ss = ColorUtils.GetFloat(s);
+                    for (var v = 0; v <= 255; v++)
+                    {
+                        var vv = ColorUtils.GetFloat(v);
+                        var (r, g, b) = ColorUtils.CalcRGB(h, ss, vv);
+                        var rr = ColorUtils.GetInt(r) << 16;
+                        var gg = ColorUtils.GetInt(g) << 8;
+                        var bb = ColorUtils.GetInt(b);
+                        counts[rr | gg | bb]++;
+                    }
+                }
+            }
+            Console.WriteLine();
+            SortedDictionary<int, List<(byte, byte, byte)>> dic2 = [];
+            unsafe
+            {
+                fixed (int* ptr = counts)
+                {
+                    for (var i = 0; i < 16777216; i++)
+                    {
+                        var count = ptr[i];
+                        if (count > 0)
+                        {
+                            var r = (byte)((i >> 16) & 0xFF);
+                            var g = (byte)((i >> 8) & 0xFF);
+                            var b = (byte)(i & 0xFF);
+                            Collections.CollectionExtensions.Add(dic2, count, (r, g, b));
+                        }
+                    }
+                }
+            }
+            foreach (var (count, list) in dic2)
+            {
+                Console.WriteLine($"dup count={count}: {(list.Count > 5 ? $"(count={list.Count})" : string.Join(", ", list))}");
+            }
+        }
+    }
 }

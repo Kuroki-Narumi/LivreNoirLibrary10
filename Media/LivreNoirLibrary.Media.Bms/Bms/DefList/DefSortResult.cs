@@ -89,8 +89,7 @@ namespace LivreNoirLibrary.Media.Bms
         {
             if (Count is > 0)
             {
-                using var o = ObjectPool.Rent<StringBuilder>();
-                var sb = o.Value;
+                using var o = ObjectPool.Rent<StringBuilder>(out var sb);
                 sb.AppendLine("DefSort result:");
                 foreach (var (Before, After) in this.AsSpan())
                 {

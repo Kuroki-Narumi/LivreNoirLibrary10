@@ -5,7 +5,7 @@ namespace LivreNoirLibrary.YuGiOh.Data
 {
     public class Token : Card
     {
-        public string ConvertedName { get; internal set; }
+        public string NameForSearch { get; internal set; }
         public bool IsInitialized { get; internal set; }
         public SortedCardList Generators { get; } = [];
         public SortedCardList Referers { get; } = [];
@@ -13,9 +13,8 @@ namespace LivreNoirLibrary.YuGiOh.Data
         public Token(int id, string name)
         {
             Id = id;
-            var (_, cname) = TextConvert.StrConv(name);
             Name = name;
-            ConvertedName = cname;
+            NameForSearch = name.ConvertForSearch(true, true);
         }
     }
 

@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using LivreNoirLibrary.Collections;
 
 namespace LivreNoirLibrary.YuGiOh
 {
@@ -38,24 +37,6 @@ namespace LivreNoirLibrary.YuGiOh
         public const string Continuous_Trap = $"{Continuous}{Trap}";
         public const string Counter_Trap = $"{Counter}{Trap}";
 
-        public static string GetLevelName(CardType type) => type switch { CardType.Link_Monster => Link, CardType.Xyz_Monster => Rank, _ => Level };
-
-        public static string GetName(this CardType value, bool appendMonster = false)
-        {
-            if (_cType2name.TryGetValue(value, out var name))
-            {
-                if (appendMonster && value is >= CardType.Fusion_Monster and < CardType.Normal_Spell)
-                {
-                    name += Monster;
-                }
-                return name;
-            }
-            return value.ToString();
-        }
-
-        public static CardType GetCardType(this string? name) => GetEnumValue(name, _name2cType);
-        public static bool TryGetCardType(this string name, out CardType type) => TryGetEnumValue(name, _name2cType, out type);
-
         private static readonly Dictionary<CardType, string> _cType2name = new()
         {
             { CardType.Main_Monster,    Monster },
@@ -78,35 +59,41 @@ namespace LivreNoirLibrary.YuGiOh
             { CardType.Counter_Trap,    Counter_Trap },
         };
 
-        private static readonly Dictionary<string, CardType> _name2cType = CreateName2CType();
-
-        private static Dictionary<string, CardType> CreateName2CType()
+        private static readonly Dictionary<string, CardType>.AlternateLookup<ReadOnlySpan<char>> _name2cType = CreateName2CType();
+        private static Dictionary<string, CardType>.AlternateLookup<ReadOnlySpan<char>> CreateName2CType()
         {
-            var dic = _cType2name.Invert();
-            AppendEnglishNames(dic);
-            dic.Add(nameof(Fusion), CardType.Fusion_Monster);
-            dic.Add(nameof(Ritual), CardType.Ritual_Monster);
-            dic.Add(nameof(Synchro), CardType.Synchro_Monster);
-            dic.Add(nameof(Xyz), CardType.Xyz_Monster);
-            dic.Add(nameof(Link), CardType.Link_Monster);
+            var dic = CreateInvertedDictionary(_cType2name);
 
-            void AddUnderscoreRemoved(CardType t)
-            {
-                dic.Add(t.ToString().Replace("_", ""), t);
-            }
+            // "FusionMonster"ではなく"Fusion"と書かれていた場合のために
+            dic[nameof(Fusion)] = CardType.Fusion_Monster;
+            dic[nameof(Ritual)] = CardType.Ritual_Monster;
+            dic[nameof(Synchro)] = CardType.Synchro_Monster;
+            dic[nameof(Xyz)] = CardType.Xyz_Monster;
+            dic[nameof(Link)] = CardType.Link_Monster;
 
-            AddUnderscoreRemoved(CardType.Normal_Spell);
-            AddUnderscoreRemoved(CardType.Field_Spell);
-            AddUnderscoreRemoved(CardType.Equip_Spell);
-            AddUnderscoreRemoved(CardType.Continuous_Spell);
-            AddUnderscoreRemoved(CardType.Quick_Spell);
-            dic.Add("QuickPlaySpell", CardType.Quick_Spell);
-            AddUnderscoreRemoved(CardType.Ritual_Spell);
+            // TCGでの表記
+            dic["QuickPlaySpell"] = CardType.Quick_Spell;
 
-            AddUnderscoreRemoved(CardType.Normal_Trap);
-            AddUnderscoreRemoved(CardType.Continuous_Trap);
-            AddUnderscoreRemoved(CardType.Counter_Trap);
             return dic;
         }
+
+        public static string GetLevelName(CardType type) => type switch { CardType.Link_Monster => Link, CardType.Xyz_Monster => Rank, _ => Level };
+
+        public static string GetName(this CardType value, bool appendMonster = false)
+        {
+            if (_cType2name.TryGetValue(value, out var name))
+            {
+                if (appendMonster && value is >= CardType.Fusion_Monster and < CardType.Normal_Spell)
+                {
+                    name += Monster;
+                }
+                return name;
+            }
+            return value.ToString();
+        }
+
+        public static CardType GetCardType(this ReadOnlySpan<char> name) => GetEnumValue(name, _name2cType);
+        public static bool TryGetCardType(this ReadOnlySpan<char> name, out CardType type) => TryGetEnumValue(name, _name2cType, out type);
+
     }
 }

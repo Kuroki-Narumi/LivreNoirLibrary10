@@ -5,6 +5,8 @@ namespace LivreNoirLibrary.YuGiOh
     [Flags]
     public enum LinkDirection
     {
+        None = 0,
+
         LowerLeft  = 0b0000_0001,
         Lower      = 0b0000_0010,
         LowerRight = 0b0000_0100,

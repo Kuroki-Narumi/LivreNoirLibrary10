@@ -14,15 +14,19 @@
 	</PropertyGroup>
 
 	<ItemGroup>
+	  <PackageReference Include="HtmlAgilityPack" Version="1.12.4" />
+	</ItemGroup>
+
+	<ItemGroup>
 	  <ProjectReference Include="..\..\Core\LivreNoirLibrary.Core\LivreNoirLibrary.Core.csproj" />
 	</ItemGroup>
 
 	<ItemGroup>
-	  <None Update="Resources\CardFormat.txt">
-	    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+	  <None Update="Resources\CardFormat.md">
+	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
 	  </None>
 	  <None Update="Resources\CardPool.json">
-	    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
 	  </None>
 	</ItemGroup>
 </Project>

@@ -12,10 +12,7 @@ namespace LivreNoirLibrary.Windows.Controls.Bms
 
         private void OnViewModelChanged(TimelineViewModel? oldValue, TimelineViewModel? newValue)
         {
-            if (oldValue is not null)
-            {
-                oldValue.RequestRefresh -= OnRequestRefresh;
-            }
+            oldValue?.RequestRefresh -= OnRequestRefresh;
             if (newValue is not null)
             {
                 newValue.RequestRefresh += OnRequestRefresh;

@@ -1,78 +1,71 @@
-﻿using System;
+﻿using LivreNoirLibrary.Collections;
+using System;
 using System.Collections;
 using System.Collections.Generic;
-using LivreNoirLibrary.Collections;
 
 namespace LivreNoirLibrary.YuGiOh.Data
 {
-    public class PackInfoCollection() : ICollection<PackInfo>
+    public class PackInfoCollection() : IEnumerable<PackInfo>
     {
-        private readonly Dictionary<string, PackInfo> _list = [];
-        private int _ocg_count;
-        private int _tcg_count;
+        private readonly List<PackInfo> _ocgList = [];
+        private readonly List<PackInfo> _tcgList = [];
 
-        public string GetNumber(string pid) => _list.TryGetValue(pid, out var info) ? info.Number : "";
+        private readonly Dictionary<LocaleType, (DateTime Frist, DateTime Last)> _dates = [];
+        private bool _needCheckDate;
 
-        public bool IsReadOnly => false;
-        public int Count => _list.Count;
-        public int OcgCount => _ocg_count;
-        public int TcgCount => _tcg_count;
-
-        public PackInfoCollection(List<Serializable.PackInfo>? source) : this()
-        {
-            if (source is not null)
-            {
-                foreach (var info in source.AsSpan())
-                {
-                    PackInfo item = new(info);
-                    _list.TryAdd(item.ProductId, item);
-                }
-            }
-        }
+        public int Count => OcgCount + TcgCount;
+        public int OcgCount => _ocgList.Count;
+        public bool ContainsOcg => _ocgList.Count is > 0;
+        public int TcgCount => _tcgList.Count;
+        public bool ContainsTcg => _tcgList.Count is > 0;
 
         public void Clear()
         {
-            _date_checked = false;
-            _list.Clear();
-            _ocg_count = 0;
-            _tcg_count = 0;
+            _needCheckDate = true;
+            _ocgList.Clear();
+            _tcgList.Clear();
+        }
+
+        public void Load(PackInfoCollection source)
+        {
+            Clear();
+            _ocgList.AddRange(source._ocgList);
+            _tcgList.AddRange(source._tcgList);
         }
 
         public void Add(PackInfo item)
         {
-            var id = item.ProductId;
-            if (_list.TryGetValue(id, out var current))
+            if (item.IsTcg())
             {
-                if (!string.IsNullOrEmpty(item.Number))
-                {
-                    current.Number = item.Number;
-                }
+                AddImpl(_tcgList, item);
             }
             else
             {
-                _list.Add(id, item);
+                AddImpl(_ocgList, item);
             }
-            _date_checked = false;
+            _needCheckDate = true;
         }
 
-        public bool Remove(PackInfo item)
+        private static void AddImpl(List<PackInfo> list, PackInfo info)
         {
-            _date_checked = false;
-            return _list.Remove(item.ProductId);
+            var index = list.BinarySearch(info);
+            if (index is >= 0)
+            {
+                list[index] = info;
+            }
+            else
+            {
+                list.Insert(~index, info);
+            }
         }
-
-        public bool Remove(string pid)
-        {
-            _date_checked = false;
-            return _list.Remove(pid);
-        }
-
-        public bool Contains(PackInfo item) => _list.ContainsKey(item.ProductId);
-        public void CopyTo(PackInfo[] array, int arrayIndex) => _list.Values.CopyTo(array, arrayIndex);
 
         public IEnumerator<PackInfo> GetEnumerator()
         {
-            foreach (var (_, item) in _list)
+            foreach (var item in _ocgList)
+            {
+                yield return item;
+            }
+            foreach (var item in _tcgList)
             {
                 yield return item;
             }
@@ -80,71 +73,51 @@ namespace LivreNoirLibrary.YuGiOh.Data
 
         IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 
-        private readonly Dictionary<LocaleType, (DateTime Frist, DateTime Last)> _dates = [];
-        private bool _date_checked;
-        private bool _ocg;
-        private bool _tcg;
-        private void CheckDate()
+        public IEnumerable<PackFullInfo> EnumerateFullInfo()
         {
-            if (!_date_checked)
+            var packs = CardPool.Instance.Packs;
+            foreach (var info in this)
             {
-                _dates.Clear();
-                _ocg_count = 0;
-                _tcg_count = 0;
-                _date_checked = true;
-                DateTime first_ocg, first_tcg, last_ocg, last_tcg;
-                first_ocg = first_tcg = DateTime.MaxValue;
-                last_ocg = last_tcg = DateTime.MinValue;
-                foreach (var (_, item) in _list)
-                {
-                    var date = item.Date;
-                    if (item.IsTcg())
-                    {
-                        _tcg_count++;
-                        _tcg = true;
-                        if (date < first_tcg)
-                        {
-                            first_tcg = date;
-                        }
-                        if (date > last_tcg)
-                        {
-                            last_tcg = date;
-                        }
-                    }
-                    else
-                    {
-                        _ocg_count++;
-                        _ocg = true;
-                        if (date < first_ocg)
-                        {
-                            first_ocg = date;
-                        }
-                        if (date > last_ocg)
-                        {
-                            last_ocg = date;
-                        }
-                    }
-                }
-
-                var first = first_ocg > first_tcg ? first_tcg : first_ocg;
-                var last = last_ocg > last_tcg ? last_ocg : last_tcg;
-                _dates.Add(LocaleType.Ocg, (first_ocg, last_ocg));
-                _dates.Add(LocaleType.Tcg, (first_tcg, last_tcg));
-                _dates.Add(LocaleType.None, (first, last));
-                _dates.Add(LocaleType.Both, (first, last));
+                yield return new(info, packs);
             }
         }
 
-        public bool ContainsOcg()
+        private void CheckDate()
         {
-            CheckDate();
-            return _ocg;
-        }
+            if (_needCheckDate)
+            {
+                var (first_ocg, last_ocg) = UpdateDate(_ocgList);
+                var (first_tcg, last_tcg) = UpdateDate(_tcgList);
 
-        public bool ContainsTcg()
-        {
-            CheckDate();
-            return _tcg;
+                var first = first_ocg > first_tcg ? first_tcg : first_ocg;
+                var last = last_ocg > last_tcg ? last_ocg : last_tcg;
+                var dates = _dates;
+                dates[LocaleType.Ocg] = (first_ocg, last_ocg);
+                dates[LocaleType.Tcg] = (first_tcg, last_tcg);
+                dates[LocaleType.None] = (first, last);
+                dates[LocaleType.Both] = (first, last);
+
+                _needCheckDate = false;
+            }
+
+            static (DateTime First, DateTime Last) UpdateDate(List<PackInfo> list)
+            {
+                var first = DateTime.MaxValue;
+                var last = DateTime.MinValue;
+                foreach (var item in list.AsSpan())
+                {
+                    var date = item.Date;
+                    if (date < first)
+                    {
+                        first = date;
+                    }
+                    if (date > last)
+                    {
+                        last = date;
+                    }
+                }
+                return (first, last);
+            }
         }
 
         public (DateTime First, DateTime Last) GetDate(LocaleType type)
@@ -158,25 +131,25 @@ namespace LivreNoirLibrary.YuGiOh.Data
         public DateTime GetFirstDateOcg(bool ascending)
         {
             CheckDate();
-            return _ocg ? _dates[LocaleType.Ocg].Frist : GetPadding(ascending);
+            return ContainsOcg ? _dates[LocaleType.Ocg].Frist : GetPadding(ascending);
         }
 
         public DateTime GetLastDateOcg(bool ascending)
         {
             CheckDate();
-            return _ocg ? _dates[LocaleType.Ocg].Last : GetPadding(ascending);
+            return ContainsOcg ? _dates[LocaleType.Ocg].Last : GetPadding(ascending);
         }
 
         public DateTime GetFirstDateTcg(bool ascending)
         {
             CheckDate();
-            return _tcg ? _dates[LocaleType.Tcg].Last : GetPadding(ascending);
+            return ContainsTcg ? _dates[LocaleType.Tcg].Last : GetPadding(ascending);
         }
 
         public DateTime GetLastDateTcg(bool ascending)
         {
             CheckDate();
-            return _tcg ? _dates[LocaleType.Tcg].Last : GetPadding(ascending);
+            return ContainsTcg ? _dates[LocaleType.Tcg].Last : GetPadding(ascending);
         }
     }
 }

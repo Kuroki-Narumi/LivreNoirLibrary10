@@ -16,15 +16,16 @@ namespace LivreNoirLibrary.Media.Bms
 
             public double Length { get; internal set; } = 1;
 
-            public void AddBgm(Channel channel, double position, int value, ref int offset)
+            public void AddBgm(Channel channel, double position, int value, ref int offset, long resolutionLimit)
             {
+                var pos = BmsUtils.Rationalize(position);
                 var lane = channel - Channel.Bgm_Start + offset;
                 var bgm = _bgm;
                 while (bgm.Count <= lane)
                 {
                     bgm.Add(new());
                 }
-                while (!bgm[lane].TryAdd(position, value))
+                while (!bgm[lane].TryAdd(pos, value, resolutionLimit))
                 {
                     offset++;
                     lane++;
@@ -32,45 +33,35 @@ namespace LivreNoirLibrary.Media.Bms
                 }
             }
 
-            public void Add(Channel channel, double position, int value)
+            public void Add(Channel channel, double position, int value, long resolutionLimit)
             {
+                var pos = BmsUtils.Rationalize(position);
                 var list = _channels.GetOrAdd(channel);
-                if (!list.Any(l => l.TryAdd(position, value)))
+                foreach (var item in _channels.GetOrAdd(channel).AsSpan())
                 {
-                    list.Add(new(position, value));
+                    if (item.TryAdd(pos, value, resolutionLimit))
+                    {
+                        return;
+                    }
                 }
+                list.Add(new(pos, value));
             }
 
-            public long GetMaxDenominator()
+            public long GetMaxResolution()
             {
                 var value = 0L;
                 foreach (var line in _bgm.AsSpan())
                 {
-                    value = Math.Max(value, line._den);
+                    value = Math.Max(value, line._resol);
                 }
                 foreach (var (_, lines) in _channels)
                 {
                     foreach (var line in lines.AsSpan())
                     {
-                        value = Math.Max(value, line._den);
+                        value = Math.Max(value, line._resol);
                     }
                 }
                 return value;
-            }
-
-            public void ReductDenominator(long limit)
-            {
-                foreach (var line in _bgm.AsSpan())
-                {
-                    line.ReductDenominator(limit);
-                }
-                foreach (var (_, lines) in _channels)
-                {
-                    foreach (var line in lines.AsSpan())
-                    {
-                        line.ReductDenominator(limit);
-                    }
-                }
             }
         }
     }

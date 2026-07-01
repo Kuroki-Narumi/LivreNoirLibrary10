@@ -62,9 +62,9 @@ namespace LivreNoirLibrary.Media.Bms
             public DefIndexCollection GetUsedDefList(DefIndexCollection? used = null)
             {
                 used ??= [];
-                foreach (var d in root.EnumerateAllData())
+                foreach (var (_, data) in root.EnumerateAllData())
                 {
-                    foreach (var (_, note) in d.Timeline)
+                    foreach (var (_, note) in data.Timeline)
                     {
                         if (note.TryGetDefType(out var type) && note.Value is not 0)
                         {
@@ -78,7 +78,7 @@ namespace LivreNoirLibrary.Media.Bms
             public HashSet<Channel> GetUsedKeyLanes(HashSet<Channel>? set = null)
             {
                 set ??= [];
-                foreach (var data in root.EnumerateAllData())
+                foreach (var (_, data) in root.EnumerateAllData())
                 {
                     foreach (var (_, note) in data.Timeline)
                     {
@@ -103,7 +103,7 @@ namespace LivreNoirLibrary.Media.Bms
             {
                 var like_7 = false;
                 var like_10 = false;
-                foreach (var data in root.EnumerateAllData())
+                foreach (var (_, data) in root.EnumerateAllData())
                 {
                     foreach (var (_, note) in data.Timeline)
                     {
@@ -131,7 +131,7 @@ namespace LivreNoirLibrary.Media.Bms
                 var like_3 = false;
                 var like_5 = false;
                 var like_9 = false;
-                foreach (var data in root.EnumerateAllData())
+                foreach (var (_, data) in root.EnumerateAllData())
                 {
                     foreach (var (_, note) in data.Timeline)
                     {
@@ -159,7 +159,7 @@ namespace LivreNoirLibrary.Media.Bms
 
             private int GetKeyCount_Keyboard()
             {
-                foreach (var data in root.EnumerateAllData())
+                foreach (var (_, data) in root.EnumerateAllData())
                 {
                     foreach (var (_, note) in data.Timeline)
                     {

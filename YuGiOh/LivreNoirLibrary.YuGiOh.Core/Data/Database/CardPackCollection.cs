@@ -4,21 +4,36 @@ using System.Collections.Generic;
 
 namespace LivreNoirLibrary.YuGiOh.Data
 {
-    public class CardPackCollection : DataCollectionBase<(DateTime, string), CardPack>
+    public class CardPackCollection : DataCollectionBase<CardPackCollection.Key, CardPack>
     {
-        protected override (DateTime, string) GetKey(CardPack item) => (item.Date, item.ProductId);
+        public readonly record struct Key(DateTime Date, string ProductId) : IComparable<Key>
+        {
+            public int CompareTo(Key other)
+            {
+                var c = Date.CompareTo(other.Date);
+                if (c is not 0)
+                {
+                    return c;
+                }
+                return ProductId.CompareTo(other.ProductId, StringComparison.Ordinal);
+            }
+        }
+
+        protected override Key GetKey(CardPack item) => new(item.Date, item.ProductId);
 
         public void Load(List<Serializable.CardPack> source)
         {
             ClearWithoutNotify();
             var c = source.Count;
-            _list.EnsureCapacity(c);
-            _key_list.EnsureCapacity(c);
+            var list = _list;
+            var keyList = _key_list;
+            list.EnsureCapacity(c);
+            keyList.EnsureCapacity(c);
             foreach (var item in source.AsSpan())
             {
                 CardPack pack = new(item);
-                _list.Add(pack);
-                _key_list.Add(GetKey(pack));
+                list.Add(pack);
+                keyList.Add(GetKey(pack));
             }
             NotifyCollectionReset();
         }
@@ -34,62 +49,24 @@ namespace LivreNoirLibrary.YuGiOh.Data
             return [];
         }
 
-        public CardPack GetNew(string pid, DateTime date)
+        public bool Remove(string pid)
         {
-            CardPack pack;
             if (CheckUpdate().TryGetValue(pid, out var index))
             {
-                pack = _list[index];
-                if (date != pack.Date)
-                {
-                    RemoveWithoutNotify(pack);
-                    pack.Date = date;
-                    AddWithoutNotify(pack);
-                }
+                return Remove(_list[index]);
             }
-            else
-            {
-                pack = new() { ProductId = pid, Date = date };
-                AddWithoutNotify(pack);
-            }
-            return pack;
-        }
-
-        public void Register(DateTime date, string pname, string pid, string number, bool tcg, Card card)
-        {
-            if (tcg && !CardPack.IsTcgPack(pid))
-            {
-                pid = $"{pid}e";
-            }
-            var key = (date, pid);
-            var index = IndexOfKey(key);
-            CardPack pack;
-            if (index is >= 0)
-            {
-                pack = _list[index];
-            }
-            else
-            {
-                pack = new()
-                {
-                    Date = date,
-                    Name = pname,
-                    ProductId = pid,
-                };
-                InsertItem(~index, key, pack);
-            }
-            card.PackInfo.Add(new() { ProductId = pid, Number = number });
-            pack.Add(card);
+            return false;
         }
 
         public override void Refresh()
         {
-            _name2idx.Clear();
+            var dic = _name2idx;
+            dic.Clear();
             var c = _list.Count;
-            for (int i = 0; i < c; i++)
+            for (var i = 0; i < c; i++)
             {
                 var id = _list[i].ProductId;
-                _name2idx.TryAdd(id, i);
+                dic[id] = i;
             }
         }
     }

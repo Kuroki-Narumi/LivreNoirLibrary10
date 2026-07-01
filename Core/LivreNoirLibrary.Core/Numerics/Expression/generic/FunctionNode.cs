@@ -55,12 +55,12 @@ namespace LivreNoirLibrary.Numerics
                 exception = null;
                 return true;
             }
-            exception = new NotImplementedException($"function \"{symbol}{{{operandCount}}}\" is not supported.");
+            exception = ExpressionExceptions.FunctionNotSupported(symbol, operandCount);
             return false;
         }
 
         protected static FunctionNode CreateValueNode(T value) => new(value.ToString()!, 0, (s, v) => value);
-        protected static FunctionNode CreateVariableNode(string symbol) => new(symbol, 0, 
-            (s, v) => v(symbol, out var value) ? value : new KeyNotFoundException($"the variable \"{symbol}\" is not found."));
+
+        protected static FunctionNode CreateVariableNode(string symbol) => new(symbol, 0, (s, v) => v(symbol, out var value) ? value : ExpressionExceptions.VariableNotFound(symbol));
     }
 }

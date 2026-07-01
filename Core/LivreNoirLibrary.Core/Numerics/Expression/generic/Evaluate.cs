@@ -14,14 +14,11 @@ namespace LivreNoirLibrary.Numerics
             return true;
         }
 
-        private static readonly Exception ExpressionEmptyException = new("the expression is empty.");
-        private static ArgumentException ArgumentTooFewException(int actual, int expected) => new($"too few arguments ({actual}, expected:{expected}).");
-
         public bool TryGetLazyNode(List<LazyNode<T>> output, [MaybeNullWhen(true)]out Exception exception)
         {
             if (_nodes.Count is 0)
             {
-                exception = ExpressionEmptyException;
+                exception = ExpressionExceptions.ExpressionEmpty;
                 return false;
             }
             foreach (var token in _nodes.AsSpan())
@@ -30,7 +27,7 @@ namespace LivreNoirLibrary.Numerics
                 var opCount = token.OperandCount;
                 if (currentCount < opCount)
                 {
-                    exception = ArgumentTooFewException(currentCount, opCount);
+                    exception = ExpressionExceptions.ArgumentTooFew(currentCount, opCount);
                     return false;
                 }
                 var index = currentCount - opCount;
@@ -46,8 +43,7 @@ namespace LivreNoirLibrary.Numerics
         public bool TryEvaluate(TryGetFunc<T> variables, out T result, [MaybeNullWhen(true)] out Exception exception)
         {
             result = default;
-            using var obj = ObjectPool.Rent<List<LazyNode<T>>>();
-            var nodes = obj.Value;
+            using var obj = ObjectPool.Rent<List<LazyNode<T>>>(out var nodes);
             try
             {
                 if (!TryGetLazyNode(nodes, out exception))
@@ -72,8 +68,7 @@ namespace LivreNoirLibrary.Numerics
 
         public IEnumerable<T> EvaluateAll(TryGetFunc<T> variables)
         {
-            using var obj = ObjectPool.Rent<List<LazyNode<T>>>();
-            var nodes = obj.Value;
+            using var obj = ObjectPool.Rent<List<LazyNode<T>>>(out var nodes);
             if (TryGetLazyNode(nodes, out _))
             {
                 foreach (var node in nodes)

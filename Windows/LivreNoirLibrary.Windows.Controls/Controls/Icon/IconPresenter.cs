@@ -2,7 +2,6 @@
 using LivreNoirLibrary.Numerics;
 using LivreNoirLibrary.Windows.Media;
 using System;
-using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Windows;
 using System.Windows.Controls;
@@ -17,6 +16,7 @@ namespace LivreNoirLibrary.Windows.Controls
         static IconPresenter()
         {
             IsEnabledProperty.OverrideMetadata(typeof(IconPresenter), PropertyUtils.GetMeta(true, OnIsEnabledChanged));
+            ClipToBoundsProperty.OverrideMetadata(typeof(IconPresenter), PropertyUtils.GetMeta(true));
         }
 
         public static readonly FontFamily DefaultFontFamily = new("Segoe MDL2 Assets");
@@ -25,6 +25,7 @@ namespace LivreNoirLibrary.Windows.Controls
         public const StretchDirection DefaultStretchDirection = StretchDirection.Both;
         public const double DefaultSize = 32;
 
+        public static readonly DependencyProperty BackgroundProperty = Control.BackgroundProperty.AddOwner(typeof(IconPresenter));
         public static readonly DependencyProperty FontFamilyProperty = PropertyUtils.RegisterTwoWay(typeof(IconPresenter), DefaultFontFamily, OnFontFamilyChanged);
         public static readonly DependencyProperty ForegroundProperty = Control.ForegroundProperty.AddOwner(typeof(IconPresenter), DefaultForeground, OnForegroundChanged);
 
@@ -41,10 +42,7 @@ namespace LivreNoirLibrary.Windows.Controls
             if (d is IconPresenter i)
             {
                 i._option.FontFamily = (e.NewValue as FontFamily) ?? DefaultFontFamily;
-                if (i._ft is not null)
-                {
-                    i.UpdateText();
-                }
+                i.UpdateText();
             }
         }
 
@@ -53,32 +51,25 @@ namespace LivreNoirLibrary.Windows.Controls
             if (d is IconPresenter i)
             {
                 i._option.Foreground = (e.NewValue as Brush) ?? DefaultForeground;
-                if (i._ft is not null)
-                {
-                    i.UpdateText();
-                }
+                i.UpdateText();
             }
         }
-
-        private ImageSource? _imageSource;
-        private Drawing? _drawing;
-        private Visual? _visual;
-        private string? _text;
 
         private readonly FormattedTextOptions _option = new() { FontFamily = DefaultFontFamily, FontSize = DefaultSize, Foreground = DefaultForeground };
         private FormattedText? _ft;
 
-        private double _src_x = 0;
-        private double _src_y = 0;
-        private double _src_w = double.NaN;
-        private double _src_h = double.NaN;
-
-        [DependencyProperty(AffectsMeasure = true)]
+        [DependencyProperty(AffectsMeasure = true, AffectsRender = true)]
         private object? _source;
-        [DependencyProperty(AffectsMeasure = true)]
+        [DependencyProperty(AffectsMeasure = true, AffectsRender = true)]
         private Stretch _stretch = DefaultStretch;
-        [DependencyProperty(AffectsMeasure = true)]
+        [DependencyProperty(AffectsMeasure = true, AffectsRender = true)]
         private StretchDirection _stretchDirection = DefaultStretchDirection;
+        [DependencyProperty(AffectsRender = true)]
+        private AlignmentX _alignmentX = AlignmentX.Center;
+        [DependencyProperty(AffectsRender = true)]
+        private AlignmentY _alignmentY = AlignmentY.Center;
+
+        public Brush? Background { get => GetValue(BackgroundProperty) as Brush; set => SetValue(BackgroundProperty, value); }
 
         public FontFamily? FontFamily
         {
@@ -98,99 +89,18 @@ namespace LivreNoirLibrary.Windows.Controls
             IsHitTestVisible = false;
         }
 
-        private void OnSourceChanged(object? value)
-        {
-            if (ReferenceEquals(value, this))
-            {
-                value = null;
-            }
-            _imageSource = value as ImageSource;
-            _drawing = value as Drawing;
-            _visual = value as Visual;
-            _text = value?.ToString();
-            if (_imageSource is not null)
-            {
-                _src_x = 0;
-                _src_y = 0;
-                _src_w = _imageSource.Width;
-                _src_h = _imageSource.Height;
-            }
-            else if (_drawing is not null)
-            {
-                (_src_x, _src_y, _src_w, _src_h) = _drawing.Bounds;
-            }
-            else if (_visual is null && !string.IsNullOrEmpty(_text))
-            {
-                UpdateText();
-                return;
-            }
-            else
-            {
-                (_src_x, _src_y, _src_w, _src_h) = (0, 0, double.NaN, double.NaN);
-            }
-            _ft = null;
-            InvalidateMeasure();
-            InvalidateVisual();
-        }
+        private void OnSourceChanged() => UpdateText();
 
         private void UpdateText()
         {
-            _ft = _text!.CreateFormattedText(_option);
-            _src_x = 0;
-            _src_y = 0;
-            _src_w = _ft.Width;
-            _src_h = _ft.Height;
+            _ft = Source?.ToString()?.CreateFormattedText(_option);
             InvalidateMeasure();
             InvalidateVisual();
         }
 
         protected override Size MeasureOverride(Size availableSize)
         {
-            (Source as UIElement)?.Measure(new(double.PositiveInfinity, double.PositiveInfinity));
             return MeasureArrangeHelper(availableSize);
-
-                /*
-            var w = Width;
-            var h = Height;
-            var w_infinite = !double.IsFinite(w);
-            var h_infinite = !double.IsFinite(h);
-            if (double.IsFinite(_src_w))
-            {
-                if (w_infinite)
-                {
-                    if (h_infinite)
-                    {
-                        w = Math.Min(_src_w, availableSize.Width);
-                        h = Math.Min(_src_h, availableSize.Height);
-                    }
-                    else
-                    {
-                        w = _src_w * h / _src_h;
-                    }
-                }
-                else if (h_infinite)
-                {
-                    h = _src_h * w / _src_w;
-                }
-            }
-            else
-            {
-                if (w_infinite)
-                {
-                    w = _visual is not null ? availableSize.Width : 0;
-                }
-                if (h_infinite)
-                {
-                    h = _visual is not null ? availableSize.Height : 0;
-                }
-            }
-            return new(w, h);
-            if (Source is Drawing d && Icons.IconList.FirstOrDefault(i => i.Drawing == d) is { } info)
-            {
-                ExConsole.Write($"IconPresenter Measure: Source={info.Name}, Size=({w},{h})");
-            }
-            return new(0, 0);
-                */
         }
 
         protected override Size ArrangeOverride(Size finalSize)
@@ -200,225 +110,191 @@ namespace LivreNoirLibrary.Windows.Controls
             return size;
         }
 
-        private Size MeasureArrangeHelper(Size inputSize, [CallerMemberName]string? caller = null)
+        private Size MeasureArrangeHelper(Size inputSize)
         {
-            Size desiredSize;
-            switch (Source)
-            {
-                case UIElement element:
-                    desiredSize = element.DesiredSize;
-                    break;
-                case MediaPlayer mp:
-                    desiredSize = new(mp.NaturalVideoWidth, mp.NaturalVideoHeight);
-                    break;
-                case ImageSource image:
-                    desiredSize = new(image.Width, image.Height);
-                    break;
-                case Drawing drawing:
-                    var bounds = drawing.Bounds;
-                    desiredSize = new(bounds.Width, bounds.Height);
-                    break;
-                default:
-                    if (_ft is { } ft)
-                    {
-                        desiredSize = new(ft.Width, ft.Height);
-                        break;
-                    }
-                    else
-                    {
-                        return new(0, 0);
-                    }
-            }
-            var scale = ComputeScaleFactor(inputSize, desiredSize, Stretch, StretchDirection);
-            var w = desiredSize.Width * scale.Width;
-            var h = desiredSize.Height * scale.Height;
-            if (UseLayoutRounding)
-            {
-                w = Math.Round(w);
-                h = Math.Round(h);
-            }
-            ExConsole.Write($"{caller}: ({w}, {h})");
-            return new(w, h);
+            var (sourceW, sourceH) = GetContentSize();
+            var size = ComputeSize(Width, Height, inputSize.Width, inputSize.Height, sourceW, sourceH, Stretch, StretchDirection);
+            return size;
         }
 
-        internal static Size ComputeScaleFactor(Size availableSize, Size contentSize, Stretch stretch, StretchDirection stretchDirection)
+        public Size GetContentSize() => Source switch
         {
-            double sx = 1, sy = 1;
-            var isWidthFinite = double.IsFinite(availableSize.Width);
-            var isHeightFinite = double.IsFinite(availableSize.Height);
-            if (stretch is Stretch.Fill or Stretch.Uniform or Stretch.UniformToFill & (isWidthFinite || isHeightFinite))
+            Drawing drawing => drawing.Bounds.Size,
+            ImageSource image => new(image.Width, image.Height),
+            MediaPlayer mp => ApplyDisplayScale(mp.NaturalVideoWidth, mp.NaturalVideoHeight),
+            UIElement element => element.DesiredSize,
+            _ => _ft is { } ft ? new(ft.Width, ft.Height) : new(0, 0),
+        };
+
+        private Size ApplyDisplayScale(double w, double h)
+        {
+            var (dpiX, dpiY) = this.GetDisplayScale();
+            return new(w * dpiX, h * dpiY);
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        private static double ValidateScale(double value, StretchDirection stretchDirection) => stretchDirection switch
+        {
+            StretchDirection.UpOnly => Math.Max(value, 1),
+            StretchDirection.DownOnly => Math.Min(value, 1),
+            _ => value,
+        };
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        static double ApplyStretch(double input, double source, double refScale, Stretch stretch, StretchDirection stretchDirection) => stretch switch
+        {
+            Stretch.None => source == 0 ? input.Validate(0) : source, // sourceが確定していればその値、未確定ならinput
+            Stretch.Fill or Stretch.UniformToFill => input.Validate(source), // inputが有限ならその値、無限ならsource(0になる可能性あり)
+            Stretch.Uniform => Math.Min(source * ValidateScale(refScale, stretchDirection), input).Validate(0), // 与えられた拡大率に合わせるが、inputを上限とする
+            _ => 0,
+        };
+
+        public static Size ComputeSize(double specifiedW, double specifiedH, double inputW, double inputH, double sourceW, double sourceH, Stretch stretch, StretchDirection stretchDirection)
+        {
+            /**
+             * 想定されるパターン
+             * specified: 有限値 or NaN(未指定)
+             * input: 有限値 or +Infinity(無制限)
+             * source: 有限値 or 0(決定不能)
+             * 
+             * 返すべき値
+             * specified が有限 -> specified
+             * source が 0 -> input が無限なら 0, それ以外は input
+             * それ以外 -> source と input の小さい方
+             */
+            double w = 0, h = 0;
+            if (double.IsFinite(specifiedW))
             {
-                sx = contentSize.Width == 0 ? 0 : availableSize.Width / contentSize.Width;
-                sy = contentSize.Height == 0 ? 0 : availableSize.Height / contentSize.Height;
-                if (!isWidthFinite)
+                w = specifiedW;
+                if (double.IsFinite(specifiedH)) // 全て指定
                 {
-                    sx = sy;
+                    h = specifiedH;
                 }
-                else if (!isHeightFinite)
+                else // 幅のみ指定
                 {
-                    sy = sx;
+                    h = ApplyStretch(inputH, sourceH, specifiedW / sourceW, stretch, stretchDirection);
                 }
-                else
+            }
+            else
+            {
+                if (double.IsFinite(specifiedH)) // 高さのみ指定
+                {
+                    w = ApplyStretch(inputW, sourceW, specifiedH / sourceH, stretch, stretchDirection);
+                    h = specifiedH;
+                }
+                else // どちらも未定義
                 {
                     switch (stretch)
                     {
-                        case Stretch.Uniform:
-                            sx = sy = Math.Min(sx, sy);
+                        case Stretch.None:
+                            w = sourceW;
+                            h = sourceH;
                             break;
+                        case Stretch.Fill:
                         case Stretch.UniformToFill:
-                            sx = sy = Math.Max(sx, sy);
+                            w = inputW.Validate(sourceW);
+                            h = inputH.Validate(sourceH);
+                            break;
+                        case Stretch.Uniform:
+                            var scale = Math.Min(
+                                sourceW == 0 ? 1 : inputW / sourceW,
+                                sourceH == 0 ? 1 : inputH / sourceH
+                                );
+                            scale = ValidateScale(scale, stretchDirection).Validate(1);
+                            w = sourceW * scale;
+                            h = sourceH * scale;
                             break;
                     }
                 }
-                switch (stretchDirection)
-                {
-                    case StretchDirection.UpOnly:
-                        sx = Math.Max(sx, 1);
-                        sy = Math.Max(sy, 1);
-                        break;
-                    case StretchDirection.DownOnly:
-                        sx = Math.Min(sx, 1);
-                        sy = Math.Min(sy, 1);
-                        break;
-                }
             }
-            return new(sx, sy);
-        }
-
-        private static (double ScaleX, double ScaleY) GetScale(double dstW, double dstH, double srcW, double srcH, Stretch stretch, StretchDirection direction = StretchDirection.Both)
-        {
-            var scaleX = dstW / srcW;
-            var scaleY = dstH / srcH;
-            switch (stretch)
-            {
-                case Stretch.Fill:
-                    break;
-                case Stretch.Uniform:
-                case Stretch.UniformToFill:
-                    if (stretch is Stretch.Uniform ? scaleX <= scaleY : scaleX >= scaleY)
-                    {
-                        scaleY = scaleX;
-                    }
-                    else
-                    {
-                        scaleX = scaleY;
-                    }
-                    break;
-                default:
-                    scaleX = scaleY = 1;
-                    break;
-            }
-            switch (direction)
-            {
-                case StretchDirection.UpOnly:
-                    if (scaleX < 1) scaleX = 1;
-                    if (scaleY < 1) scaleY = 1;
-                    break;
-                case StretchDirection.DownOnly:
-                    if (scaleX > 1) scaleX = 1;
-                    if (scaleY > 1) scaleY = 1;
-                    break;
-            }
-            return (scaleX, scaleY);
+            return new(w, h);
         }
 
         protected override void OnRender(DrawingContext dc)
         {
             base.OnRender(dc);
-            var (w, h) = RenderSize;
+            var (renderW, renderH) = RenderSize;
+
+            if (Background is { } background)
+            {
+                dc.DrawRectangle(background, null, new(0, 0, renderW, renderH));
+            }
+
+            Action<DrawingContext> renderAction;
+            Rect sourceRect;
             switch (Source)
             {
-                case UIElement element:
-                    VisualBrush brush = new(element)
-                    {
-                        Stretch = Stretch,
-                        AlignmentX = AlignmentX.Center,
-                        AlignmentY = AlignmentY.Center,
-                    };
-                    ExConsole.Write((element.RenderSize, (w, h)));
-                    dc.DrawRectangle(brush, null, new(0, 0, w, h));
+                case Drawing drawing:
+                    sourceRect = drawing.Bounds;
+                    renderAction = dc => dc.DrawDrawing(drawing);
+                    break;
+                case ImageSource image:
+                    sourceRect = new(0, 0, image.Width, image.Height);
+                    renderAction = dc => dc.DrawImage(image, sourceRect);
                     break;
                 case MediaPlayer player:
-                    dc.DrawVideo(player, new(0, 0, w, h));
-                    return;
-                case ImageSource image:
-                    dc.DrawImage(image, new(0, 0, w, h));
-                    return;
-                case Drawing drawing:
-                    var bounds = drawing.Bounds;
-                    var m = Matrix.Identity;
-                    m.Translate(-bounds.X, -bounds.Y);
-                    m.Scale(w / bounds.Width, h / bounds.Height);
-                    MatrixTransform transform = new(m);
-                    transform.Freeze();
-                    dc.PushTransform(transform);
-                    dc.DrawDrawing(drawing);
-                    dc.Pop();
-                    return;
+                    sourceRect = new(new Point(0, 0), ApplyDisplayScale(player.NaturalVideoWidth, player.NaturalVideoHeight));
+                    renderAction = dc => dc.DrawVideo(player, sourceRect);
+                    break;
+                case UIElement element:
+                    sourceRect = new(0, 0, 1, 1);
+                    renderAction = dc =>
+                    {
+                        VisualBrush brush = new(element)
+                        {
+                            Stretch = Stretch,
+                            AlignmentX = AlignmentX.Center,
+                            AlignmentY = AlignmentY.Center,
+                        };
+                        dc.DrawRectangle(brush, null, sourceRect);
+                    };
+                    break;
                 default:
                     if (_ft is { } ft)
                     {
-                        m = Matrix.Identity;
-                        m.Scale(w / ft.Width, h / ft.Height);
-                        transform = new(m);
-                        transform.Freeze();
-                        dc.PushTransform(transform);
-                        dc.DrawText(ft, new(0, 0));
-                        dc.Pop();
+                        sourceRect = new(0, 0, ft.Width, ft.Height);
+                        renderAction = dc => dc.DrawText(ft, new(0, 0));
+                        break;
                     }
-                    return;
+                    else
+                    {
+                        return;
+                    }
             }
 
-            /*
-            var (dstW, dstH) = RenderSize;
-            Action renderAction;
-            if (_drawing is not null)
+            var stretch = Stretch;
+            var stretchDirection = StretchDirection;
+            var alignX = (int)AlignmentX;
+            var alignY = (int)AlignmentY;
+            var sx = renderW / sourceRect.Width;
+            var sy = renderH / sourceRect.Height;
+            switch (stretch)
             {
-                renderAction = () => dc.DrawDrawing(_drawing);
+                case Stretch.None:
+                    sx = sy = 1;
+                    break;
+                case Stretch.Uniform:
+                    sx = sy = Math.Min(sx, sy);
+                    break;
+                case Stretch.UniformToFill:
+                    sx = sy = Math.Max(sx, sy);
+                    break;
             }
-            else if (_imageSource is not null)
-            {
-                renderAction = () => dc.DrawImage(_imageSource, new(0, 0, _src_w, _src_h));
-            }
-            else if (_visual is not null)
-            {
-                VisualBrush brush = new(_visual)
-                {
-                    Stretch = _stretch,
-                    AlignmentX = AlignmentX.Center,
-                    AlignmentY = AlignmentY.Center,
-                };
-                dc.DrawRectangle(brush, null, new(0, 0, dstW, dstH));
-                return;
-            }
-            else if (_ft is not null)
-            {
-                renderAction = () => dc.DrawText(_ft, new(0, 0));
-            }
-            else
-            {
-                return;
-            }
-            //var (scaleX, scaleY) = GetScale(dstW, dstH, _src_w, _src_h, _stretch);
-            var scaleX = dstW / _src_w;
-            var scaleY = dstH / _src_h;
-            var ox = (dstW - _src_w * scaleX) * 0.5;
-            var oy = (dstH - _src_h * scaleY) * 0.5;
-            if (UseLayoutRounding)
-            {
-                ox = Math.Round(ox);
-                oy = Math.Round(oy);
-            }
-            Matrix m = new();
-            m.Translate(-_src_x, -_src_y);
-            m.Scale(scaleX, scaleY);
-            m.Translate(ox, oy);
-            MatrixTransform mt = new(m);
-            mt.Freeze();
-            dc.PushTransform(mt);
-            renderAction();
+            sx = ValidateScale(sx, stretchDirection);
+            sy = ValidateScale(sy, stretchDirection);
+            var actualW = sourceRect.Width * sx;
+            var actualH = sourceRect.Height * sy;
+            var offsetX = (renderW - actualW) * alignX * 0.5;
+            var offsetY = (renderH - actualH) * alignY * 0.5;
+            var m = Matrix.Identity;
+            m.Translate(-sourceRect.X, -sourceRect.Y);
+            m.Scale(sx, sy);
+            m.Translate(offsetX, offsetY);
+            MatrixTransform t = new(m);
+            t.Freeze();
+            dc.PushTransform(t);
+            renderAction(dc);
             dc.Pop();
-             */
         }
     }
 }

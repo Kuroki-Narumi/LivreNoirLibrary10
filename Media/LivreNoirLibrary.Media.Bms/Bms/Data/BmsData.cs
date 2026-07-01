@@ -17,7 +17,7 @@ namespace LivreNoirLibrary.Media.Bms
             return data;
         }
 
-        private readonly List<BaseData> _dataList = [new()];
+        private readonly List<BmsDataUnit> _dataList = [new()];
         private readonly SortedSet<int> _freeDataIndex = [];
 
         public ChartType ChartType { get; set; }
@@ -149,7 +149,7 @@ namespace LivreNoirLibrary.Media.Bms
             count = reader.ReadInt32();
             for (var i = 0; i < count; i++)
             {
-                BaseData data;
+                BmsDataUnit data;
                 if (i >= list.Count)
                 {
                     data = new();

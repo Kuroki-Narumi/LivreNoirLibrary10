@@ -16,11 +16,6 @@ namespace LivreNoirLibrary.YuGiOh
         public const string Scale_Short = $"P{Scale}";
         public const string Scale_Full = $"{Pendulum}{Scale}";
 
-        public const string Unusable = "使用不可";
-        public const string Forbidden = "禁止";
-        public const string Limit1 = "制限";
-        public const string Limit2 = "準制限";
-        public const string Unlimited = "無制限";
-        public const string Specified = "特別指定";
+        public const string Separators = "/／|｜,、";
     }
 }

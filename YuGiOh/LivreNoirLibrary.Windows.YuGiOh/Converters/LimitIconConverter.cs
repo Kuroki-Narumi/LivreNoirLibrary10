@@ -11,11 +11,11 @@ namespace LivreNoirLibrary.Windows.YuGiOh
         {
             if (value is Card card)
             {
-                return Icons.GetLimitIcon(Regulation.Instance.Get(card));
+                return Icons.GetLimitIconOrNull(Regulation.Instance.Get(card));
             }
             else if (value is ICardWrapper w)
             {
-                return Icons.GetLimitIcon(Regulation.Instance.Get(w.Card));
+                return Icons.GetLimitIconOrNull(Regulation.Instance.Get(w.Card));
             }
             return null;
         }

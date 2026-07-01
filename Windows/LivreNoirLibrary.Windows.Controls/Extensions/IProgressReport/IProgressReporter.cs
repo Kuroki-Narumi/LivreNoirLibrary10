@@ -17,9 +17,9 @@ namespace LivreNoirLibrary.Windows.Controls
 
     public static class IProgressExtension
     {
-        public static void StartTask(this IProgressReporter ip, StartTaskArgs args) => StartTask(ip, args.MainProcess, args.IsAbortable, args.InitialReport, args.Finished);
+        public static void StartTask(this IProgressReporter ip, StartTaskArgs args) => StartTask(ip, args.MainProcess, args.AsyncProcess, args.IsAbortable, args.InitialReport, args.Finished);
 
-        public static void StartTask(this IProgressReporter ip, ProgressHandler mainProcess, bool isAbortable = true, ProgressReport initialReport = default, TaskFinishedHandler? finished = null)
+        public static void StartTask(this IProgressReporter ip, ProgressHandler? mainProcess = null, AsyncProgressHandler? asyncProcess = null, bool isAbortable = true, ProgressReport initialReport = default, TaskFinishedHandler? finished = null)
         {
             if (ip.WorkingTask is { } task)
             {
@@ -28,7 +28,7 @@ namespace LivreNoirLibrary.Windows.Controls
             }
             PrepareTask(ip, initialReport, isAbortable);
             ProgressReporter progress = new(ip.ProgressBar.OnProgressChanged);
-            ip.WorkingTask = ProcessTask(ip, progress, mainProcess, finished);
+            ip.WorkingTask = ProcessTask(ip, progress, mainProcess, asyncProcess, finished);
         }
 
         public static void PrepareTask(this IProgressReporter ip, in ProgressReport report, bool abortable = false)
@@ -56,24 +56,39 @@ namespace LivreNoirLibrary.Windows.Controls
             e.Cancel = true;
         }
 
-        private static async Task ProcessTask(IProgressReporter ip, ProgressReporter p, ProgressHandler mainProcess, TaskFinishedHandler? finished)
+        private static async Task ProcessTask(IProgressReporter ip, ProgressReporter p, ProgressHandler? mainProcess, AsyncProgressHandler? asyncProcess, TaskFinishedHandler? finished)
         {
             var aborted = false;
             var c = ip.ProgressBar.CreateCancellationTokenSource();
             var token = c.Token;
             try
             {
-                await Task.Run(() =>
+                if (mainProcess is not null)
+                {
+                    await Task.Run(async () =>
+                    {
+                        try
+                        {
+                            mainProcess(p, token);
+                        }
+                        catch (OperationCanceledException)
+                        {
+                            aborted = true;
+                        }
+                    }, token);
+                }
+
+                if (asyncProcess is not null)
                 {
                     try
                     {
-                        mainProcess(p, token);
+                        await asyncProcess(p, token);
                     }
                     catch (OperationCanceledException)
                     {
                         aborted = true;
                     }
-                }, token);
+                }
             }
             finally
             {
@@ -88,7 +103,7 @@ namespace LivreNoirLibrary.Windows.Controls
 
         public static void StartTaskSynchronized(this IProgressReporter ip, StartTaskArgs args) => StartTaskSynchronized(ip, args.MainProcess, args.IsAbortable, args.InitialReport, args.Finished);
 
-        public static void StartTaskSynchronized(this IProgressReporter ip, ProgressHandler mainProcess, bool isAbortable = true, ProgressReport initialReport = default, TaskFinishedHandler? finished = null)
+        public static void StartTaskSynchronized(this IProgressReporter ip, ProgressHandler? mainProcess, bool isAbortable = true, ProgressReport initialReport = default, TaskFinishedHandler? finished = null)
         {
             if (ip.WorkingTask is { } task)
             {
@@ -105,7 +120,7 @@ namespace LivreNoirLibrary.Windows.Controls
             var token = c.Token;
             try
             {
-                mainProcess(progress, token);
+                mainProcess?.Invoke(progress, token);
             }
             catch (OperationCanceledException)
             {

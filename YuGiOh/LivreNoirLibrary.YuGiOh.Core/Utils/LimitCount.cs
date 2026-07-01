@@ -2,7 +2,7 @@
 
 namespace LivreNoirLibrary.YuGiOh
 {
-    public static class LimitNumber
+    public static class LimitCount
     {
         public const int Unusable = -1;
         public const int Forbidden = 0;

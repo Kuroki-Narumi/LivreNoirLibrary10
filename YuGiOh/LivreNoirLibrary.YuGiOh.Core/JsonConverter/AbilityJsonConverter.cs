@@ -11,11 +11,7 @@ namespace LivreNoirLibrary.YuGiOh.Converters
             switch (reader.TokenType)
             {
                 case JsonTokenType.String:
-                    if (reader.GetString() is string str)
-                    {
-                        return Vocab.GetAbility(str.Split("/"));
-                    }
-                    return 0;
+                    return Vocab.GetAbility(reader.GetString());
                 case JsonTokenType.Number:
                     return (Ability)reader.GetInt32();
                 case JsonTokenType.Null:

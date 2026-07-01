@@ -43,7 +43,7 @@ namespace LivreNoirLibrary.Numerics
                         opCount = functionOperandCounts.Pop() + (expectValueToken ? 0 : 1);
                         break;
                     default:
-                        exception = new ExpressionParseException($"unexpected token detected {token.Symbol}", expression, index);
+                        exception = ExpressionExceptions.UnexpectedToken(token.Symbol, expression, index);
                         return true;
                 }
                 if (TryGetFunctionNode(token.Symbol, opCount, out var node, out exception))
@@ -71,7 +71,7 @@ namespace LivreNoirLibrary.Numerics
                                 // 対応する開き括弧でない場合は不正
                                 if (open.CloseSymbol != symbol)
                                 {
-                                    exception = new ExpressionParseException($"unexpected close bracket (\"{symbol}\", expected=\"{open.CloseSymbol}\")", expression, i);
+                                    exception = ExpressionExceptions.UnexpectedCloseBracket(symbol, open.CloseSymbol, expression, i);
                                     goto ReturnInvalid;
                                 }
                                 // スタックのトップが関数トークンの場合は、それも取り出す
@@ -93,13 +93,13 @@ namespace LivreNoirLibrary.Numerics
                             }
                         }
                         // 開き括弧が見つからなかった場合は不正
-                        exception = new ExpressionParseException("open bracket missing", expression, i);
+                        exception = ExpressionExceptions.OpenBracketMissing(expression, i);
                         goto ReturnInvalid;
                     case SymbolType.ArgumentDelimiter:
                         // 関数の内部でない場合は不正
                         if (functionOperandCounts.Count is 0)
                         {
-                            exception = new ExpressionParseException("argument delimiter must be written in a function", expression, i);
+                            exception = ExpressionExceptions.UnexpectedDelimiter(expression, i);
                             goto ReturnInvalid;
                         }
                         // 開き括弧が見つかるまでスタックを掘る
@@ -124,7 +124,7 @@ namespace LivreNoirLibrary.Numerics
                             }
                         }
                         // 開き括弧が見つからなかった場合は不正
-                        exception = new ExpressionParseException("open bracket missing", expression, i);
+                        exception = ExpressionExceptions.OpenBracketMissing(expression, i);
                         goto ReturnInvalid;
                     case SymbolType.Number:
                         if (T.TryParse(symbol, null, out var value))
@@ -136,7 +136,7 @@ namespace LivreNoirLibrary.Numerics
                         else
                         {
                             // 数値に変換できない場合は不正
-                            exception = new ExpressionParseException($"unparsable number symbol ({symbol})", expression, i);
+                            exception = ExpressionExceptions.UnparsableSymbol(symbol, expression, i);
                             goto ReturnInvalid;
                         }
                         break;
@@ -163,7 +163,7 @@ namespace LivreNoirLibrary.Numerics
                                         // 期待と異なる第一記号が見つかった場合
                                         if (op.SecondSymbol != symbol)
                                         {
-                                            exception = new ExpressionParseException($"unexpected ternary symbol (\"{symbol}\", expected=\"{op.SecondSymbol}\")", expression, i);
+                                            exception = ExpressionExceptions.UnexpectedTernarySymbol(symbol, op.SecondSymbol, expression, i);
                                             goto ReturnInvalid;
                                         }
                                         // 完成した演算子としてスタックに再プッシュ
@@ -177,7 +177,7 @@ namespace LivreNoirLibrary.Numerics
                                     }
                                 }
                                 // 第一記号が見つからなかった場合は不正
-                                exception = new ExpressionParseException($"ternary operator symbol missing", expression, i);
+                                exception = ExpressionExceptions.TernarySymbolMissing(expression, i);
                                 goto ReturnInvalid;
                             }
                             else
@@ -214,10 +214,10 @@ namespace LivreNoirLibrary.Numerics
                 switch (token)
                 {
                     case TernaryOperator1Token: // 未処理の三項演算子
-                        exception = new ExpressionParseException($"unresolved ternary operator({token.Symbol})", expression, len);
+                        exception = ExpressionExceptions.UnresolvedTernaryOperator(token.Symbol, expression, len);
                         goto ReturnInvalid;
                     case OpenBracketToken: // 閉じられていない括弧
-                        exception = new ExpressionParseException("unclosed open bracket", expression, len);
+                        exception = ExpressionExceptions.UnclosedOpenBracket(token.Symbol, expression, len);
                         goto ReturnInvalid;
                     default:
                         if (AssertAddNode(token, expression, len, out exception))
@@ -229,7 +229,7 @@ namespace LivreNoirLibrary.Numerics
             }
         ReturnInvalid:
             list.Clear();
-            exception ??= new ExpressionParseException("unhandled exception", expression, 0);
+            exception ??= ExpressionExceptions.Unhandled(expression, 0);
             return false;
         }
     }

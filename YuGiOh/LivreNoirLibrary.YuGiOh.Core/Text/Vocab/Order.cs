@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using LivreNoirLibrary.Collections;
 using LivreNoirLibrary.YuGiOh.MasterDuel;
 
 namespace LivreNoirLibrary.YuGiOh
@@ -25,10 +24,6 @@ namespace LivreNoirLibrary.YuGiOh
         public const string Second_Full = $"{CoinLose} / {Second}";
         public const string CSecond_Full = $"{CoinWin} / {Second}";
 
-        public static string GetName(Order value) => GetEnumName(value, _order2name);
-        public static string GetFullName(Order value) => GetEnumName(value, _order2name_full);
-        public static Order GetOrder(string? name) => GetEnumValue(name, _name2order);
-
         private static readonly Dictionary<Order, string> _order2name = new()
         {
             { MasterDuel.Order.First, WinFirst },
@@ -45,24 +40,19 @@ namespace LivreNoirLibrary.YuGiOh
             { MasterDuel.Order.CSecond, CSecond_Full },
         };
 
-        private static readonly Dictionary<string, Order> _name2order = CreateName2Order();
-
-        private static Dictionary<string, Order> CreateName2Order()
+        private static readonly Dictionary<string, Order>.AlternateLookup<ReadOnlySpan<char>> _name2order = CreateName2Order();
+        private static Dictionary<string, Order>.AlternateLookup<ReadOnlySpan<char>> CreateName2Order()
         {
-            var dic = _order2name.Invert();
+            var dic = CreateInvertedDictionary(_order2name);
             foreach (var (k, v) in _order2name_full)
             {
-                dic.Add(v, k);
+                dic[v] = k;
             }
-            void Add(Order order)
-            {
-                dic.Add(order.ToString(), order);
-            }
-            Add(MasterDuel.Order.First);
-            Add(MasterDuel.Order.CFirst);
-            Add(MasterDuel.Order.Second);
-            Add(MasterDuel.Order.CSecond);
             return dic;
         }
+
+        public static string GetName(Order value) => GetEnumName(value, _order2name);
+        public static string GetFullName(Order value) => GetEnumName(value, _order2name_full);
+        public static Order GetOrder(ReadOnlySpan<char> name) => GetEnumValue(name, _name2order);
     }
 }

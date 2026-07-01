@@ -12,7 +12,7 @@ namespace LivreNoirLibrary.Media.Bms
         public const double DefaultBarLength = 1;
         public const double StopUnit = 1d / 192d;
         public const int MaxBarNumber = 999;
-        public const long MaxInnerResolution = 432000;
+        public const long MaxInnerResolution = 1209600;
 
         public const int MaxKeyLane = 72;
 

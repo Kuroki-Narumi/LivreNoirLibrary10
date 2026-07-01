@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Runtime.Intrinsics;
 using System.Text;
+using System.Windows.Media;
 
 namespace LivreNoirLibrary.SandBox.Test
 {
@@ -27,6 +28,5 @@ namespace LivreNoirLibrary.SandBox.Test
 
     static class BitmapOperations
     {
-
     }
 }

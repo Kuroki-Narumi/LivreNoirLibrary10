@@ -1,4 +1,5 @@
-﻿using System;
+﻿using LivreNoirLibrary.ObjectModel;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
@@ -10,23 +11,23 @@ namespace LivreNoirLibrary.YuGiOh.Data
         [GeneratedRegex(@"(?<!(?:そ|ター|カード|相手)の効果は)「(?<name1>[^「」]*(?:「[^「」]+」[^「」]*)*)」(?!効果は|効果を持つ|として適用)|(?<!(?:resolve|effect) becomes? |effect, )""(?<name2>[^""]*)""")]
         private static partial Regex Regex_Name { get; }
 
-        [GeneratedRegex(@"属性は(「[^」]+?」)+としても")]
+        [GeneratedRegex(@"属性(?:は|を)(「[^」]」)+としても")]
         private static partial Regex Regex_Name_Attr { get; }
 
-        public string[] RelatedList => _related_created ? _related : GetRelated();
-        private string[] _related = [];
-        private bool _related_created;
+        private string[]? _related = [];
+        public IEnumerable<string> RelatedList => _related ?? CreateRelatedList();
 
-        private string[] GetRelated()
+        private string[] CreateRelatedList()
         {
-            _related_created = true;
-            HashSet<string> set = [Name];
+            using var o1 = ObjectPool.Rent<HashSet<string>>(out var set);
+            using var o2 = ObjectPool.Rent<List<(int, int)>>(out var attr);
+            set.Add(Name);
             int index = 0;
             Match match;
-            List<(int, int)> attr = [];
+            var text = Text;
             for (; ; )
             {
-                match = Regex_Name_Attr.Match(Text, index);
+                match = Regex_Name_Attr.Match(text, index);
                 if (match.Success)
                 {
                     index = match.Index + match.Length;
@@ -40,7 +41,7 @@ namespace LivreNoirLibrary.YuGiOh.Data
             index = 0;
             for (; ; )
             {
-                match = Regex_Name.Match(Text, index);
+                match = Regex_Name.Match(text, index);
                 if (match.Success)
                 {
                     var name = match.Groups["name1"].Success ? match.Groups["name1"].Value : match.Groups["name2"].Value;

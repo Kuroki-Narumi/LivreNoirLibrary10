@@ -13,6 +13,22 @@ namespace LivreNoirLibrary.ObjectModel
         public static PooledObject<T> Rent<T>() where T : class, new() => new(DefaultFactory<T>.Instance);
         public static PooledObject<T> Rent<T>(Func<T> factory) where T : class => new(factory);
 
+        public static PooledObject<T> Rent<T>(out T obj)
+            where T : class, new()
+        {
+            var ret = Rent<T>();
+            obj = ret.Value;
+            return ret;
+        }
+
+        public static PooledObject<T> Rent<T>(Func<T> factory, out T obj)
+            where T : class
+        {
+            var ret = Rent(factory);
+            obj = ret.Value;
+            return ret;
+        }
+
         private static class DefaultFactory<T>
             where T : class, new()
         {

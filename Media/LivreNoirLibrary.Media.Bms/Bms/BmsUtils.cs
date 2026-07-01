@@ -242,5 +242,7 @@ namespace LivreNoirLibrary.Media.Bms
             dic[Channel.ChangeOption] = DefType.ChangeOption;
             return dic;
         }
+
+        public static Rational Rationalize(double position) => Rational.RationalizeUnsafe(position, BmsConstants.MaxInnerResolution);
     }
 }

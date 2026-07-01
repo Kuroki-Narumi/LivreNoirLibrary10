@@ -3,12 +3,12 @@ using System.Text.Json.Serialization;
 
 namespace LivreNoirLibrary.YuGiOh.Serializable
 {
-    public class PackInfo
+    public class CardPackItem
     {
-        [JsonPropertyName(JsonPropertyNames.ProductId)]
-        public string? ProductId { get; set; }
+        [JsonPropertyName(JsonPropertyNames.Id)]
+        public int CardId { get; set; }
 
         [JsonPropertyName(JsonPropertyNames.Number)]
-        public string? Number { get; set; }
+        public string Number { get; set; } = "";
     }
 }

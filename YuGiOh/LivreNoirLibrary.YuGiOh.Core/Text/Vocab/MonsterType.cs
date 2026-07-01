@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using LivreNoirLibrary.Collections;
 
 namespace LivreNoirLibrary.YuGiOh
 {
@@ -63,11 +62,6 @@ namespace LivreNoirLibrary.YuGiOh
         public const string MT_DivineBeast = $"{DivineBeast}{MType_Suffix}";
         public const string MT_CreatorGod = $"{CreatorGod}{MType_Suffix}";
 
-        public static string GetName(this MonsterType value) => GetEnumName(value, _mType2name);
-        public static string GetShortName(this MonsterType value) => GetEnumName(value, _mType2name_short);
-        public static MonsterType GetMonsterType(this string? name) => GetEnumValue(name, _name2mType);
-        public static bool TryGetMonsterType(this string name, out MonsterType type) => TryGetEnumValue(name, _name2mType, out type);
-
         private static readonly Dictionary<MonsterType, string> _mType2name = new()
         {
             { YuGiOh.MonsterType.Spellcaster, MT_Spellcaster },
@@ -128,18 +122,21 @@ namespace LivreNoirLibrary.YuGiOh
             { YuGiOh.MonsterType.CreatorGod, CreatorGod },
         };
 
-        private static readonly Dictionary<string, MonsterType> _name2mType = CreateName2MType();
-
-        private static Dictionary<string, MonsterType> CreateName2MType()
+        private static Dictionary<string, MonsterType>.AlternateLookup<ReadOnlySpan<char>> _name2mType = CreateName2MType();
+        private static Dictionary<string, MonsterType>.AlternateLookup<ReadOnlySpan<char>> CreateName2MType()
         {
-            var dic = _mType2name.Invert();
+            var dic = CreateInvertedDictionary(_mType2name);
+            // "族"を除いた表記
             foreach (var (type, name) in _mType2name_short)
             {
-                dic.Add(name, type);
+                dic[name] = type;
             }
-            AppendEnglishNames(dic);
-            dic.Add($"{Illusion}Type", YuGiOh.MonsterType.Illusion);
             return dic;
         }
+
+        public static string GetName(this MonsterType value) => GetEnumName(value, _mType2name);
+        public static string GetShortName(this MonsterType value) => GetEnumName(value, _mType2name_short);
+        public static MonsterType GetMonsterType(this ReadOnlySpan<char> name) => GetEnumValue(name, _name2mType);
+        public static bool TryGetMonsterType(this ReadOnlySpan<char> name, out MonsterType type) => TryGetEnumValue(name, _name2mType, out type);
     }
 }

@@ -1,17 +1,14 @@
 ﻿using System;
 using System.Linq;
-using System.Collections.Generic;
-using System.Text;
 using System.Windows.Controls;
 using System.Windows.Media;
-using System.Globalization;
-using System.Windows.Markup;
+using LivreNoirLibrary.Windows.Media;
 
 namespace LivreNoirLibrary.Windows.Controls
 {
     public partial class FontSelector : ComboBox
     {
-        private static readonly FontSelectorItem[] _items = [.. Fonts.SystemFontFamilies.Select(font => new FontSelectorItem(font))];
+        private static readonly FontInfo[] _items = [.. Fonts.SystemFontFamilies.Select(font => new FontInfo(font))];
 
         static FontSelector()
         {
@@ -42,33 +39,12 @@ namespace LivreNoirLibrary.Windows.Controls
         protected override void OnSelectionChanged(SelectionChangedEventArgs e)
         {
             base.OnSelectionChanged(e);
-            if (!_fontFamilyUpdating && e.AddedItems[0] is FontSelectorItem item)
+            if (!_fontFamilyUpdating && e.AddedItems[0] is FontInfo item)
             {
                 _fontFamilyUpdating = true;
                 SelectedFontFamily = item.FontFamily;
                 _fontFamilyUpdating = false;
             }
-        }
-    }
-
-    public class FontSelectorItem(FontFamily fontFamily)
-    {
-        public FontFamily FontFamily { get; } = fontFamily;
-        public string Source => FontFamily.Source;
-        public string FriendlyName => GetName(FontFamily);
-
-        private static string GetName(FontFamily fontFamily)
-        {
-            var names = fontFamily.FamilyNames;
-            if (names.TryGetValue(XmlLanguage.GetLanguage(CultureInfo.CurrentCulture.IetfLanguageTag), out var name))
-            {
-                return name;
-            }
-            if (names.TryGetValue(XmlLanguage.GetLanguage("en-us"), out name))
-            {
-                return name;
-            }
-            return "???";
         }
     }
 }

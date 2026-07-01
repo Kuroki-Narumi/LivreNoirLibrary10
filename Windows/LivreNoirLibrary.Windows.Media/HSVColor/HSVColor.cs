@@ -21,7 +21,7 @@ namespace LivreNoirLibrary.Windows.Media
         public byte ByteG => GetByte(G);
         public byte ByteB => GetByte(B);
 
-        private HsvColor(bool fromRGB, float a, float v1, float v2, float v3)
+        private HsvColor(bool fromRGB, float a, float v1, float v2, float v3, float fallbackH = 0, float fallbackS = 0)
         {
             A = Math.Clamp(a, 0, 1);
             if (fromRGB)
@@ -29,7 +29,7 @@ namespace LivreNoirLibrary.Windows.Media
                 R = Math.Clamp(v1, 0, 1);
                 G = Math.Clamp(v2, 0, 1);
                 B = Math.Clamp(v3, 0, 1);
-                (H, S, V) = CalcHSV(v1, v2, v3);
+                (H, S, V) = CalcHSV(v1, v2, v3, fallbackH, fallbackS);
             }
             else
             {
@@ -101,22 +101,22 @@ namespace LivreNoirLibrary.Windows.Media
             return alpha ? $"#{a:X2}{r:X2}{g:X2}{b:X2}" : $"#{r:X2}{g:X2}{b:X2}";
         }
 
-        public static bool TryParseColorCode(string colorCode, out HsvColor color)
+        public static bool TryParseColorCode(string colorCode, out HsvColor color, float fallbackH = 0, float fallbackS = 0)
         {
             if (ColorUtils.TryParseColorCode(colorCode, out var a, out var r, out var g, out var b))
             {
-                color = new(true, a, r, g, b);
+                color = new(true, a, r, g, b, fallbackH, fallbackS);
                 return true;
             }
             color = default;
             return false;
         }
 
-        public static HsvColor FromColorCode(string colorCode)
+        public static HsvColor FromColorCode(string colorCode, float fallbackH = 0, float fallbackS = 0)
         {
             if (ColorUtils.TryParseColorCode(colorCode, out var a, out var r, out var g, out var b))
             {
-                return new(true, a, r, g, b);
+                return new(true, a, r, g, b, fallbackH, fallbackS);
             }
             throw new FormatException($"wrong color code style: {colorCode}");
         }

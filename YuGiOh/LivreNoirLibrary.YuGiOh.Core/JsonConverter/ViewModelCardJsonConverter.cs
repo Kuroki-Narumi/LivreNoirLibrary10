@@ -38,27 +38,14 @@ namespace LivreNoirLibrary.YuGiOh.Converters
                 WriteStatus(writer, JsonPropertyNames.Atk, value.Atk);
                 WriteStatus(writer, JsonPropertyNames.Def, value.Def);
                 writer.WriteEndObject();
-                if (value.Ability.IsPendulum())
-                {
-                    writer.WritePropertyName(JsonPropertyNames.PendulumInfo);
-                    writer.WriteStartObject();
-                    writer.WriteNumber(JsonPropertyNames.Scale, value.PendulumScale);
-                    writer.WriteStringIfNotNull(JsonPropertyNames.Text, value.PendulumText);
-                    writer.WriteEndObject();
-                }
             }
-            if (value.PackInfo.Count is > 0)
+            if (value.Ability.IsPendulum())
             {
-                writer.WritePropertyName(JsonPropertyNames.PackInfo);
-                writer.WriteStartArray();
-                foreach (var info in value.PackInfo)
-                {
-                    writer.WriteStartObject();
-                    writer.WriteString(JsonPropertyNames.ProductId, info.ProductId);
-                    writer.WriteString(JsonPropertyNames.Number, info.Number);
-                    writer.WriteEndObject();
-                }
-                writer.WriteEndArray();
+                writer.WritePropertyName(JsonPropertyNames.PendulumInfo);
+                writer.WriteStartObject();
+                writer.WriteNumber(JsonPropertyNames.Scale, value.PendulumScale);
+                writer.WriteStringIfNotNull(JsonPropertyNames.Text, value.PendulumText);
+                writer.WriteEndObject();
             }
             writer.WriteEndObject();
         }

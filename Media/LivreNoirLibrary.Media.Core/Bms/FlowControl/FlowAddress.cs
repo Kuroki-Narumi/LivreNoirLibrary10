@@ -8,6 +8,7 @@ namespace LivreNoirLibrary.Media.Bms
     public class FlowAddress : IEquatable<FlowAddress>, IComparable<FlowAddress>, IComparisonOperators<FlowAddress, FlowAddress, bool>
     {
         private static readonly Dictionary<(int[], int), FlowAddress> _cache = [];
+        private static readonly Dictionary<int[], FlowAddress> _reverseCache = [];
 
         public static FlowAddress Empty { get; } = new();
 
@@ -19,6 +20,25 @@ namespace LivreNoirLibrary.Media.Bms
             {
                 newAddress = new([.. array, value]);
                 _cache.Add(key, newAddress);
+                _reverseCache.Add(newAddress._array, address);
+            }
+            return newAddress;
+        }
+
+        public static FlowAddress Back(FlowAddress address)
+        {
+            var array = address._array;
+            if (array.Length <= 1)
+            {
+                return address;
+            }
+            if (!_reverseCache.TryGetValue(array, out var newAddress))
+            {
+                newAddress = Empty;
+                foreach (var value in array.AsSpan()[..^1])
+                {
+                    newAddress = Append(newAddress, value);
+                }
             }
             return newAddress;
         }
@@ -48,7 +68,7 @@ namespace LivreNoirLibrary.Media.Bms
         private FlowAddress()
         {
             _array = [];
-            _toString = "[empty]";
+            _toString = "[root]";
         }
 
         private FlowAddress(int[] array)
@@ -61,7 +81,16 @@ namespace LivreNoirLibrary.Media.Bms
             ReadOnlySpan<char> delim = ['-', ';'];
             for (var i = 0; i < arrayLength; i++)
             {
-                array[i].TryFormat(chars[index..], out var charsWritten);
+                var charsWritten = 1;
+                var value = array[i];
+                if (value is BmsConstants.DefaultCondition)
+                {
+                    chars[index] = '*';
+                }
+                else
+                {
+                    value.TryFormat(chars[index..], out charsWritten);
+                }
                 chars[index + charsWritten] = delim[i % 2];
                 index += charsWritten + 1;
             }
@@ -82,6 +111,7 @@ namespace LivreNoirLibrary.Media.Bms
 
         public FlowAddress Append(int value) => Append(this, value);
         public FlowAddress ChangeAt(int index, int value) => ChangeAt(this, index, value);
+        public FlowAddress Back() => Back(this);
 
         public bool Equals(FlowAddress? other) => ReferenceEquals(_array, other?._array);
         public override bool Equals(object? obj) => obj is FlowAddress other && Equals(other);

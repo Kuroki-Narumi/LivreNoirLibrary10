@@ -3,155 +3,160 @@ using System.Runtime.CompilerServices;
 using System.Windows.Media;
 using LivreNoirLibrary.ObjectModel;
 using LivreNoirLibrary.Media;
-using static LivreNoirLibrary.Media.ColorUtils;
 
 namespace LivreNoirLibrary.Windows.Media
 {
     public partial class ColorInfo : ObservableObjectBase
     {
-        private float _a;
-        private float _r;
-        private float _g;
-        private float _b;
-        private float _h;
-        private float _s;
-        private float _v;
+        public const float HueInvertFactor = 1f / 359f;
+
+        public event Action<Color>? ColorChanged;
 
         public bool IsAlphaEnabled { get; set => SetValue(ref field, value); }
 
-        public float A { get => _a; set => SetPropertyA(ref _a, Math.Clamp(value, 0, 1)); }
-        public float R { get => _r; set => SetProperty(ref _r, Math.Clamp(value, 0, 1)); }
-        public float G  { get => _g; set => SetProperty(ref _g, Math.Clamp(value, 0, 1)); }
-        public float B { get => _b; set => SetProperty(ref _b, Math.Clamp(value, 0, 1)); }
-        public float H { get => _h; set => SetPropertyH(ref _h, Math.Clamp(value, 0, 360)); }
-        public float S { get => _s; set => SetPropertySV(ref _s, Math.Clamp(value, 0, 1)); }
-        public float V { get => _v; set => SetPropertySV(ref _v, Math.Clamp(value, 0, 1)); }
+        public float A { get; private set => SetValue(ref field, value, [nameof(IntA)]); }
+        public float R { get; private set => SetValue(ref field, value, [nameof(IntR)]); }
+        public float G { get; private set => SetValue(ref field, value, [nameof(IntG)]); }
+        public float B { get; private set => SetValue(ref field, value, [nameof(IntB)]); }
+        public float H { get; private set => SetValue(ref field, value, [nameof(IntH), nameof(ScaledIntH)]); }
+        public float S { get; private set => SetValue(ref field, value, [nameof(IntS)]); }
+        public float V { get; private set => SetValue(ref field, value, [nameof(IntV)]); }
 
-        public int IntA { get => GetInt(_a); set => A = GetFloat(value); }
-        public int IntR { get => GetInt(_r); set => R = GetFloat(value); }
-        public int IntG { get => GetInt(_g); set => G = GetFloat(value); }
-        public int IntB { get => GetInt(_b); set => B = GetFloat(value); }
-        public int IntH { get => (int)MathF.Round(_h); set => H = value; }
-        public int IntS { get => GetInt(_s); set => S = GetFloat(value); }
-        public int IntV { get => GetInt(_v); set => V = GetFloat(value); }
-
-        public Color Color { get => GetColor(); set => SetColor(value); }
-        public string ColorCode { get => GetColorCode(); set => SetColorCode(value); }
-
-        public Color GetColor()
+        public int IntA
         {
-            var a = IsAlphaEnabled ? GetByte(_a) : (byte)255;
-            var r = GetByte(_r);
-            var g = GetByte(_g);
-            var b = GetByte(_b);
-            return Color.FromArgb(a, r, g, b);
+            get => ColorUtils.GetInt(A); 
+            set
+            {
+                A = GetFloat(value);
+                UpdateColor();
+            }
+        }
+        public int IntR
+        {
+            get => ColorUtils.GetInt(R); 
+            set
+            {
+                R = GetFloat(value);
+                OnRgbChanged();
+            }
+        }
+        public int IntG
+        {
+            get => ColorUtils.GetInt(G); 
+            set
+            {
+                G = GetFloat(value);
+                OnRgbChanged();
+            }
+        }
+        public int IntB
+        {
+            get => ColorUtils.GetInt(B); 
+            set
+            {
+                B = GetFloat(value);
+                OnRgbChanged();
+            }
+        }
+        public int IntH
+        {
+            get => (int)MathF.Round(H); 
+            set
+            {
+                H = Math.Clamp(value, 0, 359);
+                OnHsvChanged();
+            }
+        }
+        public int ScaledIntH
+        {
+            get => ColorUtils.GetInt(H * HueInvertFactor);
+            set
+            {
+                H = ColorUtils.GetFloat(value) * 359;
+                OnHsvChanged();
+            }
+        }
+        public int IntS
+        {
+            get => ColorUtils.GetInt(S); 
+            set
+            {
+                S = GetFloat(value);
+                OnHsvChanged();
+            }
+        }
+        public int IntV
+        {
+            get => ColorUtils.GetInt(V); 
+            set
+            {
+                V = GetFloat(value);
+                OnHsvChanged();
+            }
+        }
+
+        public Color Color { get; private set => SetValue(ref field, value); }
+
+        private static float GetFloat(int value) => Math.Clamp(ColorUtils.GetFloat(value), 0, 1);
+
+        private bool _updating;
+
+        private void OnRgbChanged()
+        {
+            _updating = true;
+            (H, S, V) = ColorUtils.CalcHSV(R, G, B, H, S);
+            UpdateColor();
+            _updating = false;
+        }
+
+        private void OnHsvChanged()
+        {
+            _updating = true;
+            (R, G, B) = ColorUtils.CalcRGB(H, S, V);
+            UpdateColor();
+            _updating = false;
+        }
+
+        private void UpdateColor()
+        {
+            var a = IsAlphaEnabled ? ColorUtils.GetByte(A) : (byte)255;
+            var r = ColorUtils.GetByte(R);
+            var g = ColorUtils.GetByte(G);
+            var b = ColorUtils.GetByte(B);
+            var color = Color.FromArgb(a, r, g, b);
+            Color = color;
+            ColorChanged?.Invoke(color);
         }
 
         public void SetColor(Color color)
         {
-            _a = IsAlphaEnabled ? GetFloat(color.A) : 1f;
-            _r = GetFloat(color.R);
-            _g = GetFloat(color.G);
-            _b = GetFloat(color.B);
-            CalcHSV();
+            A = IsAlphaEnabled ? GetFloat(color.A) : 1f;
+            R = ColorUtils.GetFloat(color.R);
+            G = ColorUtils.GetFloat(color.G);
+            B = ColorUtils.GetFloat(color.B);
+            OnRgbChanged();
         }
 
-        public string GetColorCode() => IsAlphaEnabled ? ColorUtils.GetColorCode(_a, _r, _g, _b) : ColorUtils.GetColorCode(_r, _g, _b);
+        public string GetColorCode() => IsAlphaEnabled ? ColorUtils.GetColorCode(A, R, G, B) : ColorUtils.GetColorCode(R, G, B);
 
-        public bool SetColorCode(string colorCode)
+        public bool TrySetColorCode(string colorCode)
         {
-            if (HsvColor.TryParseColorCode(colorCode, out var color))
+            if (HsvColor.TryParseColorCode(colorCode, out var color, H, S))
             {
-                _a = color.A;
-                _r = color.R;
-                _g = color.G;
-                _b = color.B;
-                _h = color.H;
-                _s = color.S;
-                _v = color.V;
-                SendAllPropertiesChanged();
+                if (!_updating)
+                {
+                    A = color.A;
+                    R = color.R;
+                    G = color.G;
+                    B = color.B;
+                    H = color.H;
+                    S = color.S;
+                    V = color.V;
+                    UpdateColor();
+                }
                 return true;
             }
             return false;
-        }
-
-        private void SendAllPropertiesChanged()
-        {
-            SendPropertyChanged(nameof(A));
-            SendPropertyChanged(nameof(R));
-            SendPropertyChanged(nameof(G));
-            SendPropertyChanged(nameof(B));
-            SendPropertyChanged(nameof(H));
-            SendPropertyChanged(nameof(S));
-            SendPropertyChanged(nameof(V));
-            SendPropertyChanged(nameof(IntA));
-            SendPropertyChanged(nameof(IntR));
-            SendPropertyChanged(nameof(IntG));
-            SendPropertyChanged(nameof(IntB));
-            SendPropertyChanged(nameof(IntH));
-            SendPropertyChanged(nameof(IntS));
-            SendPropertyChanged(nameof(IntV));
-            SendPropertyChanged(nameof(Color));
-            SendPropertyChanged(nameof(ColorCode));
-        }
-
-        private void CalcRGB()
-        {
-            (_r, _g, _b) = ColorUtils.CalcRGB(_h, _s, _v);
-            SendAllPropertiesChanged();
-        }
-
-        private void CalcHSV()
-        {
-            (_h, _s, V) = ColorUtils.CalcHSV(_r, _g, _b, _h, _s);
-            SendAllPropertiesChanged();
-        }
-
-        private void SetPropertyA(ref float field, float value, [CallerMemberName]string propName = "")
-        {
-            if (value != field)
-            {
-                field = Math.Clamp(value, 0, 1);
-                SendPropertyChanged(propName);
-                SendPropertyChanged($"Int{propName}");
-                SendPropertyChanged(nameof(Color));
-                SendPropertyChanged(nameof(ColorCode));
-            }
-        }
-
-        private void SetProperty(ref float field, float value)
-        {
-            value = Math.Clamp(value, 0, 1);
-            if (value != field)
-            {
-                field = value;
-                CalcHSV();
-            }
-        }
-
-        private void SetPropertyH(ref float field, float value)
-        {
-            value = Math.Clamp(value, 0, 359);
-            if (value != field)
-            {
-                field = value;
-                CalcRGB();
-            }
-        }
-
-        private void SetPropertySV(ref float field, float value)
-        {
-            value = Math.Clamp(value, 0, 1);
-            if (value != field)
-            {
-                field = value;
-                CalcRGB();
-            }
-        }
-
-        public (byte R, byte G, byte B) GetBytes()
-        {
-            return (GetByte(_r), GetByte(_g), GetByte(_b));
         }
     }
 }

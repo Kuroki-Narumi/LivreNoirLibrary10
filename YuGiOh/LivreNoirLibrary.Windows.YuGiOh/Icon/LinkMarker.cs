@@ -13,23 +13,21 @@ namespace LivreNoirLibrary.Windows.YuGiOh
         public static readonly SolidColorBrush Link_Off_Fill = MediaUtils.GetBrush(128, 128, 128, 128);
         public static readonly SolidColorBrush Link_Off_Stroke = MediaUtils.GetBrush(192, 64, 64, 64);
 
-        private static readonly Dictionary<LinkDirection, DrawingImage> _link_cache = [];
-        public static DrawingImage GetLinkIcon(LinkDirection dir)
+        private static readonly Dictionary<LinkDirection, DrawingGroup> _link_cache = [];
+        public static DrawingGroup GetLinkIcon(LinkDirection dir)
         {
-            if (!_link_cache.TryGetValue(dir, out var di))
+            if (!_link_cache.TryGetValue(dir, out var dg))
             {
-                DrawingGroup dg = new();
+                dg = new();
                 using (var ctx = dg.Open())
                 {
                     ctx.DrawGeometry(Link_Off_Stroke, null, GetLinkGeometry(~dir, IconWidth, IconHeight));
                     ctx.DrawGeometry(Link_On_Fill, null, GetLinkGeometry(dir, IconWidth, IconHeight));
                 }
                 dg.Freeze();
-                di = new(dg);
-                di.Freeze();
-                _link_cache.Add(dir, di);
+                _link_cache.Add(dir, dg);
             }
-            return di;
+            return dg;
         }
 
         private static void LineTriangle(StreamGeometryContext ctx, double ox, double oy, double dx1, double dy1, double dx2, double dy2)

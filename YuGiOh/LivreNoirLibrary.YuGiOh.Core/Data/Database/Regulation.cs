@@ -37,10 +37,10 @@ namespace LivreNoirLibrary.YuGiOh.Data
         {
             _list_map = new()
             {
-                { LimitNumber.Forbidden, Forbidden },
-                { LimitNumber.Limit1, Limit1 },
-                { LimitNumber.Limit2, Limit2 },
-                { LimitNumber.Specified, Specified },
+                { LimitCount.Forbidden, Forbidden },
+                { LimitCount.Limit1, Limit1 },
+                { LimitCount.Limit2, Limit2 },
+                { LimitCount.Specified, Specified },
             };
         }
 
@@ -100,10 +100,10 @@ namespace LivreNoirLibrary.YuGiOh.Data
                     Set(list.Select(CardPool.Instance.Get), num);
                 }
             }
-            SetInternal(source.Forbidden, LimitNumber.Forbidden);
-            SetInternal(source.Limit1, LimitNumber.Limit1);
-            SetInternal(source.Limit2, LimitNumber.Limit2);
-            SetInternal(source.Specified, LimitNumber.Specified);
+            SetInternal(source.Forbidden, LimitCount.Forbidden);
+            SetInternal(source.Limit1, LimitCount.Limit1);
+            SetInternal(source.Limit2, LimitCount.Limit2);
+            SetInternal(source.Specified, LimitCount.Specified);
         }
 
         public void Load(IDict source)
@@ -122,7 +122,7 @@ namespace LivreNoirLibrary.YuGiOh.Data
         {
             if (card.Unusable)
             {
-                return LimitNumber.Unusable;
+                return LimitCount.Unusable;
             }
             else if (_list.TryGetValue(card, out var value))
             {
@@ -130,11 +130,11 @@ namespace LivreNoirLibrary.YuGiOh.Data
             }
             else
             {
-                return LimitNumber.Unlimited;
+                return LimitCount.Unlimited;
             }
         }
 
-        public int GetActual(Card card) => Math.Clamp(Get(card), LimitNumber.Forbidden, LimitNumber.Unlimited);
+        public int GetActual(Card card) => Math.Clamp(Get(card), LimitCount.Forbidden, LimitCount.Unlimited);
 
         public bool Set(Card card, int value)
         {
@@ -227,10 +227,10 @@ namespace LivreNoirLibrary.YuGiOh.Data
             Specified.NotifyCollectionReset();
         }
 
-        public void SetForbidden(List<Card> cards) => Set(cards, LimitNumber.Forbidden);
-        public void SetLimit1(List<Card> cards) => Set(cards, LimitNumber.Limit1);
-        public void SetLimit2(List<Card> cards) => Set(cards, LimitNumber.Limit2);
-        public void SetSpecified(List<Card> cards) => Set(cards, LimitNumber.Specified);
+        public void SetForbidden(List<Card> cards) => Set(cards, LimitCount.Forbidden);
+        public void SetLimit1(List<Card> cards) => Set(cards, LimitCount.Limit1);
+        public void SetLimit2(List<Card> cards) => Set(cards, LimitCount.Limit2);
+        public void SetSpecified(List<Card> cards) => Set(cards, LimitCount.Specified);
 
         public SortedDictionary<Card, int>.Enumerator GetEnumerator() => _list.GetEnumerator();
 
@@ -238,11 +238,11 @@ namespace LivreNoirLibrary.YuGiOh.Data
         bool IDict.ContainsKey(Card key) => _list.ContainsKey(key);
         bool IDict.TryGetValue(Card key, out int value) => _list.TryGetValue(key, out value);
         void IDict.Add(Card key, int value) => Set(key, value);
-        bool IDict.Remove(Card key) => Set(key, LimitNumber.Unlimited);
+        bool IDict.Remove(Card key) => Set(key, LimitCount.Unlimited);
 
         bool ICollection<KVPair>.Contains(KVPair item) => Get(item.Key) == item.Value;
         void ICollection<KVPair>.Add(KVPair item) => Set(item.Key, item.Value);
-        bool ICollection<KVPair>.Remove(KVPair item) => Set(item.Key, LimitNumber.Unlimited);
+        bool ICollection<KVPair>.Remove(KVPair item) => Set(item.Key, LimitCount.Unlimited);
         void ICollection<KVPair>.CopyTo(KVPair[] array, int arrayIndex) => _list.CopyTo(array, arrayIndex);
 
         IEnumerator<KVPair> IEnumerable<KVPair>.GetEnumerator() => GetEnumerator();
