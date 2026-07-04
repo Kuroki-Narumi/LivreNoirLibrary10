@@ -1,3 +1,4 @@
+using LivreNoirLibrary.Text;
 using System;
 using System.Text.Json;
 using System.Text.Json.Serialization;
@@ -6,77 +7,79 @@ namespace LivreNoirLibrary.Windows
 {
     public sealed class VocabDataJsonConverter : JsonConverter<VocabData>
     {
-        public const string PropertyName_Header = "header";
-        public const string PropertyName_Description = "desc";
-        public const string PropertyName_KeyTip = "key";
+        public const string PropertyName_Value = "v";
+        public const string PropertyName_KeyTip = "k";
 
         public override VocabData? Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
         {
-            if (reader.TokenType is JsonTokenType.String)
+            switch (reader.TokenType)
             {
-                return new() { Header = reader.GetString()! };
-            }
-            else if (reader.TokenType is JsonTokenType.StartObject)
-            {
-                string? header = null, desc = null, key = null;
-                using (var doc = JsonDocument.ParseValue(ref reader))
-                {
-                    foreach (var prop in doc.RootElement.EnumerateObject())
+                case JsonTokenType.String:
+                    return new() { Value = reader.GetString()! };
+                case JsonTokenType.StartObject:
+                    var currentProp = "";
+                    var depth = 0;
+                    string? value = null, key = null;
+                    while (reader.Read())
                     {
-                        switch (prop.Name)
+                        if (depth is 0)
                         {
-                            case PropertyName_Header:
-                                header = prop.Value.GetString();
-                                break;
-                            case PropertyName_Description:
-                                desc = prop.Value.GetString();
-                                break;
-                            case PropertyName_KeyTip:
-                                key = prop.Value.GetString();
-                                break;
+                            switch (reader.TokenType)
+                            {
+                                case JsonTokenType.EndObject:
+                                    goto LoopEnd;
+                                case JsonTokenType.StartArray:
+                                case JsonTokenType.StartObject:
+                                    depth++;
+                                    continue;
+                                case JsonTokenType.PropertyName:
+                                    currentProp = reader.GetString();
+                                    continue;
+                                case JsonTokenType.String:
+                                    switch (currentProp)
+                                    {
+                                        case PropertyName_Value:
+                                            value = reader.GetString();
+                                            break;
+                                        case PropertyName_KeyTip:
+                                            key = reader.GetString();
+                                            break;
+                                    }
+                                    break;
+                            }
+                            currentProp = "";
+                        }
+                        else if (reader.TokenType is JsonTokenType.EndArray or JsonTokenType.EndObject)
+                        {
+                            depth--;
                         }
                     }
-                }
-                VocabData data = new()
-                {
-                    Header = header ?? "",
-                    Description = desc,
-                    KeyTip = key,
-                };
-                return data;
+                LoopEnd:
+                    VocabData data = new()
+                    {
+                        Value = value ?? "",
+                        KeyTip = key,
+                    };
+                    return data;
             }
             throw new JsonException();
         }
 
         public override void Write(Utf8JsonWriter writer, VocabData value, JsonSerializerOptions options) => WriteStatic(value, writer, options);
 
-        public static void WriteStatic(VocabData value, Utf8JsonWriter writer, JsonSerializerOptions options)
+        public static void WriteStatic(VocabData data, Utf8JsonWriter writer, JsonSerializerOptions options)
         {
-            var header = value.Header;
-            var desc = value.Description;
-            var keyTip = value.KeyTip;
-            var empty_desc = string.IsNullOrEmpty(desc);
-            var empty_key = string.IsNullOrEmpty(keyTip);
-            if (empty_desc && empty_key)
+            var value = data.Value;
+            var keyTip = data.KeyTip;
+            if (string.IsNullOrEmpty(keyTip))
             {
-                writer.WriteStringValue(header);
+                writer.WriteStringValue(value);
             }
             else
             {
                 writer.WriteStartObject();
-                var empty_header = string.IsNullOrEmpty(header);
-                if (!empty_header)
-                {
-                    writer.WriteString(PropertyName_Header, header);
-                }
-                if (!empty_desc)
-                {
-                    writer.WriteString(PropertyName_Description, desc);
-                }
-                if (!empty_key)
-                {
-                    writer.WriteString(PropertyName_KeyTip, keyTip);
-                }
+                writer.WriteStringIfNotNull(PropertyName_Value, value);
+                writer.WriteStringIfNotNull(PropertyName_KeyTip, keyTip);
                 writer.WriteEndObject();
             }
         }

@@ -47,8 +47,6 @@ namespace LivreNoirLibrary.ObjectModel
         }
 
         public static JsonNode CreateNode(string text) => CreateNode(Encoding.UTF8.GetBytes(text));
-        public static JsonNode CreateNode(byte[] utf8Text) => CreateNode(new ReadOnlySpan<byte>(utf8Text));
-        public static JsonNode CreateNode(Memory<byte> utf8Text) => CreateNode((ReadOnlySpan<byte>)utf8Text.Span);
         public static JsonNode CreateNode(ReadOnlyMemory<byte> utf8Text) => CreateNode(utf8Text.Span);
         public static JsonNode CreateNode(ReadOnlySpan<byte> utf8Text)
         {

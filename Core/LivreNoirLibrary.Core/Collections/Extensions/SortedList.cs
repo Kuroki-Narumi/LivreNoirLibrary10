@@ -22,6 +22,10 @@ namespace LivreNoirLibrary.Collections
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static bool ContainsKey<TKey>(List<TKey> keys, TKey key, IComparer<TKey>? comparer = null) => keys.BinarySearch(key, comparer) is >= 0;
 
+        /// <inheritdoc cref="ContainsKey{TKey}(List{TKey}, TKey, IComparer{TKey}?)"/>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static bool ContainsKey<TKey>(ReadOnlySpan<TKey> keys, TKey key, IComparer<TKey>? comparer = null) => keys.BinarySearch(key, comparer ?? Comparer<TKey>.Default) is >= 0;
+
         /// <summary>
         /// Attempts to find the index of the specified key in a sorted list using binary search.
         /// </summary>
@@ -39,6 +43,14 @@ namespace LivreNoirLibrary.Collections
         public static bool TryGetIndex<TKey>(List<TKey> keys, TKey key, out int index, IComparer<TKey>? comparer = null)
         {
             index = keys.BinarySearch(key, comparer);
+            return index >= 0;
+        }
+
+        /// <inheritdoc cref="TryGetIndex{TKey}(List{TKey}, TKey, out int, IComparer{TKey}?)"/>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static bool TryGetIndex<TKey>(ReadOnlySpan<TKey> keys, TKey key, out int index, IComparer<TKey>? comparer = null)
+        {
+            index = keys.BinarySearch(key, comparer ?? Comparer<TKey>.Default);
             return index >= 0;
         }
 
@@ -70,6 +82,20 @@ namespace LivreNoirLibrary.Collections
             return false;
         }
 
+        /// <inheritdoc cref="TryGetValue{TKey, TValue}(List{TKey}, List{TValue}, TKey, out TValue, IComparer{TKey}?)"/>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static bool TryGetValue<TKey, TValue>(ReadOnlySpan<TKey> keys, ReadOnlySpan<TValue> values, TKey key, [MaybeNullWhen(false)]out TValue value, IComparer<TKey>? comparer = null)
+        {
+            var index = keys.BinarySearch(key, comparer ?? Comparer<TKey>.Default);
+            if (index is >= 0)
+            {
+                value = values[index];
+                return true;
+            }
+            value = default;
+            return false;
+        }
+
         /// <summary>
         /// Retrieves the value associated with the specified key from the provided sorted key and value lists.
         /// or returns a default value if the key is not found.
@@ -86,7 +112,7 @@ namespace LivreNoirLibrary.Collections
         /// <param name="comparer">The comparer to use when comparing keys, or <see langword="null"/> to use the default comparer for <typeparamref name="TKey"/>.</param>
         /// <returns>The value associated with the specified key if found; otherwise, the specified default value.</returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static TValue GetOrDefault<TKey, TValue>(List<TKey> keys, List<TValue> values, TKey key, TValue defaultValue, IComparer<TKey>? comparer = null)
+        public static TValue GetValueOrDefault<TKey, TValue>(List<TKey> keys, List<TValue> values, TKey key, TValue defaultValue, IComparer<TKey>? comparer = null)
         {
             var index = keys.BinarySearch(key, comparer);
             if (index is >= 0)

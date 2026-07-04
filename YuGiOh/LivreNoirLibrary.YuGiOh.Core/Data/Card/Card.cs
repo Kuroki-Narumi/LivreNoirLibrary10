@@ -2,7 +2,6 @@
 using System.Text.Json.Serialization;
 using LivreNoirLibrary.ObjectModel;
 using LivreNoirLibrary.YuGiOh.Converters;
-using LivreNoirLibrary.YuGiOh.Search;
 
 namespace LivreNoirLibrary.YuGiOh.Data
 {
@@ -11,25 +10,26 @@ namespace LivreNoirLibrary.YuGiOh.Data
     {
         public static Card Dummy { get; } = new();
 
-        public int Id { get; set => SetValue(ref field, value); }
-        public string Name { get; set => SetValue(ref field, value, ClearTextCache); } = "";
-        public string Ruby { get; set => SetValue(ref field, value, ClearTextCache); } = "";
-        public string EnName { get; set => SetValue(ref field, value, ClearTextCache); } = "";
-        public CardType CardType
-        { 
-            get; 
-            set => SetValue(ref field, value, [nameof(CardTypeText), nameof(AbilityTextWithType), nameof(DefText), nameof(FullText)]); 
-        }
-        public string Text { get; set => SetValue(ref field, value.ReplaceLineEndings("\n"), [nameof(FullText)], OnTextChanged); } = "";
-        public bool Unusable { get; set => SetValue(ref field, value, [nameof(Usable)]); }
+        public Card ThisCard => this;
 
-        public Attribute Attribute { get; set => SetValue(ref field, value, [nameof(AttributeText), nameof(AttrText), nameof(MonsterInfoText), nameof(FullText)]); }
+        public int Id { get; set => SetValue(ref field, value, nameof(ThisCard)); }
+        public string Name { get; set => SetValue(ref field, value); } = "";
+        public string Ruby { get; set => SetValue(ref field, value); } = "";
+        public string EnName { get; set => SetValue(ref field, value); } = "";
+        public CardType CardType { get;  set => SetValue(ref field, value, 
+            [nameof(CardTypeText), nameof(AbilityTextWithType), nameof(DefText), nameof(FullText), nameof(Icon), nameof(LinkIcon), nameof(FrameBrush)]); }
+        public string Text { get; set => SetValue(ref field, value.ReplaceLineEndings("\n"), [nameof(FullText)], OnTextChanged); } = "";
+        public bool Unusable { get; set => SetValue(ref field, value, [nameof(LimitIcon)]); }
+
+        public Attribute Attribute { get; set => SetValue(ref field, value, [nameof(AttributeText), nameof(AttrText), nameof(MonsterInfoText), nameof(FullText), nameof(AttributeIcon)]); }
         public MonsterType MonsterType { get; set => SetValue(ref field, value, [nameof(MonsterTypeText), nameof(MonsterInfoText), nameof(FullText)]); }
-        public bool HasEffect { get; set => SetValue(ref field, value, [nameof(EffectText), nameof(AbilityText), nameof(AbilityTextWithType), nameof(MonsterInfoText), nameof(FullText)]); }
-        public Ability Ability { get; set => SetValue(ref field, value, [nameof(AbilityText), nameof(AbilityTextWithType), nameof(MonsterInfoText), nameof(FullText)]); }
+        public bool HasEffect { get; set => SetValue(ref field, value, 
+            [nameof(EffectText), nameof(AbilityText), nameof(AbilityTextWithType), nameof(MonsterInfoText), nameof(FullText), nameof(Icon), nameof(LinkIcon), nameof(FrameBrush)]); }
+        public Ability Ability { get; set => SetValue(ref field, value, 
+            [nameof(AbilityText), nameof(AbilityTextWithType), nameof(MonsterInfoText), nameof(FullText), nameof(TunerIcon), nameof(FrameBrush)]); }
         public int Level { get; set => SetValue(ref field, value, [nameof(LevelText), nameof(StatusText), nameof(FullText)]); } = -1;
         public int Atk { get; set => SetValue(ref field, value, [nameof(AtkText), nameof(StatusText), nameof(FullText)]); } = -1;
-        public int Def { get; set => SetValue(ref field, value, [nameof(LinkDirection), nameof(DefText), nameof(StatusText), nameof(FullText)]); } = -1;
+        public int Def { get; set => SetValue(ref field, value, [nameof(DefText), nameof(StatusText), nameof(FullText), nameof(LinkIcon)]); } = -1;
 
         public int PendulumScale { get; set => SetValue(ref field, value, [nameof(FullText)]); } = -1;
         public string PendulumText { get; set => SetValue(ref field, value.ReplaceLineEndings("\n"), [nameof(FullText)], OnTextChanged); } = "";
@@ -89,7 +89,7 @@ namespace LivreNoirLibrary.YuGiOh.Data
             PendulumText = PendulumText,
         };
 
-        public void Update(Card source)
+        public void CopyFrom(Card source)
         {
             Id = source.Id;
             Name = source.Name;
@@ -110,16 +110,12 @@ namespace LivreNoirLibrary.YuGiOh.Data
             PackInfo.Load(source.PackInfo);
         }
 
-        private void ClearTextCache()
-        {
-            TextSearchConditions.RemoveTextCache(this);
-        }
-
         private void OnTextChanged()
         {
             _related = null;
             SendPropertyChanged(nameof(RelatedList));
-            ClearTextCache();
         }
+
+        public void NotifyLimitChanged() => SendPropertyChanged(nameof(LimitIcon));
     }
 }

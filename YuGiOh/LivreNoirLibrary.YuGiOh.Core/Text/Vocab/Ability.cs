@@ -14,6 +14,7 @@ namespace LivreNoirLibrary.YuGiOh
         public const string Spirit = "スピリット";
         public const string Tuner = "チューナー";
         public const string Flip = "リバース";
+        public const string Pendulum = "ペンデュラム";
         public const string SpecialSummon = "特殊召喚";
 
         public const string Ability_Separator = " / ";
@@ -54,6 +55,7 @@ namespace LivreNoirLibrary.YuGiOh
         }
 
         public static string GetName(this Ability value) => string.Join(Ability_Separator, GetNames(value));
+        public static string GetSingleName(this Ability value) => GetEnumName(value, _abi2name);
 
         public static Ability GetAbility(this ReadOnlySpan<char> text)
         {

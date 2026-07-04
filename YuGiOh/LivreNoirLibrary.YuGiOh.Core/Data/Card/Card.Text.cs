@@ -16,15 +16,15 @@ namespace LivreNoirLibrary.YuGiOh.Data
         public string AbilityText => Vocab.GetName(Ability);
         public string AbilityTextWithType => GetAbilityTextWithType(true);
         public string LevelText => Level is < 0 ? Vocab.Unknown : Level.ToString();
-        public string AtkText => Atk is < 0 ? Vocab.Unknown : Atk.ToString();
-        public string DefText => Def is < 0 ? Vocab.Unknown : Def.ToString();
-        public string MonsterInfoText => IsMosnter() ? GetMonsterInfoText() : "";
-        public string StatusText => IsMosnter() ? GetStatusText() : "";
+        public string AtkText => Vocab.GetStatusText(Atk);
+        public string DefText => Vocab.GetStatusText(Def);
+        public string MonsterInfoText => this.IsMonster() ? GetMonsterInfoText() : "";
+        public string StatusText => this.IsMonster() ? GetStatusText() : "";
         public string FullText => GetFullText();
 
         public string GetAbilityTextWithType(bool addNone)
         {
-            using var o = ObjectPool.Rent<StringBuilder>(out var sb);
+            using var o = ObjectPool.RentStringBuilder(out var sb);
             var list = Vocab.GetNames(Ability);
             sb.AppendJoin(Vocab.Ability_Separator, list);
             if (HasEffect)
@@ -52,7 +52,7 @@ namespace LivreNoirLibrary.YuGiOh.Data
 
         public string GetMonsterInfoText()
         {
-            using var o = ObjectPool.Rent<StringBuilder>(out var sb);
+            using var o = ObjectPool.RentStringBuilder(out var sb);
             sb.Append(AttributeText);
             sb.Append(Vocab.Ability_Separator);
             sb.Append(MonsterTypeText);
@@ -72,16 +72,16 @@ namespace LivreNoirLibrary.YuGiOh.Data
 
         public string GetStatusText()
         {
-            using var o = ObjectPool.Rent<StringBuilder>(out var sb);
+            using var o = ObjectPool.RentStringBuilder(out var sb);
             sb.Append(Vocab.GetLevelName(CardType));
             sb.Append($" {LevelText}");
             sb.Append(Vocab.Ability_Separator);
             sb.Append("ATK ");
             sb.Append(AtkText);
             sb.Append(Vocab.Ability_Separator);
-            if (CardType is CardType.Link_Monster)
+            if (this.IsLink())
             {
-                sb.Append(Vocab.GetName((LinkDirection)Def));
+                sb.Append(Vocab.GetName(this.GetLinkDirections()));
             }
             else
             {
@@ -93,8 +93,8 @@ namespace LivreNoirLibrary.YuGiOh.Data
 
         public string GetFullText()
         {
-            using var o = ObjectPool.Rent<StringBuilder>(out var sb);
-            if (IsMosnter())
+            using var o = ObjectPool.RentStringBuilder(out var sb);
+            if (this.IsMonster())
             {
                 sb.AppendLine(GetMonsterInfoText());
                 sb.AppendLine(GetStatusText());
@@ -104,7 +104,7 @@ namespace LivreNoirLibrary.YuGiOh.Data
                 sb.AppendLine(CardTypeText);
             }
             sb.Append(Text);
-            if (IsMosnter() && IsPendulum)
+            if (this.IsMonster() && this.IsPendulum())
             {
                 sb.AppendLine();
                 if (!string.IsNullOrEmpty(PendulumText))

@@ -23,8 +23,12 @@ namespace LivreNoirLibrary.Windows
             return alpha ? $"#{color.A:X2}{color.R:X2}{color.G:X2}{color.B:X2}" : $"#{color.R:X2}{color.G:X2}{color.B:X2}";
         }
 
-        public static Color ToColor(this string colorCode)
+        public static Color ToColor(this ReadOnlySpan<char> colorCode)
         {
+            if (colorCode.Length is 0)
+            {
+                return default;
+            }
             if (ColorUtils.TryParseColorCodeToByte(colorCode, out var a, out var r, out var g, out var b))
             {
                 return Color.FromArgb(a, r, g, b);
@@ -32,7 +36,7 @@ namespace LivreNoirLibrary.Windows
             throw new FormatException($"wrong color code style: {colorCode}");
         }
 
-        public static bool TryParseToColor(this string colorCode, out Color color)
+        public static bool TryParseToColor(this ReadOnlySpan<char> colorCode, out Color color)
         {
             if (ColorUtils.TryParseColorCodeToByte(colorCode, out var a, out var r, out var g, out var b))
             {

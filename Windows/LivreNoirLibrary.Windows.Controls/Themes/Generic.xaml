@@ -536,7 +536,7 @@
     <Style x:Key="HelpToggleButton" TargetType="local:ToggleButton">
         <Setter Property="VerticalContentAlignment" Value="Center"/>
         <Setter Property="HorizontalContentAlignment" Value="Center"/>
-        <Setter Property="Icon" Value="{x:Static local:Icons.Help}"/>
+        <Setter Property="Icon" Value="{x:Static media:Icons.Help}"/>
         <Setter Property="IsOptionMarkVisible" Value="False"/>
         <Setter Property="BorderThickness" Value="0"/>
         <Setter Property="BorderBrush" Value="{x:Null}"/>
@@ -568,7 +568,7 @@
                 <ControlTemplate TargetType="local:PopupHelpButton">
                     <Grid>
                         <Border x:Name="templateRoot" CornerRadius="{TemplateBinding CornerRadius}" Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}">
-                            <local:IconPresenter Margin="{TemplateBinding IconPadding}" VerticalAlignment="{TemplateBinding VerticalContentAlignment}" HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}" Height="{TemplateBinding IconSize}" Source="{x:Static local:Icons.Help}"/>
+                            <local:IconPresenter Margin="{TemplateBinding IconPadding}" VerticalAlignment="{TemplateBinding VerticalContentAlignment}" HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}" Height="{TemplateBinding IconSize}" Source="{x:Static media:Icons.Help}"/>
                         </Border>
                         <Popup x:Name="popup" PlacementTarget="{Binding ElementName=templateRoot}" Placement="{TemplateBinding PopupPlacement}">
                             <Border Style="{StaticResource HelpPopupContent}">
@@ -623,10 +623,10 @@
                                         <Setter Property="GroupName" Value="VerticalAlignment"/>
                                     </Style>
                                 </StackPanel.Resources>
-                                <local:RadioButton x:Name="Button_V1" Icon="{x:Static local:Icons.VerticalAlign_Top}"/>
-                                <local:RadioButton x:Name="Button_V2" Icon="{x:Static local:Icons.VerticalAlign_Center}"/>
-                                <local:RadioButton x:Name="Button_V3" Icon="{x:Static local:Icons.VerticalAlign_Bottom}"/>
-                                <local:RadioButton x:Name="Button_V4" Icon="{x:Static local:Icons.VerticalAlign_Stretch}" Visibility="{TemplateBinding IsVerticalStretchEnabled, Converter={StaticResource BVConv}}"/>
+                                <local:RadioButton x:Name="Button_V1" Icon="{x:Static media:Icons.VerticalAlign_Top}"/>
+                                <local:RadioButton x:Name="Button_V2" Icon="{x:Static media:Icons.VerticalAlign_Center}"/>
+                                <local:RadioButton x:Name="Button_V3" Icon="{x:Static media:Icons.VerticalAlign_Bottom}"/>
+                                <local:RadioButton x:Name="Button_V4" Icon="{x:Static media:Icons.VerticalAlign_Stretch}" Visibility="{TemplateBinding IsVerticalStretchEnabled, Converter={StaticResource BVConv}}"/>
                             </StackPanel>
                             <Border x:Name="Padding" Width="8" Height="4" Visibility="Collapsed"/>
                             <StackPanel x:Name="PART_Horizontal" Orientation="Horizontal">
@@ -635,10 +635,10 @@
                                         <Setter Property="GroupName" Value="HorizontalAlignment"/>
                                     </Style>
                                 </StackPanel.Resources>
-                                <local:RadioButton x:Name="Button_H1" Icon="{x:Static local:Icons.HorizontalAlign_Left}"/>
-                                <local:RadioButton x:Name="Button_H2" Icon="{x:Static local:Icons.HorizontalAlign_Center}"/>
-                                <local:RadioButton x:Name="Button_H3" Icon="{x:Static local:Icons.HorizontalAlign_Right}"/>
-                                <local:RadioButton x:Name="Button_H4" Icon="{x:Static local:Icons.HorizontalAlign_Stretch}" Visibility="{TemplateBinding IsHorizontalStretchEnabled, Converter={StaticResource BVConv}}"/>
+                                <local:RadioButton x:Name="Button_H1" Icon="{x:Static media:Icons.HorizontalAlign_Left}"/>
+                                <local:RadioButton x:Name="Button_H2" Icon="{x:Static media:Icons.HorizontalAlign_Center}"/>
+                                <local:RadioButton x:Name="Button_H3" Icon="{x:Static media:Icons.HorizontalAlign_Right}"/>
+                                <local:RadioButton x:Name="Button_H4" Icon="{x:Static media:Icons.HorizontalAlign_Stretch}" Visibility="{TemplateBinding IsHorizontalStretchEnabled, Converter={StaticResource BVConv}}"/>
                             </StackPanel>
                         </StackPanel>
                     </Border>
@@ -789,9 +789,9 @@
                                                     <Setter Property="Background" Value="White"/>
                                                 </Style>
                                             </StackPanel.Resources>
-                                            <local:Button Icon="{x:Static local:Icons.Check_Green}" Content="{TemplateBinding DecideText}" Command="local:EditableTextCommands.Decide" Margin="0"/>
-                                            <local:Button Icon="{x:Static local:Icons.Cross_Red}" Content="{TemplateBinding CancelText}" Command="local:EditableTextCommands.Cancel"/>
-                                            <local:Button Icon="{x:Static local:Icons.Delete}" Content="{TemplateBinding ClearText}" Command="local:EditableTextCommands.Clear" x:Name="clearButton"/>
+                                            <local:Button Icon="{x:Static media:Icons.Check_Green}" Content="{TemplateBinding DecideText}" Command="local:EditableTextCommands.Decide" Margin="0"/>
+                                            <local:Button Icon="{x:Static media:Icons.Cross_Red}" Content="{TemplateBinding CancelText}" Command="local:EditableTextCommands.Cancel"/>
+                                            <local:Button Icon="{x:Static media:Icons.Delete}" Content="{TemplateBinding ClearText}" Command="local:EditableTextCommands.Clear" x:Name="clearButton"/>
                                         </StackPanel>
                                     </Border>
                                 </Grid>
@@ -1004,7 +1004,7 @@
         <Setter Property="MinWidth" Value="0"/>
         <Setter Property="MinHeight" Value="0"/>
         <Setter Property="BorderBrush" Value="Transparent"/>
-        <Setter Property="Icon" Value="{x:Static local:Icons.Clock}"/>
+        <Setter Property="Icon" Value="{x:Static media:Icons.Clock}"/>
         <Setter Property="VerticalAlignment" Value="Center"/>
         <Setter Property="HorizontalAlignment" Value="Center"/>
         <Setter Property="Focusable" Value="False"/>
@@ -1450,12 +1450,12 @@
                                 <ContextMenu>
                                     <MenuItem Header="{TemplateBinding CopyText}" Command="local:ConsoleCommands.Copy">
                                         <MenuItem.Icon>
-                                            <local:IconPresenter Style="{StaticResource MenuItemIconStyle}" Source="{x:Static local:Icons.Copy}"/>
+                                            <local:IconPresenter Style="{StaticResource MenuItemIconStyle}" Source="{x:Static media:Icons.Copy}"/>
                                         </MenuItem.Icon>
                                     </MenuItem>
                                     <MenuItem Header="{TemplateBinding FlushText}" Command="local:ConsoleCommands.Flush">
                                         <MenuItem.Icon>
-                                            <local:IconPresenter Style="{StaticResource MenuItemIconStyle}" Source="{x:Static local:Icons.Delete}"/>
+                                            <local:IconPresenter Style="{StaticResource MenuItemIconStyle}" Source="{x:Static media:Icons.Delete}"/>
                                         </MenuItem.Icon>
                                     </MenuItem>
                                 </ContextMenu>

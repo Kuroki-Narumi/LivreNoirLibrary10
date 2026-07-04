@@ -17,6 +17,9 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using LivreNoirLibrary.Windows.Media;
+using System.Diagnostics.CodeAnalysis;
+using LivreNoirLibrary.Collections;
 
 namespace LivreNoirLibrary.SandBox
 {
@@ -26,6 +29,7 @@ namespace LivreNoirLibrary.SandBox
     public partial class Unit_YuGiOh : UserControl, IProgressReporter
     {
         public static CardPool CardPool => CardPool.Instance;
+        public static string CardPoolFilePath { get; } = YuGiOh.Utils.GetFullPath(CardPool.DefaultResourceName);
         public TextSearchConditions TextSearchConditions { get; } = new();
 
         UIElement IProgressReporter.MainElement => MainUI;
@@ -34,10 +38,13 @@ namespace LivreNoirLibrary.SandBox
 
         public Unit_YuGiOh()
         {
-            var t0 = Stopwatch.GetTimestamp();
-            CardPool.LoadFile(YuGiOh.Utils.GetFullPath(CardPool.DefaultResourceName));
-            Console.WriteLine($"CardPool loaded in {Stopwatch.GetElapsedTime(t0).TotalMilliseconds}ms");
             InitializeComponent();
+            Dispatcher.Invoke(InitializeCardPool);
+        }
+
+        private void InitializeCardPool()
+        {
+            CardPool.LoadFile(CardPoolFilePath);
         }
 
         private void OnClick_Search(object sender, RoutedEventArgs e)
@@ -65,7 +72,7 @@ namespace LivreNoirLibrary.SandBox
             var database = CardPool;
             var ids = await YuGiOh.Scraping.CardPack.GetCardList(database.Packs, p, c);
             await YuGiOh.Scraping.Card.UpdateAllCards(ids, database.Cards, database.Packs, p, c);
-            database.SaveJson(YuGiOh.Utils.GetFullPath(CardPool.DefaultResourceName));
+            database.SaveJson(CardPoolFilePath);
 
             await Dispatcher.BeginInvoke(() =>
             {

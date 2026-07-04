@@ -39,7 +39,7 @@
         <Grid Grid.Column="2" RowDefinitions="Auto, *">
             <Grid ColumnDefinitions="Auto, *, Auto">
                 <TextBlock Text="Target" />
-                <ct:Button Grid.Column="2" Icon="{x:Static ct:Icons.Maximize}" Click="OnClick_Maximize"/>
+                <ct:Button Grid.Column="2" Icon="{x:Static media:Icons.Maximize}" Click="OnClick_Maximize"/>
             </Grid>
             <Grid Style="{StaticResource MainGrid}">
                 <Rectangle Width="{Binding ActualWidth, ElementName=Image_Target}" Height="{Binding ActualHeight, ElementName=Image_Target}"/>
@@ -54,10 +54,10 @@
                 </StackPanel>
                 <ct:LabeledSlider x:Name="Slider_Opacity" Grid.Column="1" Minimum="0" Maximum="100" Value="100" TickFrequency="5" IsSnapToTickEnabled="True"/>
                 <StackPanel Grid.Column="2" Orientation="Horizontal">
-                    <ct:Button Icon="{x:Static ct:Icons.Check_Green}" Click="OnClick_Image_Blend"/>
+                    <ct:Button Icon="{x:Static media:Icons.Check_Green}" Click="OnClick_Image_Blend"/>
                     <Border Style="{StaticResource Separator}"/>
-                    <ct:Button Icon="{x:Static ct:Icons.Copy}" Click="OnClick_Image_Copy"/>
-                    <ct:Button Icon="{x:Static ct:Icons.Save}" Click="OnClick_Image_Save"/>
+                    <ct:Button Icon="{x:Static media:Icons.Copy}" Click="OnClick_Image_Copy"/>
+                    <ct:Button Icon="{x:Static media:Icons.Save}" Click="OnClick_Image_Save"/>
                 </StackPanel>
             </Grid>
             <Grid Style="{StaticResource MainGrid}" AllowDrop="False">

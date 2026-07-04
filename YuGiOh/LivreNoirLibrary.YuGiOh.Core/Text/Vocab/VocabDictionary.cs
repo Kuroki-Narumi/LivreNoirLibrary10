@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using LivreNoirLibrary.Text;
 using LivreNoirLibrary.Text.Convert;
 
 namespace LivreNoirLibrary.YuGiOh
@@ -16,11 +17,14 @@ namespace LivreNoirLibrary.YuGiOh
             return value is 0 ? Unknown : value.ToString();
         }
 
-        private static readonly ConvertingStringComparer<VocabKeyStringConverter> _keyComparer = new(new VocabKeyStringConverter());
+        private static readonly VocabKeyStringConverter _converter = new();
+        private static ConvertingStringComparer<VocabKeyStringConverter>? _keyComparer;
 
         private static Dictionary<string, T>.AlternateLookup<ReadOnlySpan<char>> CreateInvertedDictionary<T>(Dictionary<T, string> source)
             where T : struct, Enum
         {
+            var converter = _converter;
+            _keyComparer ??= new(converter);
             var dic = new Dictionary<string, T>(_keyComparer);
             var alternateLookup = dic.GetAlternateLookup<ReadOnlySpan<char>>();
             foreach (var (value, name) in source)

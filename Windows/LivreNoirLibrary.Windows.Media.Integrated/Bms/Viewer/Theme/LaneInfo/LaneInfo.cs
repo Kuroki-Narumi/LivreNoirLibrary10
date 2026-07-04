@@ -26,7 +26,7 @@ namespace LivreNoirLibrary.Windows.Media.Bms
             NoteColor = Colors.Note_Bgm,
         };
 
-        public string Name { get; set => SetValue(ref field, value.Shared()); } = "";
+        public string Name { get; set => SetValue(ref field, value); } = "";
         public Channel Channel { get; set => SetValue(ref field, value, [nameof(Lane), nameof(IsSeparator)]); }
         public int Lane { get => Channel.TryGetLane(out var lane) ? lane : int.MaxValue; set => Channel = value.TryGetChannel(out var channel) ? channel : 0; }
         public bool IsSeparator => Channel is 0;

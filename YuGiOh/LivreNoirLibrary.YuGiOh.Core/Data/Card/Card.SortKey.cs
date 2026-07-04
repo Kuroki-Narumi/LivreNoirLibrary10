@@ -1,5 +1,4 @@
 ﻿using LivreNoirLibrary.Text;
-using LivreNoirLibrary.YuGiOh.Converters;
 using System;
 using System.Collections.Generic;
 
@@ -22,8 +21,8 @@ namespace LivreNoirLibrary.YuGiOh.Data
         public int EnNameLength => string.IsNullOrEmpty(EnName) ? Padding : EnName.Length;
         public int EnNameLengthD => string.IsNullOrEmpty(EnName) ? -Padding : EnName.Length;
         public int TextLength => Text.LengthWithoutSpace();
-        public int PendulumTextLength => (IsMosnter() && IsPendulum) ? PendulumText.LengthWithoutSpace() : Padding;
-        public int PendulumTextLengthD => (IsMosnter() && IsPendulum) ? PendulumText.LengthWithoutSpace() : -Padding;
+        public int PendulumTextLength => (this.IsMonster() && this.IsPendulum()) ? PendulumText.LengthWithoutSpace() : Padding;
+        public int PendulumTextLengthD => (this.IsMonster() && this.IsPendulum()) ? PendulumText.LengthWithoutSpace() : -Padding;
 
         private static readonly Dictionary<CardType, int> Type_index_list = new()
         {
@@ -51,13 +50,13 @@ namespace LivreNoirLibrary.YuGiOh.Data
             get
             {
                 var result = Type_index_list[CardType];
-                if (IsMosnter())
+                if (this.IsMonster())
                 {
                     if (CardType is 0 && !HasEffect)
                     {
                         result = 0;
                     }
-                    if (IsPendulum)
+                    if (this.IsPendulum())
                     {
                         result += 16;
                     }
@@ -67,23 +66,23 @@ namespace LivreNoirLibrary.YuGiOh.Data
         }
 
         public int TypeIdIndex => (TypeIndex + Level) * Padding + Id;
-        public Attribute AttributeIndex => IsMosnter() ? Attribute : (Attribute)Padding;
-        public Attribute AttributeIndexD => IsMosnter() ? Attribute : (Attribute)(-Padding);
-        public MonsterType MonsterTypeIndex => IsMosnter() ? MonsterType : (MonsterType)Padding;
-        public MonsterType MonsterTypeIndexD => IsMosnter() ? MonsterType : (MonsterType)(-Padding);
-        public Ability AbilityIndex => IsMosnter() ? Ability : (Ability)Padding;
-        public Ability AbilityIndexD => IsMosnter() ? Ability : (Ability)(-Padding);
+        public Attribute AttributeIndex => this.IsMonster() ? Attribute : (Attribute)Padding;
+        public Attribute AttributeIndexD => this.IsMonster() ? Attribute : (Attribute)(-Padding);
+        public MonsterType MonsterTypeIndex => this.IsMonster() ? MonsterType : (MonsterType)Padding;
+        public MonsterType MonsterTypeIndexD => this.IsMonster() ? MonsterType : (MonsterType)(-Padding);
+        public Ability AbilityIndex => this.IsMonster() ? Ability : (Ability)Padding;
+        public Ability AbilityIndexD => this.IsMonster() ? Ability : (Ability)(-Padding);
 
-        public int EffectIndex => IsMosnter() ? HasEffect ? 0 : 1 : 2;
-        public int TunerIndex => IsMosnter() ? IsTuner ? 0 : 1 : 2;
-        public int LevelIndex => IsMosnter() ? Level : Padding;
-        public int LevelIndexD => IsMosnter() ? Level : -Padding;
-        public int AtkIndex => IsMosnter() ? Atk : Padding;
-        public int AtkIndexD => IsMosnter() ? Atk : -Padding;
-        public int DefIndex => HasDef()? Def : Padding;
-        public int DefIndexD => HasDef() ? Def : -Padding;
-        public int ScaleIndex => (IsMosnter() && IsPendulum) ? PendulumScale : Padding;
-        public int ScaleIndexD => (IsMosnter() && IsPendulum) ? PendulumScale : -Padding;
+        public int EffectIndex => this.IsMonster() ? this.HasEffect ? 0 : 1 : 2;
+        public int TunerIndex => this.IsMonster() ? this.IsTuner() ? 0 : 1 : 2;
+        public int LevelIndex => this.IsMonster() ? Level : Padding;
+        public int LevelIndexD => this.IsMonster() ? Level : -Padding;
+        public int AtkIndex => this.IsMonster() ? Atk : Padding;
+        public int AtkIndexD => this.IsMonster() ? Atk : -Padding;
+        public int DefIndex => this.HasDef()? Def : Padding;
+        public int DefIndexD => this.HasDef() ? Def : -Padding;
+        public int ScaleIndex => (this.IsMonster() && this.IsPendulum()) ? PendulumScale : Padding;
+        public int ScaleIndexD => (this.IsMonster() && this.IsPendulum()) ? PendulumScale : -Padding;
 
         public DateTime FirstDateOcg => PackInfo.GetFirstDateOcg(true);
         public DateTime FirstDateOcgD => PackInfo.GetFirstDateOcg(false);

@@ -6,7 +6,7 @@ using System.Threading;
 
 namespace LivreNoirLibrary.ObjectModel
 {
-    public static class ObjectPool
+    public static partial class ObjectPool
     {
         public static int MaxStoreCount { get; set; } = 16;
 
@@ -50,7 +50,7 @@ namespace LivreNoirLibrary.ObjectModel
     internal static class ObjectPool<T>
         where T : class
     {
-        private static readonly ThreadLocal<Stack<T>> _stored = new(() => new(4));
+        private static readonly ThreadLocal<Stack<T>> _stored = new(static () => new(4));
         private static readonly Action<T>? _clearMethod;
         private static readonly Func<T, T>? _clearMethod2;
 

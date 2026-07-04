@@ -7,6 +7,21 @@ namespace LivreNoirLibrary.YuGiOh.Serializable
     public class Regulation
     {
         [JsonPropertyName(JsonPropertyNames.Forbidden)]
+        public List<int>? Forbidden { get; set; }
+
+        [JsonPropertyName(JsonPropertyNames.Limit1)]
+        public List<int>? Limit1 { get; set; }
+
+        [JsonPropertyName(JsonPropertyNames.Limit2)]
+        public List<int>? Limit2 { get; set; }
+
+        [JsonPropertyName(JsonPropertyNames.Specified)]
+        public List<int>? Specified { get; set; }
+    }
+
+    public class StringRegulation
+    {
+        [JsonPropertyName(JsonPropertyNames.Forbidden)]
         public List<string>? Forbidden { get; set; }
 
         [JsonPropertyName(JsonPropertyNames.Limit1)]

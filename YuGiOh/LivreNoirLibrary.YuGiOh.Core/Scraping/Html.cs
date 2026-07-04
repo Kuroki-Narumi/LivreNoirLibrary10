@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Net.Http;
@@ -40,10 +41,14 @@ namespace LivreNoirLibrary.YuGiOh.Scraping
 
         public static async Task<HtmlDocument?> CreateDocument(string url, CancellationToken c = default)
         {
+            var t0 = Stopwatch.GetTimestamp();
             Console.WriteLine($"document create from {url}");
             var text = await GetString(url, c);
+            Console.WriteLine($"  got html in {Stopwatch.GetElapsedTime(t0).TotalMilliseconds}ms");
+            t0 = Stopwatch.GetTimestamp();
             var document = new HtmlDocument();
             document.LoadHtml(text);
+            Console.WriteLine($"  document created in {Stopwatch.GetElapsedTime(t0).TotalMilliseconds}ms");
             return document;
         }
 
@@ -77,7 +82,7 @@ namespace LivreNoirLibrary.YuGiOh.Scraping
             {
                 return result;
             }
-            using var o = ObjectPool.Rent<StringBuilder>(out var sb);
+            using var o = ObjectPool.RentStringBuilder(out var sb);
             sb.Append(".//");
             if (string.IsNullOrEmpty(tag))
             {

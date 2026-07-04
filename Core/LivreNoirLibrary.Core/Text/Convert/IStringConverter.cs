@@ -1,21 +1,19 @@
 ﻿using LivreNoirLibrary.Collections;
 using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace LivreNoirLibrary.Text
 {
     public interface IStringConverter
     {
         /// <summary>
-        /// Returns the maximum number of characters that can be produced from the given <paramref name="span"/>.
+        /// Gets the maximum number of characters that could be produced from the given <paramref name="span"/>.
         /// </summary>
         /// <param name="span">A span of <see cref="char"/> to convert.</param>
-        /// <returns>The maximum number of characters that can be produced.</returns>
+        /// <returns>The maximum number of characters.</returns>
         int GetMaxCharCount(ReadOnlySpan<char> span);
 
         /// <summary>
-        /// Tries to read the character and set to <paramref name="c"/> from the given <paramref name="span"/> at <paramref name="spanIndex"/>. <br/>
+        /// Tries to read the character and set to <paramref name="c"/> from the given <paramref name="span"/> at <paramref name="spanIndex"/>.
         /// </summary>
         /// <remarks>
         /// This method typically simply returns the value of <paramref name="span"/>[<paramref name="spanIndex"/>] without modifying <paramref name="spanIndex"/>.
@@ -29,10 +27,11 @@ namespace LivreNoirLibrary.Text
         bool TryGetChar(ReadOnlySpan<char> span, ref int spanIndex, out char c);
     }
 
-    public ref struct TextConverterEnumerator(ReadOnlySpan<char> span, IStringConverter converter)
+    public ref struct StringConverterEnumerator<T>(ReadOnlySpan<char> span, T converter)
+        where T : IStringConverter
     {
         private readonly ReadOnlySpan<char> _span = span;
-        private readonly IStringConverter _converter = converter;
+        private readonly T _converter = converter;
         private int _index;
         private char _current;
 
@@ -49,18 +48,43 @@ namespace LivreNoirLibrary.Text
             return ret;
         }
 
-        public readonly TextConverterEnumerator GetEnumerator() => this;
+        public readonly StringConverterEnumerator<T> GetEnumerator() => this;
     }
 
     public static partial class TextConvert
     {
-        public static TextConverterEnumerator GetEnumerator<T>(this T converter, ReadOnlySpan<char> source) where T : IStringConverter => new(source, converter);
+        /// <summary>
+        /// Create a <see cref="StringConverterEnumerator{T}"/> that enumerates characters from the <paramref name="source"/>, using the provided <paramref name="converter"/>.
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="converter">The <see cref="IStringConverter"/> used for conversion.</param>
+        /// <param name="source">The text to enumerate characters.</param>
+        /// <returns></returns>
+        public static StringConverterEnumerator<T> EnumerateChars<T>(this T converter, ReadOnlySpan<char> source) where T : IStringConverter => new(source, converter);
+
+        /// <summary>
+        /// Gets the actual number of characters that produced from the given <paramref name="source"/>.
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="converter">The <see cref="IStringConverter"/> used for conversion.</param>
+        /// <param name="source">The text to convert.</param>
+        /// <returns>The actual number of characters.</returns>
+        public static int GetCharCount<T>(this T converter, ReadOnlySpan<char> source)
+            where T : IStringConverter
+        {
+            var count = 0;
+            foreach (var _ in EnumerateChars(converter, source))
+            {
+                count++;
+            }
+            return count;
+        }
 
         public static int Convert<T>(this T converter, ReadOnlySpan<char> source, Span<char> target)
             where T : IStringConverter
         {
             var targetIndex = 0;
-            foreach (var c in GetEnumerator(converter, source))
+            foreach (var c in EnumerateChars(converter, source))
             {
                 target[targetIndex] = c;
                 targetIndex++;
@@ -77,8 +101,8 @@ namespace LivreNoirLibrary.Text
             }
             var maxCharCount = converter.GetMaxCharCount(source);
             using var o = ArrayPool.Rent<char>(maxCharCount);
-            var targetIndex = Convert(converter, source, o.Span);
-            return new(o.AsSpan(targetIndex));
+            var length = Convert(converter, source, o.Span);
+            return new(o.AsSpan(length));
         }
     }
 }

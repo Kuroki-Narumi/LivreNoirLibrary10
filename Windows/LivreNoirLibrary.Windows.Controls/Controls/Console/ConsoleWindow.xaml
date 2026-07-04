@@ -4,6 +4,7 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:LivreNoirLibrary.Windows.Controls"
+        xmlns:media="clr-namespace:LivreNoirLibrary.Windows.Media;assembly=LivreNoirLibrary.Windows.Media"
         mc:Ignorable="d"
         d:DataContext="{d:DesignInstance Type=local:ConsoleWindow}"
         Title="Console" Height="400" MinHeight="400" Width ="522" MinWidth="522" ResizeMode="CanResizeWithGrip"
@@ -27,8 +28,8 @@
             </FrameworkElement.Resources>
             <local:TitleBar.RightPanelItems>
                 <Slider VerticalAlignment="Center" Width="100" Minimum="0" Maximum="1" Value="{Binding BackgroundOpacity, Mode=TwoWay}" TickFrequency="0.1" IsSnapToTickEnabled="True" Margin="6,0" PreviewMouseWheel="OnMouseWheel_Slider"/>
-                <local:ToggleButton IsChecked="{Binding ShowInTaskbar}" ToolTip="{Binding ShowInTaskbarText}" Icon="{x:Static local:Icons.ShowInTaskbar}"/>
-                <local:ToggleButton IsChecked="{Binding Topmost}" ToolTip="{Binding TopmostText}" Icon="{x:Static local:Icons.Topmost}"/>
+                <local:ToggleButton IsChecked="{Binding ShowInTaskbar}" ToolTip="{Binding ShowInTaskbarText}" Icon="{x:Static media:Icons.ShowInTaskbar}"/>
+                <local:ToggleButton IsChecked="{Binding Topmost}" ToolTip="{Binding TopmostText}" Icon="{x:Static media:Icons.Topmost}"/>
             </local:TitleBar.RightPanelItems>
         </local:TitleBar>
         <local:ConsoleViewer x:Name="Viewer" BackgroundOpacity="{Binding BackgroundOpacity}" CopyText="{Binding CopyText}" FlushText="{Binding FlushText}" PreviewMouseLeftButtonDown="OnLeftButtonDown_Inner" IsHitTestVisible="{Binding SlipThrough, Converter={StaticResource InvertConverter}}"/>

@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
 		<TargetFramework>net10.0-windows</TargetFramework>
@@ -16,8 +16,17 @@
 	</PropertyGroup>
 
 	<ItemGroup>
+	  <ProjectReference Include="..\..\Windows\LivreNoirLibrary.Windows.Controls\LivreNoirLibrary.Windows.Controls.csproj" />
 	  <ProjectReference Include="..\..\Windows\LivreNoirLibrary.Windows.Media\LivreNoirLibrary.Windows.Media.csproj" />
 	  <ProjectReference Include="..\LivreNoirLibrary.YuGiOh.Core\LivreNoirLibrary.YuGiOh.Core.csproj" />
+		<ProjectReference Include="..\..\Windows\LivreNoirLibrary.Windows.SourceGenerator\LivreNoirLibrary.Windows.SourceGenerator.csproj">
+			<OutputItemType>Analyzer</OutputItemType>
+			<ReferenceOutputAssembly>false</ReferenceOutputAssembly>
+		</ProjectReference>
+	</ItemGroup>
+
+	<ItemGroup>
+	  <Folder Include="ViewModel\" />
 	</ItemGroup>
 
 </Project>

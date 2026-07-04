@@ -56,7 +56,7 @@ namespace LivreNoirLibrary.Media.Wave
                 }
             }
             // apply
-            var purpose = "beat".Shared();
+            var purpose = "beat";
             foreach (var (i, name, pos, length) in source.EnumerateWithLength(totalSamples, false))
             {
                 CueData data = new(pos) { Id = i };

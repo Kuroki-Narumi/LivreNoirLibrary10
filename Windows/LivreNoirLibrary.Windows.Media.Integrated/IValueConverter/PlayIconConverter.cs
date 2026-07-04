@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Globalization;
 using System.Windows.Data;
-using LivreNoirLibrary.Windows.Controls;
+using LivreNoirLibrary.Windows.Media;
 
 namespace LivreNoirLibrary.Windows.Converters
 {

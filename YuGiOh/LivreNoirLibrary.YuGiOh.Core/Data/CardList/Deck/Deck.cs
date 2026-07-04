@@ -35,17 +35,38 @@ namespace LivreNoirLibrary.YuGiOh.Data
 
         public void Load(Serializable.Deck source)
         {
-            if (source.MainDeck is not null)
+            if (source.MainDeck is { } main)
             {
-                MainDeck.Load(source.MainDeck);
+                MainDeck.Load(main);
             }
-            if (source.ExtraDeck is not null)
+            if (source.ExtraDeck is { } extra)
             {
-                ExtraDeck.Load(source.ExtraDeck);
+                ExtraDeck.Load(extra);
             }
-            if (source.SideDeck is not null)
+            if (source.SideDeck is { } side)
             {
-                SideDeck.Load(source.SideDeck);
+                SideDeck.Load(side);
+            }
+        }
+
+        public void Load(IEnumerable<int> source)
+        {
+            Clear();
+            var main = MainDeck;
+            var extra = ExtraDeck;
+            foreach (var id in source)
+            {
+                if (CardPool.Instance.TryGet(id, out var card))
+                {
+                    if (card.IsExtraDeck())
+                    {
+                        extra.AddWithoutNotify(card);
+                    }
+                    else
+                    {
+                        main.AddWithoutNotify(card);
+                    }
+                }
             }
         }
 
@@ -84,7 +105,11 @@ namespace LivreNoirLibrary.YuGiOh.Data
                 {
                     Load(deck);
                 }
-                else if (Json.TryOpen<List<string>>(path, out var data))
+                else if (Json.TryOpen<int[]>(path, out var idData))
+                {
+                    Load(idData);
+                }
+                else if (Json.TryOpen<string[]>(path, out var data))
                 {
                     Load(data);
                 }

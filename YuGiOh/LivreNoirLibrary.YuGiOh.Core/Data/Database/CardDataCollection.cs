@@ -6,7 +6,7 @@ using LivreNoirLibrary.Text;
 
 namespace LivreNoirLibrary.YuGiOh.Data
 {
-    public class CardDataCollection : DataCollectionBase<int, Card>
+    public class CardDataCollection : DataCollectionBase<int, Card>, ICardEnumerable
     {
         protected override int GetKey(Card item) => item.Id;
 
@@ -14,15 +14,24 @@ namespace LivreNoirLibrary.YuGiOh.Data
         {
             ClearWithoutNotify();
             var c = source.Count;
-            _list.EnsureCapacity(c);
-            _key_list.EnsureCapacity(c);
+            var list = _list;
+            var keys = _key_list;
+            list.EnsureCapacity(c);
+            keys.EnsureCapacity(c);
             foreach (var item in source.AsSpan())
             {
                 Card card = new(item);
-                _list.Add(card);
-                _key_list.Add(card.Id);
+                list.Add(card);
+                keys.Add(card.Id);
             }
             NotifyCollectionReset();
+        }
+
+        internal void AddInternal(Serializable.Card card)
+        {
+            Card c = new(card);
+            _list.Add(c);
+            _key_list.Add(c.Id);
         }
 
         public bool Contains(int id) => _key_list.Contains(id);
@@ -121,5 +130,7 @@ namespace LivreNoirLibrary.YuGiOh.Data
                 }
             }
         }
+
+        IEnumerable<Card> ICardEnumerable.EnumerateCards() => this;
     }
 }

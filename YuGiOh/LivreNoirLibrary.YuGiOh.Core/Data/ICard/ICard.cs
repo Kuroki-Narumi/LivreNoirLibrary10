@@ -5,7 +5,13 @@ namespace LivreNoirLibrary.YuGiOh.Data
 {
     public interface ICard
     {
+        /// <summary>
+        /// This property is used when you want to receive change notifications while binding the card itself.
+        /// </summary>
+        Card ThisCard { get; }
+
         int Id { get; }
+
         string Name { get; }
         string Ruby { get; }
         string EnName { get; }
@@ -22,15 +28,7 @@ namespace LivreNoirLibrary.YuGiOh.Data
         int Def { get; }
         int PendulumScale { get; }
         string PendulumText { get; }
-    }
 
-    public static partial class ICardExtensions
-    {
-        public static string NameWithBracket(this ICard obj) => $"《{obj.Name}》";
-
-        public static string RemoveBracket(this string name) => Regex_Bracket.Replace(name, "$1");
-
-        [GeneratedRegex(@"^《(.+)》$")]
-        private static partial Regex Regex_Bracket { get; }
+        PackInfoCollection PackInfo { get; }
     }
 }

@@ -189,7 +189,7 @@ namespace LivreNoirLibrary.Text
             ThrowIfRadixOutOfRange(radix);
             if (value is <= 0)
             {
-                return (minDigits is <= 0 ? "0" : new string('0', minDigits)).Shared();
+                return minDigits is <= 0 ? "0" : new string('0', minDigits);
             }
             var len = Math.Max((int)long.Log2(value) + 1, minDigits);
             var buffer = (stackalloc char[len]);
@@ -216,7 +216,7 @@ namespace LivreNoirLibrary.Text
                     buffer[i] = '0';
                 }
             }
-            return new string(buffer[i..]).Shared();
+            return new string(buffer[i..]);
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]

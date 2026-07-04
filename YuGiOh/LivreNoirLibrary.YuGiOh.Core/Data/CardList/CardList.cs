@@ -24,7 +24,7 @@ namespace LivreNoirLibrary.YuGiOh.Data
             return result;
         }
 
-        public IEnumerable<Card> EnumCards() => _list;
+        public IEnumerable<Card> EnumerateCards() => _list;
 
         public void Load(IEnumerable<Card> source)
         {

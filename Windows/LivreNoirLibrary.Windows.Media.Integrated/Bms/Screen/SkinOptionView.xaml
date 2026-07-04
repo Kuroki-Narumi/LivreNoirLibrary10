@@ -4,6 +4,7 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:ct="clr-namespace:LivreNoirLibrary.Windows.Controls;assembly=LivreNoirLibrary.Windows.Controls"
+             xmlns:media="clr-namespace:LivreNoirLibrary.Windows.Media;assembly=LivreNoirLibrary.Windows.Media"
              xmlns:input="clr-namespace:LivreNoirLibrary.Windows.Input;assembly=LivreNoirLibrary.Windows.Core"
              xmlns:skin="clr-namespace:LivreNoirLibrary.Windows.Media.Bms.SkinInfo"
              mc:Ignorable="d" FontSize="14" UseLayoutRounding="True">
@@ -68,7 +69,7 @@
     <Grid RowDefinitions="Auto, Auto, *" Background="White">
         <Grid Margin="4,4,4,2" ColumnDefinitions="*, Auto">
             <TextBlock Text="Skin Options" Margin="4,0" VerticalAlignment="Center" HorizontalAlignment="Center"/>
-            <ct:Button Grid.Column="1" Icon="{x:Static ct:Icons.Update_Mono}" Content="Default" Click="OnClick_Default"/>
+            <ct:Button Grid.Column="1" Icon="{x:Static media:Icons.Update_Mono}" Content="Default" Click="OnClick_Default"/>
         </Grid>
         <Border Grid.Row="1" Style="{StaticResource Separator}"/>
         <ScrollViewer Padding="4,2,4,4" Grid.Row="2" HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto">

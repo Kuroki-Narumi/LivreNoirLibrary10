@@ -1,4 +1,5 @@
-﻿using System;
+﻿using LivreNoirLibrary.Collections;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 
@@ -22,22 +23,19 @@ namespace LivreNoirLibrary.Text.Convert
 
         public int GetHashCode(ReadOnlySpan<char> alternate)
         {
-            var hashCode = new HashCode();
-            foreach (var c in _converter.GetEnumerator(alternate))
-            {
-                hashCode.Add(c);
-            }
-            return hashCode.ToHashCode();
+            using var o = ArrayPool.Rent<char>(_converter.GetMaxCharCount(alternate));
+            var length = _converter.Convert(alternate, o.Span);
+            return string.GetHashCode(o.AsSpan(length));
         }
 
         public bool Equals(ReadOnlySpan<char> alternate, string other)
         {
-            var enum1 = _converter.GetEnumerator(alternate);
-            var enum2 = _converter.GetEnumerator(other);
+            var enum1 = _converter.EnumerateChars(alternate);
+            var enum2 = _converter.EnumerateChars(other);
             
             while (enum1.MoveNext() && enum2.MoveNext())
             {
-                if (!enum1.Current.Equals(enum2.Current))
+                if (enum1.Current != enum2.Current)
                 {
                     return false;
                 }

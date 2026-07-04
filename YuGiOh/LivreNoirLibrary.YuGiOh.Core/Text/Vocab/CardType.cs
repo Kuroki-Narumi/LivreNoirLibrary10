@@ -9,15 +9,13 @@ namespace LivreNoirLibrary.YuGiOh
         public const string Spell = "魔法";
         public const string Trap = "罠";
 
-        public const string Token = "トークン";
-
         public const string Main = "メイン";
         public const string Fusion = "融合";
         public const string Ritual = "儀式";
         public const string Synchro = "シンクロ";
         public const string Xyz = "エクシーズ";
-        public const string Pendulum = "ペンデュラム";
         public const string Link = "リンク";
+        public const string Token = "トークン";
 
         public const string Normal = "通常";
         public const string Effect = "効果";
@@ -36,6 +34,10 @@ namespace LivreNoirLibrary.YuGiOh
         public const string Normal_Trap = $"{Normal}{Trap}";
         public const string Continuous_Trap = $"{Continuous}{Trap}";
         public const string Counter_Trap = $"{Counter}{Trap}";
+
+        public const string SpellMonster = $"{Spell}{Monster}";
+        public const string TrapMonster = $"{Trap}{Monster}";
+        public const string ContinuousTrapMonster = $"{Continuous_Trap}{Monster}";
 
         private static readonly Dictionary<CardType, string> _cType2name = new()
         {
@@ -76,8 +78,6 @@ namespace LivreNoirLibrary.YuGiOh
 
             return dic;
         }
-
-        public static string GetLevelName(CardType type) => type switch { CardType.Link_Monster => Link, CardType.Xyz_Monster => Rank, _ => Level };
 
         public static string GetName(this CardType value, bool appendMonster = false)
         {

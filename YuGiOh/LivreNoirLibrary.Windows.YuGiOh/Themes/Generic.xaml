@@ -1,0 +1,11 @@
+<ResourceDictionary
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="clr-namespace:LivreNoirLibrary.Windows.YuGiOh.Controls"
+    xmlns:ctrl="clr-namespace:LivreNoirLibrary.Windows.Controls;assembly=LivreNoirLibrary.Windows.Controls"
+    >
+    <ResourceDictionary.MergedDictionaries>
+        <ResourceDictionary Source="pack://application:,,,/LivreNoirLibrary.Windows.Controls;component/Themes/Generic.xaml" />
+    </ResourceDictionary.MergedDictionaries>
+
+</ResourceDictionary>

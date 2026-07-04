@@ -1,7 +1,9 @@
-﻿using System;
+﻿using LivreNoirLibrary.Media;
+using System;
 using System.Collections.Generic;
 using System.Windows;
 using System.Windows.Media;
+using V = LivreNoirLibrary.Media.VectorGraphics;
 
 namespace LivreNoirLibrary.Windows.Media
 {
@@ -53,6 +55,68 @@ namespace LivreNoirLibrary.Windows.Media
         }
         public static Pen? GetPen(Color color, double th) => GetPen(GetBrush(color), th);
         public static Pen? GetPen(string colorCode, double th) => GetPen(GetBrush(colorCode), th);
+
+
+        public static Brush? GetBrush(V.IBrush? brush) => brush switch
+        {
+            V.SingleColorBrush b => GetBrush(b.Color),
+            V.GradientBrush b => CreateGradientBrush(b),
+            _ => null,
+        };
+
+        private static GradientBrush CreateGradientBrush(V.GradientBrush b)
+        {
+            GradientBrush result;
+            if (b.Type is V.GradientType.Radial)
+            {
+                RadialGradientBrush r = new()
+                {
+                    GradientOrigin = new(b.Origin.X, b.Origin.Y),
+                };
+                result = r;
+            }
+            else
+            {
+                LinearGradientBrush r = new()
+                {
+                    EndPoint = b.Type is V.GradientType.Horizontal ? new(1, 0) : new(0, 1)
+                };
+                result = r;
+            }
+            var stops = result.GradientStops;
+            foreach (var stop in b.Stops)
+            {
+                var gs = new GradientStop()
+                {
+                    Color = stop.Color.ToColor(),
+                    Offset = stop.Offset,
+                };
+                gs.Freeze();
+                stops.Add(gs);
+            }
+            result.Freeze();
+            return result;
+        }
+
+        public static Pen? GetPen(V.Pen? pen)
+        {
+            if (pen is null || pen.Thickness is <= 0)
+            {
+                return null;
+            }
+            switch (pen?.Brush)
+            {
+                case V.SingleColorBrush b:
+                    return GetPen(b.Color, pen.Thickness);
+                case V.GradientBrush b:
+                    var brush = CreateGradientBrush(b);
+                    var p = new Pen(brush, pen.Thickness);
+                    p.Freeze();
+                    return p;
+                default:
+                    return null;
+            }
+        }
 
         public static DrawingBrush CreateHorizontalDashBrush(Color color1, Color color2, double len1 = DefaultDashLength, double len2 = DefaultDashLength)
         {

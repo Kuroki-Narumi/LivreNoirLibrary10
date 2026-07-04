@@ -1,4 +1,5 @@
-﻿using System;
+﻿using LivreNoirLibrary.Text;
+using System;
 
 namespace LivreNoirLibrary.YuGiOh
 {
@@ -15,7 +16,16 @@ namespace LivreNoirLibrary.YuGiOh
         public const string Scale = "スケール";
         public const string Scale_Short = $"P{Scale}";
         public const string Scale_Full = $"{Pendulum}{Scale}";
+        public const string PText = $"P{Effect}";
 
         public const string Separators = "/／|｜,、";
+
+        public static string GetLevelName(CardType type) => type switch { CardType.Link_Monster => Link, CardType.Xyz_Monster => Rank, _ => Level };
+
+        public static string GetStatusText(int value) => value is < 0 ? Unknown : value.ToString();
+
+        private static readonly SelectCharsStringConverter _textCounter = new(static c => !char.IsWhiteSpace(c));
+
+        public static int GetTextLength(ReadOnlySpan<char> text) => _textCounter.GetCharCount(text);
     }
 }

@@ -12,7 +12,7 @@ namespace LivreNoirLibrary.YuGiOh.Data
         public SortedCardList(int capacity) : base(capacity) { }
         public SortedCardList(IEnumerable<Card> collection) : base(collection) { }
 
-        public IEnumerable<Card> EnumCards() => _list;
+        public IEnumerable<Card> EnumerateCards() => _list;
 
         public void Load(IEnumerable<Card> source)
         {

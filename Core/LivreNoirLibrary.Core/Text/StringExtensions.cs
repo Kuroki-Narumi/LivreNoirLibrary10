@@ -78,8 +78,6 @@ namespace LivreNoirLibrary.Text
         public static string? GetNullIfEmpty(this string? text) => string.IsNullOrEmpty(text) ? null : text;
         public static string? GetNullIfWhiteSpace(this string? text) => string.IsNullOrWhiteSpace(text) ? null : text;
 
-        public static string Shared(this string text) => StringPool.Get(text);
-
         public static StringComparer NaturalOrderComparer { get; } = StringComparer.Create(CultureInfo.InvariantCulture, CompareOptions.NumericOrdering);
 
         public static int CompareByNaturalOrder(this string? left, string? right) => NaturalOrderComparer.Compare(left, right);

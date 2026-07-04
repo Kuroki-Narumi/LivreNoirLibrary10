@@ -17,7 +17,7 @@ namespace LivreNoirLibrary.Windows
             Path = path;
         }
 
-        internal static LanguageData GetDefault() => new(DefaultName, "");
+        internal static LanguageData CreateDefault() => new(DefaultName, "::invalid_path::");
         internal static bool TryGetData(string path, [MaybeNullWhen(false)]out LanguageData data)
         {
             if (Json.TryOpen<VocabBase>(path, out var obj))

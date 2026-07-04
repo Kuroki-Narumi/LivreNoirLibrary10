@@ -141,13 +141,12 @@ namespace LivreNoirLibrary.Media
         public static string GetColorCode(float a, float r, float g, float b) => $"#{GetInt(a):X2}{GetInt(r):X2}{GetInt(g):X2}{GetInt(b):X2}";
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static bool IsValidColorCode(string? text)
+        public static bool IsValidColorCode(ReadOnlySpan<char> span)
         {
-            if (string.IsNullOrEmpty(text))
+            if (span.IsWhiteSpace())
             {
                 return false;
             }
-            var span = text.AsSpan();
             if (span[0] is '#')
             {
                 span = span[1..];
@@ -155,8 +154,6 @@ namespace LivreNoirLibrary.Media
             return span.Length is 3 or 4 or 6 or 8 && uint.TryParse(span, System.Globalization.NumberStyles.HexNumber, null, out _);
         }
 
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static bool TryParseColorCodeToByte(string? colorCode, out byte a, out byte r, out byte g, out byte b) => TryParseColorCodeToByte(colorCode.AsSpan(), out a, out r, out g, out b);
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static bool TryParseColorCodeToByte(ReadOnlySpan<char> span, out byte a, out byte r, out byte g, out byte b)
         {
@@ -201,8 +198,6 @@ namespace LivreNoirLibrary.Media
             return false;
         }
 
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static bool TryParseColorCode(string? colorCode, out float a, out float r, out float g, out float b) => TryParseColorCode(colorCode.AsSpan(), out a, out r, out g, out b);
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static bool TryParseColorCode(ReadOnlySpan<char> span, out float a, out float r, out float g, out float b)
         {

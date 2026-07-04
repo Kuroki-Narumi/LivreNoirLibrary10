@@ -38,6 +38,13 @@ namespace LivreNoirLibrary.YuGiOh.Data
             NotifyCollectionReset();
         }
 
+        internal void AddInternal(Serializable.CardPack pack)
+        {
+            CardPack p = new(pack);
+            _list.Add(p);
+            _key_list.Add(GetKey(p));
+        }
+
         public bool Contains(string pid) => CheckUpdate().ContainsKey(pid);
 
         public CardPack Get(string pid)

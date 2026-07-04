@@ -7,6 +7,6 @@ namespace LivreNoirLibrary.Media.Wave.Chunks
     {
         private string _chid = ChunkIds.Data;
 
-        public string Chid { get => _chid; set => _chid = value.Shared(); }
+        public string Chid { get => _chid; set => _chid = string.Intern(value); }
     }
 }

@@ -36,19 +36,10 @@ namespace LivreNoirLibrary.Text
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static char ToHalf(this char c, Func<char, bool> selector) => selector(c) ? (char) (c - Offset_Ascii) : c;
 
-        public static string ToHalfRegex(this ReadOnlySpan<char> text)
+        public static int ToHalfRegex(this ReadOnlySpan<char> text, Span<char> span, bool toHiragana = false)
         {
-            if (text.Length is 0)
-            {
-                return string.Empty;
-            }
-
-            // 文字列長は最大で2倍になる可能性がある
-            using var o = ArrayPool.Rent<char>(text.Length * 2);
-            var targetSpan = o.Span;
-
             var rChars = _regexChars;
-            var targetIndex = 0;
+            var index = 0;
             var escaping = false;
             for (var i = 0; i < text.Length; i++)
             {
@@ -57,20 +48,37 @@ namespace LivreNoirLibrary.Text
                 if (!escaping && rChars.Contains(c))
                 {
                     // エスケープ文字を追加
-                    targetSpan[targetIndex] = '\\';
-                    targetIndex++;
+                    span[index] = '\\';
+                    index++;
                 }
                 if (IsAsciiCharacter(c))
                 {
                     c = (char)(c - Offset_Ascii);
                 }
+                else if (toHiragana)
+                {
+                    TryGetHiragana(text, ref i, out c);
+                }
                 // エスケープ中かどうかの判定
                 escaping = c is '\\' && !escaping;
 
-                targetSpan[targetIndex] = c;
-                targetIndex++;
+                span[index] = c;
+                index++;
             }
+            return index;
+        }
 
+        public static string ToHalfRegex(this ReadOnlySpan<char> text, bool toHiragana = false)
+        {
+            if (text.Length is 0)
+            {
+                return string.Empty;
+            }
+            // 文字列長は最大で2倍になる可能性がある
+            using var o = ArrayPool.Rent<char>(text.Length * 2);
+
+            var targetSpan = o.Span;
+            var targetIndex = ToHalfRegex(text, targetSpan, toHiragana);
             return new(targetSpan[..targetIndex]);
         }
 

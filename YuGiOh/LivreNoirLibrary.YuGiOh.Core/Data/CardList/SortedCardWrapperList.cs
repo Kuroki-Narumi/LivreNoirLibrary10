@@ -18,7 +18,7 @@ namespace LivreNoirLibrary.YuGiOh.Data
 
         public bool Contains(Card card) => _list.Exists(item => item.Card == card);
 
-        public IEnumerable<Card> EnumCards()
+        public IEnumerable<Card> EnumerateCards()
         {
             var c = _list.Count;
             for (var i = 0; i < c; i++)

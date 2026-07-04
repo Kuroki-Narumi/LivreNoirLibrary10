@@ -14,7 +14,7 @@ namespace LivreNoirLibrary.YuGiOh.Scraping
         {
             p?.ReportInitial("checking card pack", "creating pack list...");
 
-            List<(string, string)> packs = [];
+            List<(string, string, DateTime)> packs = [];
             c.ThrowIfCancellationRequested();
 
             await GetPackList(target, false, packs, c);
@@ -22,8 +22,8 @@ namespace LivreNoirLibrary.YuGiOh.Scraping
             await GetPackList(target, true, packs, c);
 
             packs.Reverse();
-            var cardIds = await GetCardIds(packs, p, c);
-
+            var cardIds = await GetCardIds(target, packs, p, c);
+            target?.NotifyCollectionReset();
             return cardIds;
         }
 
@@ -32,10 +32,10 @@ namespace LivreNoirLibrary.YuGiOh.Scraping
         const string Class_Time = "time";
         const string Class_Main = "main";
 
-        private static async ValueTask GetPackList(CardPackCollection? target, bool tcg, List<(string, string)> packs, CancellationToken c)
+        private static async ValueTask GetPackList(CardPackCollection? target, bool tcg, List<(string, string, DateTime)> packs, CancellationToken c)
         {
             c.ThrowIfCancellationRequested();
-            var now = DateTime.Now;
+            var now = tcg ? DateTime.UtcNow : DateTime.Now;
             var url = Url.PackList(tcg);
             var document = await Html.CreateDocument(url, c);
             var invalidDate = _invalidDate;
@@ -70,17 +70,14 @@ namespace LivreNoirLibrary.YuGiOh.Scraping
                         DateTime.TryParse(timeDiv.InnerText, out time))
                     {
                         validCount++;
-                        if (time == invalidDate && !dateFallback.TryGetValue(pid, out time))
+                        if (time == invalidDate)
                         {
-                            continue;
+                            dateFallback.TryGetValue(pid, out time);
                         }
                     }
-                    if (validCount is 3 &&
-                        time <= now && 
-                        (target is null || !target.Contains(pid)))
+                    if (validCount is 3 && time <= now && (target is null || !target.Contains(pid)))
                     {
-                        packs.Add((pid, name));
-                        target?.AddWithoutNotify(new() { ProductId = pid, Name = name, Date = time });
+                        packs.Add((pid, name, time));
                     }
                 }
             }
@@ -88,34 +85,36 @@ namespace LivreNoirLibrary.YuGiOh.Scraping
 
         const string Id_CardList = "card_list";
 
-        private static async ValueTask<SortedSet<int>> GetCardIds(List<(string, string)> packs, ProgressReporter? p, CancellationToken c)
+        private static async ValueTask<SortedSet<int>> GetCardIds(CardPackCollection? target, List<(string, string, DateTime)> packs, ProgressReporter? p, CancellationToken c)
         {
             SortedSet<int> cids = [];
             var count = packs.Count;
             for (var i = 0; i < count; i++)
             {
                 c.ThrowIfCancellationRequested();
-                var (pid, name) = packs[i];
+                var (pid, name, date) = packs[i];
                 p?.Report($"{name} ({i + 1}/{count})", i, count);
-                await GetCardIds(pid, cids, p, c);
-            }
-            return cids;
-        }
 
-        private static async ValueTask GetCardIds(string pid, SortedSet<int> cids, ProgressReporter? p, CancellationToken c)
-        {
-            var url = Url.Pack(pid);
-            var document = await Html.CreateDocument(url, c);
-            if (document?.GetElementbyId(Id_CardList) is { } div)
-            {
-                foreach (var node in div.EnumerateNodes(Tags.Input, klass: "cid"))
+                var url = Url.Pack(pid);
+                var document = await Html.CreateDocument(url, c);
+                if (document?.GetElementbyId(Id_CardList) is { } div)
                 {
-                    if (int.TryParse(node.Attributes["value"]?.Value, out var cid))
+                    var valid = false;
+                    foreach (var node in div.EnumerateNodes(Tags.Input, klass: "cid"))
                     {
-                        cids.Add(cid);
+                        if (int.TryParse(node.Attributes["value"]?.Value, out var cid))
+                        {
+                            cids.Add(cid);
+                            valid = true;
+                        }
+                    }
+                    if (valid)
+                    {
+                        target?.AddWithoutNotify(new() { ProductId = pid, Name = name, Date = date });
                     }
                 }
             }
+            return cids;
         }
 
         private static readonly DateTime _invalidDate = new(1990, 1, 1);

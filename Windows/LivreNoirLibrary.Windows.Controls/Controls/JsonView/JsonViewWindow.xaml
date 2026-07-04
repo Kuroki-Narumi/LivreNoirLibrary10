@@ -4,6 +4,7 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:LivreNoirLibrary.Windows.Controls"
+        xmlns:media="clr-namespace:LivreNoirLibrary.Windows.Media;assembly=LivreNoirLibrary.Windows.Media"
         mc:Ignorable="d" ShowInTaskbar="False" WindowStyle="None" AllowsTransparency="True" ResizeMode="CanResizeWithGrip" BorderThickness="8"
         d:DataContext="{d:DesignInstance Type=local:JsonViewWindow}"
         Title="JsonView" Height="320" Width="480">
@@ -24,8 +25,8 @@
     <DockPanel>
         <local:TitleBar DockPanel.Dock="Top" IsMinimizeVisible="False">
             <local:TitleBar.RightPanelItems>
-                <local:Button Style="{StaticResource TitleBar_Button}" Icon="{x:Static local:Icons.Copy}" Content="{Binding CopyText}" Command="ApplicationCommands.Copy"/>
-                <local:Button Style="{StaticResource TitleBar_Button}" Icon="{x:Static local:Icons.SaveAs}" Content="{Binding SaveAsText}" Command="ApplicationCommands.Save"/>
+                <local:Button Style="{StaticResource TitleBar_Button}" Icon="{x:Static media:Icons.Copy}" Content="{Binding CopyText}" Command="ApplicationCommands.Copy"/>
+                <local:Button Style="{StaticResource TitleBar_Button}" Icon="{x:Static media:Icons.SaveAs}" Content="{Binding SaveAsText}" Command="ApplicationCommands.Save"/>
             </local:TitleBar.RightPanelItems>
         </local:TitleBar>
         <local:JsonView x:Name="JsonView" Source="{Binding Source}"/>

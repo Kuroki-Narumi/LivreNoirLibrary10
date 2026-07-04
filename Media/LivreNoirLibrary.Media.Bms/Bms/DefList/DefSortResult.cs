@@ -24,7 +24,7 @@ namespace LivreNoirLibrary.Media.Bms
 
             void Add(string before, string after)
             {
-                base.Add((before.Shared(), after.Shared()));
+                base.Add((before, after));
             }
 
             foreach (var (type, map) in maps)
@@ -89,7 +89,7 @@ namespace LivreNoirLibrary.Media.Bms
         {
             if (Count is > 0)
             {
-                using var o = ObjectPool.Rent<StringBuilder>(out var sb);
+                using var o = ObjectPool.RentStringBuilder(out var sb);
                 sb.AppendLine("DefSort result:");
                 foreach (var (Before, After) in this.AsSpan())
                 {

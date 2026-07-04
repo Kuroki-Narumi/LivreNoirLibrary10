@@ -4,7 +4,7 @@ namespace LivreNoirLibrary.ObjectModel
 {
     public readonly struct ProgressReport(string? caption, string? message, double value, double maximum)
     {
-        public string? Caption { get; } = StringPool.Get(caption);
+        public string? Caption { get; } = caption;
         public string? Message { get; } = message;
         public double Value { get; } = value;
         public double Maximum { get; } = maximum;

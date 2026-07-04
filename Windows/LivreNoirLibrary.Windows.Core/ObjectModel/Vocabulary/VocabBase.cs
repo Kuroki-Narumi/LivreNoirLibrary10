@@ -9,6 +9,7 @@ using LivreNoirLibrary.IO;
 using LivreNoirLibrary.Text;
 using LivreNoirLibrary.ObjectModel;
 using LivreNoirLibrary.Collections;
+using System.Linq;
 
 namespace LivreNoirLibrary.Windows
 {
@@ -18,33 +19,25 @@ namespace LivreNoirLibrary.Windows
         public const string VocabDirname = "Vocab";
         public const string DefaultResourceName = $"/{VocabDirname}/{DefaultLanguage}.json";
 
-        public static string VocabDir { get; private set; } = "";
-        public static ObservableCollection<LanguageData> LanguageList { get; } = [];
-
         [JsonIgnore]
         public LanguageData? CurrentLanguage { get; set => SetValue(ref field, value); }
 
-        protected static void SetupInstance<T>(string resourcePath = DefaultResourceName)
-            where T : VocabBase, IVocabulary<T>, new()
+        protected static void SetupInstance<T>(string resourcePath = DefaultResourceName, string vocabDir = VocabDirname)
+            where T : VocabBase, IVocabulary<T>
         {
-            try
+            var text = ResourceManager.GetText(resourcePath);
+            if (Json.TryParse<T>(text, out var source))
             {
-                var text = ResourceManager.GetText(resourcePath);
-                T.Default = Json.Parse<T>(text);
-                T.Current.UpdateVocabData(T.Default);
-            }
-            catch
-            {
-                T.Default = new();
+                T.Default.UpdateVocabData(source);
             }
 
-            var list = LanguageList;
+            var list = T.Languages;
             list.Clear();
-            list.Add(LanguageData.GetDefault());
-            VocabDir = Path.Join(General.GetAssemblyDir(), VocabDirname);
-            if (Directory.Exists(VocabDir))
+            list.Add(LanguageData.CreateDefault());
+            var dir = Path.Join(General.GetAssemblyDir(), vocabDir);
+            if (Directory.Exists(dir))
             {
-                foreach (var path in Directory.GetFiles(VocabDir))
+                foreach (var path in Directory.GetFiles(dir))
                 {
                     if (LanguageData.TryGetData(path, out var data))
                     {
@@ -52,6 +45,8 @@ namespace LivreNoirLibrary.Windows
                     }
                 }
             }
+
+            OpenLanguageData<T>(null);
         }
 
         public string? Language { get; set => SetValue(ref field, value); }
@@ -71,35 +66,34 @@ namespace LivreNoirLibrary.Windows
             return false;
         }
 
-        protected internal void UpdateVocabData<T>(T source)
+        protected internal virtual void UpdateVocabData<T>(T? source)
             where T : VocabBase
         {
-            foreach (var (key, data) in source._dictionary)
+            if (source is not null)
             {
-                SetData(data, key);
+                foreach (var (key, data) in source._dictionary)
+                {
+                    SetData(data, key);
+                }
             }
         }
 
-        public virtual void OnLoadVocabData() { }
-    }
+        public virtual void OnLanguageChanged() { }
 
-    public static class VocabExtension
-    {
-        public static void LinkToMenu<TVocab, TMenuItem>(this TVocab vocab, TMenuItem menu)
+        public static void CreateMenuItems<TVocab, TMenuItem>(ItemCollection items)
             where TVocab : VocabBase, IVocabulary<TVocab>
             where TMenuItem : MenuItem, new()
         {
-            var items = menu.Items;
             items.Clear();
-            foreach (var data in VocabBase.LanguageList)
+            foreach (var data in TVocab.Languages)
             {
                 TMenuItem m = new() { Header = data.Name };
-                m.Click += (s, e) => OpenLanguageData(vocab, data);
+                m.Click += (s, e) => OpenLanguageData<TVocab>(data);
                 items.Add(m);
             }
         }
 
-        public static void OpenLanguageData<T>(this T vocab, LanguageData language)
+        public static void OpenLanguageData<T>(LanguageData? language)
             where T : VocabBase, IVocabulary<T>
         {
             var current = T.Current;
@@ -107,22 +101,19 @@ namespace LivreNoirLibrary.Windows
             {
                 return;
             }
-            if (current.CurrentLanguage is not null)
-            {
-                current.CurrentLanguage.IsChecked = false;
-            }
-            if (Json.TryOpen<T>(language.Path, out var data))
+            current.CurrentLanguage?.IsChecked = false;
+            if (language is not null && Json.TryOpen<T>(language.Path, out var data))
             {
                 current.UpdateVocabData(data);
             }
             else
             {
-                language = VocabBase.LanguageList[0];
+                language = T.Languages.First();
                 current.UpdateVocabData(T.Default);
             }
-            vocab.CurrentLanguage = language;
+            current.CurrentLanguage = language;
             language.IsChecked = true;
-            vocab.OnLoadVocabData();
+            current.OnLanguageChanged();
         }
     }
 }

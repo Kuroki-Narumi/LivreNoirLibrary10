@@ -4,28 +4,23 @@ using System.Collections.Generic;
 using System.Linq;
 using LivreNoirLibrary.Text;
 using LivreNoirLibrary.Collections;
+using System.Text.Json;
 
 namespace LivreNoirLibrary.YuGiOh.Data
 {
-    using IDict = IDictionary<Card, int>;
-    using KVPair = KeyValuePair<Card, int>;
-
-    public class Regulation : IDict
+    public class Regulation : IJsonWriter
     {
-        public static Regulation Instance { get; } = [];
+        public static Regulation Instance { get; } = new();
 
-        private readonly SortedDictionary<Card, int> _list = [];
-        private readonly Dictionary<int, SortedCardList> _list_map;
+        private readonly SortedDictionary<int, int> _list = [];
+        private readonly Dictionary<int, RegulationCardList> _list_map;
 
-        public SortedCardList Forbidden { get; set; } = [];
-        public SortedCardList Limit1 { get; set; } = [];
-        public SortedCardList Limit2 { get; set; } = [];
-        public SortedCardList Specified { get; set; } = [];
+        public RegulationCardList Forbidden { get; } = [];
+        public RegulationCardList Limit1 { get; } = [];
+        public RegulationCardList Limit2 { get; } = [];
+        public RegulationCardList Specified { get; } = [];
 
-        public ICollection<Card> Keys => _list.Keys;
-        public ICollection<int> Values => _list.Values;
         public int Count => _list.Count;
-        bool ICollection<KVPair>.IsReadOnly => false;
 
         public int this[Card key]
         {
@@ -49,16 +44,11 @@ namespace LivreNoirLibrary.YuGiOh.Data
 
         public void Clear()
         {
-            var cards = _list.Keys.ToArray();
             _list.Clear();
             Forbidden.Clear();
             Limit1.Clear();
             Limit2.Clear();
             Specified.Clear();
-            foreach (var card in cards)
-            {
-                card.OnLimitChanged();
-            }
         }
 
         public void Clear(int value)
@@ -67,8 +57,7 @@ namespace LivreNoirLibrary.YuGiOh.Data
             {
                 foreach (var card in list.AsSpan())
                 {
-                    _list.Remove(card);
-                    card.OnLimitChanged();
+                    _list.Remove(card.Id);
                 }
                 list.Clear();
             }
@@ -81,23 +70,31 @@ namespace LivreNoirLibrary.YuGiOh.Data
                 Load(data);
                 return true;
             }
+            else if (Json.TryOpen<Serializable.StringRegulation>(path, out var sData))
+            {
+                Load(sData);
+                return true;
+            }
             return false;
         }
 
         public void Load(Regulation source)
         {
             Clear();
-            Set(source);
+            Set(source.Forbidden.EnumerateKeys(), LimitCount.Forbidden);
+            Set(source.Limit1.EnumerateKeys(), LimitCount.Limit1);
+            Set(source.Limit2.EnumerateKeys(), LimitCount.Limit2);
+            Set(source.Specified.EnumerateKeys(), LimitCount.Specified);
         }
 
         public void Load(Serializable.Regulation source)
         {
             Clear();
-            void SetInternal(List<string>? list, int num)
+            void SetInternal(List<int>? list, int num)
             {
                 if (list is not null)
                 {
-                    Set(list.Select(CardPool.Instance.Get), num);
+                    Set(list, num);
                 }
             }
             SetInternal(source.Forbidden, LimitCount.Forbidden);
@@ -106,25 +103,36 @@ namespace LivreNoirLibrary.YuGiOh.Data
             SetInternal(source.Specified, LimitCount.Specified);
         }
 
-        public void Load(IDict source)
+        public void Load(Serializable.StringRegulation source)
+        {
+            var database = CardPool.Instance.Cards;
+            Clear();
+            void SetInternal(List<string>? list, int num)
+            {
+                if (list is not null)
+                {
+                    Set(list.Select(database.Get), num);
+                }
+            }
+            SetInternal(source.Forbidden, LimitCount.Forbidden);
+            SetInternal(source.Limit1, LimitCount.Limit1);
+            SetInternal(source.Limit2, LimitCount.Limit2);
+            SetInternal(source.Specified, LimitCount.Specified);
+        }
+
+        public void Load(IDictionary<Card, int> source)
         {
             Clear();
             Set(source);
         }
 
-        public void Load(IDictionary<string, int> source)
-        {
-            Clear();
-            Set(source);
-        }
-
-        public int Get(Card card)
+        public int Get(ICard card)
         {
             if (card.Unusable)
             {
                 return LimitCount.Unusable;
             }
-            else if (_list.TryGetValue(card, out var value))
+            else if (_list.TryGetValue(card.Id, out var value))
             {
                 return value;
             }
@@ -134,119 +142,145 @@ namespace LivreNoirLibrary.YuGiOh.Data
             }
         }
 
-        public int GetActual(Card card) => Math.Clamp(Get(card), LimitCount.Forbidden, LimitCount.Unlimited);
+        public int GetActualCount(Card card) => Math.Clamp(Get(card), LimitCount.Forbidden, LimitCount.Unlimited);
 
-        public bool Set(Card card, int value)
+        private static void NotifyChanged(int id) => CardPool.Instance.Get(id).NotifyLimitChanged();
+
+        public bool Set(int id, int value)
         {
-            SortedCardList? list;
-            if (_list.TryGetValue(card, out var current))
+            RegulationCardList? list;
+            if (_list.TryGetValue(id, out var current))
             {
                 if (current == value)
                 {
                     return false;
                 }
-                _list.Remove(card);
+                _list.Remove(id);
                 if (_list_map.TryGetValue(current, out list))
                 {
-                    list.Remove(card);
+                    list.RemoveKey(id);
                 }
             }
             if (_list_map.TryGetValue(value, out list))
             {
-                _list.Add(card, value);
-                list.Add(card);
+                _list[id] = value;
+                list.Add(id);
             }
-            card.OnLimitChanged();
+            NotifyChanged(id);
             return true;
         }
 
-        public void Set(string name, int value)
-        {
-            Set(CardPool.Instance.Get(name), value);
-        }
+        public bool Set(ICard card, int value) => Set(card.Id, value);
 
-        public void Set(IEnumerable<Card> cards, int value)
+        public void Set(ReadOnlySpan<int> ids, int value)
         {
-            SortedCardList? list;
-            foreach (var card in cards)
+            RegulationCardList? list;
+            foreach (var id in ids)
             {
-                if (_list.TryGetValue(card, out var current))
+                if (_list.TryGetValue(id, out var current))
                 {
                     if (current == value)
                     {
                         continue;
                     }
-                    _list[card] = value;
+                    _list[id] = value;
                     if (_list_map.TryGetValue(current, out list))
                     {
-                        list.Remove(card);
+                        list.RemoveKey(id);
                     }
                 }
                 else
                 {
-                    _list.Add(card, value);
+                    _list.Add(id, value);
                 }
-                card.OnLimitChanged();
+                NotifyChanged(id);
             }
             if (_list_map.TryGetValue(value, out list))
             {
-                list.AddRange(cards);
+                list.AddRange(ids);
             }
         }
 
-        public void Set(IDict items)
+        public void Set(IEnumerable<int> ids, int value)
+        {
+            RegulationCardList? list;
+            foreach (var id in ids)
+            {
+                if (_list.TryGetValue(id, out var current))
+                {
+                    if (current == value)
+                    {
+                        continue;
+                    }
+                    _list[id] = value;
+                    if (_list_map.TryGetValue(current, out list))
+                    {
+                        list.RemoveKey(id);
+                    }
+                }
+                else
+                {
+                    _list.Add(id, value);
+                }
+                NotifyChanged(id);
+            }
+            if (_list_map.TryGetValue(value, out list))
+            {
+                list.AddRange(ids);
+            }
+        }
+
+        public void Set(IEnumerable<Card> cards, int value) => Set(cards.Select(card => card.Id), value);
+
+        public void Set(IDictionary<Card, int> items)
         {
             foreach (var group in items.GroupBy(kv => kv.Value))
             {
-                Set(group.Select(kv => kv.Key), group.Key);
+                Set(group.Select(kv => kv.Key.Id), group.Key);
             }
         }
 
-        public void Set(IDictionary<string, int> items)
+        public void Remove(List<int> ids)
         {
-            foreach (var group in items.GroupBy(kv => kv.Value))
+            Forbidden.RemoveKeys(ids);
+            Limit1.RemoveKeys(ids);
+            Limit2.RemoveKeys(ids);
+            Specified.RemoveKeys(ids);
+            foreach (var id in ids.AsSpan())
             {
-                Set(group.Select(kv => CardPool.Instance.Get(kv.Key)), group.Key);
+                _list.Remove(id);
+                NotifyChanged(id);
             }
         }
 
-        public void Remove(List<Card> cards)
+        public void SetForbidden(List<int> ids) => Set(ids, LimitCount.Forbidden);
+        public void SetLimit1(List<int> ids) => Set(ids, LimitCount.Limit1);
+        public void SetLimit2(List<int> ids) => Set(ids, LimitCount.Limit2);
+        public void SetSpecified(List<int> ids) => Set(ids, LimitCount.Specified);
+
+        public SortedDictionary<int, int>.Enumerator GetEnumerator() => _list.GetEnumerator();
+
+        public void WriteJson(Utf8JsonWriter writer, JsonSerializerOptions options)
         {
-            foreach (var card in cards.AsSpan())
+            writer.WriteStartObject();
+            void WriteInternal(RegulationCardList list, string propertyName)
             {
-                Forbidden.RemoveWithoutNotify(card);
-                Limit1.RemoveWithoutNotify(card);
-                Limit2.RemoveWithoutNotify(card);
-                Specified.RemoveWithoutNotify(card);
-                _list.Remove(card);
-                card.OnLimitChanged();
+                if (list.Count is 0)
+                {
+                    return;
+                }
+                writer.WritePropertyName(propertyName);
+                writer.WriteStartArray();
+                foreach (var card in list.AsSpan())
+                {
+                    writer.WriteNumberValue(card.Id);
+                }
+                writer.WriteEndArray();
             }
-            Forbidden.NotifyCollectionReset();
-            Limit1.NotifyCollectionReset();
-            Limit2.NotifyCollectionReset();
-            Specified.NotifyCollectionReset();
+            WriteInternal(Forbidden, JsonPropertyNames.Forbidden);
+            WriteInternal(Limit1, JsonPropertyNames.Limit1);
+            WriteInternal(Limit2, JsonPropertyNames.Limit2);
+            WriteInternal(Specified, JsonPropertyNames.Specified);
         }
-
-        public void SetForbidden(List<Card> cards) => Set(cards, LimitCount.Forbidden);
-        public void SetLimit1(List<Card> cards) => Set(cards, LimitCount.Limit1);
-        public void SetLimit2(List<Card> cards) => Set(cards, LimitCount.Limit2);
-        public void SetSpecified(List<Card> cards) => Set(cards, LimitCount.Specified);
-
-        public SortedDictionary<Card, int>.Enumerator GetEnumerator() => _list.GetEnumerator();
-
-        #region interface methods
-        bool IDict.ContainsKey(Card key) => _list.ContainsKey(key);
-        bool IDict.TryGetValue(Card key, out int value) => _list.TryGetValue(key, out value);
-        void IDict.Add(Card key, int value) => Set(key, value);
-        bool IDict.Remove(Card key) => Set(key, LimitCount.Unlimited);
-
-        bool ICollection<KVPair>.Contains(KVPair item) => Get(item.Key) == item.Value;
-        void ICollection<KVPair>.Add(KVPair item) => Set(item.Key, item.Value);
-        bool ICollection<KVPair>.Remove(KVPair item) => Set(item.Key, LimitCount.Unlimited);
-        void ICollection<KVPair>.CopyTo(KVPair[] array, int arrayIndex) => _list.CopyTo(array, arrayIndex);
-
-        IEnumerator<KVPair> IEnumerable<KVPair>.GetEnumerator() => GetEnumerator();
-        IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
-        #endregion
     }
 }

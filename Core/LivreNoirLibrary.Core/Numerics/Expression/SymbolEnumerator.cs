@@ -70,7 +70,7 @@ namespace LivreNoirLibrary.Numerics
                 {
                     type = SymbolType.Function;
                 }
-                _current = new(i, type, symbol.Shared());
+                _current = new(i, type, string.Intern(symbol));
                 _index = index;
                 return true;
             }

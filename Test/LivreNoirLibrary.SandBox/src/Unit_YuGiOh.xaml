@@ -5,7 +5,9 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:LivreNoirLibrary.SandBox"
              xmlns:ct="clr-namespace:LivreNoirLibrary.Windows.Controls;assembly=LivreNoirLibrary.Windows.Controls"
+             xmlns:conv="clr-namespace:LivreNoirLibrary.Windows.Converters;assembly=LivreNoirLibrary.Windows.Controls"
              xmlns:ygo="clr-namespace:LivreNoirLibrary.YuGiOh.Data;assembly=LivreNoirLibrary.YuGiOh.Core"
+             xmlns:yc="clr-namespace:LivreNoirLibrary.Windows.YuGiOh.Controls;assembly=LivreNoirLibrary.Windows.YuGiOh"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
     <Grid>
@@ -16,15 +18,51 @@
                 <Button Content="Update" Click="OnClick_Test"/>
             </WrapPanel>
             <Grid ColumnDefinitions="*, 3*" Grid.Row="1">
-                <ListView x:Name="ListView_Cards" ItemsSource="{Binding Cards, Source={x:Static ygo:CardPool.Instance}}">
+                <Grid.Resources>
+                    <conv:LnIconConverter x:Key="IconConv"/>
+                </Grid.Resources>
+                <ListView x:Name="ListView_Cards" ItemsSource="{Binding Cards, Source={x:Static ygo:CardPool.Instance}}" ScrollViewer.HorizontalScrollBarVisibility="Disabled">
                     <ListView.ItemTemplate>
                         <DataTemplate>
-                            <StackPanel>
+                            <StackPanel Orientation="Horizontal">
+                                <Image Height="16">
+                                    <Image.Source>
+                                        <DrawingImage Drawing="{Binding Icon, Converter={StaticResource IconConv}}"/>
+                                    </Image.Source>
+                                </Image>
                                 <TextBlock Text="{Binding Name}"/>
                             </StackPanel>
                         </DataTemplate>
                     </ListView.ItemTemplate>
                 </ListView>
+                <Grid Grid.Column="1" DataContext="{Binding SelectedItem, ElementName=ListView_Cards}" d:DataContext="{d:DesignInstance Type=ygo:Card}"
+                      ColumnDefinitions="Auto, *" RowDefinitions="Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto">
+                    <TextBlock Grid.Row="0" Text="Name"/>
+                    <TextBlock Grid.Row="1" Text="Ruby"/>
+                    <TextBlock Grid.Row="2" Text="EnName"/>
+                    <TextBlock Grid.Row="3" Text="CardType"/>
+                    <TextBlock Grid.Row="4" Text="Text"/>
+                    <TextBlock Grid.Row="5" Text="Attribute"/>
+                    <TextBlock Grid.Row="6" Text="MonsterType"/>
+                    <TextBlock Grid.Row="7" Text="Level"/>
+                    <TextBlock Grid.Row="8" Text="Atk"/>
+                    <TextBlock Grid.Row="9" Text="Def"/>
+                    <TextBlock Grid.Row="10" Text="P Scale"/>
+                    <TextBlock Grid.Row="11" Text="P Text"/>
+                    <TextBox Grid.Column="1" Grid.Row="0" Text="{Binding Name, Mode=OneWay}"/>
+                    <TextBox Grid.Column="1" Grid.Row="1" Text="{Binding Ruby, Mode=OneWay}"/>
+                    <TextBox Grid.Column="1" Grid.Row="2" Text="{Binding EnName, Mode=OneWay}"/>
+                    <TextBox Grid.Column="1" Grid.Row="3" Text="{Binding CardTypeText, Mode=OneWay}"/>
+                    <TextBox Grid.Column="1" Grid.Row="4" Text="{Binding Text, Mode=OneWay}" TextWrapping="Wrap"/>
+                    <TextBox Grid.Column="1" Grid.Row="5" Text="{Binding AttributeText, Mode=OneWay}"/>
+                    <TextBox Grid.Column="1" Grid.Row="6" Text="{Binding MonsterTypeText, Mode=OneWay}"/>
+                    <TextBox Grid.Column="1" Grid.Row="7" Text="{Binding LevelText, Mode=OneWay}"/>
+                    <TextBox Grid.Column="1" Grid.Row="8" Text="{Binding AtkText, Mode=OneWay}"/>
+                    <TextBox Grid.Column="1" Grid.Row="9" Text="{Binding DefText, Mode=OneWay}"/>
+                    <TextBox Grid.Column="1" Grid.Row="10" Text="{Binding PendulumScale, Mode=OneWay}"/>
+                    <TextBox Grid.Column="1" Grid.Row="11" Text="{Binding PendulumText, Mode=OneWay}" TextWrapping="Wrap"/>
+                    <yc:LinkMarkerView Grid.Column="1" Grid.Row="12"  Width="120" Height="120"/>
+                </Grid>
             </Grid>
         </Grid>
         <ct:TaskProgressBar x:Name="TaskProgressBar"/>

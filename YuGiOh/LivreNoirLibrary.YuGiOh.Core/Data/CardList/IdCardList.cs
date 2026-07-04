@@ -29,7 +29,7 @@ namespace LivreNoirLibrary.YuGiOh.Data
             return result;
         }
 
-        public IEnumerable<Card> EnumCards()
+        public IEnumerable<Card> EnumerateCards()
         {
             var list = _list;
             var c = list.Count;

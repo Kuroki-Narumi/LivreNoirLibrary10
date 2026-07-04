@@ -36,8 +36,10 @@ namespace LivreNoirLibrary.Text
             converters = _writeOptions.Converters;
             converters.Add(new IJsonWriterJsonConverter());
 
-            _prettyWriteOptions = new(_writeOptions);
-            _prettyWriteOptions.WriteIndented = true;
+            _prettyWriteOptions = new(_writeOptions)
+            {
+                WriteIndented = true
+            };
         }
 
         private static T GetValueOrThrow<T>(T? value)

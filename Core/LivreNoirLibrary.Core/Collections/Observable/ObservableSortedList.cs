@@ -32,7 +32,9 @@ namespace LivreNoirLibrary.Collections
         }
 
         protected abstract TKey GetKey(TValue item);
+
         public sealed override int IndexOf(TValue item) => IndexOfKey(GetKey(item));
+
         public (TKey Key, int Index) GetKeyAndIndex(TValue item)
         {
             var key = GetKey(item);
@@ -41,6 +43,7 @@ namespace LivreNoirLibrary.Collections
         }
 
         public bool ContainsKey(TKey key) => (uint)IndexOfKey(key) < (uint)_key_list.Count;
+
         public int IndexOfKey(TKey key) => _key_list.BinarySearch(key, _comparer);
 
         public bool TryGetValue(TKey key, [MaybeNullWhen(false)] out TValue item)
@@ -83,21 +86,31 @@ namespace LivreNoirLibrary.Collections
         /// <inheritdoc cref="List{T}.AddRange"/>
         public void AddRange(IEnumerable<TValue> collection)
         {
+            var modified = false;
             foreach (var item in collection)
             {
                 AddItem(item, out _, out _, out _);
+                modified = true;
             }
-            OnCollectionReset();
+            if (modified)
+            {
+                OnCollectionReset();
+            }
         }
 
         /// <inheritdoc cref="System.Collections.Generic.CollectionExtensions.AddRange"/>
         public void AddRange(params ReadOnlySpan<TValue> source)
         {
+            var modified = false;
             foreach (var item in source)
             {
                 AddItem(item, out _, out _, out _);
+                modified = true;
             }
-            OnCollectionReset();
+            if (modified)
+            {
+                OnCollectionReset();
+            }
         }
 
         public int RemoveRange(IEnumerable<TValue> collection)
@@ -249,5 +262,7 @@ namespace LivreNoirLibrary.Collections
             current = default;
             return false;
         }
+
+        public ReadOnlySpan<TKey> EnumerateKeys() => _key_list.AsSpan();
     }
 }

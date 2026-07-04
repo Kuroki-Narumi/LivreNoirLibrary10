@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Text.Json;
@@ -19,13 +20,17 @@ namespace LivreNoirLibrary.YuGiOh.Data
 
         public bool LoadFile(string path = "")
         {
+            var t0 = Stopwatch.GetTimestamp();
             if (!File.Exists(path))
             {
                 path = Utils.GetFullPath(path);
             }
+
             if (Json.TryOpen<Serializable.CardPool>(path, out var data))
             {
+                Console.WriteLine($"CardPool: got json object in {Stopwatch.GetElapsedTime(t0).TotalMilliseconds}ms");
                 Load(data);
+                Console.WriteLine($"CardPool: total time in {Stopwatch.GetElapsedTime(t0).TotalMilliseconds}ms");
                 return true;
             }
             return false;
@@ -33,10 +38,18 @@ namespace LivreNoirLibrary.YuGiOh.Data
 
         public void Load(Serializable.CardPool source)
         {
+            var t0 = Stopwatch.GetTimestamp();
             Packs.Load(source.Packs);
+            Console.WriteLine($"CardPool: loaded Packs in {Stopwatch.GetElapsedTime(t0).TotalMilliseconds}ms");
+
+            t0 = Stopwatch.GetTimestamp();
             Cards.Load(source.Cards);
+            Console.WriteLine($"CardPool: loaded Cards in {Stopwatch.GetElapsedTime(t0).TotalMilliseconds}ms");
+
+            t0 = Stopwatch.GetTimestamp();
             UpdateCardPackInfo();
             LastUpdate = source.LastUpdate;
+            Console.WriteLine($"CardPool: updated pack info in {Stopwatch.GetElapsedTime(t0).TotalMilliseconds}ms");
         }
 
         public void UpdateCardPackInfo()

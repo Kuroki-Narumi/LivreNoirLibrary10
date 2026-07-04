@@ -86,16 +86,16 @@
                         </DataTemplate>
                     </ComboBox.ItemTemplate>
                 </ComboBox>
-                <ct:Button Icon="{x:Static ct:Icons.Config}" ToolTip="Skin Optins" Click="OnClick_SkinOptions" IsEnabled="{Binding BmsScreen.HasSkinOptions}"/>
+                <ct:Button Icon="{x:Static media:Icons.Config}" ToolTip="Skin Optins" Click="OnClick_SkinOptions" IsEnabled="{Binding BmsScreen.HasSkinOptions}"/>
 
                 <Border Style="{StaticResource Separator}"/>
-                <ct:Button Icon="{x:Static ct:Icons.Open}" Content="{Binding BmsScreen.BmsBaseName}" ToolTip="Open" Command="ApplicationCommands.Open"/>
-                <ct:Button Icon="{x:Static ct:Icons.Save}" ToolTip="Save" Command="ApplicationCommands.Save"/>
-                <ct:Button Icon="{x:Static ct:Icons.Document}" ToolTip="Hash" Click="OnClick_Hash"/>
+                <ct:Button Icon="{x:Static media:Icons.Open}" Content="{Binding BmsScreen.BmsBaseName}" ToolTip="Open" Command="ApplicationCommands.Open"/>
+                <ct:Button Icon="{x:Static media:Icons.Save}" ToolTip="Save" Command="ApplicationCommands.Save"/>
+                <ct:Button Icon="{x:Static media:Icons.Document}" ToolTip="Hash" Click="OnClick_Hash"/>
 
                 <Border Style="{StaticResource Separator}"/>
                 <ct:DropDownMenuButton>
-                    <ct:IconPresenter Height="16" Source="{x:Static ct:Icons.Volume_3}"/>
+                    <ct:IconPresenter Height="16" Source="{x:Static media:Icons.Volume_3}"/>
                     <ct:DropDownMenuButton.DropDownContent>
                         <Grid ColumnDefinitions="Auto, *" RowDefinitions="Auto, Auto, Auto, Auto, Auto">
                             <TextBlock Style="{StaticResource Top}" Text="Volume"/>
@@ -111,7 +111,7 @@
                     </ct:DropDownMenuButton.DropDownContent>
                 </ct:DropDownMenuButton>
                 <ct:DropDownMenuButton>
-                    <ct:IconPresenter Height="16" Source="{x:Static ct:Icons.Download}"/>
+                    <ct:IconPresenter Height="16" Source="{x:Static media:Icons.Download}"/>
                     <ct:DropDownMenuButton.DropDownContent>
                         <StackPanel>
                             <TextBlock Style="{StaticResource Top}" Text="HighSpeed"/>
@@ -125,12 +125,12 @@
                 </ct:DropDownMenuButton>
 
                 <Border Style="{StaticResource Separator}"/>
-                <ct:Button Icon="{x:Static ct:Icons.Wave}" ToolTip="Assemble" Click="OnClick_Assemble" IsEnabled="{Binding BmsScreen.IsBmsReady, Mode=OneWay}"/>
+                <ct:Button Icon="{x:Static media:Icons.Wave}" ToolTip="Assemble" Click="OnClick_Assemble" IsEnabled="{Binding BmsScreen.IsBmsReady, Mode=OneWay}"/>
 
                 <Border Style="{StaticResource Separator}"/>
 
                 <ct:DropDownMenuButton>
-                    <ct:IconPresenter Source="{x:Static ct:Icons.Config}" Height="16"/>
+                    <ct:IconPresenter Source="{x:Static media:Icons.Config}" Height="16"/>
                     <ct:DropDownMenuButton.DropDownContent>
                         <StackPanel>
                             <TextBlock Style="{StaticResource Top}" Text="Video"/>
@@ -164,8 +164,8 @@
                         </StackPanel>
                     </ct:DropDownMenuButton.DropDownContent>
                 </ct:DropDownMenuButton>
-                <ct:Button Icon="{x:Static ct:Icons.Camera}" ToolTip="Save Video" Click="OnClick_Video" IsEnabled="{Binding BmsScreen.IsBmsReady, Mode=OneWay}"/>
-                <ct:Button Icon="{x:Static ct:Icons.Play}" ToolTip="Play" Click="OnClick_Play" IsEnabled="{Binding BmsScreen.IsBmsReady, Mode=OneWay}"/>
+                <ct:Button Icon="{x:Static media:Icons.Camera}" ToolTip="Save Video" Click="OnClick_Video" IsEnabled="{Binding BmsScreen.IsBmsReady, Mode=OneWay}"/>
+                <ct:Button Icon="{x:Static media:Icons.Play}" ToolTip="Play" Click="OnClick_Play" IsEnabled="{Binding BmsScreen.IsBmsReady, Mode=OneWay}"/>
 
                 <Border Style="{StaticResource Separator}"/>
             </WrapPanel>

@@ -8,7 +8,7 @@ namespace LivreNoirLibrary.Media.FFmpeg
     {
         public const string NA = "N/A";
         public static string? GetString(void* ptr) => Marshal.PtrToStringUTF8((nint)ptr);
-        public static string GetName(void* ptr) => GetString(ptr) is string text ? Text.StringPool.Get(text) : NA;
+        public static string GetName(void* ptr) => GetString(ptr) is string text ? string.Intern(text) : NA;
 
         public static bool IsKeyFrame(AVPacket* packet) => (packet->flags & ffmpeg.AV_PKT_FLAG_KEY) is not 0;
 
