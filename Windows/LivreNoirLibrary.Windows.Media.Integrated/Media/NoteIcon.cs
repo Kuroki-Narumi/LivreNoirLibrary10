@@ -6,7 +6,7 @@ namespace LivreNoirLibrary.Windows.Media
 {
     public static class NoteIcon
     {
-        private const string ResourcePath = "pack://application:,,,/LivreNoirLibrary.Windows.Media;component/Resources/NoteIcons.png";
+        private const string ResourcePath = "/LivreNoirLibrary.Windows.Media;component/Resources/NoteIcons.png";
         private const int Size = 16;
 
         private static readonly Dictionary<int, CroppedBitmap> _resources = CreateResource();

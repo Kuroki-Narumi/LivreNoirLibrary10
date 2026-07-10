@@ -11,7 +11,7 @@
     <Control.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
-                <ResourceDictionary Source="pack://application:,,,/LivreNoirLibrary.Windows.Controls;component/Themes/Generic.xaml"/>
+                <ResourceDictionary Source="/LivreNoirLibrary.Windows.Controls;component/Themes/Generic.xaml"/>
             </ResourceDictionary.MergedDictionaries>
             <Style TargetType="TextBlock" x:Key="Header">
                 <Setter Property="Margin" Value="0,4,4,4"/>

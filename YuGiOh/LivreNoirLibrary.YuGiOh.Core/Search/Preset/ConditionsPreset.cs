@@ -4,16 +4,7 @@ using System.Text.Json.Serialization;
 
 namespace LivreNoirLibrary.YuGiOh.Search
 {
-    public abstract class ConditionPreset : ObservableObjectBase
-    {
-        public static void CopyHashSet<T>(HashSet<T> from, HashSet<T> to)
-        {
-            to.Clear();
-            to.UnionWith(from);
-        }
-    }
-
-    public abstract class ConditionsPreset<T> : ConditionPreset
+    public abstract class ConditionsPreset<T> : ObservableObjectBase, INamedObject
         where T : new()
     {
         [JsonPropertyName(JsonPropertyNames.Name)]
@@ -26,7 +17,5 @@ namespace LivreNoirLibrary.YuGiOh.Search
 
         [JsonPropertyName(JsonPropertyNames.Preset_Conditions)]
         public T Conditions { get; set; } = new();
-
-        public abstract void Copy(T from, T to);
     }
 }

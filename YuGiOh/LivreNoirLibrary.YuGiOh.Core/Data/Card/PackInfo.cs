@@ -3,7 +3,7 @@ using System.Diagnostics.CodeAnalysis;
 
 namespace LivreNoirLibrary.YuGiOh.Data
 {
-    public readonly struct PackInfo(string pid, string number) : IEquatable<PackInfo>, IComparable<PackInfo>
+    public class PackInfo(string pid, string number) : IEquatable<PackInfo>, IComparable<PackInfo>
     {
         public string ProductId { get; } = pid;
         public string Number { get; } = number;
@@ -15,9 +15,13 @@ namespace LivreNoirLibrary.YuGiOh.Data
 
         public bool IsTcg() => CardPack.IsTcgPack(ProductId);
 
-        public int CompareTo(PackInfo other)
+        public int CompareTo(PackInfo? other)
         {
-            var c = Date.CompareTo(other.Date);
+            if (other is null)
+            {
+                return -1;
+            }
+            var c = other.Date.CompareTo(Date);
             if (c is not 0)
             {
                 return c;
@@ -25,7 +29,7 @@ namespace LivreNoirLibrary.YuGiOh.Data
             return ProductId.CompareTo(other.ProductId, StringComparison.Ordinal);
         }
 
-        public bool Equals(PackInfo other) => ProductId == other.ProductId && Number == other.Number;
+        public bool Equals(PackInfo? other) => other is not null && ProductId == other.ProductId && Number == other.Number;
         public override bool Equals([NotNullWhen(true)] object? obj) => obj is PackInfo other && Equals(other);
         public override int GetHashCode() => HashCode.Combine(ProductId, Number);
 

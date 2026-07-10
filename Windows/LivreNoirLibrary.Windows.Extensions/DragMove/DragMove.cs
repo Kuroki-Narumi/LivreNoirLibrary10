@@ -44,40 +44,41 @@ namespace LivreNoirLibrary.Windows
             return default;
         }
 
-        public static void CorrectPosition(this Window target, Window? subject = null)
+        public static void CorrectPosition(this Window target, Window? boundsSource = null)
         {
-            subject ??= target;
-            var bounds = GetScreenBounds(subject);
+            boundsSource ??= target;
+            var bounds = GetScreenBounds(boundsSource);
             var (x, y, w, h) = GetDisplayRect(target);
-            var (sx, sy) = GetDisplayScale(subject);
+            var (sx, sy) = GetDisplayScale(boundsSource);
             x = Math.Clamp(x, bounds.X, Math.Max(bounds.Right - w, bounds.X));
             y = Math.Clamp(y, bounds.Y, Math.Max(bounds.Bottom - h, bounds.Y));
             target.Left = x / sx;
             target.Top = y / sy;
         }
 
-        public static void PlaceToCenter(this Window window, double offsetX = 0, double offsetY = 0)
+        public static void PlaceToCenter(this Window window, double offsetX = 0, double offsetY = 0, Visual? scaleSource = null)
         {
             var bounds = GetScreenBounds(window);
-            var (sx, sy) = window.GetDisplayScale();
+            var (sx, sy) = GetDisplayScale(scaleSource ?? window);
             var x = bounds.X + (bounds.Width - window.ActualWidth * sx) * 0.5 + offsetX;
             var y = bounds.Y + (bounds.Height - window.ActualHeight * sy) * 0.5 + offsetY;
             window.Left = x / sx;
             window.Top = y / sy;
         }
 
-        public static void PlaceToCursor(this Window window, double offsetX = 0, double offsetY = 0)
+        public static void PlaceToCursor(this Window window, double offsetX = 0, double offsetY = 0, Window? placementTarget = null)
         {
-            var (x, y) = window.PointToScreen(Mouse.GetPosition(window));
-            PlaceToPoint(window, new(x + offsetX, y + offsetY));
+            placementTarget ??= window;
+            var (x, y) = placementTarget.PointToScreen(Mouse.GetPosition(placementTarget));
+            PlaceToPoint(window, new(x + offsetX, y + offsetY), placementTarget);
         }
 
-        public static void PlaceToPoint(this Window window, Point point)
+        public static void PlaceToPoint(this Window window, Point point, Visual? scaleSource = null)
         {
             var bounds = GetScreenBounds(point);
-            var (sx, sy) = window.GetDisplayScale();
-            var x = Math.Max(point.X, bounds.X + Math.Max(bounds.Width - window.ActualWidth * sx, 0));
-            var y = Math.Max(point.Y, bounds.Y + Math.Max(bounds.Height - window.ActualHeight * sy, 0));
+            var (sx, sy) = GetDisplayScale(scaleSource ?? window);
+            var x = Math.Min(point.X, bounds.X + Math.Max(bounds.Width - window.ActualWidth * sx, 0));
+            var y = Math.Min(point.Y, bounds.Y + Math.Max(bounds.Height - window.ActualHeight * sy, 0));
             window.Left = x / sx;
             window.Top = y / sy;
         }

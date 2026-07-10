@@ -39,7 +39,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LivreNoirLibrary.YuGiOh.Cor
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LivreNoirLibrary.Windows.YuGiOh", "YuGiOh\LivreNoirLibrary.Windows.YuGiOh\LivreNoirLibrary.Windows.YuGiOh.csproj", "{B3D9989B-2F3B-4F23-9F98-4053EBDD2C02}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LNImageEditor", "Applications\LNImageEditor\LNImageEditor.csproj", "{7A0DAF94-9CD7-4097-BE99-EC95687779F2}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LN-ImageEditor", "Applications\LN-ImageEditor\LN-ImageEditor.csproj", "{7A0DAF94-9CD7-4097-BE99-EC95687779F2}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LivreNoirLibrary.Media.Integrated", "Media\LivreNoirLibrary.Media.Integrated\LivreNoirLibrary.Media.Integrated.csproj", "{5E9A1C5E-7DCA-4CE7-A4CB-7B3F33A65C58}"
 EndProject
@@ -55,13 +55,15 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LivreNoirLibrary.Windows.Me
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LivreNoirLibrary.Collections", "Core\LivreNoirLibrary.Collections\LivreNoirLibrary.Collections.csproj", "{B7592E8D-D02C-42B4-AA77-CA218C12E8DC}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LNClock", "Applications\LNClock\LNClock.csproj", "{28560B02-4DF0-434D-BBF5-68AAD1EF9728}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LN-Clock", "Applications\LN-Clock\LN-Clock.csproj", "{28560B02-4DF0-434D-BBF5-68AAD1EF9728}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Applications", "Applications", "{91D8486E-F2AC-455C-BB54-37AA9D6AFC42}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LivreNoirLibrary.GameOfLife", "Test\LivreNoirLibrary.GameOfLife\LivreNoirLibrary.GameOfLife.csproj", "{40EEB7B6-93F4-46F2-9654-0D64490F923C}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LivreNoirLibrary.Updater", "Windows\LivreNoirLibrary.Updater\LivreNoirLibrary.Updater.csproj", "{D68A1A1B-4A1E-4CDE-9DB8-DF5F54D0C06A}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LN-YuGiOhDatabase", "Applications\LN-YuGiOhDatabase\LN-YuGiOhDatabase.csproj", "{E2BA656E-9E7C-13FF-3989-33996C8397C4}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -165,6 +167,10 @@ Global
 		{D68A1A1B-4A1E-4CDE-9DB8-DF5F54D0C06A}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{D68A1A1B-4A1E-4CDE-9DB8-DF5F54D0C06A}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{D68A1A1B-4A1E-4CDE-9DB8-DF5F54D0C06A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E2BA656E-9E7C-13FF-3989-33996C8397C4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E2BA656E-9E7C-13FF-3989-33996C8397C4}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E2BA656E-9E7C-13FF-3989-33996C8397C4}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E2BA656E-9E7C-13FF-3989-33996C8397C4}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -194,6 +200,7 @@ Global
 		{28560B02-4DF0-434D-BBF5-68AAD1EF9728} = {91D8486E-F2AC-455C-BB54-37AA9D6AFC42}
 		{40EEB7B6-93F4-46F2-9654-0D64490F923C} = {AE37215D-7D57-4F37-AFBD-A9F4BBCDFCA0}
 		{D68A1A1B-4A1E-4CDE-9DB8-DF5F54D0C06A} = {FAE50CAA-58F4-4889-8A49-AF066B7E3E20}
+		{E2BA656E-9E7C-13FF-3989-33996C8397C4} = {91D8486E-F2AC-455C-BB54-37AA9D6AFC42}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {E9E77D05-4DB4-4801-B31A-B18084065C39}

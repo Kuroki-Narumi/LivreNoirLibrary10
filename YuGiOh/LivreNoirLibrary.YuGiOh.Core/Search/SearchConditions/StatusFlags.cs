@@ -12,5 +12,7 @@ namespace LivreNoirLibrary.YuGiOh.Search
         AbilityPerf = 4,
         LinkMarkerPerf = 8,
         StatusExpression = 16,
+
+        Default = LinkMarkerPerf,
     }
 }

@@ -1,5 +1,6 @@
 ﻿using LivreNoirLibrary.Debug;
 using LivreNoirLibrary.Numerics;
+using LivreNoirLibrary.Windows.Converters;
 using LivreNoirLibrary.Windows.Media;
 using System;
 using System.Runtime.CompilerServices;
@@ -119,6 +120,7 @@ namespace LivreNoirLibrary.Windows.Controls
 
         public Size GetContentSize() => Source switch
         {
+            LivreNoirLibrary.Media.VectorGraphics.ElementGroup g => LnIconConverter.Convert(g).Bounds.Size,
             Drawing drawing => drawing.Bounds.Size,
             ImageSource image => new(image.Width, image.Height),
             MediaPlayer mp => ApplyDisplayScale(mp.NaturalVideoWidth, mp.NaturalVideoHeight),
@@ -224,6 +226,11 @@ namespace LivreNoirLibrary.Windows.Controls
             Rect sourceRect;
             switch (Source)
             {
+                case LivreNoirLibrary.Media.VectorGraphics.ElementGroup g:
+                    var gd = LnIconConverter.Convert(g);
+                    sourceRect = gd.Bounds;
+                    renderAction = dc => dc.DrawDrawing(gd);
+                    break;
                 case Drawing drawing:
                     sourceRect = drawing.Bounds;
                     renderAction = dc => dc.DrawDrawing(drawing);

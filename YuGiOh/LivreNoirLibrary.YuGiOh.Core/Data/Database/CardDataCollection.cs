@@ -131,6 +131,14 @@ namespace LivreNoirLibrary.YuGiOh.Data
             }
         }
 
+        public void NotifyLimitChanged()
+        {
+            foreach (var card in _list.AsSpan())
+            {
+                card.NotifyLimitChanged();
+            }
+        }
+
         IEnumerable<Card> ICardEnumerable.EnumerateCards() => this;
     }
 }

@@ -8,10 +8,12 @@ namespace LivreNoirLibrary.Windows.YuGiOh.Converters
 {
     public class TextLengthConveter : IValueConverter
     {
+        public static int Convert(string? text) => LivreNoirLibrary.YuGiOh.Vocab.GetTextLength(text);
+
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
             var text = value is string s ? s : value.ToString();
-            return LivreNoirLibrary.YuGiOh.Vocab.GetTextLength(text);
+            return Convert(text);
         }
 
         public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)

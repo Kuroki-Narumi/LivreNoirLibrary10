@@ -103,5 +103,7 @@ namespace LivreNoirLibrary.Text
                 return NaturalOrderComparer.Compare(left, right);
             }
         }
+
+        public static string ToStringAuto(this Version version) => version.ToString(version.Revision > 0 ? 4 : 3);
     }
 }

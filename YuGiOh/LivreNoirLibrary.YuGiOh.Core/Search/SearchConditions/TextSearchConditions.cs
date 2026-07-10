@@ -98,21 +98,21 @@ namespace LivreNoirLibrary.YuGiOh.Search
             if (_regex is { } regex1)
             {
                 var regex2 = _regexForText!;
-                return SearchCondition.IsMatch(_name, card.Name, buffer, regex1, converter1) ||
-                       SearchCondition.IsMatch(_ruby, card.Ruby, buffer, regex1, converter1) ||
-                       SearchCondition.IsMatch(_enName, card.EnName, buffer, regex1, converter1) ||
-                       SearchCondition.IsMatch(_text, card.Text, buffer, regex2, converter2) ||
-                       SearchCondition.IsMatch(_pText, card.PendulumText, buffer, regex2, converter2);
+                return SearchUtils.IsMatch(_name, card.Name, buffer, regex1, converter1) ||
+                       SearchUtils.IsMatch(_ruby, card.Ruby, buffer, regex1, converter1) ||
+                       SearchUtils.IsMatch(_enName, card.EnName, buffer, regex1, converter1) ||
+                       SearchUtils.IsMatch(_text, card.Text, buffer, regex2, converter2) ||
+                       SearchUtils.IsMatch(_pText, card.PendulumText, buffer, regex2, converter2);
             }
             else
             {
                 var segments1 = _input.AsSpan();
                 var segments2 = _inputForText.AsSpan();
-                return SearchCondition.IsMatch(_name, card.Name, buffer, segments1, converter1) ||
-                       SearchCondition.IsMatch(_ruby, card.Ruby, buffer, segments1, converter1) ||
-                       SearchCondition.IsMatch(_enName, card.EnName, buffer, segments1, converter1) ||
-                       SearchCondition.IsMatch(_text, card.Text, buffer, segments2, converter2) ||
-                       SearchCondition.IsMatch(_pText, card.PendulumText, buffer, segments2, converter2);
+                return SearchUtils.IsMatch(_name, card.Name, buffer, segments1, converter1) ||
+                       SearchUtils.IsMatch(_ruby, card.Ruby, buffer, segments1, converter1) ||
+                       SearchUtils.IsMatch(_enName, card.EnName, buffer, segments1, converter1) ||
+                       SearchUtils.IsMatch(_text, card.Text, buffer, segments2, converter2) ||
+                       SearchUtils.IsMatch(_pText, card.PendulumText, buffer, segments2, converter2);
             }
         }
     }

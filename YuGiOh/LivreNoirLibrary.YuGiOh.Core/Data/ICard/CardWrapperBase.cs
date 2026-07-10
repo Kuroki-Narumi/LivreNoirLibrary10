@@ -7,6 +7,8 @@ namespace LivreNoirLibrary.YuGiOh.Data
     {
         public Card Card { get; } = card;
 
+        public Card ThisCard => Card;
+
         public int Id => Card.Id;
         public string Name => Card.Name;
         public string Ruby => Card.Ruby;

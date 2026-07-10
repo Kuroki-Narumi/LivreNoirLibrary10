@@ -124,6 +124,7 @@ namespace LivreNoirLibrary.YuGiOh.Data
 
         public void WriteJson(Utf8JsonWriter writer, JsonSerializerOptions options)
         {
+            writer.WriteStartObject();
             if (MainDeck.Count is > 0)
             {
                 writer.WritePropertyName(JsonPropertyNames.MainDeck);
@@ -139,6 +140,7 @@ namespace LivreNoirLibrary.YuGiOh.Data
                 writer.WritePropertyName(JsonPropertyNames.SideDeck);
                 SideDeck.WriteJson(writer, options);
             }
+            writer.WriteEndObject();
         }
     }
 }

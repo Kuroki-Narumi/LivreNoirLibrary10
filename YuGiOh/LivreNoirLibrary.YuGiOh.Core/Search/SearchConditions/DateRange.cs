@@ -13,6 +13,14 @@ namespace LivreNoirLibrary.YuGiOh.Search
 
         public bool IsOutOfRange(DateTime value) => Exclusive ^ (value < Since || value > Until);
 
+        public void Set(DateTime since, DateTime until, bool isEnabled, bool exclusive)
+        {
+            Since = since;
+            Until = until;
+            IsEnabled = isEnabled;
+            Exclusive = exclusive;
+        }
+
         public void CopyFrom(DateRange other)
         {
             base.CopyFrom(other);

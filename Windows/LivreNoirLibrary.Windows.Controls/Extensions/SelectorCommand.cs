@@ -146,6 +146,14 @@ namespace LivreNoirLibrary.Windows.Controls
             e.Handled = true;
         }
 
+        public static void OnExecuted_Insert<T>(this Selector selector, IList<T> list, T item, ExecutedRoutedEventArgs e)
+        {
+            var index = selector.SelectedIndex + 1;
+            list.Insert(index, item);
+            ProcessSelect(selector, index);
+            e.Handled = true;
+        }
+
         public static void OnExecuted_Duplicate<T>(this Selector selector, IList<T> list, Func<T, T> duplicateFunc, ExecutedRoutedEventArgs e)
         {
             var index = selector.SelectedIndex;

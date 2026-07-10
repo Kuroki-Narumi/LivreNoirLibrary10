@@ -6,14 +6,14 @@ namespace LivreNoirLibrary.Windows.Controls
 {
     public class ValidityChecker
     {
-        private readonly ValidityChangedEventHandler? _handler;
+        private readonly RoutedEventHandler<bool>? _handler;
         private readonly Dictionary<object, bool> _list = [];
         private int _valid_count;
         private bool _last_valid;
 
         public bool IsValid => _valid_count == _list.Count;
 
-        public ValidityChecker(ValidityChangedEventHandler? handler, params ReadOnlySpan<object> controls)
+        public ValidityChecker(RoutedEventHandler<bool>? handler, params ReadOnlySpan<object> controls)
         {
             _handler = handler;
             foreach (var control in controls)
@@ -67,7 +67,6 @@ namespace LivreNoirLibrary.Windows.Controls
             if (flag != _last_valid)
             {
                 _last_valid = flag;
-                _handler?.Invoke(this, new() { IsValid = flag });
             }
         }
 
@@ -80,9 +79,9 @@ namespace LivreNoirLibrary.Windows.Controls
             Check();
         }
 
-        private void CheckS(object sender, ValidityChangedEventArgs e)
+        private void CheckS(object sender, RoutedEventArgs<bool> e)
         {
-            CheckObject(sender, e.IsValid);
+            CheckObject(sender, e.Value);
             Check();
         }
     }

@@ -42,30 +42,29 @@ namespace LivreNoirLibrary.Windows.YuGiOh.Vocabulary
 
         public void LoadDefault()
         {
-            var dic = _dictionary;
             foreach (var type in EnumUtils.EnumerateCardTypes(true, true, true))
             {
-                dic[$"{type}"] = type.GetName();
+                SetData(type.ToString(), type.GetName(true));
             }
             
-            dic[nameof(Monster)] = LivreNoirLibrary.YuGiOh.Vocab.Monster;
-            dic[nameof(Spell)] = LivreNoirLibrary.YuGiOh.Vocab.Spell;
-            dic[nameof(Trap)] = LivreNoirLibrary.YuGiOh.Vocab.Trap;
+            SetData(nameof(Monster), LivreNoirLibrary.YuGiOh.Vocab.Monster);
+            SetData(nameof(Spell), LivreNoirLibrary.YuGiOh.Vocab.Spell);
+            SetData(nameof(Trap), LivreNoirLibrary.YuGiOh.Vocab.Trap);
 
-            dic[nameof(Main)] = LivreNoirLibrary.YuGiOh.Vocab.Main;
-            dic[nameof(Fusion)] = LivreNoirLibrary.YuGiOh.Vocab.Fusion;
-            dic[nameof(Ritual)] = LivreNoirLibrary.YuGiOh.Vocab.Ritual;
-            dic[nameof(Synchro)] = LivreNoirLibrary.YuGiOh.Vocab.Synchro;
-            dic[nameof(Xyz)] = LivreNoirLibrary.YuGiOh.Vocab.Xyz;
-            dic[nameof(Link)] = LivreNoirLibrary.YuGiOh.Vocab.Link;
-            dic[nameof(Token)] = LivreNoirLibrary.YuGiOh.Vocab.Token;
-            dic[nameof(Normal)] = LivreNoirLibrary.YuGiOh.Vocab.Normal;
-            dic[nameof(Effect)] = LivreNoirLibrary.YuGiOh.Vocab.Effect;
-            dic[nameof(Continuous)] = LivreNoirLibrary.YuGiOh.Vocab.Continuous;
-            dic[nameof(Field)] = LivreNoirLibrary.YuGiOh.Vocab.Field;
-            dic[nameof(Equip)] = LivreNoirLibrary.YuGiOh.Vocab.Equip;
-            dic[nameof(Quick)] = LivreNoirLibrary.YuGiOh.Vocab.Quick;
-            dic[nameof(Counter)] = LivreNoirLibrary.YuGiOh.Vocab.Counter;
+            SetData(nameof(Main), LivreNoirLibrary.YuGiOh.Vocab.Main);
+            SetData(nameof(Fusion), LivreNoirLibrary.YuGiOh.Vocab.Fusion);
+            SetData(nameof(Ritual), LivreNoirLibrary.YuGiOh.Vocab.Ritual);
+            SetData(nameof(Synchro), LivreNoirLibrary.YuGiOh.Vocab.Synchro);
+            SetData(nameof(Xyz), LivreNoirLibrary.YuGiOh.Vocab.Xyz);
+            SetData(nameof(Link), LivreNoirLibrary.YuGiOh.Vocab.Link);
+            SetData(nameof(Token), LivreNoirLibrary.YuGiOh.Vocab.Token);
+            SetData(nameof(Normal), LivreNoirLibrary.YuGiOh.Vocab.Normal);
+            SetData(nameof(Effect), LivreNoirLibrary.YuGiOh.Vocab.Effect);
+            SetData(nameof(Continuous), LivreNoirLibrary.YuGiOh.Vocab.Continuous);
+            SetData(nameof(Field), LivreNoirLibrary.YuGiOh.Vocab.Field);
+            SetData(nameof(Equip), LivreNoirLibrary.YuGiOh.Vocab.Equip);
+            SetData(nameof(Quick), LivreNoirLibrary.YuGiOh.Vocab.Quick);
+            SetData(nameof(Counter), LivreNoirLibrary.YuGiOh.Vocab.Counter);
         }
     }
 }

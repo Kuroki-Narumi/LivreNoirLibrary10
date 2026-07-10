@@ -227,6 +227,7 @@ namespace LivreNoirLibrary.Numerics
                         break;
                 }
             }
+            return true;
         ReturnInvalid:
             list.Clear();
             exception ??= ExpressionExceptions.Unhandled(expression, 0);

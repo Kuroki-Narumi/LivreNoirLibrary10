@@ -96,7 +96,7 @@ namespace LivreNoirLibrary.Windows.Controls
             ProcessCancel();
         }
 
-        public void Open() => _parent?.Open(this);
+        public void Open(bool? closeByClick = null) => _parent?.Open(this, closeByClick);
 
         public void Close() => _parent?.Close();
 

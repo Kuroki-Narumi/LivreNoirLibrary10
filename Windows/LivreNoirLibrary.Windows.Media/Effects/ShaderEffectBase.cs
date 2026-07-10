@@ -9,7 +9,7 @@ namespace LivreNoirLibrary.Windows.Media.Effects
 {
     public abstract class ShaderEffectBase : ShaderEffect
     {
-        private const string ResourcePath_Base = "pack://application:,,,/LivreNoirLibrary.Windows.Media;component/Effects/Shaders/";
+        private const string ResourcePath_Base = "/LivreNoirLibrary.Windows.Media;component/Effects/Shaders/";
         private static readonly Dictionary<string, PixelShader> _pixelShaders = [];
 
         protected static PixelShader GetPixelShader(string shaderName, string directory = ResourcePath_Base)

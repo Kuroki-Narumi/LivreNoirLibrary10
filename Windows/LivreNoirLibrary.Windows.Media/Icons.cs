@@ -68,6 +68,8 @@ namespace LivreNoirLibrary.Windows.Media
         public static DrawingGroup ArrowRight { get; } = CreateInternal(V.Icons.ArrowRight);
         public static DrawingGroup ArrowUp { get; } = CreateInternal(V.Icons.ArrowUp);
         public static DrawingGroup ArrowDown { get; } = CreateInternal(V.Icons.ArrowDown);
+        public static DrawingGroup RightLeft { get; } = CreateInternal(V.Icons.RightLeft);
+        public static DrawingGroup UpDown { get; } = CreateInternal(V.Icons.UpDown);
 
         public static DrawingGroup HeadLeft { get; } = CreateInternal(V.Icons.HeadLeft);
         public static DrawingGroup HeadRight { get; } = CreateInternal(V.Icons.HeadRight);
@@ -201,13 +203,10 @@ namespace LivreNoirLibrary.Windows.Media
 
         public static DrawingGroup Browse { get; } = CreateInternal(V.Icons.Browse);
 
-        public static IEnumerable<IconInfo> IconList => _iconList;
-
-        private static readonly IconInfo[] _iconList = CreateIconList();
         private static IconInfo[] CreateIconList()
         {
             var list = new List<IconInfo>();
-            foreach (var prop in typeof(Icons).GetProperties(System.Reflection.BindingFlags.Static))
+            foreach (var prop in typeof(Icons).GetProperties())
             {
                 if (prop.PropertyType.IsAssignableTo(typeof(Drawing)))
                 {
@@ -217,6 +216,9 @@ namespace LivreNoirLibrary.Windows.Media
             }
             return [.. list];
         }
+
+        private static IconInfo[] _iconList = CreateIconList();
+        public static IEnumerable<IconInfo> IconList => _iconList;
     }
 
     public record IconInfo(string Name, Drawing Drawing);

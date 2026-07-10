@@ -109,7 +109,7 @@ namespace LivreNoirLibrary.YuGiOh.Media
         };
 
         private static readonly string _card_frame_geometry = $"M0,0 h{CardFrameWidth} v{CardFrameHeight} h-{CardFrameWidth} Z";
-        private static readonly string _card_inner_frame_geometry = $"M1,1 h{CardFrameWidth - 2} v{CardFrameHeight - 2} h-{CardFrameWidth - 2} Z";
+        private static readonly string _card_inner_frame_geometry = $"M2,2 h{CardFrameWidth - 4} v{CardFrameHeight - 4} h-{CardFrameWidth - 4} Z";
         private static readonly string _card_illust_geometry = $"M{CardIllustX},{CardIllustY} h{CardIllustSize} v{CardIllustSize} h-{CardIllustSize} Z";
 
         private static readonly Dictionary<CardIconType, ElementGroup> _card_icons = [];

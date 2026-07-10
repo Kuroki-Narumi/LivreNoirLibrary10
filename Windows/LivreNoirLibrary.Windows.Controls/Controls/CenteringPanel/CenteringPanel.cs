@@ -115,7 +115,7 @@ namespace LivreNoirLibrary.Windows.Controls
         protected override void OnMouseDown(MouseButtonEventArgs e)
         {
             _clicked = false;
-            if (_closeByClick && e.OriginalSource == this)
+            if (CloseByClick && e.OriginalSource == this)
             {
                 if (_mode is ClickMode.Press)
                 {
@@ -133,7 +133,7 @@ namespace LivreNoirLibrary.Windows.Controls
 
         protected override void OnMouseUp(MouseButtonEventArgs e)
         {
-            if (_closeByClick && e.OriginalSource == this && _mode is ClickMode.Release && _clicked)
+            if (CloseByClick && e.OriginalSource == this && _mode is ClickMode.Release && _clicked)
             {
                 Close();
                 e.Handled = true;
@@ -202,7 +202,7 @@ namespace LivreNoirLibrary.Windows.Controls
             InvalidateMeasure();
         }
 
-        public void Open()
+        public void Open(bool? closeByClick = null)
         {
             if (_visibleIndex is < 0)
             {
@@ -210,6 +210,10 @@ namespace LivreNoirLibrary.Windows.Controls
             }
             else
             {
+                if (closeByClick is { } flag)
+                {
+                    CloseByClick = flag;
+                }
                 Visibility = Visibility.Visible;
             }
         }
@@ -226,13 +230,13 @@ namespace LivreNoirLibrary.Windows.Controls
             }
         }
 
-        public void Open(int index)
+        public void Open(int index, bool? closeByClick = null)
         {
             if ((uint)index < (uint)Children.Count)
             {
                 if (index == _visibleIndex)
                 {
-                    Open();
+                    Open(closeByClick);
                 }
                 else
                 {
@@ -245,6 +249,6 @@ namespace LivreNoirLibrary.Windows.Controls
             }
         }
 
-        public void Open(UIElement element) => Open(Children.IndexOf(element));
+        public void Open(UIElement element, bool? closeByClick = null) => Open(Children.IndexOf(element), closeByClick);
     }
 }

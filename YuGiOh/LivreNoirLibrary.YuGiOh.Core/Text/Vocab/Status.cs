@@ -1,5 +1,6 @@
 ﻿using LivreNoirLibrary.Text;
 using System;
+using System.Text.RegularExpressions;
 
 namespace LivreNoirLibrary.YuGiOh
 {
@@ -19,6 +20,8 @@ namespace LivreNoirLibrary.YuGiOh
         public const string PText = $"P{Effect}";
 
         public const string Separators = "/／|｜,、";
+        [GeneratedRegex($"[{Separators}]")]
+        public static partial Regex Regex_Separators { get; }
 
         public static string GetLevelName(CardType type) => type switch { CardType.Link_Monster => Link, CardType.Xyz_Monster => Rank, _ => Level };
 

@@ -11,10 +11,10 @@ namespace LivreNoirLibrary.Windows.Controls
 
     public class StartTaskArgs
     {
-        public bool IsAbortable { get; init; } = true;
         public ProgressHandler? MainProcess { get; init; }
         public AsyncProgressHandler? AsyncProcess { get; init; }
         public ProgressReport InitialReport { get; init; }
+        public bool IsAbortable { get; init; } = true;
         public TaskFinishedHandler? Finished { get; init; }
     }
 }

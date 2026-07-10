@@ -84,11 +84,11 @@ namespace LivreNoirLibrary.YuGiOh.Search
         public bool IsMatch(CardPack pack)
         {
             // 発売日
-            if (SearchCondition.NotMatch(Date, pack.Date)) return false;
+            if (SearchUtils.NotMatch(Date, pack.Date)) return false;
             // ロケール
             if ((_req_ocg && pack.IsTcg) || (_req_tcg && !pack.IsTcg)) return false;
             // 収録カード数
-            if (SearchCondition.NotMatch(CardCount, pack.Count)) return false;
+            if (SearchUtils.NotMatch(CardCount, pack.Count)) return false;
 
             // 名前
             if (_notEffective)
@@ -99,12 +99,24 @@ namespace LivreNoirLibrary.YuGiOh.Search
             var converter = _converter;
             if (_regex is { } regex)
             {
-                return SearchCondition.IsMatch(true, pack.Name, buffer, regex, converter);
+                return SearchUtils.IsMatch(true, pack.Name, buffer, regex, converter);
             }
             else
             {
-                return SearchCondition.IsMatch(true, pack.Name, buffer, _input.AsSpan(), converter);
+                return SearchUtils.IsMatch(true, pack.Name, buffer, _input.AsSpan(), converter);
             }
+        }
+
+        public static void Copy(PackSearchConditions from, PackSearchConditions to, bool copyText)
+        {
+            if (copyText)
+            {
+                to.SearchText = from.SearchText;
+            }
+            to.TextFlags = from.TextFlags;
+            to.CardCount.CopyFrom(from.CardCount);
+            to.Date.CopyFrom(from.Date);
+            to.DateLocale = from.DateLocale;
         }
     }
 }

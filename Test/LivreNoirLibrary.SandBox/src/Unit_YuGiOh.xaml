@@ -8,61 +8,41 @@
              xmlns:conv="clr-namespace:LivreNoirLibrary.Windows.Converters;assembly=LivreNoirLibrary.Windows.Controls"
              xmlns:ygo="clr-namespace:LivreNoirLibrary.YuGiOh.Data;assembly=LivreNoirLibrary.YuGiOh.Core"
              xmlns:yc="clr-namespace:LivreNoirLibrary.Windows.YuGiOh.Controls;assembly=LivreNoirLibrary.Windows.YuGiOh"
-             mc:Ignorable="d" 
+             mc:Ignorable="d" Background="White" FontFamily="Meiryo"
              d:DesignHeight="450" d:DesignWidth="800">
+    <UserControl.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="/LivreNoirLibrary.Windows.YuGiOh;component/Themes/Generic.xaml"/>
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </UserControl.Resources>
     <Grid>
         <Grid x:Name="MainUI" RowDefinitions="Auto, *">
             <WrapPanel Orientation="Horizontal">
-                <TextBox x:Name="SearchInput" Width="240"/>
-                <Button Content="Search" Click="OnClick_Search"/>
-                <Button Content="Update" Click="OnClick_Test"/>
+                <yc:SearchBar x:Name="SearchBar" Width="300" RequestSearch="OnRequestSearch" RequestOpenSort="OnRequestOpenSort" RequestOpenSearch="OnRequestOpenSearch" RequestClear="OnRequestClear" ItemsCount="{Binding Items.Count, ElementName=ListView_Cards}"/>
+                <Button Content="Update Database" Click="OnClick_Test"/>
+                <Button Content="Update Regulation" Click="OnClick_Regulation"/>
             </WrapPanel>
             <Grid ColumnDefinitions="*, 3*" Grid.Row="1">
                 <Grid.Resources>
                     <conv:LnIconConverter x:Key="IconConv"/>
                 </Grid.Resources>
-                <ListView x:Name="ListView_Cards" ItemsSource="{Binding Cards, Source={x:Static ygo:CardPool.Instance}}" ScrollViewer.HorizontalScrollBarVisibility="Disabled">
+                <ListView x:Name="ListView_Cards" Style="{StaticResource Alt2ListBoxStyle}" ItemsSource="{Binding Cards, Source={x:Static ygo:CardPool.Instance}}">
                     <ListView.ItemTemplate>
                         <DataTemplate>
                             <StackPanel Orientation="Horizontal">
-                                <Image Height="16">
-                                    <Image.Source>
-                                        <DrawingImage Drawing="{Binding Icon, Converter={StaticResource IconConv}}"/>
-                                    </Image.Source>
-                                </Image>
+                                <ct:IconPresenter Height="16" Source="{Binding Icon}" Margin="0,0,4,0"/>
                                 <TextBlock Text="{Binding Name}"/>
                             </StackPanel>
                         </DataTemplate>
                     </ListView.ItemTemplate>
                 </ListView>
-                <Grid Grid.Column="1" DataContext="{Binding SelectedItem, ElementName=ListView_Cards}" d:DataContext="{d:DesignInstance Type=ygo:Card}"
-                      ColumnDefinitions="Auto, *" RowDefinitions="Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto">
-                    <TextBlock Grid.Row="0" Text="Name"/>
-                    <TextBlock Grid.Row="1" Text="Ruby"/>
-                    <TextBlock Grid.Row="2" Text="EnName"/>
-                    <TextBlock Grid.Row="3" Text="CardType"/>
-                    <TextBlock Grid.Row="4" Text="Text"/>
-                    <TextBlock Grid.Row="5" Text="Attribute"/>
-                    <TextBlock Grid.Row="6" Text="MonsterType"/>
-                    <TextBlock Grid.Row="7" Text="Level"/>
-                    <TextBlock Grid.Row="8" Text="Atk"/>
-                    <TextBlock Grid.Row="9" Text="Def"/>
-                    <TextBlock Grid.Row="10" Text="P Scale"/>
-                    <TextBlock Grid.Row="11" Text="P Text"/>
-                    <TextBox Grid.Column="1" Grid.Row="0" Text="{Binding Name, Mode=OneWay}"/>
-                    <TextBox Grid.Column="1" Grid.Row="1" Text="{Binding Ruby, Mode=OneWay}"/>
-                    <TextBox Grid.Column="1" Grid.Row="2" Text="{Binding EnName, Mode=OneWay}"/>
-                    <TextBox Grid.Column="1" Grid.Row="3" Text="{Binding CardTypeText, Mode=OneWay}"/>
-                    <TextBox Grid.Column="1" Grid.Row="4" Text="{Binding Text, Mode=OneWay}" TextWrapping="Wrap"/>
-                    <TextBox Grid.Column="1" Grid.Row="5" Text="{Binding AttributeText, Mode=OneWay}"/>
-                    <TextBox Grid.Column="1" Grid.Row="6" Text="{Binding MonsterTypeText, Mode=OneWay}"/>
-                    <TextBox Grid.Column="1" Grid.Row="7" Text="{Binding LevelText, Mode=OneWay}"/>
-                    <TextBox Grid.Column="1" Grid.Row="8" Text="{Binding AtkText, Mode=OneWay}"/>
-                    <TextBox Grid.Column="1" Grid.Row="9" Text="{Binding DefText, Mode=OneWay}"/>
-                    <TextBox Grid.Column="1" Grid.Row="10" Text="{Binding PendulumScale, Mode=OneWay}"/>
-                    <TextBox Grid.Column="1" Grid.Row="11" Text="{Binding PendulumText, Mode=OneWay}" TextWrapping="Wrap"/>
-                    <yc:LinkMarkerView Grid.Column="1" Grid.Row="12"  Width="120" Height="120"/>
-                </Grid>
+                <yc:CardInfoView Grid.Column="1" Margin="2" Source="{Binding SelectedItem, ElementName=ListView_Cards}"
+                                 yc:HyperLinks.CardLinkClicked="CardInfoView_CardLinkClicked"
+                                 yc:HyperLinks.PackLinkClicked="CardInfoView_PackLinkClicked"
+                                 yc:HyperLinks.RelatedTextClicked="OnRequestSearch"
+                                 Detach="CardInfoView_Detach"/>
             </Grid>
         </Grid>
         <ct:TaskProgressBar x:Name="TaskProgressBar"/>

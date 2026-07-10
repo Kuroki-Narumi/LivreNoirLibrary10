@@ -1,4 +1,5 @@
 ﻿using HtmlAgilityPack;
+using LivreNoirLibrary.Collections;
 using LivreNoirLibrary.ObjectModel;
 using System;
 using System.Collections.Generic;
@@ -16,7 +17,7 @@ namespace LivreNoirLibrary.YuGiOh.Scraping
 
         const string Class_LinkValue = "link_value";
 
-        public static async Task<Dictionary<int, List<int>>> GetLists(bool tcg, ProgressReporter p, CancellationToken c)
+        public static async Task Update(Data.Regulation target, bool tcg, ProgressReporter p, CancellationToken c)
         {
             p.Report("updating regulation", "");
 
@@ -25,38 +26,37 @@ namespace LivreNoirLibrary.YuGiOh.Scraping
             var document = await Html.CreateDocument(url, c);
             c.ThrowIfCancellationRequested();
 
-            Dictionary<int, List<int>> result = [];
+            List<int> list = [];
+            target.Clear(LimitCount.Forbidden);
+            target.Clear(LimitCount.Limit1);
+            target.Clear(LimitCount.Limit2);
 
-            var list = await GetList(document?.GetElementbyId(Id_Forbidden), LimitCount.Forbidden, p, c);
+            await GetList(list, document?.GetElementbyId(Id_Forbidden), LimitCount.Forbidden, p, c);
+            target.Set(list.AsSpan(), LimitCount.Forbidden);
             c.ThrowIfCancellationRequested();
-            result[LimitCount.Forbidden] = list;
 
-            list = await GetList(document?.GetElementbyId(Id_Limited), LimitCount.Limit1, p, c);
+            await GetList(list, document?.GetElementbyId(Id_Limited), LimitCount.Limit1, p, c);
+            target.Set(list.AsSpan(), LimitCount.Limit1);
             c.ThrowIfCancellationRequested();
-            result[LimitCount.Limit1] = list;
 
-            list = await GetList(document?.GetElementbyId(Id_SemiLimited), LimitCount.Limit2, p, c);
+            await GetList(list, document?.GetElementbyId(Id_SemiLimited), LimitCount.Limit2, p, c);
+            target.Set(list.AsSpan(), LimitCount.Limit2);
             c.ThrowIfCancellationRequested();
-            result[LimitCount.Limit2] = list;
-
-            return result;
         }
 
-        private static async ValueTask<List<int>> GetList(HtmlNode? node, int limitCount, ProgressReporter p, CancellationToken c)
+        private static async ValueTask GetList(List<int> list, HtmlNode? node, int limitCount, ProgressReporter p, CancellationToken c)
         {
+            list.Clear();
             p.Report($"updating limit-{limitCount}", limitCount, 3);
             c.ThrowIfCancellationRequested();
-
-            List<int> result = [];
             foreach (var input in node.EnumerateNodes(Tags.Input, klass: Class_LinkValue))
             {
                 c.ThrowIfCancellationRequested();
                 if (Url.TryGetCardId(input.Attributes["value"]?.Value, out var cid))
                 {
-                    result.Add(cid);
+                    list.Add(cid);
                 }
             }
-            return result;
         }
     }
 }

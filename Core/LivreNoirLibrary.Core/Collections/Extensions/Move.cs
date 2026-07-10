@@ -7,17 +7,17 @@ namespace LivreNoirLibrary.Collections
 {
     public static partial class CollectionExtensions
     {
-        public static bool CanMoveDown<T>(this T[] array, int index) => (uint)index < (uint)(array.Length - 1);
-        public static bool CanMoveUp<T>(this T[] array, int index) => (uint)(index - 1) < (uint)(array.Length - 1);
+        public static bool CanMoveDown<T>(this T[] array, int index) => array.Length is > 1 && (uint)index < (uint)(array.Length - 1);
+        public static bool CanMoveUp<T>(this T[] array, int index) => array.Length is > 1 && (uint)(index - 1) < (uint)(array.Length - 1);
 
-        public static bool CanMoveDown<T>(this Span<T> span, int index) => (uint)index < (uint)(span.Length - 1);
-        public static bool CanMoveUp<T>(this Span<T> span, int index) => (uint)(index - 1) < (uint)(span.Length - 1);
+        public static bool CanMoveDown<T>(this Span<T> span, int index) => span.Length is > 1 && (uint)index < (uint)(span.Length - 1);
+        public static bool CanMoveUp<T>(this Span<T> span, int index) => span.Length is > 1 && (uint)(index - 1) < (uint)(span.Length - 1);
 
-        public static bool CanMoveDown(IList list, int index) => (uint)index < (uint)(list.Count - 1);
-        public static bool CanMoveUp(IList list, int index) => (uint)(index - 1) < (uint)(list.Count - 1);
+        public static bool CanMoveDown(IList list, int index) => list.Count is > 1 && (uint)index < (uint)(list.Count - 1);
+        public static bool CanMoveUp(IList list, int index) => list.Count is > 1 && (uint)(index - 1) < (uint)(list.Count - 1);
 
-        public static bool CanMoveDown<T>(this IList<T> list, int index) => (uint)index < (uint)(list.Count - 1);
-        public static bool CanMoveUp<T>(this IList<T> list, int index) => (uint)(index - 1) < (uint)(list.Count - 1);
+        public static bool CanMoveDown<T>(this IList<T> list, int index) => list.Count is > 1 && (uint)index < (uint)(list.Count - 1);
+        public static bool CanMoveUp<T>(this IList<T> list, int index) => list.Count is > 1 && (uint)(index - 1) < (uint)(list.Count - 1);
 
         public static bool MoveDown<T>(this T[] array, int index) => CanMoveDown(array, index) && Swap(array, index, index + 1);
         public static bool MoveDown<T>(this T[] array, T item) => MoveDown(array, Array.IndexOf(array, item));

@@ -1,0 +1,456 @@
+﻿<Window x:Class="LivreNoirLibrary.Windows.YuGiOh.Controls.CardSearchWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:LivreNoirLibrary.Windows.YuGiOh.Controls"
+        xmlns:ygo="clr-namespace:LivreNoirLibrary.Windows.YuGiOh"
+        xmlns:ct="clr-namespace:LivreNoirLibrary.Windows.Controls;assembly=LivreNoirLibrary.Windows.Controls"
+        xmlns:md="clr-namespace:LivreNoirLibrary.Windows.Media;assembly=LivreNoirLibrary.Windows.Media"
+        xmlns:ygd="clr-namespace:LivreNoirLibrary.YuGiOh.Data;assembly=LivreNoirLibrary.YuGiOh.Core"
+        xmlns:search="clr-namespace:LivreNoirLibrary.YuGiOh.Search;assembly=LivreNoirLibrary.YuGiOh.Core"
+        xmlns:ygc="clr-namespace:LivreNoirLibrary.YuGiOh;assembly=LivreNoirLibrary.YuGiOh.Core"
+        mc:Ignorable="d" d:DataContext="{d:DesignInstance Type=search:CardSearchConditionsViewModel}"
+        Title="Search" ShowInTaskbar="False" WindowStyle="None" AllowsTransparency="True" Background="{ct:BrushProvider #1fff}"
+        Width="560" SizeToContent="Height" ResizeMode="NoResize" FontSize="14" FontFamily="Meiryo" UseLayoutRounding="True"
+        >
+    <Window.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="/LivreNoirLibrary.Windows.YuGiOh;component/Themes/Generic.xaml"/>
+            </ResourceDictionary.MergedDictionaries>
+
+            <Style TargetType="TextBlock">
+                <Setter Property="VerticalAlignment" Value="Center"/>
+            </Style>
+            <Style TargetType="ct:IconPresenter">
+                <Setter Property="Height" Value="16"/>
+                <Setter Property="VerticalAlignment" Value="Center"/>
+                <Setter Property="HorizontalAlignment" Value="Center"/>
+            </Style>
+
+            <Style x:Key="ToggleButtonBase" TargetType="ct:ToggleButton" BasedOn="{StaticResource SearchWindow_ToggleButton}">
+                <EventSetter Event="PreviewMouseLeftButtonDown" Handler="OnMouseLeftButtonDown_ToggleButton"/>
+                <EventSetter Event="MouseEnter" Handler="OnMouseEnter_ToggleButton"/>
+            </Style>
+
+            <Style TargetType="CheckBox" BasedOn="{StaticResource SearchWindow_CheckBox}">
+                <EventSetter Event="PreviewMouseLeftButtonDown" Handler="OnMouseLeftButtonDown_ToggleButton"/>
+                <EventSetter Event="MouseEnter" Handler="OnMouseEnter_ToggleButton"/>
+            </Style>
+
+            <Style TargetType="RadioButton" BasedOn="{StaticResource SearchWindow_RadioButton}"/>
+
+            <Style x:Key="RadioContainer" TargetType="Panel" BasedOn="{StaticResource RadioContainerBase}">
+                <EventSetter Event="PreviewMouseWheel" Handler="RadioContainer_MouseWheel"/>
+            </Style>
+            
+            <Style TargetType="WrapPanel">
+                <Setter Property="Grid.Column" Value="2"/>
+                <Setter Property="Orientation" Value="Horizontal"/>
+            </Style>
+        </ResourceDictionary>
+    </Window.Resources>
+    
+    <ct:WithPanelTabControl Padding="4" Margin="4" Background="{ct:BrushProvider #fdfeff}" MouseWheel="TabControl_MouseWheel">
+        <ct:WithPanelTabControl.LeftPanel>
+            <StackPanel Orientation="Horizontal">
+                <ct:Button Style="{StaticResource Button_ExecSearch}" Click="OnClick_Search"/>
+                <ct:Button Style="{StaticResource Button_ExecClear}" Click="OnClick_Clear"/>
+            </StackPanel>
+        </ct:WithPanelTabControl.LeftPanel>
+        <ct:WithPanelTabControl.RightPanel>
+            <StackPanel Orientation="Horizontal">
+                <ct:DropDownMenuButton CornerRadius="4" Margin="0,0,4,4" BorderBrush="{StaticResource Brush_Border}" Content="{Binding Preset.WithLeader, Source={x:Static ygo:Vocab.Current}}">
+                    <ct:DropDownMenuButton.DropDownContent>
+                        <Grid RowDefinitions="Auto, 4, Auto">
+                            <Grid ColumnDefinitions="*, *, *, *, *">
+                                <ct:Button Grid.Column="0" Style="{StaticResource IconButton_Add}"/>
+                                <ct:Button Grid.Column="1" Style="{StaticResource IconButton_Overwrite}"/>
+                                <ct:Button Grid.Column="2" Style="{StaticResource IconButton_MoveUp}"/>
+                                <ct:Button Grid.Column="3" Style="{StaticResource IconButton_MoveDown}"/>
+                                <ct:Button Grid.Column="4" Style="{StaticResource IconButton_Delete}"/>
+                            </Grid>
+                            <ListView Grid.Row="2" x:Name="ListView_Preset" Style="{StaticResource Alt2ListBoxStyle}" Height="116" SelectionMode="Single" ItemsSource="{x:Static local:CardSearchWindow.Presets}">
+                                <ListView.ItemTemplate>
+                                    <DataTemplate>
+                                        <local:CardSearchPresetPresenter Apply="OnApplyPreset"/>
+                                    </DataTemplate>
+                                </ListView.ItemTemplate>
+                            </ListView>
+                        </Grid>
+                    </ct:DropDownMenuButton.DropDownContent>
+                </ct:DropDownMenuButton>
+                <ct:Button Style="{StaticResource Button_ExecClose}" Click="OnClick_Close"/>
+            </StackPanel>
+        </ct:WithPanelTabControl.RightPanel>
+        <TabItem Header="{Binding Search_CardType.Value, Source={x:Static ygo:Vocab.Current}}">
+            <Grid ColumnDefinitions="Auto, *" RowDefinitions="Auto, Auto, Auto, Auto, Auto">
+                <TextBlock Grid.Row="0" Style="{StaticResource SearchWindow_Header}" Text="{Binding CInfo.CardType.Value, Source={x:Static ygo:Vocab.Current}}"/>
+                <Grid Grid.Row="0" Grid.Column="1" ColumnDefinitions="Auto, 8, *" RowDefinitions="Auto, Auto, Auto, Auto, Auto">
+                    <Grid.Resources>
+                        <Style TargetType="ct:ToggleButton" BasedOn="{StaticResource ToggleButtonBase}">
+                            <Setter Property="MinWidth" Value="112"/>
+                            <Setter Property="IconSize" Value="16"/>
+                        </Style>
+                    </Grid.Resources>
+                    <ct:ToggleButton Grid.Row="0" IsChecked="{Binding CardType_Monster}" Content="{Binding CType.Monster.Value, Source={x:Static ygo:Vocab.Current}}"/>
+                    <Border Grid.Row="1" Style="{StaticResource HorizontalSeparator}"/>
+                    <ct:ToggleButton Grid.Row="2" IsChecked="{Binding CardType_Spell}" Content="{Binding CType.Spell.Value, Source={x:Static ygo:Vocab.Current}}"/>
+                    <Border Grid.Row="3" Style="{StaticResource HorizontalSeparator}"/>
+                    <ct:ToggleButton Grid.Row="4" IsChecked="{Binding CardType_Trap}" Content="{Binding CType.Trap.Value, Source={x:Static ygo:Vocab.Current}}"/>
+                    <WrapPanel Grid.Row="0">
+                        <ct:ToggleButton IsChecked="{Binding CardType_MainMonster}">
+                            <StackPanel Orientation="Horizontal">
+                                <ct:IconPresenter Source="{x:Static local:Icons.NormalMonster}" Margin="0,0,2,0"/>
+                                <ct:IconPresenter Source="{x:Static local:Icons.EffectMonster}" Margin="0,0,2,0"/>
+                                <TextBlock Text="{Binding CType.Main.Value, Source={x:Static ygo:Vocab.Current}}" />
+                            </StackPanel>
+                        </ct:ToggleButton>
+                        <ct:ToggleButton Icon="{x:Static local:Icons.FusionMonster}" Content="{Binding CType.Fusion.Value, Source={x:Static ygo:Vocab.Current}}" IsChecked="{Binding CardType_FusionMonster}"/>
+                        <ct:ToggleButton Icon="{x:Static local:Icons.RitualMonster}" Content="{Binding CType.Ritual.Value, Source={x:Static ygo:Vocab.Current}}" IsChecked="{Binding CardType_RitualMonster}"/>
+                        <ct:ToggleButton Icon="{x:Static local:Icons.SynchroMonster}" Content="{Binding CType.Synchro.Value, Source={x:Static ygo:Vocab.Current}}" IsChecked="{Binding CardType_SynchroMonster}"/>
+                        <ct:ToggleButton Icon="{x:Static local:Icons.XyzMonster}" Content="{Binding CType.Xyz.Value, Source={x:Static ygo:Vocab.Current}}" IsChecked="{Binding CardType_XyzMonster}"/>
+                        <ct:ToggleButton Icon="{x:Static local:Icons.LinkMonster}" Content="{Binding CType.Link.Value, Source={x:Static ygo:Vocab.Current}}" IsChecked="{Binding CardType_LinkMonster}"/>
+                    </WrapPanel>
+                    <WrapPanel Grid.Row="2">
+                        <ct:ToggleButton Icon="{x:Static local:Icons.NormalSpell}" Content="{Binding CType.Normal.Value, Source={x:Static ygo:Vocab.Current}}" IsChecked="{Binding CardType_NormalSpell}"/>
+                        <ct:ToggleButton Icon="{x:Static local:Icons.FieldSpell}" Content="{Binding CType.Field.Value, Source={x:Static ygo:Vocab.Current}}" IsChecked="{Binding CardType_FieldSpell}"/>
+                        <ct:ToggleButton Icon="{x:Static local:Icons.EquipSpell}" Content="{Binding CType.Equip.Value, Source={x:Static ygo:Vocab.Current}}" IsChecked="{Binding CardType_EquipSpell}"/>
+                        <ct:ToggleButton Icon="{x:Static local:Icons.ContinuousSpell}" Content="{Binding CType.Continuous.Value, Source={x:Static ygo:Vocab.Current}}" IsChecked="{Binding CardType_ContinuousSpell}"/>
+                        <ct:ToggleButton Icon="{x:Static local:Icons.QuickSpell}" Content="{Binding CType.Quick.Value, Source={x:Static ygo:Vocab.Current}}" IsChecked="{Binding CardType_QuickSpell}"/>
+                        <ct:ToggleButton Icon="{x:Static local:Icons.RitualSpell}" Content="{Binding CType.Ritual.Value, Source={x:Static ygo:Vocab.Current}}" IsChecked="{Binding CardType_RitualSpell}"/>
+                    </WrapPanel>
+                    <WrapPanel Grid.Row="4">
+                        <ct:ToggleButton Icon="{x:Static local:Icons.NormalTrap}" Content="{Binding CType.Normal.Value, Source={x:Static ygo:Vocab.Current}}" IsChecked="{Binding CardType_NormalTrap}"/>
+                        <ct:ToggleButton Icon="{x:Static local:Icons.ContinuousTrap}" Content="{Binding CType.Continuous.Value, Source={x:Static ygo:Vocab.Current}}" IsChecked="{Binding CardType_ContinuousTrap}"/>
+                        <ct:ToggleButton Icon="{x:Static local:Icons.CounterTrap}" Content="{Binding CType.Counter.Value, Source={x:Static ygo:Vocab.Current}}" IsChecked="{Binding CardType_CounterTrap}"/>
+                    </WrapPanel>
+                </Grid>
+                <Border Grid.Row="1" Style="{StaticResource HorizontalSeparator}"/>
+                <TextBlock Grid.Row="2" Style="{StaticResource SearchWindow_Header}" Text="{Binding CInfo.Attribute.Value, Source={x:Static ygo:Vocab.Current}}"/>
+                <StackPanel Grid.Row="2" Grid.Column="1" Orientation="Horizontal">
+                    <StackPanel.Resources>
+                        <Style TargetType="ct:ToggleButton" BasedOn="{StaticResource ToggleButtonBase}">
+                            <Setter Property="Width" Value="64"/>
+                        </Style>
+                    </StackPanel.Resources>
+                    <ct:ToggleButton Icon="{x:Static local:Icons.Light}" Content="{Binding Attr.Light_S.Value, Source={x:Static ygo:Vocab.Current}}" IsChecked="{Binding Attribute_Light}"/>
+                    <ct:ToggleButton Icon="{x:Static local:Icons.Dark}" Content="{Binding Attr.Dark_S.Value, Source={x:Static ygo:Vocab.Current}}" IsChecked="{Binding Attribute_Dark}"/>
+                    <ct:ToggleButton Icon="{x:Static local:Icons.Water}" Content="{Binding Attr.Water_S.Value, Source={x:Static ygo:Vocab.Current}}" IsChecked="{Binding Attribute_Water}"/>
+                    <ct:ToggleButton Icon="{x:Static local:Icons.Fire}" Content="{Binding Attr.Fire_S.Value, Source={x:Static ygo:Vocab.Current}}" IsChecked="{Binding Attribute_Fire}"/>
+                    <ct:ToggleButton Icon="{x:Static local:Icons.Earth}" Content="{Binding Attr.Earth_S.Value, Source={x:Static ygo:Vocab.Current}}" IsChecked="{Binding Attribute_Earth}"/>
+                    <ct:ToggleButton Icon="{x:Static local:Icons.Wind}" Content="{Binding Attr.Wind_S.Value, Source={x:Static ygo:Vocab.Current}}" IsChecked="{Binding Attribute_Wind}"/>
+                    <ct:ToggleButton Icon="{x:Static local:Icons.Divine}" Content="{Binding Attr.Divine_S.Value, Source={x:Static ygo:Vocab.Current}}" IsChecked="{Binding Attribute_Divine}"/>
+                </StackPanel>
+                <Border Grid.Row="3" Style="{StaticResource HorizontalSeparator}"/>
+                <TextBlock Grid.Row="4" Style="{StaticResource SearchWindow_Header}" Text="{Binding CInfo.MonsterType.Value, Source={x:Static ygo:Vocab.Current}}"/>
+                <WrapPanel Grid.Row="4">
+                    <WrapPanel.Resources>
+                        <Style TargetType="ct:ToggleButton" BasedOn="{StaticResource ToggleButtonBase}">
+                            <Setter Property="MinWidth" Value="93"/>
+                        </Style>
+                    </WrapPanel.Resources>
+                    <ct:ToggleButton Content="{Binding MType.Spellcaster_S.Value, Source={x:Static ygo:Vocab.Current}}" IsChecked="{Binding MonsterType_Spellcaster}"/>
+                    <ct:ToggleButton Content="{Binding MType.Dragon_S.Value, Source={x:Static ygo:Vocab.Current}}" IsChecked="{Binding MonsterType_Dragon}"/>
+                    <ct:ToggleButton Content="{Binding MType.Zombie_S.Value, Source={x:Static ygo:Vocab.Current}}" IsChecked="{Binding MonsterType_Zombie}"/>
+                    <ct:ToggleButton Content="{Binding MType.Warrior_S.Value, Source={x:Static ygo:Vocab.Current}}" IsChecked="{Binding MonsterType_Warrior}"/>
+                    <ct:ToggleButton Content="{Binding MType.BeastWarrior_S.Value, Source={x:Static ygo:Vocab.Current}}" IsChecked="{Binding MonsterType_BeastWarrior}"/>
+                    <ct:ToggleButton Content="{Binding MType.Beast_S.Value, Source={x:Static ygo:Vocab.Current}}" IsChecked="{Binding MonsterType_Beast}"/>
+                    <ct:ToggleButton Content="{Binding MType.WingedBeast_S.Value, Source={x:Static ygo:Vocab.Current}}" IsChecked="{Binding MonsterType_WingedBeast}"/>
+                    <ct:ToggleButton Content="{Binding MType.Machine_S.Value, Source={x:Static ygo:Vocab.Current}}" IsChecked="{Binding MonsterType_Machine}"/>
+                    <ct:ToggleButton Content="{Binding MType.Fiend_S.Value, Source={x:Static ygo:Vocab.Current}}" IsChecked="{Binding MonsterType_Fiend}"/>
+                    <ct:ToggleButton Content="{Binding MType.Fairy_S.Value, Source={x:Static ygo:Vocab.Current}}" IsChecked="{Binding MonsterType_Fairy}"/>
+                    <ct:ToggleButton Content="{Binding MType.Insect_S.Value, Source={x:Static ygo:Vocab.Current}}" IsChecked="{Binding MonsterType_Insect}"/>
+                    <ct:ToggleButton Content="{Binding MType.Dinosaur_S.Value, Source={x:Static ygo:Vocab.Current}}" IsChecked="{Binding MonsterType_Dinosaur}"/>
+                    <ct:ToggleButton Content="{Binding MType.Reptile_S.Value, Source={x:Static ygo:Vocab.Current}}" IsChecked="{Binding MonsterType_Reptile}"/>
+                    <ct:ToggleButton Content="{Binding MType.Fish_S.Value, Source={x:Static ygo:Vocab.Current}}" IsChecked="{Binding MonsterType_Fish}"/>
+                    <ct:ToggleButton Content="{Binding MType.SeaSerpent_S.Value, Source={x:Static ygo:Vocab.Current}}" IsChecked="{Binding MonsterType_SeaSerpent}"/>
+                    <ct:ToggleButton Content="{Binding MType.Aqua_S.Value, Source={x:Static ygo:Vocab.Current}}" IsChecked="{Binding MonsterType_Aqua}"/>
+                    <ct:ToggleButton Content="{Binding MType.Pyro_S.Value, Source={x:Static ygo:Vocab.Current}}" IsChecked="{Binding MonsterType_Pyro}"/>
+                    <ct:ToggleButton Content="{Binding MType.Thunder_S.Value, Source={x:Static ygo:Vocab.Current}}" IsChecked="{Binding MonsterType_Thunder}"/>
+                    <ct:ToggleButton Content="{Binding MType.Rock_S.Value, Source={x:Static ygo:Vocab.Current}}" IsChecked="{Binding MonsterType_Rock}"/>
+                    <ct:ToggleButton Content="{Binding MType.Plant_S.Value, Source={x:Static ygo:Vocab.Current}}" IsChecked="{Binding MonsterType_Plant}"/>
+                    <ct:ToggleButton Content="{Binding MType.Psychic_S.Value, Source={x:Static ygo:Vocab.Current}}" IsChecked="{Binding MonsterType_Psychic}"/>
+                    <ct:ToggleButton Content="{Binding MType.Wyrm_S.Value, Source={x:Static ygo:Vocab.Current}}" IsChecked="{Binding MonsterType_Wyrm}"/>
+                    <ct:ToggleButton Content="{Binding MType.Cyberse_S.Value, Source={x:Static ygo:Vocab.Current}}" IsChecked="{Binding MonsterType_Cyberse}"/>
+                    <ct:ToggleButton Content="{Binding MType.Illusion_S.Value, Source={x:Static ygo:Vocab.Current}}" IsChecked="{Binding MonsterType_Illusion}"/>
+                    <ct:ToggleButton Content="{Binding MType.DivineBeast_S.Value, Source={x:Static ygo:Vocab.Current}}" IsChecked="{Binding MonsterType_DivineBeast}"/>
+                    <ct:ToggleButton Content="{Binding MType.CreatorGod_S.Value, Source={x:Static ygo:Vocab.Current}}" IsChecked="{Binding MonsterType_CreatorGod}"/>
+                </WrapPanel>
+            </Grid>
+        </TabItem>
+        <TabItem Header="{Binding Search_Status.Value, Source={x:Static ygo:Vocab.Current}}">
+            <Grid ColumnDefinitions="Auto, *" RowDefinitions="Auto, Auto, Auto, Auto, Auto, Auto, Auto, Auto, Auto, Auto, Auto">
+                <TextBlock Grid.Row="0" Style="{StaticResource SearchWindow_Header}" Text="{Binding CType.Effect.Value, Source={x:Static ygo:Vocab.Current}}"/>
+                <WrapPanel Grid.Row="0">
+                    <WrapPanel.Resources>
+                        <Style TargetType="ct:ToggleButton" BasedOn="{StaticResource ToggleButtonBase}">
+                            <Setter Property="MinWidth" Value="72"/>
+                            <Setter Property="Margin" Value="4,3"/>
+                        </Style>
+                    </WrapPanel.Resources>
+                    <ct:ToggleButton Content="{Binding Search_NotExist.Value, Source={x:Static ygo:Vocab.Current}}" IsChecked="{Binding Status_Normal}"/>
+                    <ct:ToggleButton Content="{Binding Search_Exist.Value, Source={x:Static ygo:Vocab.Current}}" IsChecked="{Binding Status_Effect}"/>
+                </WrapPanel>
+                <Border Grid.Row="1" Style="{StaticResource HorizontalSeparator}"/>
+                <StackPanel Grid.Row="2" Style="{StaticResource RadioContainer}">
+                    <TextBlock Style="{StaticResource SearchWindow_Header}" Text="{Binding CInfo.Ability.Value, Source={x:Static ygo:Vocab.Current}}"/>
+                    <RadioButton GroupName="AbilityPerf" Content="{Binding Search_Or.Value, Source={x:Static ygo:Vocab.Current}}" IsChecked="{Binding Ability_Or}"/>
+                    <RadioButton GroupName="AbilityPerf" Content="{Binding Search_And.Value, Source={x:Static ygo:Vocab.Current}}" IsChecked="{Binding Ability_And}"/>
+                </StackPanel>
+                <StackPanel Grid.Row="2" Grid.Column="2">
+                    <StackPanel.Resources>
+                        <Style TargetType="ct:ToggleButton" BasedOn="{StaticResource ToggleButtonBase}">
+                            <Setter Property="Margin" Value="4,3"/>
+                        </Style>
+                    </StackPanel.Resources>
+                    <StackPanel Orientation="Horizontal">
+                        <ct:ToggleButton Content="{Binding Abi.Pendulum.Value, Source={x:Static ygo:Vocab.Current}}" IsChecked="{Binding Ability_Pendulum}"/>
+                        <ct:ToggleButton Icon="{x:Static local:Icons.Tuner}" Content="{Binding Abi.Tuner.Value, Source={x:Static ygo:Vocab.Current}}" IsChecked="{Binding Ability_Tuner}"/>
+                        <ct:ToggleButton Content="{Binding Abi.SpecialSummon.Value, Source={x:Static ygo:Vocab.Current}}" IsChecked="{Binding Ability_SpecialSummon}"/>
+                    </StackPanel>
+                    <StackPanel Orientation="Horizontal">
+                        <ct:ToggleButton Content="{Binding Abi.Flip.Value, Source={x:Static ygo:Vocab.Current}}" IsChecked="{Binding Ability_Flip}"/>
+                        <ct:ToggleButton Content="{Binding Abi.Spirit.Value, Source={x:Static ygo:Vocab.Current}}" IsChecked="{Binding Ability_Spirit}"/>
+                        <ct:ToggleButton Content="{Binding Abi.Union.Value, Source={x:Static ygo:Vocab.Current}}" IsChecked="{Binding Ability_Union}"/>
+                        <ct:ToggleButton Content="{Binding Abi.Gemini.Value, Source={x:Static ygo:Vocab.Current}}" IsChecked="{Binding Ability_Gemini}"/>
+                        <ct:ToggleButton Content="{Binding Abi.Toon.Value, Source={x:Static ygo:Vocab.Current}}" IsChecked="{Binding Ability_Toon}"/>
+                    </StackPanel>
+                </StackPanel>
+                <Border Grid.Row="3" Style="{StaticResource HorizontalSeparator}"/>
+                <StackPanel Grid.Row="4" HorizontalAlignment="Center" VerticalAlignment="Center">
+                    <TextBlock Style="{StaticResource SearchWindow_Header}" Text="{Binding CInfo.Ability.Value, Source={x:Static ygo:Vocab.Current}}"/>
+                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                        <TextBlock Text="("/>
+                        <TextBlock Text="{Binding Search_Except.Value, Source={x:Static ygo:Vocab.Current}}"/>
+                        <TextBlock Text=")"/>
+                    </StackPanel>
+                </StackPanel>
+                <StackPanel Grid.Row="4" Grid.Column="2">
+                    <StackPanel.Resources>
+                        <Style TargetType="ct:ToggleButton" BasedOn="{StaticResource ToggleButtonBase}">
+                            <Setter Property="Margin" Value="4,3"/>
+                        </Style>
+                    </StackPanel.Resources>
+                    <StackPanel Orientation="Horizontal">
+                        <ct:ToggleButton Content="{Binding Abi.Pendulum.Value, Source={x:Static ygo:Vocab.Current}}" IsChecked="{Binding AbilityEx_Pendulum}"/>
+                        <ct:ToggleButton Icon="{x:Static local:Icons.Tuner}" Content="{Binding Abi.Tuner.Value, Source={x:Static ygo:Vocab.Current}}" IsChecked="{Binding AbilityEx_Tuner}"/>
+                        <ct:ToggleButton Content="{Binding Abi.SpecialSummon.Value, Source={x:Static ygo:Vocab.Current}}" IsChecked="{Binding AbilityEx_SpecialSummon}"/>
+                    </StackPanel>
+                    <StackPanel Orientation="Horizontal">
+                        <ct:ToggleButton Content="{Binding Abi.Flip.Value, Source={x:Static ygo:Vocab.Current}}" IsChecked="{Binding AbilityEx_Flip}"/>
+                        <ct:ToggleButton Content="{Binding Abi.Spirit.Value, Source={x:Static ygo:Vocab.Current}}" IsChecked="{Binding AbilityEx_Spirit}"/>
+                        <ct:ToggleButton Content="{Binding Abi.Union.Value, Source={x:Static ygo:Vocab.Current}}" IsChecked="{Binding AbilityEx_Union}"/>
+                        <ct:ToggleButton Content="{Binding Abi.Gemini.Value, Source={x:Static ygo:Vocab.Current}}" IsChecked="{Binding AbilityEx_Gemini}"/>
+                        <ct:ToggleButton Content="{Binding Abi.Toon.Value, Source={x:Static ygo:Vocab.Current}}" IsChecked="{Binding AbilityEx_Toon}"/>
+                    </StackPanel>
+                </StackPanel>
+                <Border Grid.Row="5" Style="{StaticResource HorizontalSeparator}"/>
+                <StackPanel Grid.Row="6" HorizontalAlignment="Center" VerticalAlignment="Center">
+                    <TextBlock Style="{StaticResource SearchWindow_Header}" Text="{Binding CInfo.Level.Value, Source={x:Static ygo:Vocab.Current}}"/>
+                    <TextBlock Style="{StaticResource SearchWindow_Header}" Text="{Binding CInfo.Rank.Value, Source={x:Static ygo:Vocab.Current}}"/>
+                    <TextBlock Style="{StaticResource SearchWindow_Header}" Text="{Binding CInfo.Link.Value, Source={x:Static ygo:Vocab.Current}}"/>
+                </StackPanel>
+                <WrapPanel Grid.Row="6">
+                    <WrapPanel.Resources>
+                        <Style TargetType="ct:ToggleButton" BasedOn="{StaticResource ToggleButtonBase}">
+                            <Setter Property="Width" Value="60"/>
+                            <Setter Property="Margin" Value="4,3"/>
+                        </Style>
+                    </WrapPanel.Resources>
+                    <ct:ToggleButton Content="0" IsChecked="{Binding Level_0}"/>
+                    <ct:ToggleButton Content="1" IsChecked="{Binding Level_1}"/>
+                    <ct:ToggleButton Content="2" IsChecked="{Binding Level_2}"/>
+                    <ct:ToggleButton Content="3" IsChecked="{Binding Level_3}"/>
+                    <ct:ToggleButton Content="4" IsChecked="{Binding Level_4}"/>
+                    <ct:ToggleButton Content="5" IsChecked="{Binding Level_5}"/>
+                    <ct:ToggleButton Content="6" IsChecked="{Binding Level_6}"/>
+                    <ct:ToggleButton Content="7" IsChecked="{Binding Level_7}"/>
+                    <ct:ToggleButton Content="8" IsChecked="{Binding Level_8}"/>
+                    <ct:ToggleButton Content="9" IsChecked="{Binding Level_9}"/>
+                    <ct:ToggleButton Content="10" IsChecked="{Binding Level_10}"/>
+                    <ct:ToggleButton Content="11" IsChecked="{Binding Level_11}"/>
+                    <ct:ToggleButton Content="12" IsChecked="{Binding Level_12}"/>
+                    <ct:ToggleButton Content="13" IsChecked="{Binding Level_13}"/>
+                </WrapPanel>
+                <Border Grid.Row="7" Style="{StaticResource HorizontalSeparator}"/>
+                <Grid Grid.Row="8" Grid.ColumnSpan="3" ColumnDefinitions="Auto, *, Auto, Auto, Auto">
+                    <TextBlock Style="{StaticResource SearchWindow_Header}" Text="{Binding CInfo.PendulumScale.Value, Source={x:Static ygo:Vocab.Current}}"/>
+                    <WrapPanel Grid.Column="1">
+                        <WrapPanel.Resources>
+                            <Style TargetType="ct:ToggleButton" BasedOn="{StaticResource ToggleButtonBase}">
+                                <Setter Property="Width" Value="46"/>
+                                <Setter Property="Margin" Value="4,3"/>
+                            </Style>
+                        </WrapPanel.Resources>
+                        <ct:ToggleButton Content="0" IsChecked="{Binding PScale_0}"/>
+                        <ct:ToggleButton Content="1" IsChecked="{Binding PScale_1}"/>
+                        <ct:ToggleButton Content="2" IsChecked="{Binding PScale_2}"/>
+                        <ct:ToggleButton Content="3" IsChecked="{Binding PScale_3}"/>
+                        <ct:ToggleButton Content="4" IsChecked="{Binding PScale_4}"/>
+                        <ct:ToggleButton Content="5" IsChecked="{Binding PScale_5}"/>
+                        <ct:ToggleButton Content="6" IsChecked="{Binding PScale_6}"/>
+                        <ct:ToggleButton Content="7" IsChecked="{Binding PScale_7}"/>
+                        <ct:ToggleButton Content="8" IsChecked="{Binding PScale_8}"/>
+                        <ct:ToggleButton Content="9" IsChecked="{Binding PScale_9}"/>
+                        <ct:ToggleButton Content="10" IsChecked="{Binding PScale_10}"/>
+                        <ct:ToggleButton Content="11" IsChecked="{Binding PScale_11}"/>
+                        <ct:ToggleButton Content="12" IsChecked="{Binding PScale_12}"/>
+                        <ct:ToggleButton Content="13" IsChecked="{Binding PScale_13}"/>
+                    </WrapPanel>
+                    <Border Grid.Column="2" Style="{StaticResource VerticalSeparator}"/>
+                    <StackPanel Grid.Column="3" Style="{StaticResource RadioContainer}">
+                        <TextBlock Style="{StaticResource SearchWindow_Header}" Text="{Binding CInfo.LinkMarker.Value, Source={x:Static ygo:Vocab.Current}}"/>
+                        <RadioButton GroupName="MarkerPerf" Content="{Binding Search_Or.Value, Source={x:Static ygo:Vocab.Current}}" IsChecked="{Binding LinkMarker_Or}"/>
+                        <RadioButton GroupName="MarkerPerf" Content="{Binding Search_And.Value, Source={x:Static ygo:Vocab.Current}}" IsChecked="{Binding LinkMarker_And}"/>
+                    </StackPanel>
+                    <local:LinkMarkerView Grid.Column="4" Width="80" Height="80" Direction="{Binding LinkMarkers}"/>
+                </Grid>
+                <Border Grid.Row="9" Style="{StaticResource HorizontalSeparator}"/>
+                <Grid Grid.Row="10" Grid.ColumnSpan="3" ColumnDefinitions="Auto, *" RowDefinitions="Auto, Auto, Auto">
+                    <Grid.Resources>
+                        <Style TargetType="ct:RangeSlider">
+                            <Setter Property="Minimum" Value="-1"/>
+                            <Setter Property="Maximum" Value="5000"/>
+                            <Setter Property="TickFrequency" Value="50"/>
+                            <Setter Property="WithExclusiveButton" Value="True"/>
+                            <Setter Property="ExclusiveText" Value="{Binding Search_Except.Value, Source={x:Static ygo:Vocab.Current}}"/>
+                            <Setter Property="WithText" Value="True"/>
+                            <Setter Property="TextWidth" Value="50"/>
+                            <Setter Property="Margin" Value="4"/>
+                            <Setter Property="Grid.Column" Value="1"/>
+                        </Style>
+                    </Grid.Resources>
+                    <CheckBox Grid.Row="0" Content="{Binding CInfo.Atk.Value, Source={x:Static ygo:Vocab.Current}}" IsChecked="{Binding Atk.IsEnabled}"/>
+                    <ct:RangeSlider Grid.Row="0" IsEnabled="{Binding Atk.IsEnabled}" Value1="{Binding Atk.LowerBound}" Value2="{Binding Atk.UpperBound}" IsExclusive="{Binding Atk.Exclusive}"/>
+                    <CheckBox Grid.Row="1" Content="{Binding CInfo.Def.Value, Source={x:Static ygo:Vocab.Current}}"/>
+                    <ct:RangeSlider Grid.Row="1" IsEnabled="{Binding Def.IsEnabled}" Value1="{Binding Def.LowerBound}" Value2="{Binding Def.UpperBound}" IsExclusive="{Binding Def.Exclusive}"/>
+                    <CheckBox Grid.Row="2" Content="{Binding Search_Expression.Value, Source={x:Static ygo:Vocab.Current}}" IsChecked="{Binding IsStatusExpressionEnabled}"/>
+                    <ct:DefaultTextBox Grid.Row="2" Grid.Column="1" x:Name="TextBox_Expression" IsEnabled="{Binding IsStatusExpressionEnabled}" InputMethod.IsInputMethodEnabled="False"
+                                       Margin="4,0" Height="26" VerticalContentAlignment="Center" DefaultText="example: (atk % 100 = 50) &amp; (atk = def)" Verify="Expression_Verify" />
+                </Grid>
+            </Grid>
+        </TabItem>
+        <TabItem Header="{Binding Search_Other.Value, Source={x:Static ygo:Vocab.Current}}">
+            <Grid RowDefinitions="Auto, Auto, Auto, Auto, Auto, Auto, Auto, Auto, Auto">
+                <Grid Grid.Row="0" ColumnDefinitions="Auto, *">
+                    <TextBlock Style="{StaticResource SearchWindow_Header}" Text="{Binding Limit.Regulation.Value, Source={x:Static ygo:Vocab.Current}}"/>
+                    <WrapPanel>
+                        <WrapPanel.Resources>
+                            <Style TargetType="ct:ToggleButton" BasedOn="{StaticResource ToggleButtonBase}">
+                                <Setter Property="MinWidth" Value="96"/>
+                            </Style>
+                        </WrapPanel.Resources>
+                        <ct:ToggleButton Icon="{x:Static local:Icons.Forbidden}" Content="{Binding Limit.Forbidden.Value, Source={x:Static ygo:Vocab.Current}}" IsChecked="{Binding Limit_Forbidden}"/>
+                        <ct:ToggleButton Icon="{x:Static local:Icons.Limit1}" Content="{Binding Limit.Limit1.Value, Source={x:Static ygo:Vocab.Current}}" IsChecked="{Binding Limit_Limit1}"/>
+                        <ct:ToggleButton Icon="{x:Static local:Icons.Limit2}" Content="{Binding Limit.Limit2.Value, Source={x:Static ygo:Vocab.Current}}" IsChecked="{Binding Limit_Limit2}"/>
+                        <ct:ToggleButton Icon="{x:Static local:Icons.Unlimited}" Content="{Binding Limit.Unlimited.Value, Source={x:Static ygo:Vocab.Current}}" IsChecked="{Binding Limit_Unlimited}"/>
+                        <ct:ToggleButton Icon="{x:Static local:Icons.Unusable}" Content="{Binding Limit.Unusable.Value, Source={x:Static ygo:Vocab.Current}}" IsChecked="{Binding Limit_Unusable}"/>
+                        <ct:ToggleButton Icon="{x:Static local:Icons.Specified}" Content="{Binding Limit.Specified.Value, Source={x:Static ygo:Vocab.Current}}" IsChecked="{Binding Limit_Specified}"/>
+                    </WrapPanel>
+                </Grid>
+                <Border Grid.Row="1" Style="{StaticResource HorizontalSeparator}"/>
+                <Grid Grid.Row="2" ColumnDefinitions="Auto, *">
+                    <TextBlock Style="{StaticResource SearchWindow_Header}" Text="{Binding Locale.Value, Source={x:Static ygo:Vocab.Current}}"/>
+                    <StackPanel Grid.Column="1" HorizontalAlignment="Left" Orientation="Horizontal" Style="{StaticResource RadioContainer}">
+                        <StackPanel.Resources>
+                            <Style TargetType="ct:RadioButton">
+                                <Setter Property="GroupName" Value="Locale"/>
+                                <Setter Property="Padding" Value="4"/>
+                                <Setter Property="Margin" Value="4"/>
+                            </Style>
+                        </StackPanel.Resources>
+                        <ct:RadioButton Content="{Binding Locale_Any.Value, Source={x:Static ygo:Vocab.Current}}" IsChecked="{Binding Locale_Any}"/>
+                        <ct:RadioButton Content="{Binding Locale_OcgExists.Value, Source={x:Static ygo:Vocab.Current}}" IsChecked="{Binding Locale_OcgExists}"/>
+                        <ct:RadioButton Content="{Binding Locale_OnlyOcg.Value, Source={x:Static ygo:Vocab.Current}}" IsChecked="{Binding Locale_OnlyOcg}"/>
+                        <ct:RadioButton Content="{Binding Locale_TcgExists.Value, Source={x:Static ygo:Vocab.Current}}" IsChecked="{Binding Locale_TcgExists}"/>
+                        <ct:RadioButton Content="{Binding Locale_OnlyTcg.Value, Source={x:Static ygo:Vocab.Current}}" IsChecked="{Binding Locale_OnlyTcg}"/>
+                        <ct:RadioButton Content="{Binding Locale_Both.Value, Source={x:Static ygo:Vocab.Current}}" IsChecked="{Binding Locale_Both}"/>
+                    </StackPanel>
+                </Grid>
+                <Border Grid.Row="3" Style="{StaticResource HorizontalSeparator}"/>
+                <Grid Grid.Row="4" ColumnDefinitions="Auto, *" RowDefinitions="Auto, Auto, Auto">
+                    <Grid.Resources>
+                        <Style TargetType="DatePicker">
+                            <Setter Property="DisplayDateStart" Value="{x:Static ygc:Utils.DateStart}"/>
+                            <Setter Property="VerticalAlignment" Value="Center"/>
+                            <Setter Property="Margin" Value="4,2"/>
+                            <EventSetter Event="PreviewMouseWheel" Handler="DatePicker_PreviewMouseWheel"/>
+                        </Style>
+                    </Grid.Resources>
+                    <CheckBox Grid.Row="0" Content="{Binding Publish_First.Value, Source={x:Static ygo:Vocab.Current}}" IsChecked="{Binding FirstDate.IsEnabled}"/>
+                    <Grid Grid.Row="0" Grid.Column="1" ColumnDefinitions="*, Auto, *, Auto" IsEnabled="{Binding FirstDate.IsEnabled}">
+                        <DatePicker Grid.Column="0" SelectedDate="{Binding FirstDate.Since}" x:Name="DatePicker_FirstSince"/>
+                        <TextBlock Grid.Column="1" Text=" - "/>
+                        <DatePicker Grid.Column="2" SelectedDate="{Binding FirstDate.Until}" x:Name="DatePicker_FirstUntil"/>
+                        <CheckBox Grid.Column="3" Content="{Binding Search_Except.Value, Source={x:Static ygo:Vocab.Current}}" IsChecked="{Binding FirstDate.Exclusive}"/>
+                    </Grid>
+                    <CheckBox Grid.Row="1" Content="{Binding Publish_Latest.Value, Source={x:Static ygo:Vocab.Current}}" IsChecked="{Binding LastDate.IsEnabled}"/>
+                    <Grid Grid.Row="1" Grid.Column="1" ColumnDefinitions="*, Auto, *, Auto" IsEnabled="{Binding LastDate.IsEnabled}">
+                        <DatePicker Grid.Column="0" SelectedDate="{Binding LastDate.Since}" x:Name="DatePicker_LastSince"/>
+                        <TextBlock Grid.Column="1" Text=" - "/>
+                        <DatePicker Grid.Column="2" SelectedDate="{Binding LastDate.Until}" x:Name="DatePicker_LastUntil"/>
+                        <CheckBox Grid.Column="3" Content="{Binding Search_Except.Value, Source={x:Static ygo:Vocab.Current}}" IsChecked="{Binding LastDate.Exclusive}"/>
+                    </Grid>
+                    <StackPanel Grid.Row="2" Grid.Column="1" Orientation="Horizontal">
+                        <StackPanel.Resources>
+                            <Style TargetType="ct:ToggleButton" BasedOn="{StaticResource ToggleButtonBase}">
+                                <Setter Property="Margin" Value="4,2,4,2"/>
+                            </Style>
+                        </StackPanel.Resources>
+                        <ct:ToggleButton Content="{Binding Ocg.Value, Source={x:Static ygo:Vocab.Current}}" IsChecked="{Binding Date_Ocg}"/>
+                        <ct:ToggleButton Content="{Binding Tcg.Value, Source={x:Static ygo:Vocab.Current}}" IsChecked="{Binding Date_Tcg}"/>
+                    </StackPanel>
+                </Grid>
+                <Border Grid.Row="5" Style="{StaticResource HorizontalSeparator}"/>
+                <Grid Grid.Row="6" ColumnDefinitions="Auto, *" RowDefinitions="Auto, Auto">
+                    <Grid.Resources>
+                        <Style TargetType="ct:RangeSlider">
+                            <Setter Property="Minimum" Value="0"/>
+                            <Setter Property="Maximum" Value="500"/>
+                            <Setter Property="TickFrequency" Value="1"/>
+                            <Setter Property="WithExclusiveButton" Value="True"/>
+                            <Setter Property="ExclusiveText" Value="{Binding Search_Except.Value, Source={x:Static ygo:Vocab.Current}}"/>
+                            <Setter Property="WithText" Value="True"/>
+                            <Setter Property="TextWidth" Value="40"/>
+                            <Setter Property="Margin" Value="4"/>
+                            <Setter Property="Grid.Column" Value="1"/>
+                        </Style>
+                    </Grid.Resources>
+                    <CheckBox Grid.Row="0" Content="{Binding Search_TextLength.Value, Source={x:Static ygo:Vocab.Current}}" IsChecked="{Binding TextLength.IsEnabled}"/>
+                    <ct:RangeSlider Grid.Row="0" IsEnabled="{Binding TextLength.IsEnabled}" Value1="{Binding TextLength.LowerBound}" Value2="{Binding TextLength.UpperBound}" IsExclusive="{Binding TextLength.Exclusive}"/>
+                    <CheckBox Grid.Row="1" Content="{Binding Search_PTextLength.Value, Source={x:Static ygo:Vocab.Current}}" IsChecked="{Binding PTextLength.IsEnabled}"/>
+                    <ct:RangeSlider Grid.Row="1" IsEnabled="{Binding PTextLength.IsEnabled}" Value1="{Binding PTextLength.LowerBound}" Value2="{Binding PTextLength.UpperBound}" IsExclusive="{Binding PTextLength.Exclusive}"/>
+                </Grid>
+                <Border Grid.Row="7" Style="{StaticResource HorizontalSeparator}"/>
+                <Grid Grid.Row="8" ColumnDefinitions="Auto, *" RowDefinitions="Auto, Auto, Auto">
+                    <TextBlock Style="{StaticResource SearchWindow_Header}" Text="{Binding Search_Text.Value, Source={x:Static ygo:Vocab.Current}}"/>
+                    <ct:DefaultTextBox x:Name="TextBox_Search" Grid.Column="1" Margin="4,4" Height="26" VerticalContentAlignment="Center" Text="{Binding SearchText}" Verify="SearchText_Verify"/>
+                    <CheckBox Grid.Row="1" Grid.RowSpan="2" Content="{Binding Search_UseRegex.Value, Source={x:Static ygo:Vocab.Current}}" IsChecked="{Binding UseRegex}"/>
+                    <StackPanel Grid.Row="1" Grid.Column="1" Orientation="Horizontal">
+                        <StackPanel.Resources>
+                            <Style TargetType="ct:ToggleButton" BasedOn="{StaticResource ToggleButtonBase}">
+                            </Style>
+                        </StackPanel.Resources>
+                        <ct:ToggleButton Content="{Binding CInfo.Name.Value, Source={x:Static ygo:Vocab.Current}}" IsChecked="{Binding CheckName}"/>
+                        <ct:ToggleButton Content="{Binding CInfo.Ruby.Value, Source={x:Static ygo:Vocab.Current}}" IsChecked="{Binding CheckRuby}"/>
+                        <ct:ToggleButton Content="{Binding CInfo.EnName.Value, Source={x:Static ygo:Vocab.Current}}" IsChecked="{Binding CheckEnName}"/>
+                        <CheckBox Content="{Binding Search_IgnoreCase.Value, Source={x:Static ygo:Vocab.Current}}" IsChecked="{Binding IgnoreCase}" Margin="8,0"/>
+                        <CheckBox Content="{Binding Search_IgnoreSymbols.Value, Source={x:Static ygo:Vocab.Current}}" IsChecked="{Binding IgnoreSymbols}"/>
+                    </StackPanel>
+                    <StackPanel Grid.Row="2" Grid.Column="1" Orientation="Horizontal">
+                        <StackPanel.Resources>
+                            <Style TargetType="ct:ToggleButton" BasedOn="{StaticResource ToggleButtonBase}">
+                            </Style>
+                        </StackPanel.Resources>
+                        <ct:ToggleButton Content="{Binding CInfo.Text.Value, Source={x:Static ygo:Vocab.Current}}" IsChecked="{Binding CheckText}"/>
+                        <ct:ToggleButton Content="{Binding CInfo.PendulumText.Value, Source={x:Static ygo:Vocab.Current}}" IsChecked="{Binding CheckPText}"/>
+                        <CheckBox Content="{Binding Search_IgnoreCase.Value, Source={x:Static ygo:Vocab.Current}}" IsChecked="{Binding TextIgnoreCase}" Margin="8,0"/>
+                        <CheckBox Content="{Binding Search_IgnoreSymbols.Value, Source={x:Static ygo:Vocab.Current}}" IsChecked="{Binding TextIgnoreSymbols}"/>
+                    </StackPanel>
+                </Grid>
+            </Grid>
+        </TabItem>
+    </ct:WithPanelTabControl>
+</Window>

@@ -11,7 +11,6 @@ using LivreNoirLibrary.Debug;
 
 namespace LivreNoirLibrary.Windows.Controls
 {
-
     public static partial class ControlExtensions
     {
         public static void ChangeByWheel(this ComboBox control, MouseWheelEventArgs e, bool wrap = false)

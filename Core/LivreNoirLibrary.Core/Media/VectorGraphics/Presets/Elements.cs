@@ -46,6 +46,8 @@ namespace LivreNoirLibrary.Media.VectorGraphics
         public static GeometryElement ArrowRight { get; } = Create(Geometries.ArrowRight, "#333");
         public static GeometryElement ArrowUp { get; } = Create(Geometries.ArrowUp, "#333");
         public static GeometryElement ArrowDown { get; } = Create(Geometries.ArrowDown, "#333");
+        public static GeometryElement RightLeft { get; } = Create(Geometries.RightLeft, "#333");
+        public static GeometryElement UpDown { get; } = Create(Geometries.UpDown, "#333");
 
         public static GeometryElement Zoom { get; } = Create(Geometries.Zoom, "#333");
         public static GeometryElement ZoomUp { get; } = Create(Geometries.Zoom_Plus, "#333");

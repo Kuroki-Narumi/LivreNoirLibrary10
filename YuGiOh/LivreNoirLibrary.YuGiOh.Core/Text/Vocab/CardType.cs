@@ -55,10 +55,13 @@ namespace LivreNoirLibrary.YuGiOh
             { CardType.Continuous_Spell, Continuous_Spell },
             { CardType.Quick_Spell,  Quick_Spell },
             { CardType.Ritual_Spell, Ritual_Spell },
+            { CardType.SpellMonster, SpellMonster },
 
             { CardType.Normal_Trap,     Normal_Trap },
             { CardType.Continuous_Trap, Continuous_Trap },
             { CardType.Counter_Trap,    Counter_Trap },
+            { CardType.TrapMonster, TrapMonster },
+            { CardType.Continuous_TrapMonster, ContinuousTrapMonster },
         };
 
         private static readonly Dictionary<string, CardType>.AlternateLookup<ReadOnlySpan<char>> _name2cType = CreateName2CType();

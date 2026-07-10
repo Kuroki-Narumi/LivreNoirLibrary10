@@ -19,7 +19,7 @@ namespace LivreNoirLibrary.YuGiOh
                 LimitCount.Limit1 => Limit1,
                 LimitCount.Limit2 => Limit2,
                 LimitCount.Specified => Specified,
-                _ => Unlimited,
+                _ => "",
             };
         }
     }

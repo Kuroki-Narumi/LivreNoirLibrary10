@@ -60,12 +60,16 @@ namespace LivreNoirLibrary.YuGiOh
         public static Ability GetAbility(this ReadOnlySpan<char> text)
         {
             var result = YuGiOh.Ability.Normal;
-            foreach (var range in text.Split(Separators))
+            foreach (var range in Regex_Separators.EnumerateSplits(text))
             {
                 var name = text[range].Trim();
                 if (TryGetEnumValue(name, _name2abi, out var val))
                 {
                     result |= val;
+                }
+                else
+                {
+                    Console.WriteLine(name);
                 }
             }
             return result;

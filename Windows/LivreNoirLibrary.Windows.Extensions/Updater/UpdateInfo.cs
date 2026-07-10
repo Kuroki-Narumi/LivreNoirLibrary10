@@ -1,6 +1,7 @@
-﻿using System;
-using System.Net.Http.Json;
+﻿using LivreNoirLibrary.ObjectModel;
+using System;
 using System.Net.Http;
+using System.Net.Http.Json;
 using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 using System.Windows;
@@ -9,12 +10,8 @@ namespace LivreNoirLibrary.Windows
 {
     public class UpdateInfo
     {
-        private static readonly HttpClient _client = new();
-
-        [JsonPropertyName("version")]
         public Version Version { get; set; } = new(0, 0, 0);
 
-        [JsonPropertyName("url")]
         public string Url { get; set; } = "";
 
         [JsonConverter(typeof(Text.Base64JsonConverter))]
@@ -30,7 +27,7 @@ namespace LivreNoirLibrary.Windows
         {
             try
             {
-                var info = await HttpClientJsonExtensions.GetFromJsonAsync<UpdateInfo>(_client, infoUrl);
+                var info = await HttpClientJsonExtensions.GetFromJsonAsync<UpdateInfo>(HttpClientPool.Instance, infoUrl);
                 return info;
             }
             catch

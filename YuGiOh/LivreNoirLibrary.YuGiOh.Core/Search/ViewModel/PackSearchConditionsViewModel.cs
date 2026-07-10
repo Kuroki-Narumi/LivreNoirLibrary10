@@ -9,6 +9,14 @@ namespace LivreNoirLibrary.YuGiOh.Search
         public bool Date_Ocg { get; set => SetValue(ref field, value); }
         public bool Date_Tcg { get; set => SetValue(ref field, value); }
 
+        public override void Clear()
+        {
+            CardCount.Set(0, 999, false, false);
+            Date.Set(Utils.DateStart, DateTime.Now, false, false);
+            Date_Ocg = Date_Tcg = false;
+            base.Clear();
+        }
+
         public void CopyFrom(PackSearchConditions conditions)
         {
             SearchText = conditions.SearchText;

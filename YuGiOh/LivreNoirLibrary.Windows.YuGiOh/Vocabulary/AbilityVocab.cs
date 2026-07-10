@@ -15,10 +15,9 @@ namespace LivreNoirLibrary.Windows.YuGiOh.Vocabulary
 
         public void LoadDefault()
         {
-            var dic = _dictionary;
             foreach (var abi in EnumUtils.EnumerateAbilities(false))
             {
-                dic[$"{abi}"] = abi.GetSingleName();
+                SetData(abi.ToString(), abi.GetSingleName());
             }
         }
     }

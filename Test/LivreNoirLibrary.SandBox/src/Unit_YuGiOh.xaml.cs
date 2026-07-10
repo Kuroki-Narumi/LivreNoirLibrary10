@@ -1,25 +1,14 @@
 ﻿using LivreNoirLibrary.Debug;
 using LivreNoirLibrary.ObjectModel;
 using LivreNoirLibrary.Text;
+using LivreNoirLibrary.Windows;
 using LivreNoirLibrary.Windows.Controls;
+using LivreNoirLibrary.Windows.YuGiOh;
+using LivreNoirLibrary.Windows.YuGiOh.Controls;
 using LivreNoirLibrary.YuGiOh.Data;
 using LivreNoirLibrary.YuGiOh.Search;
-using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Text;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
-using LivreNoirLibrary.Windows.Media;
-using System.Diagnostics.CodeAnalysis;
-using LivreNoirLibrary.Collections;
 
 namespace LivreNoirLibrary.SandBox
 {
@@ -29,8 +18,11 @@ namespace LivreNoirLibrary.SandBox
     public partial class Unit_YuGiOh : UserControl, IProgressReporter
     {
         public static CardPool CardPool => CardPool.Instance;
+        public static Regulation Regulation => Regulation.Instance;
         public static string CardPoolFilePath { get; } = YuGiOh.Utils.GetFullPath(CardPool.DefaultResourceName);
-        public TextSearchConditions TextSearchConditions { get; } = new();
+        public static string RegulationFilePath { get; } = YuGiOh.Utils.GetFullPath("Resources/Regulation.json");
+        public CardSearchConditions CardSearchConditions { get; } = new();
+        public CardSortOptionCollection CardSortOptions { get; } = [];
 
         UIElement IProgressReporter.MainElement => MainUI;
         TaskProgressBar IProgressReporter.ProgressBar => TaskProgressBar;
@@ -45,29 +37,68 @@ namespace LivreNoirLibrary.SandBox
         private void InitializeCardPool()
         {
             CardPool.LoadFile(CardPoolFilePath);
+            Regulation.LoadFile(RegulationFilePath);
+            CardPool.Cards.NotifyLimitChanged();
         }
 
-        private void OnClick_Search(object sender, RoutedEventArgs e)
+        private void OnRequestSearch(object sender, RoutedEventArgs<string> e)
+        {
+            CardSearchConditions.SearchText = e.Value;
+            UpdateFilter();
+        }
+
+        private void OnRequestOpenSort(object sender, RoutedEventArgs e)
+        {
+            var owner = Window.GetWindow(this);
+            CardSortWindow window = new() { Owner = owner };
+            window.Setup(CardSortOptions);
+            window.Sort += Window_SortExecuted;
+            window.PlaceToCursor(-32, -16, owner);
+            window.ShowDialog();
+        }
+
+        private void OnRequestOpenSearch(object sender, RoutedEventArgs e)
+        {
+            var owner = Window.GetWindow(this);
+            CardSearchWindow window = new() { Owner = owner };
+            window.Setup(CardSearchConditions);
+            window.Search += Window_SearchExecuted;
+            window.PlaceToCursor(-32, -16, owner);
+            window.ShowDialog();
+        }
+
+        private void OnRequestClear(object sender, RoutedEventArgs e)
+        {
+            var s = CardSearchConditions;
+            CardSearchConditions.CopyTo(CardSearchConditions.Default, s, false);
+            s.SearchText = "";
+            UpdateFilter();
+        }
+
+        private void Window_SortExecuted(object? sender, EventArgs e) => UpdateSort();
+
+        private void UpdateSort()
+        {
+            ListView_Cards.ApplySortDescriptions(CardSortOptions);
+        }
+
+        private void Window_SearchExecuted(object? sender, EventArgs e) => UpdateFilter();
+
+        private void UpdateFilter()
         {
             using var t = ExStopwatch.ProcessTime("Search");
-            var text = SearchInput.Text;
-            if (string.IsNullOrWhiteSpace(text))
-            {
-                ListView_Cards.Items.Filter = null;
-                return;
-            }
-            var conds = TextSearchConditions;
-            conds.Text = text;
+            var conds = CardSearchConditions;
             conds.Prepare();
+            SearchBar.SearchText = conds.SearchText;
             ListView_Cards.Items.Filter = item => item is ICard c && conds.IsMatch(c);
         }
 
         private void OnClick_Test(object sender, RoutedEventArgs e)
         {
-            this.StartTask(asyncProcess: MainProcess, isAbortable: false);
+            this.StartTask(asyncProcess: UpdateDatabase, isAbortable: false);
         }
 
-        private async Task MainProcess(ProgressReporter p, CancellationToken c)
+        private async Task UpdateDatabase(ProgressReporter p, CancellationToken c)
         {
             var database = CardPool;
             var ids = await YuGiOh.Scraping.CardPack.GetCardList(database.Packs, p, c);
@@ -85,6 +116,39 @@ namespace LivreNoirLibrary.SandBox
                     MessageBox.Show($"{ids.Count}件のカード情報を更新しました。");
                 }
             });
+        }
+
+        private void OnClick_Regulation(object sender, RoutedEventArgs e)
+        {
+            this.StartTask(asyncProcess: UpdateRegulation, isAbortable: false);
+        }
+
+        private async Task UpdateRegulation(ProgressReporter p, CancellationToken c)
+        {
+            await YuGiOh.Scraping.Regulation.Update(Regulation, false, p, c);
+            Regulation.SaveJson(RegulationFilePath);
+            CardPool.Cards.NotifyLimitChanged();
+        }
+
+        private void CardInfoView_CardLinkClicked(object sender, CardLinkClickedEventArgs e)
+        {
+            this.OpenUrl_Card(e.Id, e.IsTcg);
+        }
+
+        private void CardInfoView_PackLinkClicked(object sender, RoutedEventArgs<string> e)
+        {
+            this.OpenUrl_Pack(e.Value);
+        }
+
+        private void CardInfoView_Detach(object sender, RoutedEventArgs<Card> e)
+        {
+            Window_CardInfo window = new(e.Value, Window.GetWindow(this), new()
+            {
+                CardLink = CardInfoView_CardLinkClicked,
+                PackLink = CardInfoView_PackLinkClicked,
+                RelatedText = OnRequestSearch,
+            });
+            window.Show();
         }
     }
 }

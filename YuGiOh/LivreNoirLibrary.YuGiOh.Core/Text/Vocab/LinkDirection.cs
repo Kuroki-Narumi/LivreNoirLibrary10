@@ -56,7 +56,7 @@ namespace LivreNoirLibrary.YuGiOh
         public static LinkDirection GetDirection(this ReadOnlySpan<char> text)
         {
             var result = LinkDirection.None;
-            foreach (var range in text.Split(Separators))
+            foreach (var range in Regex_Separators.EnumerateSplits(text))
             {
                 var name = text[range].Trim();
                 if (TryGetEnumValue(name, _name2link, out var val))

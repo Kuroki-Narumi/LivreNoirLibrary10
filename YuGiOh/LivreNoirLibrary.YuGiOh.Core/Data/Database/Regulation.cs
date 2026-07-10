@@ -57,7 +57,8 @@ namespace LivreNoirLibrary.YuGiOh.Data
             {
                 foreach (var card in list.AsSpan())
                 {
-                    _list.Remove(card.Id);
+                    var id = card.Id;
+                    _list.Remove(id);
                 }
                 list.Clear();
             }
@@ -144,8 +145,6 @@ namespace LivreNoirLibrary.YuGiOh.Data
 
         public int GetActualCount(Card card) => Math.Clamp(Get(card), LimitCount.Forbidden, LimitCount.Unlimited);
 
-        private static void NotifyChanged(int id) => CardPool.Instance.Get(id).NotifyLimitChanged();
-
         public bool Set(int id, int value)
         {
             RegulationCardList? list;
@@ -166,7 +165,6 @@ namespace LivreNoirLibrary.YuGiOh.Data
                 _list[id] = value;
                 list.Add(id);
             }
-            NotifyChanged(id);
             return true;
         }
 
@@ -193,7 +191,6 @@ namespace LivreNoirLibrary.YuGiOh.Data
                 {
                     _list.Add(id, value);
                 }
-                NotifyChanged(id);
             }
             if (_list_map.TryGetValue(value, out list))
             {
@@ -222,7 +219,6 @@ namespace LivreNoirLibrary.YuGiOh.Data
                 {
                     _list.Add(id, value);
                 }
-                NotifyChanged(id);
             }
             if (_list_map.TryGetValue(value, out list))
             {
@@ -249,7 +245,6 @@ namespace LivreNoirLibrary.YuGiOh.Data
             foreach (var id in ids.AsSpan())
             {
                 _list.Remove(id);
-                NotifyChanged(id);
             }
         }
 
@@ -263,7 +258,7 @@ namespace LivreNoirLibrary.YuGiOh.Data
         public void WriteJson(Utf8JsonWriter writer, JsonSerializerOptions options)
         {
             writer.WriteStartObject();
-            void WriteInternal(RegulationCardList list, string propertyName)
+            static void WriteInternal(Utf8JsonWriter writer, RegulationCardList list, string propertyName)
             {
                 if (list.Count is 0)
                 {
@@ -277,10 +272,11 @@ namespace LivreNoirLibrary.YuGiOh.Data
                 }
                 writer.WriteEndArray();
             }
-            WriteInternal(Forbidden, JsonPropertyNames.Forbidden);
-            WriteInternal(Limit1, JsonPropertyNames.Limit1);
-            WriteInternal(Limit2, JsonPropertyNames.Limit2);
-            WriteInternal(Specified, JsonPropertyNames.Specified);
+            WriteInternal(writer, Forbidden, JsonPropertyNames.Forbidden);
+            WriteInternal(writer, Limit1, JsonPropertyNames.Limit1);
+            WriteInternal(writer, Limit2, JsonPropertyNames.Limit2);
+            WriteInternal(writer, Specified, JsonPropertyNames.Specified);
+            writer.WriteEndObject();
         }
     }
 }

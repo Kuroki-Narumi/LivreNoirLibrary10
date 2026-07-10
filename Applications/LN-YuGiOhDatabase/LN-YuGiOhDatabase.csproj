@@ -1,0 +1,40 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net10.0-windows</TargetFramework>
+    <RootNamespace>LivreNoir.YuGiOhDatabase</RootNamespace>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>disable</ImplicitUsings>
+	  <BaseOutputPath>..\..\bin</BaseOutputPath>
+	  <AllowedReferenceRelatedFileExtensions>
+		  *.xml;
+		  *.pdb
+	  </AllowedReferenceRelatedFileExtensions>
+    <UseWPF>true</UseWPF>
+    <ApplicationIcon>icon.ico</ApplicationIcon>
+  </PropertyGroup>
+
+	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+		<DebugType>none</DebugType>
+	</PropertyGroup>
+
+	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+		<DebugType>none</DebugType>
+	</PropertyGroup>
+
+  <ItemGroup>
+    <SplashScreen Include="..\..\YuGiOh\LivreNoirLibrary.YuGiOh.Core\Resources\splash.png" Link="splash.png" />
+    <Content Include="icon.ico" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\Windows\LivreNoirLibrary.Windows.Controls\LivreNoirLibrary.Windows.Controls.csproj" />
+    <ProjectReference Include="..\..\YuGiOh\LivreNoirLibrary.Windows.YuGiOh\LivreNoirLibrary.Windows.YuGiOh.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="src\Unit_Main\" />
+  </ItemGroup>
+
+</Project>

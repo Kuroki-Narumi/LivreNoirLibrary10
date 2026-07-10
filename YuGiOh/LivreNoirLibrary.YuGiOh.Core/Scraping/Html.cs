@@ -17,15 +17,13 @@ namespace LivreNoirLibrary.YuGiOh.Scraping
     {
         public static int RetryCount { get; set; } = 5;
 
-        private static readonly HttpClient _client = new();
-
         public static async Task<string> GetString(string url, CancellationToken c = default)
         {
             for (var count = 0; ; count++)
             {
                 try
                 {
-                    var text = await _client.GetStringAsync(url, c);
+                    var text = await HttpClientPool.Instance.GetStringAsync(url, c);
                     return text;
                 }
                 catch (HttpRequestException)

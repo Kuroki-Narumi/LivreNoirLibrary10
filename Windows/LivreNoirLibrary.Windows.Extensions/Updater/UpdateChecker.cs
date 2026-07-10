@@ -30,7 +30,12 @@ namespace LivreNoirLibrary.Windows
                 var info = await UpdateInfo.CheckVersion(window.VersionUrl);
                 if (info is not null)
                 {
-                    if (window.ShowMessage_YesNo(string.Format(window.GetMessage_NewVersion(), info.Version), MessageBoxImage.Information) is MessageBoxResult.Yes)
+                    var message = window.GetMessage_NewVersion();
+                    if (message.Contains("{0}"))
+                    {
+                        message = string.Format(message, info.Version.ToStringAuto());
+                    }
+                    if (window.ShowMessage_YesNo(message, MessageBoxImage.Information) is MessageBoxResult.Yes)
                     {
                         window.SetDispatcher(() => ExecuteUpdate(window, updater, info));
                     }

@@ -112,10 +112,14 @@ namespace LivreNoirLibrary.YuGiOh.Data
 
         private void OnTextChanged()
         {
-            _related = null;
+            ClearRelatedText();
             SendPropertyChanged(nameof(RelatedList));
         }
 
-        public void NotifyLimitChanged() => SendPropertyChanged(nameof(LimitIcon));
+        public void NotifyLimitChanged()
+        {
+            SendPropertyChanged(nameof(LimitIcon));
+            SendPropertyChanged(nameof(LimitText));
+        }
     }
 }

@@ -8,6 +8,8 @@ namespace LivreNoirLibrary.YuGiOh.Search
 {
     public partial class CardSearchConditions
     {
+        public static CardSearchConditions Default { get; } = new();
+
         [JsonPropertyName(JsonPropertyNames.Search_CardTypes)]
         public HashSet<CardType> CardTypes { get; set; } = [];
 
@@ -21,7 +23,7 @@ namespace LivreNoirLibrary.YuGiOh.Search
         public HashSet<MonsterType> MonsterTypes { get; set; } = [];
 
         [JsonPropertyName(JsonPropertyNames.Search_StatusFlags)]
-        public StatusFlags StatusFlags { get; set; } = 0;
+        public StatusFlags StatusFlags { get; set; } = StatusFlags.Default;
 
         [JsonPropertyName(JsonPropertyNames.Search_Abilities)]
         public Ability Abilities { get; set; } = 0;
@@ -130,12 +132,12 @@ namespace LivreNoirLibrary.YuGiOh.Search
         public bool IsMatch(ICard card)
         {
             // 種類
-            if (SearchCondition.NotMatch(CardTypes, card.CardType)) return false;
+            if (SearchUtils.NotMatch(CardTypes, card.CardType)) return false;
             // リミット
-            if (SearchCondition.NotMatch(Limits, Regulation.Instance.Get(card))) return false;
+            if (SearchUtils.NotMatch(Limits, Regulation.Instance.Get(card))) return false;
             // ロケール
-            if (SearchCondition.NotMatch(card.IsOcgReleased(), OcgState)) return false;
-            if (SearchCondition.NotMatch(card.IsTcgReleased(), TcgState)) return false;
+            if (SearchUtils.NotMatch(card.IsOcgReleased(), OcgState)) return false;
+            if (SearchUtils.NotMatch(card.IsTcgReleased(), TcgState)) return false;
 
             // ペンデュラム
             if (_req_pen)
@@ -143,9 +145,9 @@ namespace LivreNoirLibrary.YuGiOh.Search
                 // ペンデュラムモンスター以外は無条件で偽
                 if (!card.IsPendulum()) return false;
                 // Pスケール
-                if (SearchCondition.NotMatch(PendulumScales, card.PendulumScale)) return false;
+                if (SearchUtils.NotMatch(PendulumScales, card.PendulumScale)) return false;
                 // P効果の文字数
-                if (SearchCondition.NotMatch(PTextLength, Vocab.GetTextLength(card.PendulumText))) return false;
+                if (SearchUtils.NotMatch(PTextLength, Vocab.GetTextLength(card.PendulumText))) return false;
             }
 
             // モンスターステータス
@@ -173,9 +175,9 @@ namespace LivreNoirLibrary.YuGiOh.Search
                     return false;
                 }
                 // 属性
-                if (SearchCondition.NotMatch(Attributes, card.Attribute)) return false;
+                if (SearchUtils.NotMatch(Attributes, card.Attribute)) return false;
                 // 種族
-                if (SearchCondition.NotMatch(MonsterTypes, card.MonsterType)) return false;
+                if (SearchUtils.NotMatch(MonsterTypes, card.MonsterType)) return false;
                 // 効果を持たないモンスター
                 if (_req_normal && card.HasEffect) return false;
                 // 効果モンスター
@@ -192,17 +194,17 @@ namespace LivreNoirLibrary.YuGiOh.Search
                 // 能力(除外)
                 if ((AbilitiesExcept & cabi) is not 0) return false;
                 // レベル
-                if (SearchCondition.NotMatch(Levels, card.Level)) return false;
+                if (SearchUtils.NotMatch(Levels, card.Level)) return false;
                 // 攻撃力
-                if (SearchCondition.NotMatch(Atk, card.Atk)) return false;
+                if (SearchUtils.NotMatch(Atk, card.Atk)) return false;
                 // 守備力
-                if (SearchCondition.NotMatch(Def, card.Def)) return false;
+                if (SearchUtils.NotMatch(Def, card.Def)) return false;
                 // 条件式
                 if (_exprEnabled && !_expr.IsMatch(card)) return false;
             }
 
             // テキスト長さ
-            if (SearchCondition.NotMatch(TextLength, Vocab.GetTextLength(card.Text))) return false;
+            if (SearchUtils.NotMatch(TextLength, Vocab.GetTextLength(card.Text))) return false;
 
             // 発売日
             if (_req_date)
@@ -212,13 +214,41 @@ namespace LivreNoirLibrary.YuGiOh.Search
                 if (list.Count is 0) return false;
                 var (first, last) = list.GetDate(DateLocale);
                 // 初登場
-                if (SearchCondition.NotMatch(FirstDate, first)) return false;
+                if (SearchUtils.NotMatch(FirstDate, first)) return false;
                 // 最終収録
-                if (SearchCondition.NotMatch(LastDate, last)) return false;
+                if (SearchUtils.NotMatch(LastDate, last)) return false;
             }
 
             // テキスト内容
             return _textConds.IsMatch(card);
+        }
+
+        public static void CopyTo(CardSearchConditions from, CardSearchConditions to, bool copyText)
+        {
+            SearchUtils.CopyHashSet(from.CardTypes, to.CardTypes);
+            SearchUtils.CopyHashSet(from.Limits, to.Limits);
+            SearchUtils.CopyHashSet(from.MonsterTypes, to.MonsterTypes);
+            to.StatusFlags = from.StatusFlags;
+            to.Abilities = from.Abilities;
+            to.AbilitiesExcept = from.AbilitiesExcept;
+            SearchUtils.CopyHashSet(from.Levels, to.Levels);
+            to.Atk.CopyFrom(from.Atk);
+            to.Def.CopyFrom(from.Def);
+            SearchUtils.CopyHashSet(from.PendulumScales, to.PendulumScales);
+            to.LinkMarkers = from.LinkMarkers;
+            to.StatusExpression = from.StatusExpression;
+            to.OcgState = from.OcgState;
+            to.TcgState = from.TcgState;
+            to.FirstDate.CopyFrom(from.FirstDate);
+            to.LastDate.CopyFrom(from.LastDate);
+            to.DateLocale = from.DateLocale;
+            to.TextLength.CopyFrom(from.TextLength);
+            to.PTextLength.CopyFrom(from.PTextLength);
+            if (copyText)
+            {
+                to.SearchText = from.SearchText;
+            }
+            to.TextFlags = from.TextFlags;
         }
     }
 }

@@ -23,6 +23,8 @@ namespace LivreNoirLibrary.Media.VectorGraphics
         public static ElementGroup ArrowRight { get; } = new(Elements.ArrowRight);
         public static ElementGroup ArrowUp { get; } = new(Elements.ArrowUp);
         public static ElementGroup ArrowDown { get; } = new(Elements.ArrowDown);
+        public static ElementGroup RightLeft { get; } = new(Elements.RightLeft);
+        public static ElementGroup UpDown { get; } = new(Elements.UpDown);
 
         public static ElementGroup HeadLeft { get; } = new(Elements.Circle_Outer, Elements.Circle_Inner, Elements.HeadLeft_Inner);
         public static ElementGroup HeadRight { get; } = new(Elements.Circle_Outer, Elements.Circle_Inner, Elements.HeadRight_Inner);

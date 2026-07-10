@@ -61,11 +61,10 @@ namespace LivreNoirLibrary.Windows.YuGiOh.Vocabulary
 
         public void LoadDefault()
         {
-            var dic = _dictionary;
             foreach (var type in EnumUtils.EnumerateMonsterTypes(true))
             {
-                dic[$"{type}"] = type.GetName();
-                dic[$"{type}_S"] = type.GetShortName();
+                SetData(type.ToString(), type.GetName());
+                SetData($"{type}_S", type.GetShortName());
             }
         }
     }

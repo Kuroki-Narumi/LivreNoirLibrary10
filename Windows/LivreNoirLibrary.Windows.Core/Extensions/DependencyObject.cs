@@ -166,44 +166,53 @@ namespace LivreNoirLibrary.Windows
             }
         }
 
-        public static bool TryGetFirstDescendant(this DependencyObject obj, Predicate<DependencyObject> predicate, [NotNullWhen(true)] out DependencyObject? descendant)
+        public static bool TryGetFirstDescendant(this DependencyObject? obj, Predicate<DependencyObject> predicate, [NotNullWhen(true)] out DependencyObject? descendant)
         {
-            foreach (var child in EnumerateDescendantsByQueue(obj))
+            if (obj is not null)
             {
-                if (child is not null && predicate(child))
+                foreach (var child in EnumerateDescendantsByQueue(obj))
                 {
-                    descendant = child;
-                    return true;
+                    if (child is not null && predicate(child))
+                    {
+                        descendant = child;
+                        return true;
+                    }
                 }
             }
             descendant = null;
             return false;
         }
 
-        public static bool TryGetFirstDescendant<T>(this DependencyObject obj, [NotNullWhen(true)] out T? descendant)
+        public static bool TryGetFirstDescendant<T>(this DependencyObject? obj, [NotNullWhen(true)] out T? descendant)
             where T : DependencyObject
         {
-            foreach (var child in EnumerateDescendantsByQueue(obj))
+            if (obj is not null)
             {
-                if (child is T target)
+                foreach (var child in EnumerateDescendantsByQueue(obj))
                 {
-                    descendant = target;
-                    return true;
+                    if (child is T target)
+                    {
+                        descendant = target;
+                        return true;
+                    }
                 }
             }
             descendant = null;
             return false;
         }
 
-        public static bool TryGetFirstDescendant<T>(this DependencyObject obj, Predicate<T> predicate, [NotNullWhen(true)] out T? descendant)
+        public static bool TryGetFirstDescendant<T>(this DependencyObject? obj, Predicate<T> predicate, [NotNullWhen(true)] out T? descendant)
             where T : DependencyObject
         {
-            foreach (var child in EnumerateDescendantsByQueue(obj))
+            if (obj is not null)
             {
-                if (child is T target && predicate(target))
+                foreach (var child in EnumerateDescendantsByQueue(obj))
                 {
-                    descendant = target;
-                    return true;
+                    if (child is T target && predicate(target))
+                    {
+                        descendant = target;
+                        return true;
+                    }
                 }
             }
             descendant = null;

@@ -22,11 +22,10 @@ namespace LivreNoirLibrary.Windows.YuGiOh.Vocabulary
 
         public void LoadDefault()
         {
-            var dic = _dictionary;
             foreach (var attr in EnumUtils.EnumerateAttributes(true))
             {
-                dic[$"{attr}"] = attr.GetName();
-                dic[$"{attr}_S"] = attr.GetShortName();
+                SetData(attr.ToString(), attr.GetName());
+                SetData($"{attr}_S", attr.GetShortName());
             }
         }
     }

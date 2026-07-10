@@ -30,6 +30,8 @@ namespace LivreNoirLibrary.Media.VectorGraphics
         public static string ArrowRight { get; } = "M32,16 l-15,15 l-4,-4 l8,-8 h-20 v-6 h20 l-8,-8 l4,-4 Z";
         public static string ArrowUp { get; } = "M16,0 l15,15 l-4,4 l-8,-8 v20 h-6 v-20 l-8,8 l-4,-4 Z";
         public static string ArrowDown { get; } = "M16,32 l15,-15 l-4,-4 l-8,8 v-20 h-6 v20 l-8,-8 l-4,4 Z";
+        public static string RightLeft { get; } = "M2,6 h20 v-4 l10,7 -10,7 v-4 h-20 Z M30,20 h-20 v-4 l-10,7 10,7 v-4 h20 Z";
+        public static string UpDown { get; } = "M6,30 v-20 h-4 l7,-10 7,10 h-4 v20 Z M20,2 v20 h-4 l7,10 7,-10 h-4 v-20 Z";
 
         public static string HeadLeft { get; } = "M8,16 l10,10 l4,-4 l-6,-6 l6,-6 l-4,-4 Z";
         public static string HeadRight { get; } = "M24,16 l-10,10 l-4,-4 l6,-6 l-6,-6 l4,-4 Z";

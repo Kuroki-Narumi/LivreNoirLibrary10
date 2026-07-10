@@ -192,14 +192,8 @@ namespace LivreNoirLibrary.Collections
 
         public void CopyTo(ICollection<T> target, int index, int count)
         {
-            if ((uint)index >= (uint)Count)
-            {
-                throw new ArgumentOutOfRangeException(nameof(index), "Index is out of range.");
-            }
-            if ((uint)count > (uint)(Count - index))
-            {
-                throw new ArgumentOutOfRangeException(nameof(count), "Count is out of range.");
-            }
+            ArgumentOutOfRangeException.ThrowIfGreaterThanOrEqual((uint)index, (uint)Count);
+            ArgumentOutOfRangeException.ThrowIfGreaterThanOrEqual((uint)count, (uint)(Count - index));
             for (var i = 0; i < count; i++)
             {
                 target.Add(_list[index + i]);
@@ -208,14 +202,8 @@ namespace LivreNoirLibrary.Collections
 
         public void CopyTo(ObservableCollectionBase<T> target, int index, int count)
         {
-            if ((uint)index >= (uint)Count)
-            {
-                throw new ArgumentOutOfRangeException(nameof(index), "Index is out of range.");
-            }
-            if ((uint)count > (uint)(Count - index))
-            {
-                throw new ArgumentOutOfRangeException(nameof(count), "Count is out of range.");
-            }
+            ArgumentOutOfRangeException.ThrowIfGreaterThanOrEqual((uint)index, (uint)Count);
+            ArgumentOutOfRangeException.ThrowIfGreaterThanOrEqual((uint)count, (uint)(Count - index));
             for (var i = 0; i < count; i++)
             {
                 target.AddWithoutNotify(_list[index + i]);

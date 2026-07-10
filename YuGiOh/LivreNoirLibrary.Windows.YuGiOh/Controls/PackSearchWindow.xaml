@@ -1,0 +1,72 @@
+﻿<Window x:Class="LivreNoirLibrary.Windows.YuGiOh.Controls.PackSearchWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:LivreNoirLibrary.Windows.YuGiOh.Controls"
+        xmlns:ygo="clr-namespace:LivreNoirLibrary.Windows.YuGiOh"
+        xmlns:ct="clr-namespace:LivreNoirLibrary.Windows.Controls;assembly=LivreNoirLibrary.Windows.Controls"
+        xmlns:md="clr-namespace:LivreNoirLibrary.Windows.Media;assembly=LivreNoirLibrary.Windows.Media"
+        xmlns:ygd="clr-namespace:LivreNoirLibrary.YuGiOh.Data;assembly=LivreNoirLibrary.YuGiOh.Core"
+        xmlns:search="clr-namespace:LivreNoirLibrary.YuGiOh.Search;assembly=LivreNoirLibrary.YuGiOh.Core"
+        xmlns:ygc="clr-namespace:LivreNoirLibrary.YuGiOh;assembly=LivreNoirLibrary.YuGiOh.Core"
+        mc:Ignorable="d" d:DataContext="{d:DesignInstance Type=search:PackSearchConditionsViewModel}"
+        Title="Search" ShowInTaskbar="False" WindowStyle="None" AllowsTransparency="True" Background="{ct:BrushProvider #1fff}"
+        Width="500" SizeToContent="Height" ResizeMode="NoResize" FontSize="14" FontFamily="Meiryo" UseLayoutRounding="True"
+        >
+    <Window.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="/LivreNoirLibrary.Windows.YuGiOh;component/Themes/Generic.xaml"/>
+            </ResourceDictionary.MergedDictionaries>
+
+            <Style x:Key="ToggleButtonBase" TargetType="ct:ToggleButton" BasedOn="{StaticResource SearchWindow_ToggleButton}">
+                <EventSetter Event="PreviewMouseLeftButtonDown" Handler="OnMouseLeftButtonDown_ToggleButton"/>
+                <EventSetter Event="MouseEnter" Handler="OnMouseEnter_ToggleButton"/>
+            </Style>
+
+            <Style TargetType="CheckBox" BasedOn="{StaticResource SearchWindow_CheckBox}">
+                <Setter Property="Margin" Value="4"/>
+                <EventSetter Event="PreviewMouseLeftButtonDown" Handler="OnMouseLeftButtonDown_ToggleButton"/>
+                <EventSetter Event="MouseEnter" Handler="OnMouseEnter_ToggleButton"/>
+            </Style>
+        </ResourceDictionary>
+    </Window.Resources>
+    <Grid Margin="4" RowDefinitions="Auto, Auto">
+        <Grid Grid.Row="0" ColumnDefinitions="Auto, Auto, *, Auto">
+            <ct:Button Style="{StaticResource Button_ExecSearch}" Click="OnClick_Search"/>
+            <ct:Button Style="{StaticResource Button_ExecClear}" Click="OnClick_Clear"/>
+            <ct:Button Style="{StaticResource Button_ExecClose}" Click="OnClick_Close"/>
+        </Grid>
+        <Border Grid.Row="1" Padding="4" Background="{ct:BrushProvider #fffefd}" BorderThickness="1" BorderBrush="{StaticResource Brush_Border}">
+            <Grid RowDefinitions="Auto, AUto, Auto, Auto, Auto, Auto" ColumnDefinitions="Auto, *">
+                <CheckBox Grid.Row="0" Content="{Binding PublishDate.Value, Source={x:Static ygo:Vocab.Current}}" IsChecked="{Binding Date.IsEnabled}"/>
+                <Grid Grid.Row="0" Grid.Column="1" ColumnDefinitions="*, Auto, *, Auto" IsEnabled="{Binding Date.IsEnabled}">
+                    <DatePicker Grid.Column="0" SelectedDate="{Binding Date.Since}" x:Name="DatePicker_Since"/>
+                    <TextBlock Grid.Column="1" Text=" - "/>
+                    <DatePicker Grid.Column="2" SelectedDate="{Binding Date.Until}" x:Name="DatePicker_Until"/>
+                    <CheckBox Grid.Column="3" Content="{Binding Search_Except.Value, Source={x:Static ygo:Vocab.Current}}" IsChecked="{Binding Date.Exclusive}"/>
+                </Grid>
+                <Border Grid.Row="1" Style="{StaticResource HorizontalSeparator}"/>
+                <TextBlock Grid.Row="2" Style="{StaticResource SearchWindow_Header}" Text="{Binding Locale.Value, Source={x:Static ygo:Vocab.Current}}"/>
+                <StackPanel Grid.Row="2" Grid.Column="1" Orientation="Horizontal">
+                    <StackPanel.Resources>
+                        <Style TargetType="ct:ToggleButton" BasedOn="{StaticResource ToggleButtonBase}">
+                            <Setter Property="Margin" Value="4,2,4,2"/>
+                        </Style>
+                    </StackPanel.Resources>
+                    <ct:ToggleButton Content="{Binding Ocg.Value, Source={x:Static ygo:Vocab.Current}}" IsChecked="{Binding Date_Ocg}"/>
+                    <ct:ToggleButton Content="{Binding Tcg.Value, Source={x:Static ygo:Vocab.Current}}" IsChecked="{Binding Date_Tcg}"/>
+                </StackPanel>
+                <Border Grid.Row="3" Style="{StaticResource HorizontalSeparator}"/>
+                <TextBlock Grid.Row="4" Style="{StaticResource SearchWindow_Header}" Text="{Binding Search_Text.Value, Source={x:Static ygo:Vocab.Current}}"/>
+                <ct:DefaultTextBox x:Name="TextBox_Search" Grid.Row="4" Grid.Column="1" Margin="4,4" Height="26" VerticalContentAlignment="Center" Text="{Binding SearchText}" Verify="SearchText_Verify"/>
+                <StackPanel Grid.Row="5" Grid.Column="1" Orientation="Horizontal">
+                    <CheckBox Content="{Binding Search_IgnoreCase.Value, Source={x:Static ygo:Vocab.Current}}" IsChecked="{Binding IgnoreCase}"/>
+                    <CheckBox Content="{Binding Search_IgnoreSymbols.Value, Source={x:Static ygo:Vocab.Current}}" IsChecked="{Binding IgnoreSymbols}"/>
+                    <CheckBox Content="{Binding Search_UseRegex.Value, Source={x:Static ygo:Vocab.Current}}" IsChecked="{Binding UseRegex}"/>
+                </StackPanel>
+            </Grid>
+        </Border>
+    </Grid>
+</Window>

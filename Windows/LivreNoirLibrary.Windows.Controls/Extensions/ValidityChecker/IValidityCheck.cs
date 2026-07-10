@@ -5,9 +5,9 @@ namespace LivreNoirLibrary.Windows.Controls
 {
     public interface IValidityCheck
     {
-        static readonly RoutedEvent ValidityChangedEvent = Events.Register<IInputElement, ValidityChangedEventHandler>();
+        static readonly RoutedEvent ValidityChangedEvent = Events.Register<IInputElement, RoutedEventHandler<bool>>();
 
-        event ValidityChangedEventHandler? ValidityChanged;
+        event RoutedEventHandler<bool>? ValidityChanged;
         bool IsInputValid { get; }
     }
 }

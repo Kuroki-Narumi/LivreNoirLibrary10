@@ -1,22 +1,22 @@
 ﻿using LivreNoirLibrary.Windows.Media;
 using LivreNoirLibrary.YuGiOh;
 using System;
+using System.Collections.Generic;
 using System.Windows;
 using System.Windows.Media;
+using System.Windows.Input;
 
 namespace LivreNoirLibrary.Windows.YuGiOh.Controls
 {
-    using LivreNoirLibrary.YuGiOh.Media;
-    using System.Collections.Generic;
-    using System.Windows.Input;
+    using M = LivreNoirLibrary.YuGiOh.Media;
 
     public partial class LinkMarkerView : FrameworkElement
     {
         public const double DefaultStrokeThickness = 1.0;
-        public static readonly SolidColorBrush DefaultCheckedFill = MediaUtils.GetBrush(Icons.Link_On_Fill.Color);
-        public static readonly SolidColorBrush DefaultCheckedStroke = MediaUtils.GetBrush(Icons.Link_On_Stroke.Color);
-        public static readonly SolidColorBrush DefaultFill = MediaUtils.GetBrush(Icons.Link_Off_Fill.Color);
-        public static readonly SolidColorBrush DefaultStroke = MediaUtils.GetBrush(Icons.Link_Off_Stroke.Color);
+        public static readonly SolidColorBrush DefaultCheckedFill = MediaUtils.GetBrush(M.Icons.Link_On_Fill.Color);
+        public static readonly SolidColorBrush DefaultCheckedStroke = MediaUtils.GetBrush(M.Icons.Link_On_Stroke.Color);
+        public static readonly SolidColorBrush DefaultFill = MediaUtils.GetBrush(M.Icons.Link_Off_Fill.Color);
+        public static readonly SolidColorBrush DefaultStroke = MediaUtils.GetBrush(M.Icons.Link_Off_Stroke.Color);
 
         static LinkMarkerView()
         {
@@ -50,7 +50,7 @@ namespace LivreNoirLibrary.Windows.YuGiOh.Controls
         private Brush? _fill = DefaultFill;
         [DependencyProperty(AffectsRender = true)]
         private Brush? _stroke = DefaultStroke;
-        [DependencyProperty(AffectsRender = true)]
+        [DependencyProperty(AffectsRender = true, BindsTwoWayByDefault = true)]
         private LinkDirection _direction;
         [DependencyProperty]
         private bool _isReadOnly;
@@ -78,7 +78,7 @@ namespace LivreNoirLibrary.Windows.YuGiOh.Controls
             var gs = _geometries;
             if (gs.Count is 0)
             {
-                foreach (var (d, g) in new LinkArrowEnumerator(width, height))
+                foreach (var (d, g) in new M.LinkArrowEnumerator(width, height))
                 {
                     gs[d] = MediaUtils.CreateGeometry(g);
                 }
@@ -112,7 +112,19 @@ namespace LivreNoirLibrary.Windows.YuGiOh.Controls
             return false;
         }
 
+        protected override void OnMouseDown(MouseButtonEventArgs e)
+        {
+            UpdateMarker(e);
+            base.OnMouseDown(e);
+        }
+
         protected override void OnMouseMove(MouseEventArgs e)
+        {
+            UpdateMarker(e);
+            base.OnMouseMove(e);
+        }
+
+        private void UpdateMarker(MouseEventArgs e)
         {
             if (!IsReadOnly)
             {
@@ -129,8 +141,8 @@ namespace LivreNoirLibrary.Windows.YuGiOh.Controls
                         Direction &= ~direction;
                     }
                 }
+                e.Handled = true;
             }
-            base.OnMouseMove(e);
         }
     }
 }

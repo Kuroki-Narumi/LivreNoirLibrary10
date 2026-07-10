@@ -11,7 +11,7 @@
     <Window.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
-                <ResourceDictionary Source="pack://application:,,,/LivreNoirLibrary.Windows.Controls;component/Themes/Generic.xaml"/>
+                <ResourceDictionary Source="/LivreNoirLibrary.Windows.Controls;component/Themes/Generic.xaml"/>
             </ResourceDictionary.MergedDictionaries>
             <Style TargetType="local:Button">
                 <Setter Property="BorderThickness" Value="0"/>
