@@ -31,7 +31,7 @@ namespace LivreNoirLibrary.Media
                 if (v != _volume)
                 {
                     _volume = v;
-                    SendPropertyChanged(nameof(Volume));
+                    this.NotifyPropertyChanged(nameof(Volume));
                     OnVolumeChanged(v);
                 }
             }

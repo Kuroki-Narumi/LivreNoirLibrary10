@@ -27,7 +27,7 @@ namespace LivreNoirLibrary.Media.Midi
             {
                 field.Clear();
                 field.UnionWith(value);
-                SendPropertyChanged();
+                this.NotifyPropertyChanged();
             }
         } = [];
         public Rational AfterMargin { get; set => SetValue(ref field, value); }

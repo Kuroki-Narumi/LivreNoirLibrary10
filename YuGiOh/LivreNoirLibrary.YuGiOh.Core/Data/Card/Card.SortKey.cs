@@ -21,8 +21,8 @@ namespace LivreNoirLibrary.YuGiOh.Data
         public int EnNameLength => string.IsNullOrEmpty(EnName) ? Padding : EnName.Length;
         public int EnNameLengthD => string.IsNullOrEmpty(EnName) ? -Padding : EnName.Length;
         public int TextLength => Text.LengthWithoutSpace();
-        public int PendulumTextLength => (this.IsMonster() && this.IsPendulum()) ? PendulumText.LengthWithoutSpace() : Padding;
-        public int PendulumTextLengthD => (this.IsMonster() && this.IsPendulum()) ? PendulumText.LengthWithoutSpace() : -Padding;
+        public int PendulumTextLength => (CardType.IsMonster() && Ability.IsPendulum()) ? PendulumText.LengthWithoutSpace() : Padding;
+        public int PendulumTextLengthD => (CardType.IsMonster() && Ability.IsPendulum()) ? PendulumText.LengthWithoutSpace() : -Padding;
 
         private static readonly Dictionary<CardType, int> Type_index_list = new()
         {
@@ -66,23 +66,23 @@ namespace LivreNoirLibrary.YuGiOh.Data
         }
 
         public int TypeIdIndex => (TypeIndex + Level) * Padding + Id;
-        public Attribute AttributeIndex => this.IsMonster() ? Attribute : (Attribute)Padding;
-        public Attribute AttributeIndexD => this.IsMonster() ? Attribute : (Attribute)(-Padding);
-        public MonsterType MonsterTypeIndex => this.IsMonster() ? MonsterType : (MonsterType)Padding;
-        public MonsterType MonsterTypeIndexD => this.IsMonster() ? MonsterType : (MonsterType)(-Padding);
-        public Ability AbilityIndex => this.IsMonster() ? Ability : (Ability)Padding;
-        public Ability AbilityIndexD => this.IsMonster() ? Ability : (Ability)(-Padding);
+        public Attribute AttributeIndex => CardType.IsMonster() ? Attribute : (Attribute)Padding;
+        public Attribute AttributeIndexD => CardType.IsMonster() ? Attribute : (Attribute)(-Padding);
+        public MonsterType MonsterTypeIndex => CardType.IsMonster() ? MonsterType : (MonsterType)Padding;
+        public MonsterType MonsterTypeIndexD => CardType.IsMonster() ? MonsterType : (MonsterType)(-Padding);
+        public Ability AbilityIndex => CardType.IsMonster() ? Ability : (Ability)Padding;
+        public Ability AbilityIndexD => CardType.IsMonster() ? Ability : (Ability)(-Padding);
 
-        public int EffectIndex => this.IsMonster() ? this.HasEffect ? 0 : 1 : 2;
-        public int TunerIndex => this.IsMonster() ? this.IsTuner() ? 0 : 1 : 2;
-        public int LevelIndex => this.IsMonster() ? Level : Padding;
-        public int LevelIndexD => this.IsMonster() ? Level : -Padding;
-        public int AtkIndex => this.IsMonster() ? Atk : Padding;
-        public int AtkIndexD => this.IsMonster() ? Atk : -Padding;
-        public int DefIndex => this.HasDef()? Def : Padding;
-        public int DefIndexD => this.HasDef() ? Def : -Padding;
-        public int ScaleIndex => (this.IsMonster() && this.IsPendulum()) ? PendulumScale : Padding;
-        public int ScaleIndexD => (this.IsMonster() && this.IsPendulum()) ? PendulumScale : -Padding;
+        public int EffectIndex => CardType.IsMonster() ? HasEffect ? 0 : 1 : 2;
+        public int TunerIndex => CardType.IsMonster() ? Ability.IsTuner() ? 0 : 1 : 2;
+        public int LevelIndex => CardType.IsMonster() ? Level : Padding;
+        public int LevelIndexD => CardType.IsMonster() ? Level : -Padding;
+        public int AtkIndex => CardType.IsMonster() ? Atk : Padding;
+        public int AtkIndexD => CardType.IsMonster() ? Atk : -Padding;
+        public int DefIndex => CardType.HasDef()? Def : Padding;
+        public int DefIndexD => CardType.HasDef() ? Def : -Padding;
+        public int ScaleIndex => (CardType.IsMonster() && Ability.IsPendulum()) ? PendulumScale : Padding;
+        public int ScaleIndexD => (CardType.IsMonster() && Ability.IsPendulum()) ? PendulumScale : -Padding;
 
         public DateTime FirstDateOcg => PackInfo.GetFirstDateOcg(true);
         public DateTime FirstDateOcgD => PackInfo.GetFirstDateOcg(false);

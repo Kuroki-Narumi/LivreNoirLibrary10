@@ -26,6 +26,6 @@ namespace LivreNoirLibrary.YuGiOh.Converters
             throw new JsonException();
         }
 
-        public override void Write(Utf8JsonWriter writer, int value, JsonSerializerOptions options) => ViewModelCardJsonConverter.WriteStatus(writer, null, value);
+        public override void Write(Utf8JsonWriter writer, int value, JsonSerializerOptions options) => Data.Card.WriteStatus(writer, null, value);
     }
 }

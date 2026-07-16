@@ -1,3 +1,4 @@
+using LivreNoirLibrary.ObjectModel;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
@@ -7,7 +8,7 @@ using System.Runtime.CompilerServices;
 
 namespace LivreNoirLibrary.Numerics
 {
-    public partial class ReversePolishNotation<T> : ExpressionBase, IExpressionInterpreter<T>
+    public partial class ReversePolishNotation<T> : ExpressionBase, IExpressionInterpreter<T>, IClear
         where T : unmanaged, INumber<T>
     {
         private readonly List<FunctionNode> _nodes = [];

@@ -27,7 +27,7 @@ namespace LivreNoirLibrary.Media.Midi
             set
             {
                 _numbers.OverwriteFrom(value);
-                SendPropertyChanged();
+                this.NotifyPropertyChanged();
             }
         }
 
@@ -53,8 +53,7 @@ namespace LivreNoirLibrary.Media.Midi
         public string GetNumbersText() => BasedNumber.GetListText(Numbers, 10);
         public bool TrySetNumbers(string? text)
         {
-            using var o = ObjectPool.Rent<RangeSet<int>>();
-            var cache = o.Value;
+            using var o = ObjectPool.RentClear<RangeSet<int>>(out var cache);
             if (BasedNumber.TryParseRangeSet(text, cache, 10))
             {
                 Numbers = cache;

@@ -10,7 +10,7 @@ using System.Text.Json;
 
 namespace LivreNoirLibrary.Media.Wave
 {
-    public partial class WaveBuffer() : DisposableBase, IWaveBuffer, IMarkerContainer, IJsonWriter, IClear
+    public partial class WaveBuffer() : DisposableBase, IWaveBuffer, IMarkerContainer, IWriteJson, IClear
     {
         public const int DefaultSampleRate = 44100;
         public const int DefaultChannels = 2;

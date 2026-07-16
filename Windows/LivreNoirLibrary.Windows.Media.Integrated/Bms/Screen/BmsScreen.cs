@@ -369,8 +369,7 @@ namespace LivreNoirLibrary.Windows.Controls.Bms
         {
             if (_showDebugText)
             {
-                using var o = ObjectPool.Rent<StringBuilder>();
-                var sb = o.Value;
+                using var o = ObjectPool.RentStringBuilder(out var sb);
                 var total = _debugRoot.Time;
                 AppendLine(sb, _debugRoot, total);
                 foreach (var (_, item) in _debugDic)

@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace LivreNoirLibrary.Windows
 {
@@ -6,9 +8,9 @@ namespace LivreNoirLibrary.Windows
     {
         bool CheckUpdate { get; set; }
         string VersionUrl { get; }
-        string SettingName { get; }
+        string UpdaterLocation { get; }
 
-        string GetMessage_NewVersion() => "新しいバージョン({0})が公開されています。\n更新しますか？";
-        string GetMessage_NoUpdate() => "更新はありません。";
+        bool NotifyNewVersion(Version version);
+        void NotifyNoUpdate();
     }
 }

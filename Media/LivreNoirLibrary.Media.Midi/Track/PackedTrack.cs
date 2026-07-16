@@ -60,8 +60,7 @@ namespace LivreNoirLibrary.Media.BM3
             var sk2 = options.SortKey2;
             var sk3 = options.SortKey3;
             var sc = track.SideChainSources;
-            using var o = ObjectPool.Rent<StringBuilder>();
-            var sb = o.Value;
+            using var o = ObjectPool.RentStringBuilder(out var sb);
             TempoTimeline tempo = new(data);
             List<PackedNote> notes = [];
             Dictionary<string, int> obj2id = [];
@@ -105,7 +104,7 @@ namespace LivreNoirLibrary.Media.BM3
                         ng.QuantizeLength(lenQ);
                         ng.QuantizeVelocity(velQ);
                     }
-                    sb.Clear();
+                    sb.Length = 0;
                     sb.Append("{NoteGroup Members:[");
                     foreach (var (innerPos, innerNote) in ng.EachNote(pos))
                     {

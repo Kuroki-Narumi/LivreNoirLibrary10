@@ -1,4 +1,5 @@
 ﻿using HtmlAgilityPack;
+using LivreNoirLibrary.Collections;
 using LivreNoirLibrary.ObjectModel;
 using LivreNoirLibrary.YuGiOh.Data;
 using System;

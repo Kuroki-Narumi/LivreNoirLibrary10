@@ -10,7 +10,7 @@ using System.Text.Json;
 
 namespace LivreNoirLibrary.Media.Midi
 {
-    public partial class RawData(int resolution = RawData.DefaultResolution, int format = RawData.DefaultFormat) : IJsonWriter, IDumpable, ILoadable<RawData>
+    public partial class RawData(int resolution = RawData.DefaultResolution, int format = RawData.DefaultFormat) : IWriteJson, IDumpable, ILoadable<RawData>
     {
         public const string DataHeader = "MThd";
         public const string TrackHeader = "MTrk";

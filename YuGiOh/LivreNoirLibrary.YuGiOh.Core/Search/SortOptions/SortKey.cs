@@ -29,5 +29,7 @@ namespace LivreNoirLibrary.YuGiOh.Search
         PackCount,
         PackCountOcg,
         PackCountTcg,
+
+        _Count,
     }
 }

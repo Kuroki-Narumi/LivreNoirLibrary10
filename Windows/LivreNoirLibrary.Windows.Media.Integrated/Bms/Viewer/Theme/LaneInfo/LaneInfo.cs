@@ -7,11 +7,12 @@ using System.Text.Json.Serialization;
 using LivreNoirLibrary.ObjectModel;
 using LivreNoirLibrary.Media.Bms;
 using LivreNoirLibrary.Text;
+using LivreNoirLibrary.Collections;
 
 namespace LivreNoirLibrary.Windows.Media.Bms
 {
     [JsonConverter(typeof(LaneInfoJsonConverter))]
-    public class LaneInfo : ObservableObjectBase, INamedObject, ICloneable<LaneInfo>, IEnumerable<LaneInfo>
+    public class LaneInfo : ObservableObjectBase, INamedObject, ICloneable<LaneInfo>, ISafeEnumerable<LaneInfo>
     {
         public const int DefaultLaneWidth = 2;
         public const int DefaultMetaLaneWidth = 3;
@@ -92,6 +93,5 @@ namespace LivreNoirLibrary.Windows.Media.Bms
         {
             yield return this;
         }
-        IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
     }
 }

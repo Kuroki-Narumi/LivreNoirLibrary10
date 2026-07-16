@@ -95,7 +95,7 @@ namespace LivreNoirLibrary.Media.Bms
                     }
 
                     _lastTempoInfo?.Add(beat, time);
-                    _lastTempoInfo = SortedList.GetOrAdd(_tempoList, _tempoInfoList, (int)tempo).Init(beat, time);
+                    _lastTempoInfo = SortedList.GetOrAdd(_tempoList, _tempoInfoList, (int)tempo, out _).Init(beat, time);
 
                     if (info.StopTime is not 0)
                     {
@@ -198,7 +198,7 @@ namespace LivreNoirLibrary.Media.Bms
                 : info.Position + (time - info.Time) * info.BeatsPerSecond * info.Scroll;
         }
 
-        public double GetHighSpeed(double time) => SortedList.TryGetValue(_speedTimeList, _speedValueList, time, out var value) ? value : 1;
+        public double GetHighSpeed(double time) => SortedList.TryGetValue(_speedTimeList, _speedValueList, time, out _, out var value) ? value : 1;
 
         private class TempoInfo
         {
@@ -223,8 +223,7 @@ namespace LivreNoirLibrary.Media.Bms
 
         public string GetTimingInfoText()
         {
-            using var o = ObjectPool.Rent<StringBuilder>();
-            var sb = o.Value;
+            using var o = ObjectPool.RentStringBuilder(out var sb);
             sb.AppendLine("Beat\tTime\tPosition\tTempo\tStopTime\tScroll\tSpB\tBpS");
             foreach (var item in _timeItemList)
             {
@@ -235,8 +234,7 @@ namespace LivreNoirLibrary.Media.Bms
 
         public string GetTempoInfoText()
         {
-            using var o = ObjectPool.Rent<StringBuilder>();
-            var sb = o.Value;
+            using var o = ObjectPool.RentStringBuilder(out var sb);
             sb.AppendLine($"Tempo\tBeats\tSeconds");
             foreach (var (tempo, item) in SortedList.GetEnumerator(_tempoList, _tempoInfoList))
             {

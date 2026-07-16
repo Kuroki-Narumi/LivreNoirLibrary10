@@ -52,8 +52,7 @@ namespace LivreNoirLibrary.Media.Bms
 
             public void EnsureBranches(bool ensureDefault = false)
             {
-                using var o = ObjectPool.Rent<HashSet<int>>();
-                var set = o.Value;
+                using var o = ObjectPool.RentHashSet<int>(out var set);
                 var branches = obj.Branches;
                 foreach (var branch in branches.AsSpan())
                 {

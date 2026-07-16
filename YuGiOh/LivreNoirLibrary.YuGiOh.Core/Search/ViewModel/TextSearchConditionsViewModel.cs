@@ -38,12 +38,6 @@ namespace LivreNoirLibrary.YuGiOh.Search
             IsTextValid = true;
         }
 
-        public virtual void Clear()
-        {
-            SetTextFlags(TextSearchFlags.Default);
-            SearchText = "";
-        }
-
         public void SetTextFlags(TextSearchFlags flags)
         {
             CheckName = (flags & TextSearchFlags.Name) is not 0;

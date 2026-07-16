@@ -14,5 +14,8 @@ namespace LivreNoirLibrary.YuGiOh.Serializable
 
         [JsonPropertyName(JsonPropertyNames.SideDeck)]
         public List<int>? SideDeck { get; set; }
+
+        public bool IsEmpty() => IsEmpty(MainDeck) && IsEmpty(ExtraDeck) && IsEmpty(SideDeck);
+        private static bool IsEmpty(List<int>? list) => list is null || list.Count is 0;
     }
 }

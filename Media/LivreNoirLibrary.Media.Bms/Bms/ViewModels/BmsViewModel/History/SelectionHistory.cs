@@ -20,8 +20,7 @@ namespace LivreNoirLibrary.Media.Bms.ViewModels
 
         public void Restore(Selection target, ITimeline timeline)
         {
-            using var o = ObjectPool.Rent<List<SelectionHistoryItem>>();
-            var buffer = o.Value;
+            using var o = ObjectPool.RentList<SelectionHistoryItem>(out var buffer);
             target.Clear();
             foreach (var (pos, list) in _items)
             {

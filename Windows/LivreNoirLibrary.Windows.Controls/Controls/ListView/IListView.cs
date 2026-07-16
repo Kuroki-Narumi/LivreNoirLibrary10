@@ -5,6 +5,11 @@ namespace LivreNoirLibrary.Windows.Controls
 {
     public interface IListView
     {
+        object? Tag { get; }
+        int SelectedIndex { get; set; }
+        IList SelectedItems { get; }
+        void ScrollIntoView(object item);
         void SetSelectedItems(IEnumerable list);
+        bool Focus();
     }
 }

@@ -160,8 +160,7 @@ namespace LivreNoirLibrary.Windows.Controls
 
         public static void ChangeRadioButtonByWheel(this Panel panel, MouseWheelEventArgs e, bool wrap = true)
         {
-            using var o = ObjectPool.Rent<List<RButton>>();
-            var cache = o.Value;
+            using var o = ObjectPool.RentList<RButton>(out var cache);
             var checkedIndex = 0;
             var delta = e.Delta is > 0;
             foreach (var child in panel.EnumerateDescendantsByStack())

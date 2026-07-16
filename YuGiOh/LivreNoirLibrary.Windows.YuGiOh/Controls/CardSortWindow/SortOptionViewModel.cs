@@ -3,7 +3,7 @@ using LivreNoirLibrary.YuGiOh.Search;
 
 namespace LivreNoirLibrary.Windows.YuGiOh.Controls
 {
-    public class SortOptionViewModel(string header) : ObservableObjectBase
+    public class SortOptionViewModel(string header) : ObservableObjectBase, IClear
     {
         public string? Header { get; set => SetValue(ref field, value); } = header;
         public SortSelectionItem SourceItem { get; set => SetValue(ref field, value); } = SortSelectionItem.None;
@@ -20,11 +20,11 @@ namespace LivreNoirLibrary.Windows.YuGiOh.Controls
         public void CopyFrom(CardSortOption option)
         {
             SourceItem = SortSelectionItem.GetSelectionItem(option.Key) ?? SortSelectionItem.None;
-            IsDescending = option.Direction is SortDirection.Descending;
+            IsDescending = option.IsDescending;
             IsAscending = !IsDescending;
         }
 
-        public CardSortOption GetOption() => new(SourceItem.Key, IsDescending ? SortDirection.Descending : SortDirection.Ascending);
+        public CardSortOption GetOption() => new(SourceItem.Key, IsDescending);
 
         public override string ToString() => $"({SourceItem}, {IsAscending})";
     }

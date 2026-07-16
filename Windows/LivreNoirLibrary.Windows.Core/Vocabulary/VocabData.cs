@@ -7,7 +7,7 @@ using LivreNoirLibrary.ObjectModel;
 namespace LivreNoirLibrary.Windows
 {
     [JsonConverter(typeof(VocabDataJsonConverter))]
-    public class VocabData : ObservableObjectBase, IVocabData, IJsonWriter, IEquatable<VocabData>
+    public class VocabData : ObservableObjectBase, IVocabData, IWriteJson, IEquatable<VocabData>
     {
         public const string Leader = "...";
 

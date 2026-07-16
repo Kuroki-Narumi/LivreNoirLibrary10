@@ -8,7 +8,7 @@ using System.Text;
 
 namespace LivreNoirLibrary.Media.Bms.Play
 {
-    public class ScoreManager(IJudgeProvider judgeProvider) : ObservableObjectBase
+    public class ScoreManager(IJudgeProvider judgeProvider) : ObservableObjectBase, IClear
     {
         private double _lastGauge;
         private readonly Dictionary<int, Judge> _judges = [];
@@ -119,7 +119,7 @@ namespace LivreNoirLibrary.Media.Bms.Play
 
         public bool TryGetPlayerJudge(int player, [MaybeNullWhen(false)] out Judge judge) => _judges.TryGetValue(player, out judge);
 
-        public class Judge(int player) : ObservableObjectBase
+        public class Judge(int player) : ObservableObjectBase, IClear
         {
             public int Player { get; } = player;
             public int Combo { get; private set => SetValue(ref field, value); }

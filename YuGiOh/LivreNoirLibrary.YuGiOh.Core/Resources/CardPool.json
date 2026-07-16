@@ -242307,6 +242307,52 @@
       ]
     },
     {
+      "pid": "2000001715000e",
+      "name": "ELEMENTAL HERO COLLECTION",
+      "date": "2007-11-13",
+      "cards": [
+        {
+          "id": 6310,
+          "number": "EHC1-EN001"
+        },
+        {
+          "id": 6311,
+          "number": "EHC1-EN002"
+        },
+        {
+          "id": 6393,
+          "number": "EHC1-EN003"
+        },
+        {
+          "id": 6344,
+          "number": "EHC1-EN004"
+        }
+      ]
+    },
+    {
+      "pid": "2000001716000e",
+      "name": "ELEMENTAL HERO COLLECTION 2",
+      "date": "2007-11-13",
+      "cards": [
+        {
+          "id": 6313,
+          "number": "EHC2-EN001"
+        },
+        {
+          "id": 6312,
+          "number": "EHC2-EN002"
+        },
+        {
+          "id": 6478,
+          "number": "EHC2-EN003"
+        },
+        {
+          "id": 6345,
+          "number": "EHC2-EN004"
+        }
+      ]
+    },
+    {
       "pid": "11106004e",
       "name": "GLADIATOR'S ASSAULT",
       "date": "2007-11-14",

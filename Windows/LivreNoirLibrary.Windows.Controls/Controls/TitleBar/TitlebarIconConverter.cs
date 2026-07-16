@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.ObjectModel;
 using System.Globalization;
+using System.Windows;
 using System.Windows.Data;
+using System.Windows.Media;
 using System.Windows.Media.Imaging;
 
 namespace LivreNoirLibrary.Windows.Controls
@@ -20,12 +22,13 @@ namespace LivreNoirLibrary.Windows.Controls
                     var frames = frame.Decoder.Frames;
                     return GetBestMatch(frames, w, h);
                 }
-                return value;
+                return value as ImageSource;
             }
-            return WindowsExtensions.GetApplicationIcon(SmallIcon);
+            var result = WindowsExtensions.GetApplicationIcon(SmallIcon);
+            return result;
         }
 
-        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture) => value;
+        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture) => throw new NotImplementedException();
 
         // cf: https://github.com/dotnet/wpf/blob/e4779d8e8d179c8181b51ca8c40a31daeacb7271/src/Microsoft.DotNet.Wpf/src/PresentationFramework/MS/Internal/AppModel/IconHelper.cs
         private static BitmapFrame GetBestMatch(ReadOnlyCollection<BitmapFrame> frames, int width, int height)

@@ -1,188 +1,288 @@
+using LivreNoirLibrary.Collections;
+using LivreNoirLibrary.ObjectModel;
 using System;
 using System.Collections.Generic;
+using System.Collections.Specialized;
+using System.ComponentModel;
 using System.Diagnostics.CodeAnalysis;
-using LivreNoirLibrary.Collections;
+using System.Linq;
+using System.Text.Json;
 
 namespace LivreNoirLibrary.YuGiOh.Data
 {
-    public class DeckCardList : ObservableSortedList<int, CountedCard>, ICardList
+    public class DeckCardList : ISafeEnumerable<CountedCard>, IObservableCollection, ICardEnumerable
     {
-        protected override int GetKey(CountedCard item) => item.TypeIdIndex;
-        protected static int GetKey(Card item) => item.TypeIdIndex;
+        public event PropertyChangedEventHandler? PropertyChanged;
+        public event NotifyCollectionChangedEventHandler? CollectionChanged;
 
-        private int _sum_count;
-        private readonly Dictionary<int, CountedCard> _cache = [];
+        public void RaiseCollectionChanged(object sender, NotifyCollectionChangedEventArgs e) => CollectionChanged?.Invoke(sender, e);
+        public void RaisePropertyChanged(object sender, PropertyChangedEventArgs e) => PropertyChanged?.Invoke(sender, e);
 
-        public int SumCount => _sum_count;
+        private readonly List<int> _keyList = [];
+        private readonly List<CountedCard> _valueList = [];
 
-        public int this[Card card]
+        public int MaxCount { get; set; }
+        public int UniqueCount => _keyList.Count;
+        public int Count { get; private set; }
+
+        private void NotifyUniqueCountChanged() => this.NotifyPropertyChanged(nameof(UniqueCount));
+        public void NotifyCollectionReset()
         {
-            get => TryGet(card, out var item) ? item.Count : 0;
-            set => Set(card, value);
+            IObservableCollectionExtensions.NotifyCollectionReset(this);
+            NotifyUniqueCountChanged();
         }
 
-        public new void NotifyCollectionReset()
-        {
-            UpdateCount();
-            base.NotifyCollectionReset();
-        }
-
-        /// <inheritdoc cref="ICollection{T}.Clear"/>
-        public new void Clear()
+        public void Clear()
         {
             ClearWithoutNotify();
             NotifyCollectionReset();
         }
 
-        public bool Contains(Card card) => _key_list.Contains(GetKey(card));
-        public void Add(Card card) => Set(card, this[card] + 1);
-        public bool Remove(Card card)
+        internal void ClearWithoutNotify()
         {
-            if (TryGet(card, out var item))
+            _keyList.Clear();
+            _valueList.Clear();
+            Count = 0;
+        }
+
+        public bool TryGetItem(Card card, [MaybeNullWhen(false)] out CountedCard item) => SortedList.TryGetValue(_keyList, _valueList, card.TypeIdIndex, out _, out item);
+        public int GetCount(Card card) => TryGetItem(card, out var item) ? item.Count : 0;
+
+        public bool Add(Card card)
+        {
+            switch (AddWithoutNotify(card, out var index, out var current))
             {
-                Set(card, item.Count - 1);
-                return true;
+                case NotifyCollectionChangedAction.Add:
+                    this.NotifyCollectionAdded(index, current);
+                    NotifyUniqueCountChanged();
+                    return true;
+                case NotifyCollectionChangedAction.Replace:
+                    this.NotifyCollectionReplaced(index, current, current);
+                    this.NotifyCountChanged();
+                    NotifyUniqueCountChanged();
+                    return true;
             }
             return false;
         }
 
-        public CountedCard? Set(Card card, int count)
+        public NotifyCollectionChangedAction AddWithoutNotify(Card card, out int index, out CountedCard? current)
         {
-            CountedCard? item = null;
-            var key = GetKey(card);
-            var index = IndexOfKey(key);
-            if (index is >= 0)
+            var key = card.TypeIdIndex;
+            var keys = _keyList;
+            var values = _valueList;
+            if (SortedList.TryGetValue(keys, values, key, out index, out current))
             {
-                var current = _list[index];
-                if (count <= 0)
+                if (current.Count < MaxCount)
                 {
-                    RemoveItem(index);
-                    OnCollectionRemoved(current, index);
-                }
-                else
-                {
-                    current.Count = count;
-                    item = current;
-                    OnCollectionReplaced(current, current, index);
+                    current.Count++;
+                    Count++;
+                    return NotifyCollectionChangedAction.Replace;
                 }
             }
             else
             {
+                Count++;
                 index = ~index;
-                if (!_cache.TryGetValue(key, out item))
-                {
-                    item = new(card, count);
-                    _cache.Add(key, item);
-                }
-                else
-                {
-                    item.Count = count;
-                }
-                InsertItem(index, key, item);
-                OnCollectionAdded(item, index);
+                keys.Insert(index, key);
+                current = GetItem(card);
+                current.Count = 1;
+                values.Insert(index, current);
+                return NotifyCollectionChangedAction.Add;
             }
-            UpdateCount();
-            return item;
+            return NotifyCollectionChangedAction.Reset;
         }
 
-        private void UpdateCount()
+        public bool Remove(Card card)
         {
-            _sum_count = 0;
-            foreach (var item in _list.AsSpan())
+            switch (AddWithoutNotify(card, out var index, out var current))
             {
-                _sum_count += item.Count;
+                case NotifyCollectionChangedAction.Replace:
+                    this.NotifyCollectionReplaced(index, current, current);
+                    this.NotifyCountChanged();
+                    NotifyUniqueCountChanged();
+                    return true;
+                case NotifyCollectionChangedAction.Remove:
+                    this.NotifyCollectionAdded(index, current);
+                    NotifyUniqueCountChanged();
+                    return true;
             }
-            SendPropertyChanged(nameof(SumCount));
+            return false;
         }
 
-        public bool TryGet(Card card, [MaybeNullWhen(false)] out CountedCard item)
+        public NotifyCollectionChangedAction RemoveWithoutNotify(Card card, out int index, out CountedCard? current)
         {
-            var key = GetKey(card);
-            var index = IndexOfKey(key);
-            if (index is >= 0)
+            var key = card.TypeIdIndex;
+            var keys = _keyList;
+            var values = _valueList;
+            if (SortedList.TryGetValue(keys, values, key, out index, out current))
             {
-                item = _list[index];
-                return true;
+                current.Count--;
+                Count--;
+                if (current.Count is <= 0)
+                {
+                    keys.RemoveAt(index);
+                    values.RemoveAt(index);
+                    return NotifyCollectionChangedAction.Remove;
+                }
+                return NotifyCollectionChangedAction.Replace;
             }
-            else
+            return NotifyCollectionChangedAction.Reset;
+        }
+
+        public bool Set(Card card, int count)
+        {
+            switch (SetWithoutNotify(card, count, out var index, out var current))
             {
-                item = null;
+                case NotifyCollectionChangedAction.Add:
+                    this.NotifyCollectionAdded(index, current);
+                    NotifyUniqueCountChanged();
+                    return true;
+                case NotifyCollectionChangedAction.Replace:
+                    this.NotifyCollectionReplaced(index, current, current);
+                    this.NotifyCountChanged();
+                    NotifyUniqueCountChanged();
+                    return true;
+                case NotifyCollectionChangedAction.Remove:
+                    this.NotifyCollectionRemoved(index, current);
+                    NotifyUniqueCountChanged();
+                    return true;
+            }
+            return false;
+        }
+
+        public NotifyCollectionChangedAction SetWithoutNotify(Card card, int count, out int index, out CountedCard? current)
+        {
+            var key = card.TypeIdIndex;
+            var keys = _keyList;
+            var values = _valueList;
+            if (SortedList.TryGetValue(keys, values, key, out index, out current))
+            {
+                var currentCount = current.Count;
+                if (currentCount != count)
+                {
+                    if (count is <= 0)
+                    {
+                        Count -= currentCount;
+                        keys.RemoveAt(index);
+                        values.RemoveAt(index);
+                        return NotifyCollectionChangedAction.Remove;
+                    }
+                    else
+                    {
+                        Count += count - currentCount;
+                        current.Count = count;
+                        return NotifyCollectionChangedAction.Replace;
+                    }
+                }
+            }
+            else if (count is > 0)
+            {
+                Count += count;
+                index = ~index;
+                keys.Insert(index, key);
+                current = GetItem(card);
+                current.Count = count;
+                values.Insert(index, current);
+                return NotifyCollectionChangedAction.Add;
+            }
+            return NotifyCollectionChangedAction.Reset;
+        }
+
+        private readonly Dictionary<int, CountedCard> _cache = [];
+        private CountedCard GetItem(Card card) => _cache.GetOrAdd(card.Id, id => new(card));
+
+        public ReadOnlySpan<CountedCard> AsSpan() => _valueList.AsSpan();
+        public List<CountedCard>.Enumerator GetEnumerator() => _valueList.GetEnumerator();
+        IEnumerator<CountedCard> IEnumerable<CountedCard>.GetEnumerator() => GetEnumerator();
+
+        public void WriteJson(string propertyName, Utf8JsonWriter writer)
+        {
+            if (_keyList.Count > 0)
+            {
+                writer.WritePropertyName(propertyName);
+                writer.WriteStartArray();
+                foreach (var value in _valueList.AsSpan())
+                {
+                    var id = value.ThisCard.Id;
+                    for (var i = value.Count; i > 0; i--)
+                    {
+                        writer.WriteNumberValue(id);
+                    }
+                }
+                writer.WriteEndArray();
+            }
+        }
+
+        public IEnumerable<int> EnumerateIds() => new IdEnumerator(this);
+        public IEnumerable<ICard> EnumerateCards() => new CardEnumerator(this);
+
+        private sealed class IdEnumerator(DeckCardList source) : ISafeEnumerator<int>
+        {
+            private readonly List<CountedCard> _list = source._valueList;
+            private readonly int _maxIndex = source._valueList.Count;
+            private int _index;
+            private int _count;
+            
+            public int Current { get; private set; }
+
+            public bool MoveNext()
+            {
+                if (_count > 0)
+                {
+                    _count--;
+                    return true;
+                }
+                if (_index < _maxIndex)
+                {
+                    var item = _list[_index];
+                    _index++;
+                    _count = item.Count - 1;
+                    Current = item.ThisCard.Id;
+                    return true;
+                }
+                Current = -1;
                 return false;
             }
+
+            public void Reset()
+            {
+                _index = 0;
+                _count = 0;
+            }
         }
 
-        public IEnumerable<Card> EnumerateCards()
+        private sealed class CardEnumerator(DeckCardList source) : ISafeEnumerator<ICard>
         {
-            var list = _list;
-            var c = list.Count;
-            for (var i = 0; i < c; i++)
+            private readonly List<CountedCard> _list = source._valueList;
+            private readonly int _maxIndex = source._valueList.Count;
+            private int _index;
+            private int _count;
+
+            public ICard Current { get; private set; } = null!;
+
+            public bool MoveNext()
             {
-                var (card, count) = list[i];
-                for (var j = 0; j < count; j++)
+                if (_count > 0)
                 {
-                    yield return card;
+                    _count--;
+                    return true;
                 }
-            }
-        }
-
-        public IEnumerable<(Card, int)> EnumCardsWithCount()
-        {
-            var list = _list;
-            var c = list.Count;
-            for (var i = 0; i < c; i++)
-            {
-                var (card, count) = list[i];
-                yield return (card, count);
-            }
-        }
-
-        public void Load(DeckCardList source)
-        {
-            ClearWithoutNotify();
-            var count = source.Count;
-            _key_list.EnsureCapacity(count);
-            _list.EnsureCapacity(count);
-            _sum_count = source._sum_count;
-            for (var i = 0; i < count; i++)
-            {
-                var key = source._key_list[i];
-                var value = source._list[i];
-                InsertItem(_list.Count, key, new(value.Card, value.Count));
-            }
-            NotifyCollectionReset();
-        }
-
-        public void Load(IEnumerable<Card> source)
-        {
-            ClearWithoutNotify();
-            foreach (var card in source)
-            {
-                AddWithoutNotify(card);
-            }
-            NotifyCollectionReset();
-        }
-
-        internal void AddWithoutNotify(Card card)
-        {
-            var key = GetKey(card);
-            var index = IndexOfKey(key);
-            if (index is >= 0)
-            {
-                _list[index].Count += 1;
-            }
-            else
-            {
-                index = ~index;
-                if (!_cache.TryGetValue(key, out var item))
+                while (_index < _maxIndex)
                 {
-                    item = new(card, 1);
-                    _cache.Add(key, item);
+                    var item = _list[_index];
+                    _index++;
+                    _count = item.Count - 1;
+                    Current = item.ThisCard;
+                    return true;
                 }
-                else
-                {
-                    item.Count = 1;
-                }
-                InsertItem(index, key, item);
+                Current = null!;
+                return false;
+            }
+
+            public void Reset()
+            {
+                _index = 0;
+                _count = 0;
             }
         }
     }

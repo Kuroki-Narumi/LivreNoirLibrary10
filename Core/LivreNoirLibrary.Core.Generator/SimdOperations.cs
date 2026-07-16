@@ -20,27 +20,27 @@ internal class SimdOperations : IIncrementalGenerator
     {
         // 全てのプリミティブ型が対象のメソッド
         Span<string> types = [Byte, SByte, Short, UShort, Int, UInt, IntPtr, UIntPtr, Long, ULong, Float, Double];
-        GenerateCore(context, Code_Unary_Overload, Code_Unary_Ptr, ["Clear"], types);
-        GenerateCore(context, Code_Vector_Overload, Code_Vector_Ptr, ["CopyFrom"], types);
-        GenerateCore(context, Code_Scalar_Overload, Code_Scalar_Ptr, ["CopyFrom"], types, suffix: "S");
+        GenerateCore(context, Code_Unary_Overload, ["Clear"], types);
+        GenerateCore(context, Code_Vector_Overload, ["CopyFrom"], types);
+        GenerateCore(context, Code_Scalar_Overload, ["CopyFrom"], types, suffix: "S");
         GenerateCore_Equals(context, types);
-        GenerateCore(context, Code_Vector_Overload, Code_Vector_Ptr, ["Min", "Max"], types);
-        GenerateCore(context, Code_2Scalar_Overload, Code_2Scalar_Ptr, ["Clamp"], types);
+        GenerateCore(context, Code_Vector_Overload, ["Min", "Max"], types);
+        GenerateCore(context, Code_2Scalar_Overload, ["Clamp"], types);
 
         // 算術
         types = [Int, Long, Float, Double];
         Span<string> methods = ["Add", "Subtract", "Multiply", "Divide"];
-        GenerateCore(context, Code_Vector_Overload, Code_Vector_Ptr, methods, types);
-        GenerateCore(context, Code_Scalar_Overload, Code_Scalar_Ptr, methods, types, suffix: "S");
+        GenerateCore(context, Code_Vector_Overload, methods, types);
+        GenerateCore(context, Code_Scalar_Overload, methods, types, suffix: "S");
         // 補正付きコピー
         types = [Float, Double];
         methods = ["CopyFrom", "Add"];
-        GenerateCore(context, Code_Vector_Factor_Overload, Code_Vector_Factor_Ptr, methods, types, suffix: "F");
+        GenerateCore(context, Code_Vector_Factor_Overload, methods, types, suffix: "F");
         //GenerateCore(context, Code_Vector_Factor_Overload2, Code_Vector_Factor_Ptr2, methods, types, suffix: "FV");
 
         // 符号関係
         types = [SByte, Short, Int, IntPtr, Long, Float, Double];
-        GenerateCore(context, Code_Unary_Overload, Code_Unary_Ptr, ["Abs", "Negate"], types);
+        GenerateCore(context, Code_Unary_Overload, ["Abs", "Negate"], types);
 
         // 総計
         types = [Int, UInt, Long, ULong, Float, Double];
@@ -53,14 +53,14 @@ internal class SimdOperations : IIncrementalGenerator
         // ビット演算
         types = [Byte, SByte, Short, UShort, Int, UInt, Long, ULong];
         methods = ["And", "Or", "Xor", "Nand", "Nor", "Xnor"];
-        GenerateCore(context, Code_Vector_Overload, Code_Vector_Ptr, methods, types);
-        GenerateCore(context, Code_Scalar_Overload, Code_Scalar_Ptr, methods, types, suffix: "S");
-        GenerateCore(context, Code_Unary_Overload, Code_Unary_Ptr, ["Not"], types);
-        GenerateCore(context, Code_Shift_Overload, Code_Shift_Ptr, ["ShiftLeft", "ShiftRightLogical"], types);
-        GenerateCore(context, Code_Shift_Overload, Code_Shift_Ptr, ["ShiftRightArithmetic"], [SByte, Short, Int, IntPtr, Long]);
+        GenerateCore(context, Code_Vector_Overload, methods, types);
+        GenerateCore(context, Code_Scalar_Overload, methods, types, suffix: "S");
+        GenerateCore(context, Code_Unary_Overload, ["Not"], types);
+        GenerateCore(context, Code_Shift_Overload, ["ShiftLeft", "ShiftRightLogical"], types);
+        GenerateCore(context, Code_Shift_Overload, ["ShiftRightArithmetic"], [SByte, Short, Int, IntPtr, Long]);
     }
 
-    private static void GenerateCore(IncrementalGeneratorPostInitializationContext context, string overloadCode, string pointerCode, Span<string> methods, Span<string> types, string suffix = "")
+    private static void GenerateCore(IncrementalGeneratorPostInitializationContext context, string overloadCode, Span<string> methods, Span<string> types, string suffix = "")
     {
         foreach (var method in methods)
         {
@@ -121,13 +121,6 @@ internal class SimdOperations : IIncrementalGenerator
                 }
             }
 
-            // ポインタのオーバーロード
-            text = pointerCode.Replace(PH_Method, method);
-            foreach (var type in types)
-            {
-                sb.AppendLine(text.Replace(PH_Type, type));
-            }
-
             sb.AppendLine(Code_Footer);
             context.AddSource($"{method}{suffix}.g.cs", sb.ToString());
         }
@@ -152,14 +145,6 @@ internal class SimdOperations : IIncrementalGenerator
                 {
                     sb.AppendLine(destFixed.Replace(PH_Type, type));
                 }
-            }
-
-            // ポインタのオーバーロード
-            text = Code_Unary_Readonly_Ptr.Replace(PH_Return, returnType)
-                                          .Replace(PH_Method, method);
-            foreach (var type in types)
-            {
-                sb.AppendLine(text.Replace(PH_Type, type));
             }
 
             sb.AppendLine(Code_Footer);
@@ -190,13 +175,6 @@ internal class SimdOperations : IIncrementalGenerator
                     sb.AppendLine(srcFixed.Replace(PH_Type, type));
                 }
             }
-        }
-
-        // ポインタのオーバーロード
-        text = Code_EqualsAll_Ptr;
-        foreach (var type in types)
-        {
-            sb.AppendLine(text.Replace(PH_Type, type));
         }
 
         sb.AppendLine(Code_Footer);
@@ -267,7 +245,7 @@ namespace LivreNoirLibrary.Collections
             fixed ({{PH_Type}}* dstPtr = dst)
             fixed ({{PH_Type}}* srcPtr = src)
             {
-                {{PH_Method}}Core(dstPtr, srcPtr, length);
+                {{PH_Method}}(dstPtr, srcPtr, length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -279,14 +257,9 @@ namespace LivreNoirLibrary.Collections
             fixed ({{PH_Type}}* dstPtr = dst)
             fixed ({{PH_Type}}* srcPtr = src)
             {
-                {{PH_Method}}Core(dstPtr + dstOffset, srcPtr + srcOffset, (nuint)length);
+                {{PH_Method}}(dstPtr + dstOffset, srcPtr + srcOffset, (nuint)length);
             }
         }
-""";
-
-    private const string Code_Vector_Ptr = $$"""
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static void {{PH_Method}}({{PH_Type}}* destination, {{PH_Type}}* source, nuint length) => {{PH_Method}}Core(destination, source, length);
 """;
 
     private const string Code_Vector_Factor_Overload = $$"""
@@ -299,7 +272,7 @@ namespace LivreNoirLibrary.Collections
             fixed ({{PH_Type}}* dstPtr = dst)
             fixed ({{PH_Type}}* srcPtr = src)
             {
-                {{PH_Method}}Core(dstPtr, srcPtr, factor, length);
+                {{PH_Method}}(dstPtr, srcPtr, factor, length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -311,14 +284,9 @@ namespace LivreNoirLibrary.Collections
             fixed ({{PH_Type}}* dstPtr = dst)
             fixed ({{PH_Type}}* srcPtr = src)
             {
-                {{PH_Method}}Core(dstPtr + dstOffset, srcPtr + srcOffset, factor, (nuint)length);
+                {{PH_Method}}(dstPtr + dstOffset, srcPtr + srcOffset, factor, (nuint)length);
             }
         }
-""";
-
-    private const string Code_Vector_Factor_Ptr = $$"""
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static void {{PH_Method}}({{PH_Type}}* destination, {{PH_Type}}* source, {{PH_Type}} factor, nuint length) => {{PH_Method}}Core(destination, source, factor, length);
 """;
 
     private const string Code_Vector_Factor_Overload2 = $$"""
@@ -348,11 +316,6 @@ namespace LivreNoirLibrary.Collections
         }
 """;
 
-    private const string Code_Vector_Factor_Ptr2 = $$"""
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static void {{PH_Method}}({{PH_Type}}* destination, {{PH_Type}}* source, Vector<{{PH_Type}}> factor, nuint length) => {{PH_Method}}Core(destination, source, factor, length);
-""";
-
     private const string Code_Scalar_Overload = $$"""
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static void {{PH_Method}}(this {{PH_Destination}} destination, {{PH_Type}} value)
@@ -360,7 +323,7 @@ namespace LivreNoirLibrary.Collections
             var dst = {{PH_DestinationConvert}};
             fixed ({{PH_Type}}* dstPtr = dst)
             {
-                {{PH_Method}}Core(dstPtr, value, (nuint)dst.Length);
+                {{PH_Method}}(dstPtr, value, (nuint)dst.Length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -370,14 +333,9 @@ namespace LivreNoirLibrary.Collections
             AdjustArgs(dst.Length, ref offset, ref length);
             fixed ({{PH_Type}}* dstPtr = dst)
             {
-                {{PH_Method}}Core(dstPtr + offset, value, (nuint)length);
+                {{PH_Method}}(dstPtr + offset, value, (nuint)length);
             }
         }
-""";
-
-    private const string Code_Scalar_Ptr = $$"""
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static void {{PH_Method}}({{PH_Type}}* destination, {{PH_Type}} value, nuint length) => {{PH_Method}}Core(destination, value, length);
 """;
 
     private const string Code_2Scalar_Overload = $$"""
@@ -387,7 +345,7 @@ namespace LivreNoirLibrary.Collections
             var dst = {{PH_DestinationConvert}};
             fixed ({{PH_Type}}* dstPtr = dst)
             {
-                {{PH_Method}}Core(dstPtr, min, max, (nuint)dst.Length);
+                {{PH_Method}}(dstPtr, min, max, (nuint)dst.Length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -397,14 +355,9 @@ namespace LivreNoirLibrary.Collections
             AdjustArgs(dst.Length, ref offset, ref length);
             fixed ({{PH_Type}}* dstPtr = dst)
             {
-                {{PH_Method}}Core(dstPtr + offset, min, max, (nuint)length);
+                {{PH_Method}}(dstPtr + offset, min, max, (nuint)length);
             }
         }
-""";
-
-    private const string Code_2Scalar_Ptr = $$"""
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static void {{PH_Method}}({{PH_Type}}* destination, {{PH_Type}} min, {{PH_Type}} max, nuint length) => {{PH_Method}}Core(destination, min, max, length);
 """;
 
     private const string Code_Unary_Overload = $$"""
@@ -414,7 +367,7 @@ namespace LivreNoirLibrary.Collections
             var dst = {{PH_DestinationConvert}};
             fixed ({{PH_Type}}* dstPtr = dst)
             {
-                {{PH_Method}}Core(dstPtr, (nuint)dst.Length);
+                {{PH_Method}}(dstPtr, (nuint)dst.Length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -424,14 +377,9 @@ namespace LivreNoirLibrary.Collections
             AdjustArgs(dst.Length, ref offset, ref length);
             fixed ({{PH_Type}}* dstPtr = dst)
             {
-                {{PH_Method}}Core(dstPtr + offset, (nuint)length);
+                {{PH_Method}}(dstPtr + offset, (nuint)length);
             }
         }
-""";
-
-    private const string Code_Unary_Ptr = $$"""
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static void {{PH_Method}}({{PH_Type}}* destination, nuint length) => {{PH_Method}}Core(destination, length);
 """;
 
     private const string Code_Unary_Readonly_Overload = $$"""
@@ -441,7 +389,7 @@ namespace LivreNoirLibrary.Collections
             var src = {{PH_SourceConvert}};
             fixed ({{PH_Type}}* srcPtr = src)
             {
-                return {{PH_Method}}Core(srcPtr, (nuint)src.Length);
+                return {{PH_Method}}(srcPtr, (nuint)src.Length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -451,14 +399,9 @@ namespace LivreNoirLibrary.Collections
             AdjustArgs(src.Length, ref offset, ref length);
             fixed ({{PH_Type}}* srcPtr = src)
             {
-                return {{PH_Method}}Core(srcPtr + offset, (nuint)length);
+                return {{PH_Method}}(srcPtr + offset, (nuint)length);
             }
         }
-""";
-
-    private const string Code_Unary_Readonly_Ptr = $$"""
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static {{PH_Return}} {{PH_Method}}({{PH_Type}}* source, nuint length) => {{PH_Method}}Core(source, length);
 """;
 
     private const string Code_Shift_Overload = $$"""
@@ -468,7 +411,7 @@ namespace LivreNoirLibrary.Collections
             var dst = {{PH_DestinationConvert}};
             fixed ({{PH_Type}}* dstPtr = dst)
             {
-                {{PH_Method}}Core(dstPtr, shiftCount, (nuint)dst.Length);
+                {{PH_Method}}(dstPtr, shiftCount, (nuint)dst.Length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -478,14 +421,9 @@ namespace LivreNoirLibrary.Collections
             AdjustArgs(dst.Length, ref offset, ref length);
             fixed ({{PH_Type}}* dstPtr = dst)
             {
-                {{PH_Method}}Core(dstPtr + offset, shiftCount, (nuint)length);
+                {{PH_Method}}(dstPtr + offset, shiftCount, (nuint)length);
             }
         }
-""";
-
-    private const string Code_Shift_Ptr = $$"""
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static void {{PH_Method}}({{PH_Type}}* destination, int shiftCount, nuint length) => {{PH_Method}}Core(destination, shiftCount, length);
 """;
 
     private const string Code_EqualsAll_Overload = $$"""
@@ -501,7 +439,7 @@ namespace LivreNoirLibrary.Collections
             fixed ({{PH_Type}}* leftPtr = l)
             fixed ({{PH_Type}}* rightPtr = r)
             {
-                return EqualsCore(leftPtr, rightPtr, (nuint)l.Length);
+                return EqualsAll(leftPtr, rightPtr, (nuint)l.Length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -513,7 +451,7 @@ namespace LivreNoirLibrary.Collections
             fixed ({{PH_Type}}* leftPtr = l)
             fixed ({{PH_Type}}* rightPtr = r)
             {
-                return EqualsCore(leftPtr, rightPtr, (nuint)length);
+                return EqualsAll(leftPtr, rightPtr, (nuint)length);
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -525,13 +463,8 @@ namespace LivreNoirLibrary.Collections
             fixed ({{PH_Type}}* leftPtr = l)
             fixed ({{PH_Type}}* rightPtr = r)
             {
-                return EqualsCore(leftPtr, rightPtr, (nuint)length);
+                return EqualsAll(leftPtr, rightPtr, (nuint)length);
             }
         }
-""";
-
-    private const string Code_EqualsAll_Ptr = $$"""
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static bool EqualsAll({{PH_Type}}* left, {{PH_Type}}* right, nuint length) => EqualsCore(left, right, length);
 """;
 }

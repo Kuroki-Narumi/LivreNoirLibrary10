@@ -3,6 +3,7 @@ using System;
 using System.Net.Http;
 using System.Net.Http.Json;
 using System.Text.Json.Serialization;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 
@@ -23,11 +24,11 @@ namespace LivreNoirLibrary.Windows
             return asm.Version ?? new(1, 0, 0);
         }
 
-        public static async Task<UpdateInfo?> GetUpdateVersion(string infoUrl)
+        public static async Task<UpdateInfo?> GetUpdateVersion(string infoUrl, CancellationToken c = default)
         {
             try
             {
-                var info = await HttpClientJsonExtensions.GetFromJsonAsync<UpdateInfo>(HttpClientPool.Instance, infoUrl);
+                var info = await HttpClientJsonExtensions.GetFromJsonAsync<UpdateInfo>(HttpClientPool.Instance, infoUrl, c);
                 return info;
             }
             catch
@@ -36,9 +37,9 @@ namespace LivreNoirLibrary.Windows
             }
         }
 
-        public static async Task<UpdateInfo?> CheckVersion(string infoUrl)
+        public static async Task<UpdateInfo?> CheckVersion(string infoUrl, CancellationToken c = default)
         {
-            var info = await GetUpdateVersion(infoUrl);
+            var info = await GetUpdateVersion(infoUrl, c);
             if (info is not null && !string.IsNullOrEmpty(info.Url) && info.Updater.Length > 0 && info.Version > GetCurrentVersion())
             {
                 return info;

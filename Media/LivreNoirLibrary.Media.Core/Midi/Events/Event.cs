@@ -6,7 +6,7 @@ using LivreNoirLibrary.IO;
 
 namespace LivreNoirLibrary.Media.Midi.Events
 {
-    public abstract class Event : IJsonWriter
+    public abstract class Event : IWriteJson
     {
         public abstract StatusType Status { get; }
 

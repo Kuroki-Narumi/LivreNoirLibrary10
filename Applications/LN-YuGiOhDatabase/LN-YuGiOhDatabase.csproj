@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <OutputType>WinExe</OutputType>
+    <OutputType>Exe</OutputType>
     <TargetFramework>net10.0-windows</TargetFramework>
     <RootNamespace>LivreNoir.YuGiOhDatabase</RootNamespace>
     <Nullable>enable</Nullable>
@@ -34,7 +34,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="src\Unit_Main\" />
+    <Folder Include="src\BaseClass\" />
   </ItemGroup>
 
 </Project>

@@ -69,7 +69,7 @@ namespace LivreNoirLibrary.Collections
             }
         }
 
-        private static bool EqualsCore<T>(T* left, T* right, nuint length)
+        public static bool EqualsAll<T>(T* left, T* right, nuint length)
             where T : unmanaged, IComparisonOperators<T, T, bool>
         {
             var count = (nuint)Vector<T>.Count;
@@ -94,11 +94,7 @@ namespace LivreNoirLibrary.Collections
             return true;
         }
 
-        internal static void Clear<T>(T* destination, nuint length) where T : unmanaged => ClearCore(destination, length);
-        internal static void CopyFrom<T>(T* destination, T value, nuint length) where T : unmanaged => CopyFromCore(destination, value, length);
-        internal static void CopyFrom<T>(T* destination, T* source, nuint length) where T : unmanaged => CopyFromCore(destination, source, length);
-
-        private static void ClearCore<T>(T* destination, nuint length)
+        public static void Clear<T>(T* destination, nuint length)
             where T : unmanaged
         {
             var count = (nuint)Vector<T>.Count;
@@ -113,7 +109,7 @@ namespace LivreNoirLibrary.Collections
             }
         }
 
-        private static void CopyFromCore<T>(T* destination, T value, nuint length)
+        public static void CopyFrom<T>(T* destination, T value, nuint length)
             where T : unmanaged
         {
             var count = (nuint)Vector<T>.Count;
@@ -129,75 +125,7 @@ namespace LivreNoirLibrary.Collections
             }
         }
 
-        private static void AddCore<T>(T* destination, T value, nuint length)
-            where T : unmanaged, INumber<T>
-        {
-            var count = (nuint)Vector<T>.Count;
-            var source = Vector.Create(value);
-            var dstVec = (Vector<T>*)destination;
-            for (; length >= count; length -= count, dstVec++)
-            {
-                *dstVec += source;
-            }
-            destination = (T*)dstVec;
-            for (; length is > 0; length--, destination++)
-            {
-                *destination += value;
-            }
-        }
-
-        private static void SubtractCore<T>(T* destination, T value, nuint length)
-            where T : unmanaged, INumber<T>
-        {
-            var count = (nuint)Vector<T>.Count;
-            var source = Vector.Create(value);
-            var dstVec = (Vector<T>*)destination;
-            for (; length >= count; length -= count, dstVec++)
-            {
-                *dstVec -= source;
-            }
-            destination = (T*)dstVec;
-            for (; length is > 0; length--, destination++)
-            {
-                *destination -= value;
-            }
-        }
-
-        private static void MultiplyCore<T>(T* destination, T value, nuint length)
-            where T : unmanaged, INumber<T>
-        {
-            var count = (nuint)Vector<T>.Count;
-            var source = Vector.Create(value);
-            var dstVec = (Vector<T>*)destination;
-            for (; length >= count; length -= count, dstVec++)
-            {
-                *dstVec *= source;
-            }
-            destination = (T*)dstVec;
-            for (; length is > 0; length--, destination++)
-            {
-                *destination *= value;
-            }
-        }
-
-        private static void DivideCore<T>(T* destination, T value, nuint length)
-            where T : unmanaged, INumber<T>
-        {
-            var count = (nuint)Vector<T>.Count;
-            var source = Vector.Create(value);
-            var dstVec = (Vector<T>*)destination;
-            for (; length >= count; length -= count, dstVec++)
-            {
-                *dstVec /= source;
-            }
-            destination = (T*)dstVec;
-            for (; length is > 0; length--, destination++)
-            {
-                *destination /= value;
-            }
-        }
-
-        private static void CopyFromCore<T>(T* destination, T* source, nuint length)
+        public static void CopyFrom<T>(T* destination, T* source, nuint length)
             where T : unmanaged
         {
             var count = (nuint)Vector<T>.Count;
@@ -213,191 +141,136 @@ namespace LivreNoirLibrary.Collections
             }
         }
 
-        private static void AddCore<T>(T* destination, T* source, nuint length)
-            where T : unmanaged, INumber<T>
-        {
-            var count = (nuint)Vector<T>.Count;
-            var srcVec = (Vector<T>*)source;
-            var dstVec = (Vector<T>*)destination;
-            for (; length >= count; length -= count, srcVec++, dstVec++)
-            {
-                *dstVec += *srcVec;
-            }
-            source = (T*)srcVec;
-            destination = (T*)dstVec;
-            for (; length is > 0; length--, source++, destination++)
-            {
-                *destination += *source;
-            }
-        }
+        delegate void VectorOperation<T>(Vector<T> source, Vector<T>* destination) where T : unmanaged;
+        delegate void ScalarOperation<T>(T source, T* destination) where T : unmanaged;
 
-        private static void SubtractCore<T>(T* destination, T* source, nuint length)
-            where T : unmanaged, INumber<T>
-        {
-            var count = (nuint)Vector<T>.Count;
-            var srcVec = (Vector<T>*)source;
-            var dstVec = (Vector<T>*)destination;
-            for (; length >= count; length -= count, srcVec++, dstVec++)
-            {
-                *dstVec -= *srcVec;
-            }
-            source = (T*)srcVec;
-            destination = (T*)dstVec;
-            for (; length is > 0; length--, source++, destination++)
-            {
-                *destination -= *source;
-            }
-        }
-
-        private static void MultiplyCore<T>(T* destination, T* source, nuint length)
-            where T : unmanaged, INumber<T>
-        {
-            var count = (nuint)Vector<T>.Count;
-            var srcVec = (Vector<T>*)source;
-            var dstVec = (Vector<T>*)destination;
-            for (; length >= count; length -= count, srcVec++, dstVec++)
-            {
-                *dstVec *= *srcVec;
-            }
-            source = (T*)srcVec;
-            destination = (T*)dstVec;
-            for (; length is > 0; length--, source++, destination++)
-            {
-                *destination *= *source;
-            }
-        }
-
-        private static void DivideCore<T>(T* destination, T* source, nuint length)
-            where T : unmanaged, INumber<T>
-        {
-            var count = (nuint)Vector<T>.Count;
-            var srcVec = (Vector<T>*)source;
-            var dstVec = (Vector<T>*)destination;
-            for (; length >= count; length -= count, srcVec++, dstVec++)
-            {
-                *dstVec /= *srcVec;
-            }
-            source = (T*)srcVec;
-            destination = (T*)dstVec;
-            for (; length is > 0; length--, source++, destination++)
-            {
-                *destination /= *source;
-            }
-        }
-
-        private static void CopyFromCore<T>(T* destination, T* source, T factor, nuint length)
-            where T : unmanaged, INumber<T>
-        {
-            var count = (nuint)Vector<T>.Count;
-            var srcVec = (Vector<T>*)source;
-            var dstVec = (Vector<T>*)destination;
-            for (; length >= count; length -= count, srcVec++, dstVec++)
-            {
-                *dstVec = *srcVec * factor;
-            }
-            source = (T*)srcVec;
-            destination = (T*)dstVec;
-            for (; length is > 0; length--, source++, destination++)
-            {
-                *destination = *source * factor;
-            }
-        }
-
-        private static void AddCore<T>(T* destination, T* source, T factor, nuint length)
-            where T : unmanaged, INumber<T>
-        {
-            var count = (nuint)Vector<T>.Count;
-            var srcVec = (Vector<T>*)source;
-            var dstVec = (Vector<T>*)destination;
-            for (; length >= count; length -= count, srcVec++, dstVec++)
-            {
-                *dstVec += *srcVec * factor;
-            }
-            source = (T*)srcVec;
-            destination = (T*)dstVec;
-            for (; length is > 0; length--, source++, destination++)
-            {
-                *destination += *source * factor;
-            }
-        }
-
-        private static void CopyFromCore<T>(T* destination, T* source, Vector<T> factor, nuint length)
-            where T : unmanaged, INumber<T>
-        {
-            var count = (nuint)Vector<T>.Count;
-            var srcVec = (Vector<T>*)source;
-            var dstVec = (Vector<T>*)destination;
-            for (; length >= count; length -= count, srcVec++, dstVec++)
-            {
-                *dstVec = *srcVec * factor;
-            }
-            source = (T*)srcVec;
-            destination = (T*)dstVec;
-            for (var i = 0; length is > 0; length--, source++, destination++, i++)
-            {
-                *destination = *source * factor[i];
-            }
-        }
-
-        private static void AddCore<T>(T* destination, T* source, Vector<T> factor, nuint length)
-            where T : unmanaged, INumber<T>
-        {
-            var count = (nuint)Vector<T>.Count;
-            var srcVec = (Vector<T>*)source;
-            var dstVec = (Vector<T>*)destination;
-            for (; length >= count; length -= count, srcVec++, dstVec++)
-            {
-                *dstVec += *srcVec * factor;
-            }
-            source = (T*)srcVec;
-            destination = (T*)dstVec;
-            for (var i = 0; length is > 0; length--, source++, destination++, i++)
-            {
-                *destination += *source * factor[i];
-            }
-        }
-
-        private static unsafe void MinCore<T>(T* destination, T value, nuint length)
-            where T : unmanaged, INumber<T>
+        private static void OperateCore<T>(T* destination, T value, nuint length, VectorOperation<T> vop, ScalarOperation<T> sop)
+            where T : unmanaged
         {
             var count = (nuint)Vector<T>.Count;
             var source = Vector.Create(value);
             var dstVec = (Vector<T>*)destination;
             for (; length >= count; length -= count, dstVec++)
             {
-                *dstVec = Vector.Min(*dstVec, source);
+                vop(source, dstVec);
             }
             destination = (T*)dstVec;
             for (; length is > 0; length--, destination++)
             {
-                if (value < *destination)
-                {
-                    *destination = value;
-                }
+                sop(value, destination);
             }
         }
 
-        private static void MaxCore<T>(T* destination, T value, nuint length)
+        private static void OperateCore<T>(T* destination, T* source, nuint length, VectorOperation<T> vop, ScalarOperation<T> sop)
+            where T : unmanaged
+        {
+            var count = (nuint)Vector<T>.Count;
+            var srcVec = (Vector<T>*)source;
+            var dstVec = (Vector<T>*)destination;
+            for (; length >= count; length -= count, srcVec++, dstVec++)
+            {
+                vop(*srcVec, dstVec);
+            }
+            source = (T*)srcVec;
+            destination = (T*)dstVec;
+            for (; length is > 0; length--, source++, destination++)
+            {
+                sop(*source, destination);
+            }
+        }
+
+        private static void OperateCore<T>(T* destination, T* source, T factor, nuint length, VectorOperation<T> vop, ScalarOperation<T> sop)
             where T : unmanaged, INumber<T>
         {
             var count = (nuint)Vector<T>.Count;
-            var source = Vector.Create(value);
+            var srcVec = (Vector<T>*)source;
             var dstVec = (Vector<T>*)destination;
-            for (; length >= count; length -= count, dstVec++)
+            for (; length >= count; length -= count, srcVec++, dstVec++)
             {
-                *dstVec = Vector.Max(*dstVec, source);
+                vop(*srcVec * factor, dstVec);
             }
+            source = (T*)srcVec;
             destination = (T*)dstVec;
-            for (; length is > 0; length--, destination++)
+            for (; length is > 0; length--, source++, destination++)
             {
-                if (value > *destination)
-                {
-                    *destination = value;
-                }
+                sop(*source * factor, destination);
             }
         }
 
-        private static unsafe void ClampCore<T>(T* destination, T min, T max, nuint length)
+        private static void OperateCore<T>(T* destination, T* source, Vector<T> factor, nuint length, VectorOperation<T> vop, ScalarOperation<T> sop)
+            where T : unmanaged, INumber<T>
+        {
+            var count = (nuint)Vector<T>.Count;
+            var srcVec = (Vector<T>*)source;
+            var dstVec = (Vector<T>*)destination;
+            for (; length >= count; length -= count, srcVec++, dstVec++)
+            {
+                vop(*srcVec * factor, dstVec);
+            }
+            source = (T*)srcVec;
+            destination = (T*)dstVec;
+            for (var i = 0; length is > 0; length--, source++, destination++, i++)
+            {
+                sop(*source * factor[i], destination);
+            }
+        }
+
+        private static void V_Copy<T>(Vector<T> source, Vector<T>* dest) => *dest = source;
+        private static void S_Copy<T>(T source, T* dest) where T : unmanaged, INumber<T> => *dest = source;
+        public static void CopyFrom<T>(T* destination, T* source, T factor, nuint length) where T : unmanaged, INumber<T> => OperateCore(destination, source, factor, length, V_Copy, S_Copy);
+        public static void CopyFrom<T>(T* destination, T* source, Vector<T> factor, nuint length) where T : unmanaged, INumber<T> => OperateCore(destination, source, factor, length, V_Copy, S_Copy);
+
+        private static void V_Add<T>(Vector<T> source, Vector<T>* dest) => *dest += source;
+        private static void S_Add<T>(T source, T* dest) where T : unmanaged, INumber<T> => *dest += source;
+        public static void Add<T>(T* destination, T value, nuint length) where T : unmanaged, INumber<T> => OperateCore(destination, value, length, V_Add, S_Add);
+        public static void Add<T>(T* destination, T* source, nuint length) where T : unmanaged, INumber<T> => OperateCore(destination, source, length, V_Add, S_Add);
+        public static void Add<T>(T* destination, T* source, T factor, nuint length) where T : unmanaged, INumber<T> => OperateCore(destination, source, factor, length, V_Add, S_Add);
+        public static void Add<T>(T* destination, T* source, Vector<T> factor, nuint length) where T : unmanaged, INumber<T> => OperateCore(destination, source, factor, length, V_Add, S_Add);
+
+        private static void V_Sub<T>(Vector<T> source, Vector<T>* dest) => *dest -= source;
+        private static void S_Sub<T>(T source, T* dest) where T : unmanaged, INumber<T> => *dest -= source;
+        public static void Subtract<T>(T* destination, T value, nuint length) where T : unmanaged, INumber<T> => OperateCore(destination, value, length, V_Sub, S_Sub);
+        public static void Subtract<T>(T* destination, T* source, nuint length) where T : unmanaged, INumber<T> => OperateCore(destination, source, length, V_Sub, S_Sub);
+        public static void Subtract<T>(T* destination, T* source, T factor, nuint length) where T : unmanaged, INumber<T> => OperateCore(destination, source, factor, length, V_Sub, S_Sub);
+        public static void Subtract<T>(T* destination, T* source, Vector<T> factor, nuint length) where T : unmanaged, INumber<T> => OperateCore(destination, source, factor, length, V_Sub, S_Sub);
+
+        private static void V_Mul<T>(Vector<T> source, Vector<T>* dest) => *dest *= source;
+        private static void S_Mul<T>(T source, T* dest) where T : unmanaged, INumber<T> => *dest *= source;
+        public static void Multiply<T>(T* destination, T value, nuint length) where T : unmanaged, INumber<T> => OperateCore(destination, value, length, V_Mul, S_Mul);
+        public static void Multiply<T>(T* destination, T* source, nuint length) where T : unmanaged, INumber<T> => OperateCore(destination, source, length, V_Mul, S_Mul);
+        public static void Multiply<T>(T* destination, T* source, T factor, nuint length) where T : unmanaged, INumber<T> => OperateCore(destination, source, factor, length, V_Mul, S_Mul);
+        public static void Multiply<T>(T* destination, T* source, Vector<T> factor, nuint length) where T : unmanaged, INumber<T> => OperateCore(destination, source, factor, length, V_Mul, S_Mul);
+
+        private static void V_Div<T>(Vector<T> source, Vector<T>* dest) => *dest /= source;
+        private static void S_Div<T>(T source, T* dest) where T : unmanaged, INumber<T> => *dest /= source;
+        public static void Divide<T>(T* destination, T value, nuint length) where T : unmanaged, INumber<T> => OperateCore(destination, value, length, V_Div, S_Div);
+        public static void Divide<T>(T* destination, T* source, nuint length) where T : unmanaged, INumber<T> => OperateCore(destination, source, length, V_Div, S_Div);
+        public static void Divide<T>(T* destination, T* source, T factor, nuint length) where T : unmanaged, INumber<T> => OperateCore(destination, source, factor, length, V_Div, S_Div);
+        public static void Divide<T>(T* destination, T* source, Vector<T> factor, nuint length) where T : unmanaged, INumber<T> => OperateCore(destination, source, factor, length, V_Div, S_Div);
+
+        private static void V_Min<T>(Vector<T> source, Vector<T>* dest) => *dest = Vector.Min(*dest, source);
+        private static void S_Min<T>(T source, T* dest) where T : unmanaged, INumber<T>
+        {
+            if (source < *dest)
+            {
+                *dest = source;
+            }
+        }
+        public static void Min<T>(T* destination, T value, nuint length) where T : unmanaged, INumber<T> => OperateCore(destination, value, length, V_Min, S_Min);
+        public static void Min<T>(T* destination, T* source, nuint length) where T : unmanaged, INumber<T> => OperateCore(destination, source, length, V_Min, S_Min);
+
+        private static void V_Max<T>(Vector<T> source, Vector<T>* dest) => *dest = Vector.Max(*dest, source);
+        private static void S_Max<T>(T source, T* dest) where T : unmanaged, INumber<T>
+        {
+            if (source > *dest)
+            {
+                *dest = source;
+            }
+        }
+        public static void Max<T>(T* destination, T value, nuint length) where T : unmanaged, INumber<T> => OperateCore(destination, value, length, V_Max, S_Max);
+        public static void Max<T>(T* destination, T* source, nuint length) where T : unmanaged, INumber<T> => OperateCore(destination, source, length, V_Max, S_Max);
+
+        public static void Clamp<T>(T* destination, T min, T max, nuint length)
             where T : unmanaged, INumber<T>
         {
             var count = (nuint)Vector<T>.Count;
@@ -415,49 +288,7 @@ namespace LivreNoirLibrary.Collections
             }
         }
 
-        private static unsafe void MinCore<T>(T* destination, T* source, nuint length)
-            where T : unmanaged, INumber<T>
-        {
-            var count = (nuint)Vector<T>.Count;
-            var srcVec = (Vector<T>*)source;
-            var dstVec = (Vector<T>*)destination;
-            for (; length >= count; length -= count, srcVec++, dstVec++)
-            {
-                *dstVec = Vector.Min(*srcVec, *dstVec);
-            }
-            source = (T*)srcVec;
-            destination = (T*)dstVec;
-            for (; length is > 0; length--, source++, destination++)
-            {
-                if (*source < *destination)
-                {
-                    *destination = *source;
-                }
-            }
-        }
-
-        private static void MaxCore<T>(T* destination, T* source, nuint length)
-            where T : unmanaged, INumber<T>
-        {
-            var count = (nuint)Vector<T>.Count;
-            var srcVec = (Vector<T>*)source;
-            var dstVec = (Vector<T>*)destination;
-            for (; length >= count; length -= count, srcVec++, dstVec++)
-            {
-                *dstVec = Vector.Max(*srcVec, *dstVec);
-            }
-            source = (T*)srcVec;
-            destination = (T*)dstVec;
-            for (; length is > 0; length--, source++, destination++)
-            {
-                if (*source > *destination)
-                {
-                    *destination = *source;
-                }
-            }
-        }
-
-        private static unsafe void ClampCore<T>(T* destination, T* min, T* max, nuint length)
+        public static void Clamp<T>(T* destination, T* min, T* max, nuint length)
             where T : unmanaged, INumber<T>
         {
             var count = (nuint)Vector<T>.Count;
@@ -477,7 +308,7 @@ namespace LivreNoirLibrary.Collections
             }
         }
 
-        private static T MinCore<T>(T* source, nuint length)
+        public static T Min<T>(T* source, nuint length)
             where T : unmanaged, INumber<T>
         {
             if (length is <= 0)
@@ -511,7 +342,7 @@ namespace LivreNoirLibrary.Collections
             return result;
         }
 
-        private static unsafe T MaxCore<T>(T* source, nuint length)
+        public static T Max<T>(T* source, nuint length)
             where T : unmanaged, INumber<T>
         {
             if (length is <= 0)
@@ -545,7 +376,7 @@ namespace LivreNoirLibrary.Collections
             return result;
         }
 
-        private static unsafe (T Min, T Max) MinMaxCore<T>(T* source, nuint length)
+        public static (T Min, T Max) MinMax<T>(T* source, nuint length)
             where T : unmanaged, INumber<T>
         {
             if (length is <= 0)
@@ -587,7 +418,7 @@ namespace LivreNoirLibrary.Collections
             return (min, max);
         }
 
-        private static T SumCore<T>(T* source, nuint length)
+        public static T Sum<T>(T* source, nuint length)
             where T : unmanaged, INumber<T>
         {
             if (length is <= 0)
@@ -614,7 +445,7 @@ namespace LivreNoirLibrary.Collections
             return result;
         }
 
-        private static unsafe T SquareCore<T>(T* source, nuint length)
+        public static T Square<T>(T* source, nuint length)
             where T : unmanaged, INumber<T>
         {
             if (length is <= 0)
@@ -641,324 +472,109 @@ namespace LivreNoirLibrary.Collections
             return result;
         }
 
-        private static int AverageCore(int* source, nuint length) => length is <= 0 ? 0 : SumCore(source, length) / (int)length;
-        private static uint AverageCore(uint* source, nuint length) => length is <= 0 ? 0 : SumCore(source, length) / (uint)length;
-        private static long AverageCore(long* source, nuint length) => length is <= 0 ? 0 : SumCore(source, length) / (long)length;
-        private static ulong AverageCore(ulong* source, nuint length) => length is <= 0 ? 0 : SumCore(source, length) / (ulong)length;
-        private static float AverageCore(float* source, nuint length) => length is <= 0 ? 0 : SumCore(source, length) / length;
-        private static double AverageCore(double* source, nuint length) => length is <= 0 ? 0 : SumCore(source, length) / length;
+        public static int Average(int* source, nuint length) => length is 0 ? 0 : Sum(source, length) / (int)length;
+        public static uint Average(uint* source, nuint length) => length is 0 ? 0 : Sum(source, length) / (uint)length;
+        public static long Average(long* source, nuint length) => length is 0 ? 0 : Sum(source, length) / (long)length;
+        public static ulong Average(ulong* source, nuint length) => length is 0 ? 0 : Sum(source, length) / (ulong)length;
+        public static float Average(float* source, nuint length) => length is 0 ? 0 : Sum(source, length) / length;
+        public static double Average(double* source, nuint length) => length is 0 ? 0 : Sum(source, length) / length;
 
-        private static int MeanSquareCore(int* source, nuint length) => length is <= 0 ? 0 : SquareCore(source, length) / (int)length;
-        private static uint MeanSquareCore(uint* source, nuint length) => length is <= 0 ? 0 : SquareCore(source, length) / (uint)length;
-        private static long MeanSquareCore(long* source, nuint length) => length is <= 0 ? 0 : SquareCore(source, length) / (long)length;
-        private static ulong MeanSquareCore(ulong* source, nuint length) => length is <= 0 ? 0 : SquareCore(source, length) / (ulong)length;
-        private static float MeanSquareCore(float* source, nuint length) => length is <= 0 ? 0 : SquareCore(source, length) / length;
-        private static double MeanSquareCore(double* source, nuint length) => length is <= 0 ? 0 : SquareCore(source, length) / length;
+        public static int MeanSquare(int* source, nuint length) => length is 0 ? 0 : Square(source, length) / (int)length;
+        public static uint MeanSquare(uint* source, nuint length) => length is 0 ? 0 : Square(source, length) / (uint)length;
+        public static long MeanSquare(long* source, nuint length) => length is 0 ? 0 : Square(source, length) / (long)length;
+        public static ulong MeanSquare(ulong* source, nuint length) => length is 0 ? 0 : Square(source, length) / (ulong)length;
+        public static float MeanSquare(float* source, nuint length) => length is 0 ? 0 : Square(source, length) / length;
+        public static double MeanSquare(double* source, nuint length) => length is 0 ? 0 : Square(source, length) / length;
 
-        private static void AbsCore<T>(T* destination, nuint length)
-            where T : unmanaged, INumber<T>
+        delegate void UnaryVectorOperation<T>(Vector<T>* vector);
+        delegate void UnaryScalarOperation<T>(T* vector) where T : unmanaged;
+
+        private static void OperateCore<T>(T* destination, nuint length, UnaryVectorOperation<T> vop, UnaryScalarOperation<T> sop)
+            where T : unmanaged
         {
             var count = (nuint)Vector<T>.Count;
             var dstVec = (Vector<T>*)destination;
             for (; length >= count; length -= count, dstVec++)
             {
-                *dstVec = Vector.Abs(*dstVec);
+                vop(dstVec);
             }
             destination = (T*)dstVec;
             for (; length is > 0; length--, destination++)
             {
-                *destination = T.Abs(*destination);
+                sop(destination);
             }
         }
 
-        private static unsafe void NegateCore<T>(T* destination, nuint length)
-            where T : unmanaged, INumber<T>
+        static void V_Abs<T>(Vector<T>* dest) where T : unmanaged, INumber<T> => *dest = Vector.Abs(*dest);
+        static void S_Abs<T>(T* dest) where T : unmanaged, INumber<T> => *dest = T.Abs(*dest);
+        public static void Abs<T>(T* destination, nuint length) where T : unmanaged, INumber<T> => OperateCore(destination, length, V_Abs, S_Abs);
+
+        static void V_Negate<T>(Vector<T>* dest) where T : unmanaged, INumber<T> => *dest = -*dest;
+        static void S_Negate<T>(T* dest) where T : unmanaged, INumber<T> => *dest = -*dest;
+        public static void Negate<T>(T* destination, nuint length) where T : unmanaged, INumber<T> => OperateCore(destination, length, V_Negate, S_Negate);
+
+        delegate void VectorShiftOperation<T>(Vector<T>* vector, int count);
+        delegate void ScalarShitfOperation<T>(T* vector, int count) where T : unmanaged;
+        private static void ShiftCore<T>(T* destination, int shiftCount, nuint length, VectorShiftOperation<T> vop, ScalarShitfOperation<T> sop)
+            where T : unmanaged
         {
             var count = (nuint)Vector<T>.Count;
             var dstVec = (Vector<T>*)destination;
             for (; length >= count; length -= count, dstVec++)
             {
-                *dstVec = -*dstVec;
+                vop(dstVec, shiftCount);
             }
             destination = (T*)dstVec;
             for (; length is > 0; length--, destination++)
             {
-                *destination = -*destination;
+                sop(destination, shiftCount);
             }
         }
 
-        private static unsafe void ShiftLeftCore<T>(T* destination, int shiftCount, nuint length)
-            where T : unmanaged, IBinaryInteger<T>
-        {
-            var count = (nuint)Vector<T>.Count;
-            var dstVec = (Vector<T>*)destination;
-            for (; length >= count; length -= count, dstVec++)
-            {
-                *dstVec <<= shiftCount;
-            }
-            destination = (T*)dstVec;
-            for (; length is > 0; length--, destination++)
-            {
-                *destination <<= shiftCount;
-            }
-        }
+        static void V_ShiftLeft<T>(Vector<T>* dest, int count) where T : unmanaged, IBinaryInteger<T> => *dest <<= count;
+        static void S_ShiftLeft<T>(T* dest, int count) where T : unmanaged, IBinaryInteger<T> => *dest <<= count;
+        public static void ShiftLeft<T>(T* destination, int shiftCount, nuint length) where T : unmanaged, IBinaryInteger<T> => ShiftCore(destination, shiftCount, length, V_ShiftLeft, S_ShiftLeft);
 
-        private static unsafe void ShiftRightArithmeticCore<T>(T* destination, int shiftCount, nuint length)
-            where T : unmanaged, IBinaryInteger<T>
-        {
-            var count = (nuint)Vector<T>.Count;
-            var dstVec = (Vector<T>*)destination;
-            for (; length >= count; length -= count, dstVec++)
-            {
-                *dstVec >>= shiftCount;
-            }
-            destination = (T*)dstVec;
-            for (; length is > 0; length--, destination++)
-            {
-                *destination >>= shiftCount;
-            }
-        }
+        static void V_ShiftRA<T>(Vector<T>* dest, int count) where T : unmanaged, IBinaryInteger<T> => *dest >>= count;
+        static void S_ShiftRA<T>(T* dest, int count) where T : unmanaged, IBinaryInteger<T> => *dest >>= count;
+        public static void ShiftRightArithmetic<T>(T* destination, int shiftCount, nuint length) where T : unmanaged, IBinaryInteger<T> => ShiftCore(destination, shiftCount, length, V_ShiftRA, S_ShiftRA);
 
-        private static unsafe void ShiftRightLogicalCore<T>(T* destination, int shiftCount, nuint length)
-            where T : unmanaged, IBinaryInteger<T>
-        {
-            var count = (nuint)Vector<T>.Count;
-            var dstVec = (Vector<T>*)destination;
-            for (; length >= count; length -= count, dstVec++)
-            {
-                *dstVec >>>= shiftCount;
-            }
-            destination = (T*)dstVec;
-            for (; length is > 0; length--, destination++)
-            {
-                *destination >>>= shiftCount;
-            }
-        }
+        static void V_ShiftRL<T>(Vector<T>* dest, int count) where T : unmanaged, IBinaryInteger<T> => *dest >>>= count;
+        static void S_ShiftRL<T>(T* dest, int count) where T : unmanaged, IBinaryInteger<T> => *dest >>>= count;
+        public static void ShiftRightLogical<T>(T* destination, int shiftCount, nuint length) where T : unmanaged, IBinaryInteger<T> => ShiftCore(destination, shiftCount, length, V_ShiftRL, S_ShiftRL);
 
-        private static unsafe void NotCore<T>(T* destination, nuint length)
-            where T : unmanaged, IBinaryInteger<T>
-        {
-            var count = (nuint)Vector<T>.Count;
-            var dstVec = (Vector<T>*)destination;
-            for (; length >= count; length -= count, dstVec++)
-            {
-                *dstVec = ~*dstVec;
-            }
-            destination = (T*)dstVec;
-            for (; length is > 0; length--, destination++)
-            {
-                *destination = ~*destination;
-            }
-        }
+        static void V_Not<T>(Vector<T>* dest) where T : unmanaged, IBinaryInteger<T> => *dest = ~*dest;
+        static void S_Not<T>(T* dest) where T : unmanaged, IBinaryInteger<T> => *dest = ~*dest;
+        public static void Not<T>(T* destination, nuint length) where T : unmanaged, IBinaryInteger<T> => OperateCore(destination, length, V_Not, S_Not);
 
-        private static unsafe void AndCore<T>(T* destination, T value, nuint length)
-            where T : unmanaged, IBinaryInteger<T>
-        {
-            var count = (nuint)Vector<T>.Count;
-            var source = Vector.Create(value);
-            var dstVec = (Vector<T>*)destination;
-            for (; length >= count; length -= count, dstVec++)
-            {
-                *dstVec &= source;
-            }
-            destination = (T*)dstVec;
-            for (; length is > 0; length--, destination++)
-            {
-                *destination &= value;
-            }
-        }
+        static void V_And<T>(Vector<T> source, Vector<T>* dest) where T : unmanaged, IBinaryInteger<T> => *dest &= source;
+        static void S_And<T>(T source, T* dest) where T : unmanaged, IBinaryInteger<T> => *dest &= source;
+        public static void And<T>(T* destination, T value, nuint length) where T : unmanaged, IBinaryInteger<T> => OperateCore(destination, value, length, V_And, S_And);
+        public static void And<T>(T* destination, T* source, nuint length) where T : unmanaged, IBinaryInteger<T> => OperateCore(destination, source, length, V_And, S_And);
 
-        private static unsafe void OrCore<T>(T* destination, T value, nuint length)
-            where T : unmanaged, IBinaryInteger<T>
-        {
-            var count = (nuint)Vector<T>.Count;
-            var source = Vector.Create(value);
-            var dstVec = (Vector<T>*)destination;
-            for (; length >= count; length -= count, dstVec++)
-            {
-                *dstVec |= source;
-            }
-            destination = (T*)dstVec;
-            for (; length is > 0; length--, destination++)
-            {
-                *destination |= value;
-            }
-        }
+        static void V_Or<T>(Vector<T> source, Vector<T>* dest) where T : unmanaged, IBinaryInteger<T> => *dest |= source;
+        static void S_Or<T>(T source, T* dest) where T : unmanaged, IBinaryInteger<T> => *dest |= source;
+        public static void Or<T>(T* destination, T value, nuint length) where T : unmanaged, IBinaryInteger<T> => OperateCore(destination, value, length, V_Or, S_Or);
+        public static void Or<T>(T* destination, T* source, nuint length) where T : unmanaged, IBinaryInteger<T> => OperateCore(destination, source, length, V_Or, S_Or);
 
-        private static unsafe void XorCore<T>(T* destination, T value, nuint length)
-            where T : unmanaged, IBinaryInteger<T>
-        {
-            var count = (nuint)Vector<T>.Count;
-            var source = Vector.Create(value);
-            var dstVec = (Vector<T>*)destination;
-            for (; length >= count; length -= count, dstVec++)
-            {
-                *dstVec ^= source;
-            }
-            destination = (T*)dstVec;
-            for (; length is > 0; length--, destination++)
-            {
-                *destination ^= value;
-            }
-        }
+        static void V_Xor<T>(Vector<T> source, Vector<T>* dest) where T : unmanaged, IBinaryInteger<T> => *dest ^= source;
+        static void S_Xor<T>(T source, T* dest) where T : unmanaged, IBinaryInteger<T> => *dest ^= source;
+        public static void Xor<T>(T* destination, T value, nuint length) where T : unmanaged, IBinaryInteger<T> => OperateCore(destination, value, length, V_Xor, S_Xor);
+        public static void Xor<T>(T* destination, T* source, nuint length) where T : unmanaged, IBinaryInteger<T> => OperateCore(destination, source, length, V_Xor, S_Xor);
 
-        private static unsafe void NandCore<T>(T* destination, T value, nuint length)
-            where T : unmanaged, IBinaryInteger<T>
-        {
-            var count = (nuint)Vector<T>.Count;
-            var source = Vector.Create(value);
-            var dstVec = (Vector<T>*)destination;
-            for (; length >= count; length -= count, dstVec++)
-            {
-                *dstVec &= ~source;
-            }
-            destination = (T*)dstVec;
-            for (; length is > 0; length--, destination++)
-            {
-                *destination &= ~value;
-            }
-        }
+        static void V_Nand<T>(Vector<T> source, Vector<T>* dest) where T : unmanaged, IBinaryInteger<T> => *dest = ~(*dest & source);
+        static void S_Nand<T>(T source, T* dest) where T : unmanaged, IBinaryInteger<T> => *dest = ~(*dest & source);
+        public static void Nand<T>(T* destination, T value, nuint length) where T : unmanaged, IBinaryInteger<T> => OperateCore(destination, value, length, V_Nand, S_Nand);
+        public static void Nand<T>(T* destination, T* source, nuint length) where T : unmanaged, IBinaryInteger<T> => OperateCore(destination, source, length, V_Nand, S_Nand);
 
-        private static unsafe void NorCore<T>(T* destination, T value, nuint length)
-            where T : unmanaged, IBinaryInteger<T>
-        {
-            var count = (nuint)Vector<T>.Count;
-            var source = Vector.Create(value);
-            var dstVec = (Vector<T>*)destination;
-            for (; length >= count; length -= count, dstVec++)
-            {
-                *dstVec |= ~source;
-            }
-            destination = (T*)dstVec;
-            for (; length is > 0; length--, destination++)
-            {
-                *destination |= ~value;
-            }
-        }
+        static void V_Nor<T>(Vector<T> source, Vector<T>* dest) where T : unmanaged, IBinaryInteger<T> => *dest = ~(*dest | source);
+        static void S_Nor<T>(T source, T* dest) where T : unmanaged, IBinaryInteger<T> => *dest = ~(*dest | source);
+        public static void Nor<T>(T* destination, T value, nuint length) where T : unmanaged, IBinaryInteger<T> => OperateCore(destination, value, length, V_Nor, S_Nor);
+        public static void Nor<T>(T* destination, T* source, nuint length) where T : unmanaged, IBinaryInteger<T> => OperateCore(destination, source, length, V_Nor, S_Nor);
 
-        private static unsafe void XnorCore<T>(T* destination, T value, nuint length)
-            where T : unmanaged, IBinaryInteger<T>
-        {
-            var count = (nuint)Vector<T>.Count;
-            var source = Vector.Create(value);
-            var dstVec = (Vector<T>*)destination;
-            for (; length >= count; length -= count, dstVec++)
-            {
-                *dstVec ^= ~source;
-            }
-            destination = (T*)dstVec;
-            for (; length is > 0; length--, destination++)
-            {
-                *destination ^= ~value;
-            }
-        }
-
-        private static unsafe void AndCore<T>(T* destination, T* source, nuint length)
-            where T : unmanaged, IBinaryInteger<T>
-        {
-            var count = (nuint)Vector<T>.Count;
-            var srcVec = (Vector<T>*)source;
-            var dstVec = (Vector<T>*)destination;
-            for (; length >= count; length -= count, srcVec++, dstVec++)
-            {
-                *dstVec &= *srcVec;
-            }
-            source = (T*)srcVec;
-            destination = (T*)dstVec;
-            for (; length is > 0; length--, source++, destination++)
-            {
-                *destination &= *source;
-            }
-        }
-
-        private static unsafe void OrCore<T>(T* destination, T* source, nuint length)
-            where T : unmanaged, IBinaryInteger<T>
-        {
-            var count = (nuint)Vector<T>.Count;
-            var srcVec = (Vector<T>*)source;
-            var dstVec = (Vector<T>*)destination;
-            for (; length >= count; length -= count, srcVec++, dstVec++)
-            {
-                *dstVec |= *srcVec;
-            }
-            source = (T*)srcVec;
-            destination = (T*)dstVec;
-            for (; length is > 0; length--, source++, destination++)
-            {
-                *destination |= *source;
-            }
-        }
-
-        private static unsafe void XorCore<T>(T* destination, T* source, nuint length)
-            where T : unmanaged, IBinaryInteger<T>
-        {
-            var count = (nuint)Vector<T>.Count;
-            var srcVec = (Vector<T>*)source;
-            var dstVec = (Vector<T>*)destination;
-            for (; length >= count; length -= count, srcVec++, dstVec++)
-            {
-                *dstVec ^= *srcVec;
-            }
-            source = (T*)srcVec;
-            destination = (T*)dstVec;
-            for (; length is > 0; length--, source++, destination++)
-            {
-                *destination ^= *source;
-            }
-        }
-
-        private static unsafe void NandCore<T>(T* destination, T* source, nuint length)
-            where T : unmanaged, IBinaryInteger<T>
-        {
-            var count = (nuint)Vector<T>.Count;
-            var srcVec = (Vector<T>*)source;
-            var dstVec = (Vector<T>*)destination;
-            for (; length >= count; length -= count, srcVec++, dstVec++)
-            {
-                *dstVec &= ~*srcVec;
-            }
-            source = (T*)srcVec;
-            destination = (T*)dstVec;
-            for (; length is > 0; length--, source++, destination++)
-            {
-                *destination &= ~*source;
-            }
-        }
-
-        private static unsafe void NorCore<T>(T* destination, T* source, nuint length)
-            where T : unmanaged, IBinaryInteger<T>
-        {
-            var count = (nuint)Vector<T>.Count;
-            var srcVec = (Vector<T>*)source;
-            var dstVec = (Vector<T>*)destination;
-            for (; length >= count; length -= count, srcVec++, dstVec++)
-            {
-                *dstVec |= ~*srcVec;
-            }
-            source = (T*)srcVec;
-            destination = (T*)dstVec;
-            for (; length is > 0; length--, source++, destination++)
-            {
-                *destination |= ~*source;
-            }
-        }
-
-        private static unsafe void XnorCore<T>(T* destination, T* source, nuint length)
-            where T : unmanaged, IBinaryInteger<T>
-        {
-            var count = (nuint)Vector<T>.Count;
-            var srcVec = (Vector<T>*)source;
-            var dstVec = (Vector<T>*)destination;
-            for (; length >= count; length -= count, srcVec++, dstVec++)
-            {
-                *dstVec ^= ~*srcVec;
-            }
-            source = (T*)srcVec;
-            destination = (T*)dstVec;
-            for (; length is > 0; length--, source++, destination++)
-            {
-                *destination ^= ~*source;
-            }
-        }
+        static void V_Xnor<T>(Vector<T> source, Vector<T>* dest) where T : unmanaged, IBinaryInteger<T> => *dest = ~(*dest ^ source);
+        static void S_Xnor<T>(T source, T* dest) where T : unmanaged, IBinaryInteger<T> => *dest = ~(*dest ^ source);
+        public static void Xnor<T>(T* destination, T value, nuint length) where T : unmanaged, IBinaryInteger<T> => OperateCore(destination, value, length, V_Xnor, S_Xnor);
+        public static void Xnor<T>(T* destination, T* source, nuint length) where T : unmanaged, IBinaryInteger<T> => OperateCore(destination, source, length, V_Xnor, S_Xnor);
     }
 }

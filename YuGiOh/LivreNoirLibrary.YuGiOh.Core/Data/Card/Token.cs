@@ -7,8 +7,8 @@ namespace LivreNoirLibrary.YuGiOh.Data
     {
         public string NameForSearch { get; internal set; }
         public bool IsInitialized { get; internal set; }
-        public SortedCardList Generators { get; } = [];
-        public SortedCardList Referers { get; } = [];
+        public SortedCardIdList Generators { get; } = [];
+        public SortedCardIdList Referers { get; } = [];
 
         public Token(int id, string name)
         {
@@ -20,8 +20,8 @@ namespace LivreNoirLibrary.YuGiOh.Data
 
     public class TokenCollection : List<Token>
     {
-        public SortedCardList Generic { get; } = [];
-        public SortedCardList Except { get; } = [];
+        public SortedCardIdList Generic { get; } = [];
+        public SortedCardIdList Except { get; } = [];
 
         private readonly Dictionary<string, int> _indexes = [];
 

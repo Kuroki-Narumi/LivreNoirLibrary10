@@ -6,7 +6,7 @@ using LivreNoirLibrary.Text;
 
 namespace LivreNoirLibrary.Media.Wave
 {
-    public readonly record struct DataChunk(long Position, uint Length) : IRiffChunk<DataChunk>, IJsonWriter
+    public readonly record struct DataChunk(long Position, uint Length) : IRiffChunk<DataChunk>, IWriteJson
     {
         public string Chid => ChunkIds.Data;
         public uint ByteSize => Length;

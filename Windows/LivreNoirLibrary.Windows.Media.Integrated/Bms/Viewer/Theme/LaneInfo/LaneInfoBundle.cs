@@ -8,7 +8,7 @@ using LivreNoirLibrary.Media.Bms;
 
 namespace LivreNoirLibrary.Windows.Media.Bms
 {
-    public class LaneInfoBundle : ObservableObjectBase, IEnumerable<LaneInfo>
+    public class LaneInfoBundle : ObservableObjectBase, ISafeEnumerable<LaneInfo>
     {
         [JsonPropertyName("name")]
         public string? Name { get; set => SetValue(ref field, value); }
@@ -34,7 +34,6 @@ namespace LivreNoirLibrary.Windows.Media.Bms
 
         public List<LaneInfo>.Enumerator GetEnumerator() => Lanes.GetEnumerator();
         IEnumerator<LaneInfo> IEnumerable<LaneInfo>.GetEnumerator() => GetEnumerator();
-        IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 
         public static LaneInfoBundle Conductor { get; } = new("Basic",
         [

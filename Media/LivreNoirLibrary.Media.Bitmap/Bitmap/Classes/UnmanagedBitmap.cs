@@ -40,7 +40,7 @@ namespace LivreNoirLibrary.Media
             Height = height;
         }
 
-        public override string ToString() => $"{this.GetTypeName()}{{0x{(nint)_buffer.Pointer:X16}:{Width}x{Height}}}";
+        public override string ToString() => $"{this.GetFriendlyTypeName()}{{0x{(nint)_buffer.Pointer:X16}:{Width}x{Height}}}";
 
         protected override void DisposeManaged()
         {

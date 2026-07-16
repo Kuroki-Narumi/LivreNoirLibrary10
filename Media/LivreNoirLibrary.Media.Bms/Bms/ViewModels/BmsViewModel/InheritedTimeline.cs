@@ -54,8 +54,7 @@ namespace LivreNoirLibrary.Media.Bms.ViewModels
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private static IEnumerable<(BarPosition, List<Note>)> EnumerateCore(TwoMergedEnumerator<BarPosition, List<Note>> enumer)
         {
-            using var o = ObjectPool.Rent<List<Note>>();
-            var buffer = o.Value;
+            using var o = ObjectPool.RentList<Note>(out var buffer);
             foreach (var (pos, list1, list2) in enumer)
             {
                 if (list1 is not null && list2 is not null)

@@ -19,7 +19,7 @@ namespace LivreNoirLibrary.YuGiOh.Scraping
         const string Id_CardSet = "CardSet";
         const string Id_UpdateList = "update_list";
 
-        public static async Task UpdateAllCards(ICollection<int> ids, CardDataCollection? cards = null, CardPackCollection? packs = null, ProgressReporter? p = null, CancellationToken c = default)
+        public static async Task UpdateAllCards(ICollection<int> ids, CardDataCollection cards, CardPackCollection packs, ProgressReporter? p = null, CancellationToken c = default)
         {
             p?.ReportInitial("loading card data");
             var i = 0;
@@ -32,13 +32,12 @@ namespace LivreNoirLibrary.YuGiOh.Scraping
                 if (card is not null)
                 {
                     p?.Report($"{i}/{max}: {card.Name}", i, max);
-                    cards?.Add(card);
-                    if (packs is not null)
+                    card = cards.Add(card);
+                    foreach (var info in card.PackInfo)
                     {
-                        foreach (var info in card.PackInfo)
+                        if (packs.TryGet(info.ProductId, out var pack))
                         {
-                            var pack = packs.Get(info.ProductId);
-                            pack.Add(new(card.Id, info.Number));
+                            pack.Add(new(card, info.Number));
                         }
                     }
                 }
@@ -130,7 +129,7 @@ namespace LivreNoirLibrary.YuGiOh.Scraping
         private static void UpdateCardInfo(Data.Card card, HtmlDocument document, HtmlNode cardset)
         {
             using var o1 = ObjectPool.RentStringBuilder(out var sb);
-            using var o2 = ObjectPool.Rent<List<string>>(out var spcList);
+            using var o2 = ObjectPool.RentList<string>(out var spcList);
             var t0 = Stopwatch.GetTimestamp();
 
             // カード名
@@ -307,14 +306,14 @@ namespace LivreNoirLibrary.YuGiOh.Scraping
                                 }
                             }
                             // 種族
-                            if (spcList.Count is > 0 && spcList[0].TryGetMonsterType(out var mType))
+                            if (spcList.Count is > 0 && Vocab.TryGetMonsterType(spcList[0], out var mType))
                             {
                                 card.MonsterType = mType;
                                 spcList.RemoveAt(0);
                             }
                             // カードタイプ
                             card.CardType = CardType.Main_Monster;
-                            if (spcList.Count is > 0 && spcList[0].TryGetCardType(out var cType))
+                            if (spcList.Count is > 0 && Vocab.TryGetCardType(spcList[0], out var cType))
                             {
                                 card.CardType = cType;
                                 spcList.RemoveAt(0);
@@ -458,7 +457,9 @@ namespace LivreNoirLibrary.YuGiOh.Scraping
             return sb.ToString();
         }
 
-        const string Class_Flex1Contents = "flex_1 contents ";
+        const string Class_Inside = "inside";
+        const string Class_Time = "time";
+        const string Class_PackName = "pack_name flex_1";
         const string Class_Number = "card_number";
 
         private static void UpdatePackList(Data.Card card, HtmlDocument? document, bool tcg)
@@ -468,21 +469,41 @@ namespace LivreNoirLibrary.YuGiOh.Scraping
                 return;
             }
             var packs = card.PackInfo;
-            foreach (var div in node.EnumerateNodes(Tags.Div, klass: Class_Flex1Contents))
+            foreach (var div in node.EnumerateNodes(Tags.Div, klass: Class_Inside))
             {
-                string? number = null, pid = null;
-                if (div.SelectSingleNode(Tags.Div, klass:Class_Number) is { } numberNode)
+                DateTime date = default;
+                string? name = null, number = null, pid = null;
+                if (TryGetString(div, Class_Time, out var span))
                 {
-                    number = numberNode.InnerText.Trim();
+                    date = DateTime.Parse(span);
                 }
-                if (Url.TryGetPackId(div.InnerHtml, out var pidSpan))
+                if (TryGetString(div, Class_PackName, out span))
                 {
-                    pid = Data.CardPack.EnsureTcgSuffix(pidSpan, tcg);
+                    name = new(span);
+                }
+                if (TryGetString(div, Class_Number, out span))
+                {
+                    number = new(span);
+                }
+                if (Url.TryGetPackId(div.InnerHtml, out span))
+                {
+                    pid = Data.CardPack.EnsureTcgSuffix(span, tcg);
                 }
                 if (pid is not null && number is not null)
                 {
-                    packs.Add(new(pid, number));
+                    packs.Add(new(pid, number, name ?? "", date));
                 }
+            }
+
+            static bool TryGetString(HtmlNode node, string klass, out ReadOnlySpan<char> span)
+            {
+                if (node.SelectSingleNode(Tags.Div, klass: klass) is { } child)
+                {
+                    span = child.InnerText.AsSpan().Trim();
+                    return true;
+                }
+                span = default;
+                return false;
             }
         }
     }

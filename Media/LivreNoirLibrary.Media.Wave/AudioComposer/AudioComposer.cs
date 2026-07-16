@@ -1,4 +1,5 @@
 ﻿using LivreNoirLibrary.Collections;
+using LivreNoirLibrary.ObjectModel;
 using NAudio.Wave;
 using System;
 using System.Collections;
@@ -6,7 +7,7 @@ using System.Collections.Generic;
 
 namespace LivreNoirLibrary.Media.Wave
 {
-    public class AudioComposer<TKey> : ISampleProvider
+    public class AudioComposer<TKey> : ISampleProvider, IClear
     {
         public IWaveBufferProvider<TKey> Provider { get; set; }
         public IAudioTimeline<TKey> Timeline { get; set; }

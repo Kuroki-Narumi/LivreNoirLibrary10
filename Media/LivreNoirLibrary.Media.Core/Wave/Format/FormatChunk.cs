@@ -19,7 +19,7 @@ namespace LivreNoirLibrary.Media.Wave
     /// <param name="BlockAlign">bytes per (sample * channels)</param>
     /// <param name="Bits">number of bits per sample of mono data</param>
     public readonly record struct FormatChunk(FormatType Tag, ushort Channels, uint SampleRate, uint BytesPerSecond, ushort BlockAlign, ushort Bits) : 
-        IRiffChunk<FormatChunk>, IDumpable, ILoadable<FormatChunk>, IJsonWriter
+        IRiffChunk<FormatChunk>, IDumpable, ILoadable<FormatChunk>, IWriteJson
     {
         public string Chid => ChunkIds.Format;
         public uint ByteSize => HasExtension ? 40u : Tag is FormatType.PCM ? 16u : 18u;

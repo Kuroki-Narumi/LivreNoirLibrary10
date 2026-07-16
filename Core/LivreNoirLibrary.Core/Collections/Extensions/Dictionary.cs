@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http.Headers;
 using System.Runtime.CompilerServices;
+using static LivreNoirLibrary.Collections.CollectionExtensions;
 
 namespace LivreNoirLibrary.Collections
 {
@@ -526,6 +527,49 @@ namespace LivreNoirLibrary.Collections
                 if (dic2.Count == 0)
                 {
                     dic.Remove(key1);
+                }
+                return true;
+            }
+            return false;
+        }
+
+        public static TValue GetOrAdd<TKey, TValue, TAlternateKey>(this Dictionary<TKey, TValue>.AlternateLookup<TAlternateKey> lookup, TAlternateKey key)
+            where TKey : notnull
+            where TValue : new()
+            where TAlternateKey : notnull, allows ref struct
+        {
+            if (!lookup.TryGetValue(key, out var value))
+            {
+                value = new();
+                lookup[key] = value;
+            }
+            return value;
+        }
+
+        public delegate TValue AlternateValueFactory<TAlternateKey, TValue>(TAlternateKey key) where TAlternateKey : allows ref struct;
+
+        public static TValue GetOrAdd<TKey, TValue, TAlternateKey>(this Dictionary<TKey, TValue>.AlternateLookup<TAlternateKey> lookup, TAlternateKey key, AlternateValueFactory<TAlternateKey, TValue> factory)
+            where TKey : notnull
+            where TAlternateKey : notnull, allows ref struct
+        {
+            if (!lookup.TryGetValue(key, out var value))
+            {
+                value = factory(key);
+                lookup[key] = value;
+            }
+            return value;
+        }
+
+        public static bool Remove<TKey, TValue, TAlternateKey>(this Dictionary<TKey, List<TValue>>.AlternateLookup<TAlternateKey> lookup, TAlternateKey key, TValue value)
+            where TKey : notnull
+            where TValue : new()
+            where TAlternateKey : notnull, allows ref struct
+        {
+            if (lookup.TryGetValue(key, out var list) && list.Remove(value))
+            {
+                if (list.Count is 0)
+                {
+                    lookup.Remove(key);
                 }
                 return true;
             }

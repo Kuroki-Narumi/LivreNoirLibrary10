@@ -9,7 +9,7 @@ using System;
 
 namespace LivreNoirLibrary.Windows.Controls.Bms
 {
-    public class BgaSource(IBgaVisibilityProvider provider) : ObservableObjectBase
+    public class BgaSource(IBgaVisibilityProvider provider) : ObservableObjectBase, IClear
     {
         public IBgaVisibilityProvider Provider { get; set => SetValue(ref field, value); } = provider;
 

@@ -8,8 +8,7 @@
              xmlns:ct="clr-namespace:LivreNoirLibrary.Windows.Controls;assembly=LivreNoirLibrary.Windows.Controls"
              xmlns:md="clr-namespace:LivreNoirLibrary.Windows.Media;assembly=LivreNoirLibrary.Windows.Media"
              xmlns:ygd="clr-namespace:LivreNoirLibrary.YuGiOh.Data;assembly=LivreNoirLibrary.YuGiOh.Core"
-             mc:Ignorable="d" d:DataContext="{d:DesignInstance Type=local:CardInfoView}"
-             FontSize="14" FontFamily="Meiryo" Background="White"
+             mc:Ignorable="d"
              d:DesignHeight="450" d:DesignWidth="800">
     <UserControl.Resources>
         <ResourceDictionary>
@@ -70,22 +69,22 @@
             <local:ExpanderStateConverter x:Key="ExpConv"/>
         </ResourceDictionary>
     </UserControl.Resources>
-    <Grid RowDefinitions="Auto, *, 6, Auto">
+    <Grid RowDefinitions="Auto, *, 6, Auto" x:Name="MainGrid" d:DataContext="{d:DesignInstance Type=local:CardInfoViewModel}">
         <!-- card name -->
         <Grid Grid.Row="0" ColumnDefinitions="Auto, Auto, *" RowDefinitions="Auto, Auto, Auto">
             <Label Grid.Row="0" Content="{Binding CInfo.Name.Value, Source={x:Static ygo:Vocab.Current}}"/>
             <ct:Button Grid.Row="0" Style="{StaticResource CopyButton}" Tag="{Binding ElementName=TextBox_Name}"/>
-            <TextBox Grid.Row="0" x:Name="TextBox_Name" Text="{Binding Source.Name, Mode=OneWay}"/>
+            <TextBox Grid.Row="0" x:Name="TextBox_Name" Text="{Binding Card.Name, Mode=OneWay}"/>
             
             <Label Grid.Row="1" Content="{Binding CInfo.Ruby.Value, Source={x:Static ygo:Vocab.Current}}"/>
             <ct:Button Grid.Row="1" Style="{StaticResource CopyButton}" Tag="{Binding ElementName=TextBox_Ruby}"/>
-            <TextBox Grid.Row="1" x:Name="TextBox_Ruby" Text="{Binding Source.Ruby, Mode=OneWay}"/>
+            <TextBox Grid.Row="1" x:Name="TextBox_Ruby" Text="{Binding Card.Ruby, Mode=OneWay}"/>
             
             <Label Grid.Row="2" Content="{Binding CInfo.EnName.Value, Source={x:Static ygo:Vocab.Current}}"/>
             <ct:Button Grid.Row="2" Style="{StaticResource CopyButton}" Tag="{Binding ElementName=TextBox_EnName}"/>
-            <TextBox Grid.Row="2" x:Name="TextBox_EnName" Text="{Binding Source.EnName, Mode=OneWay}"/>
+            <TextBox Grid.Row="2" x:Name="TextBox_EnName" Text="{Binding Card.EnName, Mode=OneWay}"/>
 
-            <ct:Button Grid.Column="2" Style="{StaticResource IconButtonBase}" Content="{Binding Detach.Value, Source={x:Static ygo:Vocab.Current}}" Icon="{x:Static md:Icons.NewWindow}" Background="Transparent" HorizontalAlignment="Right" Click="OnClick_Detach" Visibility="{Binding CanDetach, Converter={StaticResource BVConv}}" Margin="1,3"/>
+            <ct:Button Grid.Column="2" Style="{StaticResource IconButtonBase}" Content="{Binding Detach.Value, Source={x:Static ygo:Vocab.Current}}" Icon="{x:Static md:Icons.NewWindow}" Background="Transparent" HorizontalAlignment="Right" Click="OnClick_Detach" Visibility="{Binding CanDetach, Converter={StaticResource BVConv}}" Margin="1,3" Padding="3,0"/>
         </Grid>
         <!-- card info -->
         <Grid Grid.Row="1" ColumnDefinitions="*, 8, *" RowDefinitions="Auto, *">
@@ -93,10 +92,10 @@
             <Grid Grid.Row="0" Grid.Column="0" ColumnDefinitions="1*, 5*">
                 <Label Content="{Binding CInfo.CardType.Value, Source={x:Static ygo:Vocab.Current}}"/>
                 <Grid Grid.Column="1" ColumnDefinitions="Auto, *, Auto, Auto">
-                    <ct:IconPresenter Grid.Column="0" Source="{Binding Source.Icon}" Margin="4,0,2,0"/>
-                    <TextBlock Grid.Column="1" Text="{Binding Source.CardTypeText}" Margin="0"/>
-                    <ct:IconPresenter Grid.Column="2" Source="{Binding Source.LimitIcon}" Margin="8,0,2,0"/>
-                    <TextBlock Grid.Column="3" Text="{Binding Source.LimitText}" Margin="0,0,4,0"/>
+                    <ct:IconPresenter Grid.Column="0" Source="{Binding Card.Icon}" Margin="4,0,2,0"/>
+                    <TextBlock Grid.Column="1" Text="{Binding Card.CardTypeText}" Margin="0"/>
+                    <ct:IconPresenter Grid.Column="2" Margin="8,0,2,0" Source="{Binding Card.LimitIcon}"/>
+                    <TextBlock Grid.Column="3" Margin="0,0,4,0" Text="{Binding Card.LimitText}"/>
                 </Grid>
             </Grid>
             <!-- card text -->
@@ -104,7 +103,7 @@
                 <Label Grid.Column="0" Content="{Binding CInfo.Text.Value, Source={x:Static ygo:Vocab.Current}}"/>
                 <ct:Button Style="{StaticResource CopyButton}" Tag="{Binding ElementName=TextBox_Text}"/>
                 <TextBlock Grid.Column="2" FontSize="13" Margin="0" VerticalAlignment="Bottom">
-                    <Run Text="{Binding CInfo.Id.Value, Source={x:Static ygo:Vocab.Current}, Mode=OneWay}"/>:<Run Text="{Binding Source.Id}"/>
+                    <Run Text="{Binding CInfo.Id.Value, Source={x:Static ygo:Vocab.Current}, Mode=OneWay}"/>:<Run Text="{Binding Card.Id}"/>
                     <Hyperlink Focusable="False" Click="OnClick_DB1">
                         <Run Text="{Binding OfficialDatabase.Value, Source={x:Static ygo:Vocab.Current}, Mode=OneWay}"/>
                     </Hyperlink>
@@ -113,48 +112,48 @@
                     </Hyperlink>
                 </TextBlock>
             </Grid>
-            <TextBox Grid.Row="1" Grid.Column="2" x:Name="TextBox_Text" Style="{StaticResource TextBox_Text}" Text="{Binding Source.Text, Mode=OneWay, Converter={StaticResource LFConv}}"/>
+            <TextBox Grid.Row="1" Grid.Column="2" x:Name="TextBox_Text" Style="{StaticResource TextBox_Text}" Text="{Binding Card.Text, Mode=OneWay, Converter={StaticResource LFConv}}"/>
             <TextBlock Grid.Row="1" Grid.Column="2" Style="{StaticResource TextBlock_TextLength}" Text="{Binding Text, ElementName=TextBox_Text, Converter={StaticResource TextLengthConverter}}"/>
             <!-- monster info -->
             <Grid Grid.Row="1" Grid.Column="0" RowDefinitions="Auto, *">
-                <Grid Grid.Row="0" RowDefinitions="Auto, Auto, Auto, *" Visibility="{Binding IsMonster, Converter={StaticResource BVConv}}">
+                <Grid Grid.Row="0" RowDefinitions="Auto, Auto, Auto" Visibility="{Binding HasMonsterInfo, Converter={StaticResource BVConv}}">
                     <Grid Grid.Row="0" ColumnDefinitions="*, 2*, *, 2*">
                         <Label Grid.Column="0" Content="{Binding CInfo.Attribute.Value, Source={x:Static ygo:Vocab.Current}}"/>
                         <StackPanel Grid.Column="1" Orientation="Horizontal">
-                            <ct:IconPresenter Source="{Binding Source.AttributeIcon}" Margin="4,0,2,0"/>
-                            <TextBlock Text="{Binding Source.AttributeText}" Margin="0"/>
+                            <ct:IconPresenter Source="{Binding Card.AttributeIcon}" Margin="4,0,2,0"/>
+                            <TextBlock Text="{Binding Card.AttributeText}" Margin="0"/>
                         </StackPanel>
                         <Label Grid.Column="2" Content="{Binding CInfo.MonsterType.Value, Source={x:Static ygo:Vocab.Current}}"/>
-                        <TextBlock Grid.Column="3" Text="{Binding Source.MonsterTypeText}"/>
+                        <TextBlock Grid.Column="3" Text="{Binding Card.MonsterTypeText}"/>
                     </Grid>
                     <Grid Grid.Row="1" ColumnDefinitions="*, 5*">
                         <Label Grid.Column="0" Content="{Binding CInfo.Ability.Value, Source={x:Static ygo:Vocab.Current}}"/>
-                        <TextBlock Grid.Column="1" Text="{Binding Source.AbilityTextWithType}"/>
+                        <TextBlock Grid.Column="1" Text="{Binding Card.AbilityTextWithType}"/>
                     </Grid>
                     <Grid Grid.Row="2" ColumnDefinitions="*, *, *, *, 2*">
                         <Label Grid.Column="0" Content="{Binding LevelName}"/>
-                        <TextBlock Grid.Column="1" Text="{Binding Source.LevelText}"/>
+                        <TextBlock Grid.Column="1" Text="{Binding Card.LevelText}"/>
                         <Label Grid.Column="2" Content="{Binding CInfo.Atk.Value, Source={x:Static ygo:Vocab.Current}}"/>
-                        <TextBlock Grid.Column="3" Text="{Binding Source.AtkText}"/>
-                        <Grid Grid.Column="4" ColumnDefinitions="*, *" Visibility="{Binding IsLink, Converter={StaticResource TVConvI}}">
+                        <TextBlock Grid.Column="3" Text="{Binding Card.AtkText}"/>
+                        <Grid Grid.Column="4" ColumnDefinitions="*, *" Visibility="{Binding IsLevelEnabled, Converter={StaticResource BVConv}}">
                             <Label Grid.Column="0" Content="{Binding CInfo.Def.Value, Source={x:Static ygo:Vocab.Current}}"/>
-                            <TextBlock Grid.Column="1" Text="{Binding Source.DefText}"/>
+                            <TextBlock Grid.Column="1" Text="{Binding Card.DefText}"/>
                         </Grid>
-                        <Grid Grid.Column="4" ColumnDefinitions="1.25*, 0.75*" Visibility="{Binding IsLink, Converter={StaticResource BVConv}}">
+                        <Grid Grid.Column="4" ColumnDefinitions="1.25*, 0.75*" Visibility="{Binding IsLevelEnabled, Converter={StaticResource TVConvI}}">
                             <Label Grid.Column="0" Content="{Binding CInfo.LinkMarker.Value, Source={x:Static ygo:Vocab.Current}}"/>
-                            <local:LinkMarkerView Grid.Column="1" IsReadOnly="True" Direction="{Binding LinkMarker, Mode=OneWay}" Width="{Binding ActualHeight, RelativeSource={RelativeSource Self}}"/>
+                            <local:LinkMarkerView Grid.Column="1" IsReadOnly="True" Direction="{Binding LinkDirections, Mode=OneWay}" Width="{Binding ActualHeight, RelativeSource={RelativeSource Self}}"/>
                         </Grid>
                     </Grid>
                 </Grid>
                 <!-- pendulum info -->
-                <Grid Grid.Row="1" RowDefinitions="Auto, *" Visibility="{Binding IsPendulum, Converter={StaticResource BVConv}}">
+                <Grid Grid.Row="1" RowDefinitions="Auto, *" Visibility="{Binding HasPendulumInfo, Converter={StaticResource BVConv}}">
                     <Grid Grid.Row="0" ColumnDefinitions="*, 2*, 2*, *">
                         <Label Content="{Binding CInfo.PendulumText.Value, Source={x:Static ygo:Vocab.Current}}"/>
                         <ct:Button Style="{StaticResource CopyButton}" Tag="{Binding ElementName=TextBox_PText}"/>
                         <Label Grid.Column="2" Content="{Binding CInfo.PendulumScale.Value, Source={x:Static ygo:Vocab.Current}}"/>
-                        <TextBlock Grid.Column="3" Text="{Binding Source.PendulumScale}"/>
+                        <TextBlock Grid.Column="3" Text="{Binding Card.PendulumScale}"/>
                     </Grid>
-                    <TextBox Grid.Row="1" Grid.Column="2" x:Name="TextBox_PText" Style="{StaticResource TextBox_Text}" Text="{Binding Source.PendulumText, Mode=OneWay, Converter={StaticResource LFConv}}"/>
+                    <TextBox Grid.Row="1" Grid.Column="2" x:Name="TextBox_PText" Style="{StaticResource TextBox_Text}" Text="{Binding Card.PendulumText, Mode=OneWay, Converter={StaticResource LFConv}}"/>
                     <TextBlock Grid.Row="1" Grid.Column="2" Style="{StaticResource TextBlock_TextLength}" Text="{Binding Text, ElementName=TextBox_PText, Converter={StaticResource TextLengthConverter}}"/>
                 </Grid>
             </Grid>
@@ -171,16 +170,16 @@
                         </StackPanel.Resources>
                         <TextBlock Text="{Binding CInfo.PackInfo.Value, Source={x:Static ygo:Vocab.Current}}" Margin="0,0,1,0"/>
                         <TextBlock Text="("/>
-                        <TextBlock Text="{Binding Source.PackInfo.OcgCount}"/>
+                        <TextBlock Text="{Binding Card.PackInfo.OcgCount}"/>
                         <TextBlock Text="+"/>
-                        <TextBlock Text="{Binding Source.PackInfo.TcgCount}"/>
+                        <TextBlock Text="{Binding Card.PackInfo.TcgCount}"/>
                         <TextBlock Text="="/>
-                        <TextBlock Text="{Binding Source.PackInfo.Count}"/>
+                        <TextBlock Text="{Binding Card.PackInfo.Count}"/>
                         <TextBlock Text=")"/>
                     </StackPanel>
                 </Expander.Header>
             </Expander>
-            <ListBox Grid.Column="0" Style="{StaticResource ListBox_Link}" ItemsSource="{Binding Source.PackInfo}" Height="{Binding IsExpanded, ElementName=Expander_PackList, Converter={StaticResource ExpConv}}">
+            <ListBox Grid.Column="0" Style="{StaticResource ListBox_Link}" ItemsSource="{Binding Card.PackInfo}" Height="{Binding IsExpanded, ElementName=Expander_PackList, Converter={StaticResource ExpConv}}">
                 <ListBox.ItemTemplate>
                     <DataTemplate DataType="ygd:PackInfo">
                         <Grid Background="Transparent" ColumnDefinitions="Auto, 4, Auto, 4, *">
@@ -216,10 +215,10 @@
                 </StackPanel.Resources>
                 <TextBlock Text="{Binding CInfo.RelatedList.Value, Source={x:Static ygo:Vocab.Current}}" Margin="4,0,1,0"/>
                 <TextBlock Text="("/>
-                <TextBlock Text="{Binding Source.RelatedList.Count}"/>
+                <TextBlock Text="{Binding RelatedTexts.Count}"/>
                 <TextBlock Text=")"/>
             </StackPanel>
-            <ListBox Grid.Column="2" Style="{StaticResource ListBox_Link}" ItemsSource="{Binding Source.RelatedList}">
+            <ListBox Grid.Column="2" Style="{StaticResource ListBox_Link}" ItemsSource="{Binding RelatedTexts}">
                 <ListBox.ItemTemplate>
                     <DataTemplate DataType="string">
                         <Grid Background="Transparent">

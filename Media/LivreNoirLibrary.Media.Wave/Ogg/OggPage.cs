@@ -96,8 +96,7 @@ namespace LivreNoirLibrary.Media.Ogg
 
         public static string GetSegmentsTableText(ReadOnlySpan<byte> segmentsTable)
         {
-            using var o = ObjectPool.Rent<StringBuilder>();
-            var sb = o.Value;
+            using var o = ObjectPool.RentStringBuilder(out var sb);
             sb.Append('[');
             var flag = false;
             foreach (var b in segmentsTable)

@@ -12,7 +12,7 @@ using LivreNoirLibrary.Collections;
 
 namespace LivreNoirLibrary.Media.Ogg.Vorbis
 {
-    public class VorbisCommentList : List<VorbisComment>, IJsonWriter
+    public class VorbisCommentList : List<VorbisComment>, IWriteJson
     {
         public const string DefaultVendor = "LivreNoirLibrary";
 

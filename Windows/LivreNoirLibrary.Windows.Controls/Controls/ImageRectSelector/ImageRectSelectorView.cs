@@ -186,7 +186,7 @@ namespace LivreNoirLibrary.Windows.Controls
                 for (; end < value.Length; end++)
                 {
                     var c = span[end];
-                    if (!char.IsDigit(c) && c is not '.' or ',')
+                    if (!char.IsDigit(c) && c is not ('.' or ','))
                     {
                         break;
                     }

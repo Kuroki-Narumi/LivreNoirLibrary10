@@ -257,7 +257,7 @@ namespace LivreNoirLibrary.Text
         private static string GetListTextCore<T>(IEnumerable<T> source, ToBasedDelegate<T> func, T start, int radix, int minDgits, int maxDigits)
             where T : INumber<T>
         {
-            using var obj = ObjectPool.Rent<List<Segment>>(out var list);
+            using var obj = ObjectPool.RentList<Segment>(out var list);
             foreach (var index in source)
             {
                 var text = func(index, radix, minDgits, maxDigits);

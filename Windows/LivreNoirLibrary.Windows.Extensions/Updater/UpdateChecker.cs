@@ -4,6 +4,8 @@ using System.Windows;
 using System.IO;
 using LivreNoirLibrary.IO;
 using LivreNoirLibrary.Text;
+using System.Threading.Tasks;
+using System.Threading;
 
 namespace LivreNoirLibrary.Windows
 {
@@ -15,29 +17,26 @@ namespace LivreNoirLibrary.Windows
         public const string UpdaterName = "updater.exe";
         private static bool _checking;
 
-        public static async void CheckUpdate<T>(this T window, bool force = true)
+        public static async Task CheckUpdate<T>(this T window, bool force = true, CancellationToken c = default)
             where T : Window, IUpdateCheck
         {
-            if ((force || window.CheckUpdate) && !_checking)
+            if (!_checking && (force || window.CheckUpdate))
             {
-                var updater = GetUpdaterPath(window.SettingName);
+                c.ThrowIfCancellationRequested();
+                var updater = GetUpdaterPath(window.UpdaterLocation);
                 if (File.Exists(updater))
                 {
                     File.Delete(updater);
                 }
                 _checking = true;
                 window.CheckUpdate = true;
-                var info = await UpdateInfo.CheckVersion(window.VersionUrl);
+                c.ThrowIfCancellationRequested();
+                var info = await UpdateInfo.CheckVersion(window.VersionUrl, c);
                 if (info is not null)
                 {
-                    var message = window.GetMessage_NewVersion();
-                    if (message.Contains("{0}"))
+                    if (window.NotifyNewVersion(info.Version))
                     {
-                        message = string.Format(message, info.Version.ToStringAuto());
-                    }
-                    if (window.ShowMessage_YesNo(message, MessageBoxImage.Information) is MessageBoxResult.Yes)
-                    {
-                        window.SetDispatcher(() => ExecuteUpdate(window, updater, info));
+                        await window.SetDispatcher(() => ExecuteUpdate(window, updater, info));
                     }
                     else
                     {
@@ -46,8 +45,9 @@ namespace LivreNoirLibrary.Windows
                 }
                 else if (force)
                 {
-                    window.ShowMessage_OK(window.GetMessage_NoUpdate(), MessageBoxImage.Information);
+                    await window.SetDispatcher(window.NotifyNoUpdate);
                 }
+                c.ThrowIfCancellationRequested();
                 _checking = false;
             }
         }

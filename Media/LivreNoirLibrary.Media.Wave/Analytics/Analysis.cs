@@ -1,11 +1,12 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using LivreNoirLibrary.Collections;
 using LivreNoirLibrary.Numerics;
 
 namespace LivreNoirLibrary.Media.Wave
 {
-    public partial class Analysis : IEnumerable<Analysis.Channel>
+    public partial class Analysis : ISafeEnumerable<Analysis.Channel>
     {
         public int Channels { get; }
         public int SampleRate { get; }
@@ -61,7 +62,5 @@ namespace LivreNoirLibrary.Media.Wave
                 yield return _channelData[c];
             }
         }
-
-        IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
     }
 }

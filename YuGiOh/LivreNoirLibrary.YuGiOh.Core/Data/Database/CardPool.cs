@@ -1,31 +1,25 @@
 ﻿using System;
 using System.Diagnostics;
-using System.Diagnostics.CodeAnalysis;
-using System.IO;
 using System.Text.Json;
+using System.Text.Json.Serialization;
 using LivreNoirLibrary.Text;
 using LivreNoirLibrary.YuGiOh.Converters;
 
 namespace LivreNoirLibrary.YuGiOh.Data
 {
-    public class CardPool : IJsonWriter
+    [JsonConverter(typeof(CardPoolJsonConverter))]
+    public class CardPool : IWriteJson
     {
         public const string DefaultResourceName = "Resources/CardPool.json";
-
-        public static CardPool Instance { get; } = new();
+        public static string ResourceFilePath { get; set; } = Utils.GetFullPath(DefaultResourceName);
 
         public CardDataCollection Cards { get; } = [];
         public CardPackCollection Packs { get; } = [];
         public DateTime LastUpdate { get; set; }
 
-        public bool LoadFile(string path = "")
+        public bool LoadFile(string path)
         {
             var t0 = Stopwatch.GetTimestamp();
-            if (!File.Exists(path))
-            {
-                path = Utils.GetFullPath(path);
-            }
-
             if (Json.TryOpen<Serializable.CardPool>(path, out var data))
             {
                 Console.WriteLine($"CardPool: got json object in {Stopwatch.GetElapsedTime(t0).TotalMilliseconds}ms");
@@ -39,12 +33,12 @@ namespace LivreNoirLibrary.YuGiOh.Data
         public void Load(Serializable.CardPool source)
         {
             var t0 = Stopwatch.GetTimestamp();
-            Packs.Load(source.Packs);
-            Console.WriteLine($"CardPool: loaded Packs in {Stopwatch.GetElapsedTime(t0).TotalMilliseconds}ms");
-
-            t0 = Stopwatch.GetTimestamp();
             Cards.Load(source.Cards);
             Console.WriteLine($"CardPool: loaded Cards in {Stopwatch.GetElapsedTime(t0).TotalMilliseconds}ms");
+
+            t0 = Stopwatch.GetTimestamp();
+            Packs.Load(source.Packs, Cards);
+            Console.WriteLine($"CardPool: loaded Packs in {Stopwatch.GetElapsedTime(t0).TotalMilliseconds}ms");
 
             t0 = Stopwatch.GetTimestamp();
             UpdateCardPackInfo();
@@ -54,19 +48,19 @@ namespace LivreNoirLibrary.YuGiOh.Data
 
         public void UpdateCardPackInfo()
         {
-            foreach (var card in Cards.AsSpan())
+            var cards = Cards;
+            foreach (var card in cards)
             {
                 card.PackInfo.Clear();
             }
             foreach (var pack in Packs.AsSpan())
             {
                 var pid = pack.ProductId;
+                var name = pack.Name;
+                var date = pack.Date;
                 foreach (var info in pack.AsSpan())
                 {
-                    if (TryGet(info.CardId, out var card))
-                    {
-                        card.PackInfo.Add(new(pid, info.Number));
-                    }
+                    info.Card.PackInfo.Add(new(pid, info.Number, name, date));
                 }
             }
         }
@@ -82,12 +76,5 @@ namespace LivreNoirLibrary.YuGiOh.Data
             DateTimeJsonConverter.Write(writer, LastUpdate);
             writer.WriteEndObject();
         }
-
-        public Card Get(int id) => Cards.Get(id);
-        public Card Get(string name) => Cards.Get(name);
-        public bool TryGet(int id, [MaybeNullWhen(false)] out Card card) => Cards.TryGet(id, out card);
-        public bool TryGet(string name, [MaybeNullWhen(false)] out Card card) => Cards.TryGet(name, out card);
-
-        public CardPack GetPack(string pid) => Packs.Get(pid);
     }
 }

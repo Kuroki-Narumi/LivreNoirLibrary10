@@ -55,6 +55,11 @@ namespace LivreNoirLibrary.Windows.YuGiOh.Controls
         [DependencyProperty]
         private bool _isReadOnly;
 
+        private void OnDirectionChanged(LinkDirection value)
+        {
+            ToolTip = value is 0 ? null : value.GetName();
+        }
+
         protected override void OnRenderSizeChanged(SizeChangedInfo sizeInfo)
         {
             base.OnRenderSizeChanged(sizeInfo);

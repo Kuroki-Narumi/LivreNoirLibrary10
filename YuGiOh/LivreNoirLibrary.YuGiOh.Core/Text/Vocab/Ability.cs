@@ -57,7 +57,7 @@ namespace LivreNoirLibrary.YuGiOh
         public static string GetName(this Ability value) => string.Join(Ability_Separator, GetNames(value));
         public static string GetSingleName(this Ability value) => GetEnumName(value, _abi2name);
 
-        public static Ability GetAbility(this ReadOnlySpan<char> text)
+        public static Ability GetAbility(ReadOnlySpan<char> text)
         {
             var result = YuGiOh.Ability.Normal;
             foreach (var range in Regex_Separators.EnumerateSplits(text))
@@ -75,7 +75,7 @@ namespace LivreNoirLibrary.YuGiOh
             return result;
         }
 
-        public static Ability GetAbility(this IEnumerable<string> names)
+        public static Ability GetAbility(IEnumerable<string> names)
         {
             var value = YuGiOh.Ability.Normal;
             foreach (var name in names)

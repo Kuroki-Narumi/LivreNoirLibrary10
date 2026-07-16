@@ -272,70 +272,7 @@ namespace LivreNoirLibrary.YuGiOh.Search
         public NumberRange TextLength { get; } = new(0, 999, false, false);
         public NumberRange PTextLength { get; } = new(0, 999, false, false);
 
-        public override void Clear()
-        {
-            CardType_Monster = false;
-            CardType_Spell = false;
-            CardType_Trap = false;
-
-            Limit_Forbidden = Limit_Limit1 = Limit_Limit1 = Limit_Unlimited = Limit_Specified = false;
-            Attribute_Light = Attribute_Dark = Attribute_Water = Attribute_Fire = Attribute_Earth = Attribute_Wind = false;
-
-            MonsterType_Spellcaster = false;
-            MonsterType_Dragon = false;
-            MonsterType_Zombie = false;
-            MonsterType_Warrior = false;
-            MonsterType_BeastWarrior = false;
-            MonsterType_Beast = false;
-            MonsterType_WingedBeast = false;
-            MonsterType_Machine = false;
-            MonsterType_Fiend = false;
-            MonsterType_Fairy = false;
-            MonsterType_Insect = false;
-            MonsterType_Dinosaur = false;
-            MonsterType_Reptile = false;
-            MonsterType_Fish = false;
-            MonsterType_SeaSerpent = false;
-            MonsterType_Aqua = false;
-            MonsterType_Pyro = false;
-            MonsterType_Thunder = false;
-            MonsterType_Rock = false;
-            MonsterType_Plant = false;
-            MonsterType_Psychic = false;
-            MonsterType_Wyrm = false;
-            MonsterType_Cyberse = false;
-            MonsterType_Illusion = false;
-            MonsterType_DivineBeast = false;
-            MonsterType_CreatorGod = false;
-
-            Status_Normal = Status_Effect = false;
-            Ability_Or = true;
-            Ability_And = false;
-            Ability_SpecialSummon = Ability_Pendulum = Ability_Toon = Ability_Gemini = Ability_Union = Ability_Spirit = Ability_Tuner = Ability_Flip = false;
-            AbilityEx_SpecialSummon = AbilityEx_Pendulum = AbilityEx_Toon = AbilityEx_Gemini = AbilityEx_Union = AbilityEx_Spirit = AbilityEx_Tuner = AbilityEx_Flip = false;
-
-            Level_0 = Level_1 = Level_2 = Level_3 = Level_4 = Level_5 = Level_6 = Level_7 = Level_8 = Level_9 = Level_10 = Level_11 = Level_12 = Level_13 = false;
-            Atk.Set(-1, 5000, false, false);
-            Def.Set(-1, 5000, false, false);
-            PScale_0 = PScale_1 = PScale_2 = PScale_3 = PScale_4 = PScale_5 = PScale_6 = PScale_7 = PScale_8 = PScale_9 = PScale_10 = PScale_11 = PScale_12 = PScale_13 = false;
-            LinkMarkers = default;
-            LinkMarker_Or = false;
-            LinkMarker_And = true;
-            IsStatusExpressionEnabled = false;
-            StatusExpression.Expression = "";
-
-            Locale_Any = true;
-            Locale_OcgExists = Locale_OnlyOcg = Locale_TcgExists = Locale_OnlyTcg = Locale_Both = false;
-            FirstDate.Set(Utils.DateStart, DateTime.Now, false, false);
-            LastDate.Set(Utils.DateStart, DateTime.Now, false, false);
-            Date_Ocg = Date_Tcg = false;
-            TextLength.Set(0, 999, false, false);
-            PTextLength.Set(0, 999, false, false);
-
-            base.Clear();
-        }
-
-        public void CopyFrom(CardSearchConditions conditions, bool copyText = true)
+        public void CopyFrom(CardSearchConditions conditions)
         {
             var ctype = conditions.CardTypes;
             CardType_MainMonster = ctype.Contains(CardType.Main_Monster);
@@ -485,14 +422,11 @@ namespace LivreNoirLibrary.YuGiOh.Search
             TextLength.CopyFrom(conditions.TextLength);
             PTextLength.CopyFrom(conditions.PTextLength);
 
-            if (copyText)
-            {
-                SearchText = conditions.SearchText;
-            }
+            SearchText = conditions.SearchText;
             SetTextFlags(conditions.TextFlags);
         }
 
-        public void CopyTo(CardSearchConditions conditions, bool copyText = true)
+        public void CopyTo(CardSearchConditions conditions)
         {
             var ctype = conditions.CardTypes;
             ctype.Clear();
@@ -645,10 +579,7 @@ namespace LivreNoirLibrary.YuGiOh.Search
             conditions.TextLength.CopyFrom(TextLength);
             conditions.PTextLength.CopyFrom(PTextLength);
 
-            if (copyText)
-            {
-                conditions.SearchText = SearchText ?? "";
-            }
+            conditions.SearchText = SearchText ?? "";
             conditions.TextFlags = GetTextFlags();
         }
     }

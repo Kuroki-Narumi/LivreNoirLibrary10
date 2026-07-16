@@ -28,8 +28,8 @@ namespace LivreNoirLibrary.Media.Bms
         }
 
         public bool ContainsKey(short key) => SortedList.ContainsKey(_keys, key);
-        public bool TryGetValue(short key, [MaybeNullWhen(false)] out string value) => SortedList.TryGetValue(_keys, _values, key, out value);
-        public bool TryGetKey(string value, out short key) => SortedList.TryGetKey(_keys, _values, value, out key);
+        public bool TryGetValue(short key, [MaybeNullWhen(false)] out string value) => SortedList.TryGetValue(_keys, _values, key, out _, out value);
+        public bool TryGetKey(string value, out short key) => SortedList.TryGetKey(_keys, _values, value, out _, out key);
 
         public void Set(short key, string? value)
         {
@@ -68,6 +68,5 @@ namespace LivreNoirLibrary.Media.Bms
 
         public SortedList.Enumerator<short, string> GetEnumerator() => SortedList.GetEnumerator(_keys, _values);
         IEnumerator<(short, string)> IEnumerable<(short, string)>.GetEnumerator() => SortedList.GetSafeEnumerator(_keys, _values);
-        System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator() => SortedList.GetSafeEnumerator(_keys, _values);
     }
 }

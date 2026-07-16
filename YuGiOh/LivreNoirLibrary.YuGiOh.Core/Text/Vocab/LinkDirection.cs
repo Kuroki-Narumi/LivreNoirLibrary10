@@ -51,9 +51,9 @@ namespace LivreNoirLibrary.YuGiOh
             return list.AsSpan();
         }
 
-        public static string GetName(this LinkDirection value) => string.Join('/', GetNames(value));
+        public static string GetName(this LinkDirection value, char separator = ',') => string.Join(separator, GetNames(value));
 
-        public static LinkDirection GetDirection(this ReadOnlySpan<char> text)
+        public static LinkDirection GetDirection(ReadOnlySpan<char> text)
         {
             var result = LinkDirection.None;
             foreach (var range in Regex_Separators.EnumerateSplits(text))

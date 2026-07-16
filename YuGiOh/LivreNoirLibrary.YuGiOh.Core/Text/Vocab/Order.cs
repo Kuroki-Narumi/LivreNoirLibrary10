@@ -51,8 +51,8 @@ namespace LivreNoirLibrary.YuGiOh
             return dic;
         }
 
-        public static string GetName(Order value) => GetEnumName(value, _order2name);
-        public static string GetFullName(Order value) => GetEnumName(value, _order2name_full);
+        public static string GetName(this Order value) => GetEnumName(value, _order2name);
+        public static string GetFullName(this Order value) => GetEnumName(value, _order2name_full);
         public static Order GetOrder(ReadOnlySpan<char> name) => GetEnumValue(name, _name2order);
     }
 }

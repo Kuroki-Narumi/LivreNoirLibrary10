@@ -1,9 +1,10 @@
+using LivreNoirLibrary.Numerics;
+using LivreNoirLibrary.ObjectModel;
+using LivreNoirLibrary.Text;
 using System;
 using System.Collections.Generic;
 using System.Text.Json.Serialization;
 using System.Text.RegularExpressions;
-using LivreNoirLibrary.Text;
-using LivreNoirLibrary.Numerics;
 
 namespace LivreNoirLibrary.Media.Bms
 {
@@ -23,7 +24,7 @@ namespace LivreNoirLibrary.Media.Bms
             {
                 _channels.Clear();
                 _channels.UnionWith(value);
-                SendPropertyChanged();
+                this.NotifyPropertyChanged();
             }
         }
 

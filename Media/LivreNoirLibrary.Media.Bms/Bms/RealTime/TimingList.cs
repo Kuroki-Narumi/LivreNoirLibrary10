@@ -44,14 +44,10 @@ namespace LivreNoirLibrary.Media.Bms
             var bgmList = BgmTimeline;
             var bgaList = _bga;
             var metaList = _meta;
-            using var obj1 = ObjectPool.Rent<Dictionary<int, SoundInfo>>();
-            using var obj2 = ObjectPool.Rent<Dictionary<Channel, KeyInfo>>();
-            using var obj3 = ObjectPool.Rent<Dictionary<int, string>>();
-            using var obj4 = ObjectPool.Rent<Dictionary<int, string>>();
-            var lastBgmNotes = obj1.Value;
-            var lastNoteLane = obj2.Value;
-            var wavFilenames = obj3.Value;
-            var bgaFilenames = obj4.Value;
+            using var obj1 = ObjectPool.RentDictionary<int, SoundInfo>(out var lastBgmNotes);
+            using var obj2 = ObjectPool.RentDictionary<Channel, KeyInfo>(out var lastNoteLane);
+            using var obj3 = ObjectPool.RentDictionary<int, string>(out var wavFilenames);
+            using var obj4 = ObjectPool.RentDictionary<int, string>(out var bgaFilenames);
             var count = 0;
             foreach (var (pos, list) in source.CurrentTimeline.EnumerateList())
             {

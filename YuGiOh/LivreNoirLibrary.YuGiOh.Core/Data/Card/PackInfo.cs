@@ -3,17 +3,15 @@ using System.Diagnostics.CodeAnalysis;
 
 namespace LivreNoirLibrary.YuGiOh.Data
 {
-    public class PackInfo(string pid, string number) : IEquatable<PackInfo>, IComparable<PackInfo>
+    public class PackInfo(string pid, string number, string name, DateTime date) : IEquatable<PackInfo>, IComparable<PackInfo>
     {
         public string ProductId { get; } = pid;
         public string Number { get; } = number;
+        public string Name { get; } = name;
+        public DateTime Date { get; } = date;
 
-        public CardPack PackData => CardPool.Instance.GetPack(ProductId);
-        public string Name => PackData.Name;
-        public DateTime Date => PackData.Date;
-        public string DateText => PackData.DateText;
-
-        public bool IsTcg() => CardPack.IsTcgPack(ProductId);
+        public bool IsTcg => CardPack.IsTcgPack(ProductId);
+        public string DateText => CardPack.GetDateText(Date);
 
         public int CompareTo(PackInfo? other)
         {
@@ -39,24 +37,5 @@ namespace LivreNoirLibrary.YuGiOh.Data
         public static bool operator <=(PackInfo left, PackInfo right) => left.CompareTo(right) <= 0;
         public static bool operator >(PackInfo left, PackInfo right) => left.CompareTo(right) > 0;
         public static bool operator >=(PackInfo left, PackInfo right) => left.CompareTo(right) >= 0;
-    }
-
-    public readonly struct PackFullInfo
-    {
-        public readonly string ProductId { get; }
-        public readonly string PackName { get; }
-        public readonly DateTime Date { get; }
-        public readonly string DateText { get; }
-        public readonly string Number { get; }
-
-        internal PackFullInfo(PackInfo source, CardPackCollection packs)
-        {
-            var pack = packs.Get(source.ProductId);
-            ProductId = pack.ProductId;
-            PackName = pack.Name;
-            Date = pack.Date;
-            DateText = pack.DateText;
-            Number = source.Number;
-        }
     }
 }

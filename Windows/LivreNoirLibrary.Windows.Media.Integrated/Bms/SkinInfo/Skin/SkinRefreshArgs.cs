@@ -1,11 +1,12 @@
-﻿using System;
+﻿using LivreNoirLibrary.ObjectModel;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
 
 namespace LivreNoirLibrary.Windows.Media.Bms.SkinInfo
 {
-    public class SkinRefreshArgs
+    public class SkinRefreshArgs : IClear
     {
         private readonly Dictionary<string, Skin> _skins = [];
 

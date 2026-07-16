@@ -9,7 +9,7 @@ namespace LivreNoirLibrary.YuGiOh.Search
 {
     public static class SmallWorld
     {
-        public static bool IsMatch(ICard a, ICard b, int requiredCount = 1)
+        public static bool IsMatch(Card a, Card b, int requiredCount = 1)
         {
             var match = 0;
             if (a.MonsterType == b.MonsterType) match++;
@@ -20,7 +20,7 @@ namespace LivreNoirLibrary.YuGiOh.Search
             return match == requiredCount;
         }
 
-        public static bool IsMatch(ICard a, ICard b, out string matchText, int requiredCount = 1)
+        public static bool IsMatch(Card a, Card b, out string matchText, int requiredCount = 1)
         {
             using var o = ObjectPool.RentStringBuilder(out var sb);
             var match = 0;
@@ -65,9 +65,10 @@ namespace LivreNoirLibrary.YuGiOh.Search
             {
                 foreach (var b in source.EnumerateCards())
                 {
-                    if (b.IsMainMonster() && IsMatch(a, b))
+                    var bCard = b.ThisCard;
+                    if (b.IsMainMonster() && IsMatch(a.ThisCard, bCard))
                     {
-                        yield return b;
+                        yield return bCard;
                     }
                 }
             }
@@ -104,8 +105,8 @@ namespace LivreNoirLibrary.YuGiOh.Search
             {
                 if (card.IsMainMonster())
                 {
-                    buffer.Add(card);
-                    result.Add(card.Name);
+                    buffer.Add(card.ThisCard);
+                    result.Add(card.ThisCard.Name);
                 }
             }
             var count = buffer.Count;

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using LivreNoirLibrary.Collections;
 
 namespace LivreNoirLibrary.Media.Bms.ViewModels
 {

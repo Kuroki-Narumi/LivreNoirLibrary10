@@ -42,7 +42,7 @@ namespace LivreNoirLibrary.YuGiOh.Scraping
         [GeneratedRegex(@"(?<=\?ope=2&cid=)(\d+)")]
         private static partial Regex Regex_CardUrl { get; }
 
-        [GeneratedRegex(@"(?<=\?ope=1&sess=1&pid=)([^&])+")]
+        [GeneratedRegex(@"(?<=\?ope=1&sess=1&pid=)([^&]+)")]
         private static partial Regex Regex_PackUrl { get; }
 
         public static bool TryGetCardId(ReadOnlySpan<char> text, out int id)

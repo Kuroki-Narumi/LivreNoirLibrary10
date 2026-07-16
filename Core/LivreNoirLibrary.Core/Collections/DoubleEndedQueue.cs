@@ -1,4 +1,5 @@
-﻿using System;
+﻿using LivreNoirLibrary.ObjectModel;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
@@ -7,7 +8,7 @@ using System.Runtime.CompilerServices;
 
 namespace LivreNoirLibrary.Collections
 {
-    public class DoubleEndedQueue<T> : IReadOnlyCollection<T>
+    public class DoubleEndedQueue<T> : IReadOnlyCollection<T>, IClear
     {
         public const int DefaultCapacity = 4;
 

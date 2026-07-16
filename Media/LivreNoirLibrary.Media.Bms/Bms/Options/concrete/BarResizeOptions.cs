@@ -27,7 +27,7 @@ namespace LivreNoirLibrary.Media.Bms
             {
                 _numbers.Clear();
                 _numbers.UnionWith(value);
-                SendPropertyChanged();
+                this.NotifyPropertyChanged();
             }
         }
 

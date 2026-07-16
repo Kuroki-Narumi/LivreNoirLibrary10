@@ -35,7 +35,8 @@ namespace LivreNoirLibrary.Windows
             }
             if (ptr is not 0)
             {
-                return BitmapFrame.Create(Imaging.CreateBitmapSourceFromHIcon(ptr, Int32Rect.Empty, BitmapSizeOptions.FromEmptyOptions()));
+                var source = Imaging.CreateBitmapSourceFromHIcon(ptr, Int32Rect.Empty, BitmapSizeOptions.FromEmptyOptions());
+                return source;
             }
             return null;
         }

@@ -86,7 +86,7 @@ namespace LivreNoirLibrary.YuGiOh.Search
             _notEffective = input1.Count is 0;
         }
 
-        public bool IsMatch(ICard card)
+        public bool IsMatch(Card card)
         {
             if (_notEffective)
             {

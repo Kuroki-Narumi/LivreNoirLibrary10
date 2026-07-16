@@ -3,6 +3,7 @@ using LivreNoirLibrary.ObjectModel;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
 using System.Windows.Media;
@@ -30,9 +31,9 @@ namespace LivreNoirLibrary.Windows
             }
         }
 
-        public static void SetDispatcher(this DispatcherObject? obj, Action action, DispatcherPriority timing = DispatcherPriority.Loaded)
+        public static DispatcherOperation SetDispatcher(this DispatcherObject obj, Action action, DispatcherPriority timing = DispatcherPriority.Loaded)
         {
-            obj?.Dispatcher.BeginInvoke(action, timing);
+            return obj.Dispatcher.BeginInvoke(action, timing);
         }
 
         public static DependencyObject? GetParent(this DependencyObject? obj)
@@ -66,7 +67,6 @@ namespace LivreNoirLibrary.Windows
         }
 
         public static bool TryGetSelfOrAncestor<T>(this DependencyObject? obj, [NotNullWhen(true)] out T? element)
-            where T : DependencyObject
         {
             if (obj is T target)
             {
@@ -76,7 +76,7 @@ namespace LivreNoirLibrary.Windows
             return TryGetAncestor(obj, out element);
         }
 
-        public static bool TryGetAncestor(this DependencyObject? obj, Predicate<DependencyObject> predicate, [MaybeNullWhen(false)] out DependencyObject ancestor)
+        public static bool TryGetAncestor(this DependencyObject? obj, Predicate<DependencyObject> predicate, [NotNullWhen(true)] out DependencyObject? ancestor)
         {
             while (obj is not null)
             {
@@ -93,7 +93,6 @@ namespace LivreNoirLibrary.Windows
         }
 
         public static bool TryGetAncestor<T>(this DependencyObject? obj, [NotNullWhen(true)] out T? ancestor)
-            where T : DependencyObject
         {
             while (obj is not null)
             {
@@ -105,12 +104,11 @@ namespace LivreNoirLibrary.Windows
                 }
                 obj = parent;
             }
-            ancestor = null;
+            ancestor = default;
             return false;
         }
 
-        public static bool TryGetAncestor<T>(this DependencyObject? obj, Predicate<T> predicate, [MaybeNullWhen(false)] out T ancestor)
-            where T : DependencyObject
+        public static bool TryGetAncestor<T>(this DependencyObject? obj, Predicate<T> predicate, [NotNullWhen(true)] out T? ancestor)
         {
             while (obj is not null)
             {
@@ -122,14 +120,26 @@ namespace LivreNoirLibrary.Windows
                 }
                 obj = parent;
             }
-            ancestor = null;
+            ancestor = default;
             return false;
         }
 
-        public static IEnumerable<DependencyObject> EnumerateDescendantsByQueue(this DependencyObject obj)
+        public static IEnumerable<DependencyObject> EnumerateAncestors(this DependencyObject? obj)
         {
-            using var o1 = ObjectPool.Rent<DoubleEndedQueue<DependencyObject>>();
-            var queue = o1.Value;
+            while (obj is not null)
+            {
+                yield return obj;
+                obj = GetParent(obj);
+            }
+        }
+
+        public static IEnumerable<DependencyObject> EnumerateDescendantsByQueue(this DependencyObject? obj)
+        {
+            if (obj is null)
+            {
+                yield break;
+            }
+            using var o1 = ObjectPool.RentQueue<DependencyObject>(out var queue);
             queue.Enqueue(obj);
             while (queue.TryDequeue(out var o))
             {
@@ -140,16 +150,19 @@ namespace LivreNoirLibrary.Windows
                     if (child is not null)
                     {
                         yield return child;
-                        queue.Push(child);
+                        queue.Enqueue(child);
                     }
                 }
             }
         }
 
-        public static IEnumerable<DependencyObject> EnumerateDescendantsByStack(this DependencyObject obj)
+        public static IEnumerable<DependencyObject> EnumerateDescendantsByStack(this DependencyObject? obj)
         {
-            using var o1 = ObjectPool.Rent<DoubleEndedQueue<DependencyObject>>();
-            var stack = o1.Value;
+            if (obj is null)
+            {
+                yield break;
+            }
+            using var o1 = ObjectPool.RentStack<DependencyObject>(out var stack);
             stack.Push(obj);
             while (stack.TryPop(out var o))
             {
@@ -184,7 +197,6 @@ namespace LivreNoirLibrary.Windows
         }
 
         public static bool TryGetFirstDescendant<T>(this DependencyObject? obj, [NotNullWhen(true)] out T? descendant)
-            where T : DependencyObject
         {
             if (obj is not null)
             {
@@ -197,12 +209,11 @@ namespace LivreNoirLibrary.Windows
                     }
                 }
             }
-            descendant = null;
+            descendant = default;
             return false;
         }
 
         public static bool TryGetFirstDescendant<T>(this DependencyObject? obj, Predicate<T> predicate, [NotNullWhen(true)] out T? descendant)
-            where T : DependencyObject
         {
             if (obj is not null)
             {
@@ -215,7 +226,7 @@ namespace LivreNoirLibrary.Windows
                     }
                 }
             }
-            descendant = null;
+            descendant = default;
             return false;
         }
 

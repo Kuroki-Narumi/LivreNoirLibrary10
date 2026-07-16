@@ -82,8 +82,7 @@ namespace LivreNoirLibrary.Media.Bms
 
             public int RemoveAll(Func<short, string, bool> selector, DefIndexMap? map = null)
             {
-                using var o = ObjectPool.Rent<List<short>>();
-                var remove = o.Value;
+                using var o = ObjectPool.RentList<short>(out var remove);
                 foreach (var (key, value) in obj)
                 {
                     if (key is not 0 && selector(key, value))

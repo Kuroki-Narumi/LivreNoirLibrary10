@@ -1,7 +1,6 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Runtime.InteropServices;
 
 namespace LivreNoirLibrary.Collections
 {
@@ -22,7 +21,7 @@ namespace LivreNoirLibrary.Collections
         {
             var current = _list[index];
             _list.RemoveAt(index);
-            OnCollectionRemoved(current, index);
+            this.NotifyCollectionRemoved(index, current);
         }
 
         /// <inheritdoc cref="List{T}.RemoveAt(int)"/>
@@ -32,7 +31,7 @@ namespace LivreNoirLibrary.Collections
         public void Insert(int index, T item)
         {
             _list.Insert(index, item);
-            OnCollectionAdded(item, index);
+            this.NotifyCollectionAdded(index, item);
         }
 
         /// <inheritdoc cref="List{T}.Insert"/>
@@ -42,7 +41,7 @@ namespace LivreNoirLibrary.Collections
         {
             var current = _list[index];
             _list[index] = item;
-            OnCollectionReplaced(item, current, index);
+            this.NotifyCollectionReplaced(index, current, item);
         }
 
         public void ReplaceWithoutNotify(int index, T item) => _list[index] = item;
@@ -51,35 +50,35 @@ namespace LivreNoirLibrary.Collections
         public void AddRange(IEnumerable<T> collection)
         {
             _list.AddRange(collection);
-            OnCollectionReset();
+            this.NotifyCollectionReset();
         }
 
         /// <inheritdoc cref="System.Collections.Generic.CollectionExtensions.AddRange"/>
         public void AddRange(params ReadOnlySpan<T> source)
         {
             _list.AddRange(source);
-            OnCollectionReset();
+            this.NotifyCollectionReset();
         }
 
         /// <inheritdoc cref="List{T}.InsertRange"/>
         public void InsertRange(int index, IEnumerable<T> collection)
         {
             _list.InsertRange(index, collection);
-            OnCollectionReset();
+            this.NotifyCollectionReset();
         }
 
         /// <inheritdoc cref="System.Collections.Generic.CollectionExtensions.InsertRange"/>
         public void InsertRange(int index, params ReadOnlySpan<T> source)
         {
             _list.InsertRange(index, source);
-            OnCollectionReset();
+            this.NotifyCollectionReset();
         }
 
         /// <inheritdoc cref="List{T}.RemoveRange"/>
         public void RemoveRange(int index, int count)
         {
             _list.RemoveRange(index, count);
-            OnCollectionReset();
+            this.NotifyCollectionReset();
         }
 
         public int RemoveRange(IEnumerable<T> collection)
@@ -94,7 +93,7 @@ namespace LivreNoirLibrary.Collections
             }
             if (count is > 0)
             {
-                OnCollectionReset();
+                this.NotifyCollectionReset();
             }
             return count;
         }
@@ -111,7 +110,7 @@ namespace LivreNoirLibrary.Collections
             }
             if (count is > 0)
             {
-                OnCollectionReset();
+                this.NotifyCollectionReset();
             }
             return count;
         }
@@ -122,7 +121,7 @@ namespace LivreNoirLibrary.Collections
             var count = _list.RemoveAll(match);
             if (count is > 0)
             {
-                OnCollectionReset();
+                this.NotifyCollectionReset();
             }
             return count;
         }
@@ -133,8 +132,8 @@ namespace LivreNoirLibrary.Collections
             var item2 = _list[index2];
             _list[index1] = item2;
             _list[index2] = item1;
-            OnCollectionMoved(item1, index2, index1);
-            OnCollectionMoved(item2, index1, index2);
+            this.NotifyCollectionMoved(index1, index2, item1);
+            this.NotifyCollectionMoved(index2, index1, item2);
         }
 
         public bool CanMoveDown(int index) => _list.CanMoveDown(index);
@@ -164,7 +163,7 @@ namespace LivreNoirLibrary.Collections
         public void Reverse(int index, int count)
         {
             _list.Reverse(index, count);
-            NotifyCollectionReset();
+            this.NotifyCollectionReset();
         }
 
         public void Sort() => Sort(0, _list.Count, null);
@@ -173,21 +172,21 @@ namespace LivreNoirLibrary.Collections
         public void Sort(int index, int count, IComparer<T>? comparer)
         {
             _list.Sort(index, count, comparer);
-            NotifyCollectionReset();
+            this.NotifyCollectionReset();
         }
 
         public void Shuffle() => Shuffle(Random.Shared);
         public void Shuffle(Random random)
         {
             random.Shuffle(_list.AsSpan());
-            NotifyCollectionReset();
+            this.NotifyCollectionReset();
         }
 
         public void Shuffle(int index, int count) => Shuffle(index, count, Random.Shared);
         public void Shuffle(int index, int count, Random random)
         {
             random.Shuffle(_list.AsSpan(index, count));
-            NotifyCollectionReset();
+            this.NotifyCollectionReset();
         }
 
         public void CopyTo(ICollection<T> target, int index, int count)

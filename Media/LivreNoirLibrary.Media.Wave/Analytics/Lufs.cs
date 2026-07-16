@@ -35,12 +35,10 @@ namespace LivreNoirLibrary.Media.Wave
             var blockSize = (int)(sampleRate * 0.4);
             var capacity = 1 + sampleLength / blockSize;
             using var o1 = ArrayPool.Rent<float>(capacity);
-            using var o2 = ObjectPool.Rent<List<float>>();
             // RMSを一時保存するためのリスト
             var msList = o1.Span;
-            // 
+            using var o2 = ObjectPool.RentList<float>(out var gatedList);
             var msFactor = _ms_factors.AsSpan();
-            var gatedList = o2.Value;
             try
             {
                 // 1. フィルタ

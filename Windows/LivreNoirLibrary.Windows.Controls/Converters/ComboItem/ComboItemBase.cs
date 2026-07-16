@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Windows.Media;
 
 namespace LivreNoirLibrary.Windows
 {
@@ -7,31 +8,31 @@ namespace LivreNoirLibrary.Windows
         where T : struct, Enum
     {
         public T Value { get; }
-        public string Name { get; }
+        public Brush? Background { get; }
         public int Row { get; }
         public int Column { get; }
 
-        protected ComboItemBase(T value, string name)
+        protected ComboItemBase(T value)
         {
             Value = value;
-            Name = name;
             Row = GetRow(value);
             Column = GetColumn(value);
+            Background = GetBackground(Row, Column);
         }
 
-        protected static Dictionary<T, TValue> CreateItems<TValue>(Func<T, TValue> creator)
+        protected static Dictionary<T, TValue> CreateMap<TValue>(TValue[] items)
+            where TValue : ComboItemBase<T>
         {
             Dictionary<T, TValue> result = [];
-            foreach (var value in Enum.GetValues<T>())
+            foreach (var item in items)
             {
-                result.Add(value, creator(value));
+                result[item.Value] = item;
             }
             return result;
         }
 
         protected virtual int GetRow(T value) => 0;
         protected virtual int GetColumn(T value) => 0;
-
-        public override string ToString() => Name;
+        protected virtual Brush? GetBackground(int row, int column) => null;
     }
 }

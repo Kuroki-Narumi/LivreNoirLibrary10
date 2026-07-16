@@ -56,10 +56,10 @@ namespace LivreNoirLibrary.YuGiOh.MasterDuel
             {
                 OpponentTags.Add(newName);
             }
-            SendPropertyChanged(nameof(UserTags));
-            SendPropertyChanged(nameof(UserTagText));
-            SendPropertyChanged(nameof(OpponentTags));
-            SendPropertyChanged(nameof(OpponentTagText));
+            this.NotifyPropertyChanged(nameof(UserTags));
+            this.NotifyPropertyChanged(nameof(UserTagText));
+            this.NotifyPropertyChanged(nameof(OpponentTags));
+            this.NotifyPropertyChanged(nameof(OpponentTagText));
         }
 
         public void SetUserTags(IEnumerable<string> source) => SetTags(UserTags, source, nameof(UserTags), nameof(UserTagText));
@@ -71,7 +71,7 @@ namespace LivreNoirLibrary.YuGiOh.MasterDuel
             tags.UnionWith(source);
             foreach (var prop in propertyNames)
             {
-                SendPropertyChanged(prop);
+                this.NotifyPropertyChanged(prop);
             }
         }
 

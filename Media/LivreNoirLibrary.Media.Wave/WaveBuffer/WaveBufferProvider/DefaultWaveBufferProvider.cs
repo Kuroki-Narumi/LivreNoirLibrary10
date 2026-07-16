@@ -1,11 +1,12 @@
 ﻿using LivreNoirLibrary.Debug;
+using LivreNoirLibrary.ObjectModel;
 using System;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
 
 namespace LivreNoirLibrary.Media.Wave
 {
-    public class WaveBufferProvider : IWaveBufferProvider<string>
+    public class WaveBufferProvider : IWaveBufferProvider<string>, IClear
     {
         private readonly WaveBuffer _buffer = new();
 

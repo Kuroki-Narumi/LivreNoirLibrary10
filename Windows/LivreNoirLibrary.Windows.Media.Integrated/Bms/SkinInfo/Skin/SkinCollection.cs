@@ -53,7 +53,7 @@ namespace LivreNoirLibrary.Windows.Media.Bms.SkinInfo
             var args = _refreshArgs;
             var playSkins = PlaySkins;
             _directory = directory;
-            SendPropertyChanged(nameof(RootDirectory));
+            this.NotifyPropertyChanged(nameof(RootDirectory));
             if (Directory.Exists(directory))
             {
                 var ctx = _ctx;

@@ -6,6 +6,7 @@ using System.Text;
 using System.Text.Json;
 using System.IO;
 using LivreNoirLibrary.Text;
+using LivreNoirLibrary.Collections;
 
 namespace LivreNoirLibrary.ObjectModel
 {
@@ -20,7 +21,7 @@ namespace LivreNoirLibrary.ObjectModel
         public static byte[] CreateBuffer(object obj)
         {
             using MemoryStream ms = new();
-            if (obj is IJsonWriter w)
+            if (obj is IWriteJson w)
             {
                 w.WriteJson(ms);
             }
@@ -146,7 +147,7 @@ namespace LivreNoirLibrary.ObjectModel
         }
     }
 
-    public abstract partial class JsonNode : ObservableObjectBase, IEnumerable<JsonNode>, INamedObject
+    public abstract partial class JsonNode : ObservableObjectBase, ISafeEnumerable<JsonNode>, INamedObject
     {
         public string Name { get; set => SetValue(ref field, value); } = "";
         public bool IsExpanded { get; set => SetValue(ref field, value, [nameof(ValueText)]); }
@@ -154,7 +155,6 @@ namespace LivreNoirLibrary.ObjectModel
         public abstract string ValueText { get; }
 
         public abstract IEnumerator<JsonNode> GetEnumerator();
-        IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
     }
 
     public partial class JsonValueNode : JsonNode

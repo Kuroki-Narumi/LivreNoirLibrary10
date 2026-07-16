@@ -117,8 +117,7 @@ namespace LivreNoirLibrary.Windows.Media.Bms.SkinInfo
                 value = null;
                 return false;
             }
-            using var o = ObjectPool.Rent<HashSet<string>>();
-            var reflected = o.Value;
+            using var o = ObjectPool.RentHashSet<string>(out var reflected);
             return TryResolveReflection(expr, provider, reflected, out value);
         }
 

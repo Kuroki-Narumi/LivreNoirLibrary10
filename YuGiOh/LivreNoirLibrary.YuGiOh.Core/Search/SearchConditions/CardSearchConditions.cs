@@ -129,12 +129,21 @@ namespace LivreNoirLibrary.YuGiOh.Search
             _textConds.Prepare();
         }
 
-        public bool IsMatch(ICard card)
+        public bool IsMatch(object? obj, ICardProvider? provider)
+        {
+            if (Card.TryGetCard(obj, provider, out var card))
+            {
+                return IsMatch(card);
+            }
+            return false;
+        }
+
+        public bool IsMatch(Card card)
         {
             // 種類
             if (SearchUtils.NotMatch(CardTypes, card.CardType)) return false;
             // リミット
-            if (SearchUtils.NotMatch(Limits, Regulation.Instance.Get(card))) return false;
+            if (SearchUtils.NotMatch(Limits, card.ActualLimitCount)) return false;
             // ロケール
             if (SearchUtils.NotMatch(card.IsOcgReleased(), OcgState)) return false;
             if (SearchUtils.NotMatch(card.IsTcgReleased(), TcgState)) return false;
@@ -223,7 +232,7 @@ namespace LivreNoirLibrary.YuGiOh.Search
             return _textConds.IsMatch(card);
         }
 
-        public static void CopyTo(CardSearchConditions from, CardSearchConditions to, bool copyText)
+        public static void Copy(CardSearchConditions from, CardSearchConditions to, bool copyText)
         {
             SearchUtils.CopyHashSet(from.CardTypes, to.CardTypes);
             SearchUtils.CopyHashSet(from.Limits, to.Limits);

@@ -9,7 +9,7 @@ using System.Text;
 
 namespace LivreNoirLibrary.Numerics
 {
-    public class RangeSet<T> : IEnumerable<RangeSet<T>.Range>
+    public class RangeSet<T> : ISafeEnumerable<RangeSet<T>.Range>, IClear
         where T : INumber<T>, IMinMaxValue<T>
     {
         private readonly List<Range> _ranges = [];
@@ -157,7 +157,6 @@ namespace LivreNoirLibrary.Numerics
 
         public List<Range>.Enumerator GetEnumerator() => _ranges.GetEnumerator();
         IEnumerator<Range> IEnumerable<Range>.GetEnumerator() => GetEnumerator();
-        IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 
         public readonly struct Range(T start, T end)
         {

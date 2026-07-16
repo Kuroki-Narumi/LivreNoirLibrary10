@@ -2,13 +2,12 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Collections.Specialized;
-using System.ComponentModel;
 using System.Runtime.InteropServices;
 using LivreNoirLibrary.ObjectModel;
 
 namespace LivreNoirLibrary.Collections
 {
-    public abstract class ObservableCollectionBase<T> : ObservableObjectBase, ICollection<T>, ICollection, INotifyCollectionChanged, INotifyPropertyChanged
+    public abstract class ObservableCollectionBase<T> : ObservableObjectBase, ICollection<T>, ICollection, IObservableCollection
     {
         internal protected readonly List<T> _list;
 
@@ -16,14 +15,12 @@ namespace LivreNoirLibrary.Collections
 
         public int Count => _list.Count;
 
-        public void NotifyCollectionReset() => OnCollectionReset();
-
         public ObservableCollectionBase(int capacity) => _list = new(capacity);
         public ObservableCollectionBase(IEnumerable<T> collection) => _list = [.. collection];
 
         public T GetItemAt(int index) => _list[index];
         public virtual int IndexOf(T item) => _list.IndexOf(item);
-        public bool Contains(T item) => _list.Contains(item);
+        public bool Contains(T item) => _list.Count is > 0 && IndexOf(item) is >= 0;
 
         /// <inheritdoc cref="CollectionsMarshal.AsSpan"/>
         public ReadOnlySpan<T> AsSpan() => _list.AsSpan();
@@ -35,7 +32,7 @@ namespace LivreNoirLibrary.Collections
         public void Clear()
         {
             ClearItems();
-            OnCollectionReset();
+            this.NotifyCollectionReset();
         }
 
         /// <inheritdoc cref="Clear"/>
@@ -46,11 +43,11 @@ namespace LivreNoirLibrary.Collections
             AddItem(item, out var replaced, out var index, out var oldItem);
             if (replaced)
             {
-                OnCollectionReplaced(item, oldItem, index);
+                this.NotifyCollectionReplaced(index, oldItem, item);
             }
             else
             {
-                OnCollectionAdded(item, index);
+                this.NotifyCollectionAdded(index, item);
             }
         }
 
@@ -62,7 +59,7 @@ namespace LivreNoirLibrary.Collections
             var index = RemoveItem(item);
             if (index is >= 0)
             {
-                OnCollectionRemoved(item, index);
+                this.NotifyCollectionRemoved(index, item);
                 return true;
             }
             return false;
@@ -101,7 +98,7 @@ namespace LivreNoirLibrary.Collections
 
         protected virtual int RemoveItem(T item)
         {
-            var index = _list.IndexOf(item);
+            var index = IndexOf(item);
             if (index is >= 0)
             {
                 _list.RemoveAt(index);
@@ -109,42 +106,7 @@ namespace LivreNoirLibrary.Collections
             return index;
         }
 
-        protected void OnCountChanged() => SendPropertyChanged(nameof(Count));
-
-        private static readonly NotifyCollectionChangedEventArgs _reset_args = new(NotifyCollectionChangedAction.Reset);
-
-        protected void OnCollectionReset()
-        {
-            OnCountChanged();
-            SendCollectionChanged(_reset_args);
-        }
-
-        protected void OnCollectionAdded(T item, int indexTo)
-        {
-            OnCountChanged();
-            SendCollectionChanged(new(NotifyCollectionChangedAction.Add, item, indexTo));
-        }
-
-        protected void OnCollectionRemoved(T item, int indexFrom)
-        {
-            OnCountChanged();
-            SendCollectionChanged(new(NotifyCollectionChangedAction.Remove, item, indexFrom));
-        }
-
-        protected void OnCollectionReplaced(T newItem, T? oldItem, int index)
-        {
-            SendCollectionChanged(new(NotifyCollectionChangedAction.Replace, newItem, oldItem, index));
-        }
-
-        protected void OnCollectionMoved(T item, int indexTo, int indexFrom)
-        {
-            SendCollectionChanged(new(NotifyCollectionChangedAction.Move, item, indexTo, indexFrom));
-        }
-
-        protected void SendCollectionChanged(NotifyCollectionChangedEventArgs e)
-        {
-            CollectionChanged?.Invoke(this, e);
-        }
+        void IObservableCollection.RaiseCollectionChanged(object sender, NotifyCollectionChangedEventArgs e) => CollectionChanged?.Invoke(sender, e);
 
         IEnumerator<T> IEnumerable<T>.GetEnumerator() => GetEnumerator();
         IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();

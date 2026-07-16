@@ -11,9 +11,10 @@ namespace LivreNoirLibrary.YuGiOh.Media
         Synchro,
         Xyz,
         Link,
-        Monster = 7,
+        Token,
+        Monster = Token,
 
-        Pendulum = 8,
+        Pendulum = 64,
         Effect_Pendulum = Effect | Pendulum,
         Fusion_Pendulum = Fusion | Pendulum,
         Ritual_Pendulum = Ritual | Pendulum,
@@ -30,7 +31,5 @@ namespace LivreNoirLibrary.YuGiOh.Media
         Trap = 32,
         Continuous_Trap,
         Counter_Trap,
-
-        Token = 64,
     }
 }

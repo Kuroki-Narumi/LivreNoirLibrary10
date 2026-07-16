@@ -5,7 +5,7 @@ using LivreNoirLibrary.UnsafeOperations;
 
 namespace LivreNoirLibrary.Media.Ogg.Vorbis
 {
-    public struct IdHeader : IJsonWriter
+    public struct IdHeader : IWriteJson
     {
         private static readonly int[] _valid_block_sizes = [64, 128, 256, 512, 1024, 2048, 4096, 8192];
         private static readonly int _valid_block_count = _valid_block_sizes.Length;

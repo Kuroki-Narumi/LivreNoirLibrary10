@@ -39,8 +39,10 @@ namespace LivreNoirLibrary.YuGiOh
         public const string TrapMonster = $"{Trap}{Monster}";
         public const string ContinuousTrapMonster = $"{Continuous_Trap}{Monster}";
 
-        private static readonly Dictionary<CardType, string> _cType2name = new()
+        private static Dictionary<CardType, string> CType2Name { get; } = new()
         {
+            { CardType.None, Unknown },
+
             { CardType.Main_Monster,    Monster },
             { CardType.Fusion_Monster,  Fusion },
             { CardType.Ritual_Monster,  Ritual },
@@ -55,19 +57,19 @@ namespace LivreNoirLibrary.YuGiOh
             { CardType.Continuous_Spell, Continuous_Spell },
             { CardType.Quick_Spell,  Quick_Spell },
             { CardType.Ritual_Spell, Ritual_Spell },
-            { CardType.SpellMonster, SpellMonster },
+            { CardType.Spell_Monster, SpellMonster },
 
             { CardType.Normal_Trap,     Normal_Trap },
             { CardType.Continuous_Trap, Continuous_Trap },
             { CardType.Counter_Trap,    Counter_Trap },
-            { CardType.TrapMonster, TrapMonster },
-            { CardType.Continuous_TrapMonster, ContinuousTrapMonster },
+            { CardType.Trap_Monster, TrapMonster },
+            { CardType.CTrap_Monster, ContinuousTrapMonster },
         };
 
-        private static readonly Dictionary<string, CardType>.AlternateLookup<ReadOnlySpan<char>> _name2cType = CreateName2CType();
+        private static Dictionary<string, CardType>.AlternateLookup<ReadOnlySpan<char>> Name2CType { get; } = CreateName2CType();
         private static Dictionary<string, CardType>.AlternateLookup<ReadOnlySpan<char>> CreateName2CType()
         {
-            var dic = CreateInvertedDictionary(_cType2name);
+            var dic = CreateInvertedDictionary(CType2Name);
 
             // "FusionMonster"ではなく"Fusion"と書かれていた場合のために
             dic[nameof(Fusion)] = CardType.Fusion_Monster;
@@ -84,7 +86,7 @@ namespace LivreNoirLibrary.YuGiOh
 
         public static string GetName(this CardType value, bool appendMonster = false)
         {
-            if (_cType2name.TryGetValue(value, out var name))
+            if (CType2Name.TryGetValue(value, out var name))
             {
                 if (appendMonster && value is >= CardType.Fusion_Monster and < CardType.Normal_Spell)
                 {
@@ -95,8 +97,8 @@ namespace LivreNoirLibrary.YuGiOh
             return value.ToString();
         }
 
-        public static CardType GetCardType(this ReadOnlySpan<char> name) => GetEnumValue(name, _name2cType);
-        public static bool TryGetCardType(this ReadOnlySpan<char> name, out CardType type) => TryGetEnumValue(name, _name2cType, out type);
+        public static CardType GetCardType(ReadOnlySpan<char> name) => GetEnumValue(name, Name2CType);
+        public static bool TryGetCardType(ReadOnlySpan<char> name, out CardType type) => TryGetEnumValue(name, Name2CType, out type);
 
     }
 }

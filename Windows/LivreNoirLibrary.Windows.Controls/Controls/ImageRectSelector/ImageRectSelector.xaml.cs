@@ -100,7 +100,7 @@ namespace LivreNoirLibrary.Windows.Controls
         public void ClearHistory() => _history.Clear();
 
         Int32Rect IHistoryOwner<Int32Rect>.GetHistoryData() => SelectorView.GetRect();
-        bool IHistoryOwner<Int32Rect>.NeedsUpdateHistory(Int32Rect historyData) => historyData != SelectorView.GetRect();
+        bool IHistoryOwner<Int32Rect>.HistoryEquals(Int32Rect previous, Int32Rect current) => previous == current;
         void IHistoryOwner<Int32Rect>.ApplyHistory(Int32Rect historyData) => SelectorView.SetRect(historyData);
 
         private void OnModified(object sender, RoutedEventArgs e)

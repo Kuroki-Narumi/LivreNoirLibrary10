@@ -32,7 +32,7 @@ namespace LivreNoirLibrary.ObjectModel
                 }
                 _values[key] = value;
             }
-            SendPropertyChanged(key);
+            this.NotifyPropertyChanged(key);
             return true;
         }
 
@@ -43,7 +43,7 @@ namespace LivreNoirLibrary.ObjectModel
             {
                 foreach (var prop in relatedProperties)
                 {
-                    SendPropertyChanged(prop);
+                    this.NotifyPropertyChanged(prop);
                 }
             }
             return true;

@@ -63,7 +63,7 @@
             <StackPanel Orientation="Horizontal">
                 <ct:DropDownMenuButton CornerRadius="4" Margin="0,0,4,4" BorderBrush="{StaticResource Brush_Border}" Content="{Binding Preset.WithLeader, Source={x:Static ygo:Vocab.Current}}">
                     <ct:DropDownMenuButton.DropDownContent>
-                        <Grid RowDefinitions="Auto, 4, Auto">
+                        <Grid Width="220" RowDefinitions="26, 4, 116">
                             <Grid ColumnDefinitions="*, *, *, *, *">
                                 <ct:Button Grid.Column="0" Style="{StaticResource IconButton_Add}"/>
                                 <ct:Button Grid.Column="1" Style="{StaticResource IconButton_Overwrite}"/>
@@ -71,7 +71,7 @@
                                 <ct:Button Grid.Column="3" Style="{StaticResource IconButton_MoveDown}"/>
                                 <ct:Button Grid.Column="4" Style="{StaticResource IconButton_Delete}"/>
                             </Grid>
-                            <ListView Grid.Row="2" x:Name="ListView_Preset" Style="{StaticResource Alt2ListBoxStyle}" Height="116" SelectionMode="Single" ItemsSource="{x:Static local:CardSearchWindow.Presets}">
+                            <ListView Grid.Row="2" x:Name="ListView_Preset" Style="{StaticResource Alt2ListBoxStyle}" SelectionMode="Single" ItemsSource="{x:Static local:CardSearchWindow.Presets}">
                                 <ListView.ItemTemplate>
                                     <DataTemplate>
                                         <local:CardSearchPresetPresenter Apply="OnApplyPreset"/>

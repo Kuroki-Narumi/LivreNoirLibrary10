@@ -87,7 +87,7 @@ namespace LivreNoirLibrary.Media.Bms.ViewModels
             this.OnConductorChanged(0);
         }
 
-        public bool NeedsUpdateHistory(BmsHistoryData historyData) => true;
+        public bool HistoryEquals(BmsHistoryData previous, BmsHistoryData current) => false;
         public void OnModified() => _history.PushUndo();
     }
 }

@@ -432,8 +432,7 @@ namespace LivreNoirLibrary.Windows.Controls
                     }
                 }
             }
-            using var o = ObjectPool.Rent<StringBuilder>();
-            var sb = o.Value;
+            using var o = ObjectPool.RentStringBuilder(out var sb);
             foreach (var row in result.AsSpan())
             {
                 sb.AppendJoin('\t', row);

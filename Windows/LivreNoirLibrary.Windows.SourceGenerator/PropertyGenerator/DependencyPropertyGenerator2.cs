@@ -101,12 +101,14 @@ namespace LivreNoirLibrary.Windows.SourceGenerator
                                         On{{propertyName}}Changed{{(coerceHandler is not CoerceType.None ? $", Coerce{propertyName}" : "")}}
                                         )
                         """);
+                /*
                 if (!isValueType && !isNullable)
                 {
                     dp.AppendLine($$"""
                                     , value => value is not null
                         """);
                 }
+                */
                 dp.AppendLine($$"""
                                     );
                         """);

@@ -7,6 +7,7 @@ namespace LivreNoirLibrary.Windows.YuGiOh.Converters
     public class LineFeedConverter : IValueConverter
     {
         public static string? Convert(string? text) => text?.ReplaceLineEndings();
+        public static string? ConvertBack(string? text) => text?.ReplaceLineEndings("\n");
 
         public object? Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
@@ -14,9 +15,10 @@ namespace LivreNoirLibrary.Windows.YuGiOh.Converters
             return Convert(text);
         }
 
-        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+        public object? ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
         {
-            throw new NotImplementedException();
+            var text = value is string s ? s : value.ToString();
+            return ConvertBack(text);
         }
     }
 }

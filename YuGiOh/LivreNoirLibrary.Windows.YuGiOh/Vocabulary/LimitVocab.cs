@@ -15,11 +15,11 @@ namespace LivreNoirLibrary.Windows.YuGiOh.Vocabulary
         public void LoadDefault()
         {
             SetData(nameof(Regulation), "レギュレーション");
-            SetData(nameof(Unlimited), LivreNoirLibrary.YuGiOh.Vocab.Unlimited);
-            SetData(nameof(Forbidden), LivreNoirLibrary.YuGiOh.Vocab.Forbidden);
-            SetData(nameof(Limit1), LivreNoirLibrary.YuGiOh.Vocab.Limit1);
-            SetData(nameof(Limit2), LivreNoirLibrary.YuGiOh.Vocab.Limit2);
-            SetData(nameof(Specified), LivreNoirLibrary.YuGiOh.Vocab.Specified);
+            SetData(nameof(Unlimited), LivreNoirLibrary.YuGiOh.Vocab.Unlimited, "3");
+            SetData(nameof(Forbidden), LivreNoirLibrary.YuGiOh.Vocab.Forbidden, "0");
+            SetData(nameof(Limit1), LivreNoirLibrary.YuGiOh.Vocab.Limit1, "1");
+            SetData(nameof(Limit2), LivreNoirLibrary.YuGiOh.Vocab.Limit2, "2");
+            SetData(nameof(Specified), LivreNoirLibrary.YuGiOh.Vocab.Specified, "4");
             SetData(nameof(Unusable), LivreNoirLibrary.YuGiOh.Vocab.Unusable);
         }
     }

@@ -14,6 +14,7 @@ namespace LivreNoirLibrary.Windows.YuGiOh.Controls
         public event EventHandler? Search;
 
         private PackSearchConditions? _conditions;
+        private PackSearchConditions? _defaultConditions;
 
         public PackSearchConditionsViewModel ViewModel { get; } = new();
 
@@ -29,9 +30,10 @@ namespace LivreNoirLibrary.Windows.YuGiOh.Controls
             CardSearchWindow.CreateDateContextMenu(DatePicker_Until);
         }
 
-        public void Setup(PackSearchConditions conditions)
+        public void Setup(PackSearchConditions conditions, PackSearchConditions defaultConditions)
         {
             _conditions = conditions;
+            _defaultConditions = defaultConditions;
             ViewModel.CopyFrom(conditions);
             TextBox_Search.Text = ViewModel.SearchText;
         }
@@ -55,7 +57,7 @@ namespace LivreNoirLibrary.Windows.YuGiOh.Controls
 
         private void OnClick_Clear(object sender, RoutedEventArgs e)
         {
-            ViewModel.Clear();
+            ViewModel.CopyFrom(_defaultConditions ?? PackSearchConditions.Default);
             e.Handled = true;
         }
 

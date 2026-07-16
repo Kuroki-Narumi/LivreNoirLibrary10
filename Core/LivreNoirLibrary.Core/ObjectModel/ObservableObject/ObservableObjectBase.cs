@@ -6,13 +6,8 @@ using System.Runtime.CompilerServices;
 
 namespace LivreNoirLibrary.ObjectModel
 {
-    public abstract class ObservableObjectBase : INotifyPropertyChanged
+    public abstract class ObservableObjectBase : IObservableObject
     {
-        private static readonly ConcurrentDictionary<string, PropertyChangedEventArgs> _args_cache = [];
-        private readonly Func<string, PropertyChangedEventArgs> _args_create = n => new(n);
-
-        public PropertyChangedEventArgs GetPropertyChangedEventArgs(string propertyName) => _args_cache.GetOrAdd(propertyName, _args_create);
-
         public event PropertyChangedEventHandler? PropertyChanged;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -23,7 +18,7 @@ namespace LivreNoirLibrary.ObjectModel
                 return false;
             }
             field = value;
-            SendPropertyChanged(propertyName);
+            this.NotifyPropertyChanged(propertyName);
             return true;
         }
 
@@ -34,7 +29,7 @@ namespace LivreNoirLibrary.ObjectModel
             {
                 foreach (var prop in relatedProperties)
                 {
-                    SendPropertyChanged(prop);
+                    this.NotifyPropertyChanged(prop);
                 }
             }
             return result;
@@ -60,7 +55,7 @@ namespace LivreNoirLibrary.ObjectModel
                 changedHandler(oldValue, value);
                 foreach (var prop in relatedProperties)
                 {
-                    SendPropertyChanged(prop);
+                    this.NotifyPropertyChanged(prop);
                 }
             }
             return result;
@@ -84,15 +79,12 @@ namespace LivreNoirLibrary.ObjectModel
                 changedHandler();
                 foreach (var prop in relatedProperties)
                 {
-                    SendPropertyChanged(prop);
+                    this.NotifyPropertyChanged(prop);
                 }
             }
             return result;
         }
 
-        protected void SendPropertyChanged([CallerMemberName] string propertyName = "")
-        {
-            PropertyChanged?.Invoke(this, GetPropertyChangedEventArgs(propertyName));
-        }
+        void IObservableObject.RaisePropertyChanged(object sender, PropertyChangedEventArgs e) => PropertyChanged?.Invoke(sender, e);
     }
 }

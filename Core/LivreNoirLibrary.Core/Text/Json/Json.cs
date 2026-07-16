@@ -33,9 +33,6 @@ namespace LivreNoirLibrary.Text
             {
                 DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull
             };
-            converters = _writeOptions.Converters;
-            converters.Add(new IJsonWriterJsonConverter());
-
             _prettyWriteOptions = new(_writeOptions)
             {
                 WriteIndented = true
@@ -166,6 +163,11 @@ namespace LivreNoirLibrary.Text
         public static string GetJsonText<T>(this T obj, bool pretty = false)
         {
             return JsonSerializer.Serialize(obj, pretty ? _prettyWriteOptions : _writeOptions);
+        }
+
+        public static byte[] GetJsonBytes<T>(this T obj, bool pretty = false)
+        {
+            return JsonSerializer.SerializeToUtf8Bytes(obj, pretty ? _prettyWriteOptions : _writeOptions);
         }
 
         public static JsonSerializerOptions GetWriteOptions(bool pretty) => pretty ? _prettyWriteOptions : _writeOptions;

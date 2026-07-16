@@ -11,6 +11,8 @@ namespace LivreNoirLibrary.YuGiOh.Search
 {
     public class PackSearchConditions
     {
+        public static PackSearchConditions Default { get; } = new();
+
         [JsonIgnore]
         public string SearchText { get; set; } = "";
 
@@ -42,42 +44,37 @@ namespace LivreNoirLibrary.YuGiOh.Search
             var input = _input;
             input.Clear();
             _regex = null;
-            _notEffective = false;
 
             var text = SearchText.AsSpan();
             var flags = TextFlags;
-            if (text.IsWhiteSpace())
+            if (!text.IsWhiteSpace())
             {
-                return;
-            }
+                var ignoreCase = (flags & TextSearchFlags.IgnoreCase) is not 0;
+                var ignoreSymbols = (flags & TextSearchFlags.IgnoreSymbols) is not 0;
+                var converter = _converter = new(ignoreCase, ignoreSymbols);
 
-            var ignoreCase = (flags & TextSearchFlags.IgnoreCase) is not 0;
-            var ignoreSymbols = (flags & TextSearchFlags.IgnoreSymbols) is not 0;
-            var converter = _converter = new(ignoreCase, ignoreSymbols);
-
-            var regex = (flags & TextSearchFlags.UseRegex) is not 0;
-            // 正規表現が有効な場合は生成して終了
-            if (regex)
-            {
-                try
+                var regex = (flags & TextSearchFlags.UseRegex) is not 0;
+                // 正規表現が有効な場合は生成して終了
+                if (regex)
                 {
-                    _regex = new(text.ToHalfRegex(ignoreCase), ignoreCase ? RegexOptions.IgnoreCase : RegexOptions.None);
-                    _notEffective = false;
-                    return;
+                    try
+                    {
+                        _regex = new(text.ToHalfRegex(ignoreCase), ignoreCase ? RegexOptions.IgnoreCase : RegexOptions.None);
+                        _notEffective = false;
+                        return;
+                    }
+                    catch
+                    {
+                        // 正規表現の生成に失敗した場合は通常検索に切り替える
+                    }
                 }
-                catch
+                // 検索語の整理
+                foreach (var (segment, flag) in text.EnumerateSearchSegments())
                 {
-                    // 正規表現の生成に失敗した場合は通常検索に切り替える
+                    var t1 = converter.Convert(segment);
+                    input.Add(new(t1, flag));
                 }
             }
-
-            // 検索語の整理
-            foreach (var (segment, flag) in text.EnumerateSearchSegments())
-            {
-                var t1 = converter.Convert(segment);
-                input.Add(new(t1, flag));
-            }
-
             _notEffective = input.Count is 0;
         }
 
@@ -91,10 +88,7 @@ namespace LivreNoirLibrary.YuGiOh.Search
             if (SearchUtils.NotMatch(CardCount, pack.Count)) return false;
 
             // 名前
-            if (_notEffective)
-            {
-                return true;
-            }
+            if (_notEffective) return true;
             var buffer = StringBuffer.Get();
             var converter = _converter;
             if (_regex is { } regex)

@@ -18,7 +18,7 @@ namespace LivreNoirLibrary.Media.Integrated
             {
                 field.Clear();
                 field.UnionWith(value);
-                SendPropertyChanged();
+                this.NotifyPropertyChanged();
             }
         } = [];
         public PackOptions? PackOptions { get => field; set => SetValue(ref field, value); }

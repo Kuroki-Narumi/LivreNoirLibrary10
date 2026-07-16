@@ -6,7 +6,7 @@ using LivreNoirLibrary.ObjectModel;
 
 namespace LivreNoirLibrary.Media.Bms
 {
-    public class DefIndexMap : IEnumerable<(short, short)>, IClear
+    public class DefIndexMap : ISafeEnumerable<(short, short)>, IClear
     {
         public const int RemovedIndex = -1;
         private static readonly short[] _defaultValues = CreateMap();
@@ -71,14 +71,12 @@ namespace LivreNoirLibrary.Media.Bms
 
         public Enumerator GetEnumerator() => new(this);
         IEnumerator<(short, short)> IEnumerable<(short, short)>.GetEnumerator() => GetEnumerator();
-        IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 
-        public struct Enumerator(DefIndexMap map) : IEnumerator<(short, short)>
+        public struct Enumerator(DefIndexMap map) : ISafeEnumerator<(short, short)>
         {
             private readonly short[] _map = map._map;
             private short _index = -1;
 
-            public void Reset() => _index = -1;
             public readonly (short, short) Current => (_index, _map[_index]);
 
             public bool MoveNext()
@@ -94,8 +92,7 @@ namespace LivreNoirLibrary.Media.Bms
                 return false;
             }
 
-            readonly object IEnumerator.Current => Current;
-            readonly void IDisposable.Dispose() { }
+            public void Reset() => _index = -1;
         }
     }
 }

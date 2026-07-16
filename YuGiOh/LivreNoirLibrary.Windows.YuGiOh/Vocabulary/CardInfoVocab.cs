@@ -14,7 +14,6 @@ namespace LivreNoirLibrary.Windows.YuGiOh.Vocabulary
         public VocabData CardType { get => GetData(); set => SetData(value); }
         public VocabData Text { get => GetData(); set => SetData(value); }
 
-        public VocabData Effect { get => GetData(); set => SetData(value); }
         public VocabData Attribute { get => GetData(); set => SetData(value); }
         public VocabData MonsterType { get => GetData(); set => SetData(value); }
         public VocabData Ability { get => GetData(); set => SetData(value); }

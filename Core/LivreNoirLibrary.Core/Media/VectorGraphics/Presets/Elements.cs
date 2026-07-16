@@ -88,6 +88,7 @@ namespace LivreNoirLibrary.Media.VectorGraphics
         public static GeometryElement Update_D_Inner { get; } = Create(Geometries.Update_S, "#888");
 
         public static GeometryElement Download { get; } = Create(Geometries.Download, "#333");
+        public static GeometryElement Download_Red { get; } = Create(Geometries.Download, "#e44");
         public static GeometryElement Upload { get; } = Create(Geometries.Upload, "#333");
         public static GeometryElement Json { get; } = Create(Geometries.Json, "#333");
         public static GeometryElement Letter_A { get; } = Create(Geometries.Letter_A, "#333");

@@ -89,6 +89,7 @@ namespace LivreNoirLibrary.Windows.Media
         public static DrawingGroup Clock { get; } = CreateInternal(V.Icons.Clock);
 
         public static DrawingGroup Download { get; } = CreateInternal(V.Icons.Download);
+        public static DrawingGroup Download_Red { get; } = CreateInternal(V.Icons.Download_Red);
         public static DrawingGroup Upload { get; } = CreateInternal(V.Icons.Upload);
         public static DrawingGroup Json { get; } = CreateInternal(V.Icons.Json);
         public static DrawingGroup Letter_A { get; } = CreateInternal(V.Icons.Letter_A);

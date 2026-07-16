@@ -1,10 +1,11 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using LivreNoirLibrary.Collections;
 
 namespace LivreNoirLibrary.Media.Wave
 {
-    public partial class Relation : IEnumerable<Relation.Channel>
+    public partial class Relation : ISafeEnumerable<Relation.Channel>
     {
         private readonly Channel[] _data;
 
@@ -39,8 +40,6 @@ namespace LivreNoirLibrary.Media.Wave
                 yield return channel;
             }
         }
-
-        IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 
         public override string ToString() => $"{{Length={Length}, {string.Join(", ", _data.Select((c, i) => $"Ch{i}:{c}"))}}}";
     }

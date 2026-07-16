@@ -45,17 +45,8 @@ namespace LivreNoirLibrary.Windows.Controls
         public ObservableList<UIElement> LeftPanelItems { get; } = [];
         public ObservableList<UIElement> RightPanelItems { get; } = [];
 
-        public string? Title
-        {
-            get => GetValue(TitleProperty) as string;
-            set => SetValue(TitleProperty, value);
-        }
-
-        public ResizeMode ResizeMode
-        {
-            get => (ResizeMode)GetValue(ResizeModeProperty);
-            set => SetValue(ResizeModeProperty, value);
-        }
+        public string? Title {  get => GetValue(TitleProperty) as string; set => SetValue(TitleProperty, value); }
+        public ResizeMode ResizeMode { get => (ResizeMode)GetValue(ResizeModeProperty); set => SetValue(ResizeModeProperty, value); }
 
         public override void OnApplyTemplate()
         {

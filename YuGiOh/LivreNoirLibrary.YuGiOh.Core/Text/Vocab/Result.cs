@@ -24,7 +24,7 @@ namespace LivreNoirLibrary.YuGiOh
         };
         private static readonly Dictionary<string, Result>.AlternateLookup<ReadOnlySpan<char>> _name2result = CreateInvertedDictionary(_result2name);
 
-        public static string GetName(Result value) => GetEnumName(value, _result2name);
+        public static string GetName(this Result value) => GetEnumName(value, _result2name);
         public static Result GetResult(ReadOnlySpan<char> name) => GetEnumValue(name, _name2result);
     }
 }

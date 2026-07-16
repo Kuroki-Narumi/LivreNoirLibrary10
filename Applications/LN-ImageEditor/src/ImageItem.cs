@@ -47,7 +47,7 @@ namespace LivreNoir.ImageEditor
         public void Reload()
         {
             Image = CreateImage(FullPath);
-            SendPropertyChanged(nameof(Size));
+            NotifyPropertyChanged(nameof(Size));
         }
     }
 }

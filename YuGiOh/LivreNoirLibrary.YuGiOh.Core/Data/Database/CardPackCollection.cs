@@ -1,10 +1,13 @@
 using LivreNoirLibrary.Collections;
+using LivreNoirLibrary.Text;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
+using System.Text.Json;
 
 namespace LivreNoirLibrary.YuGiOh.Data
 {
-    public class CardPackCollection : DataCollectionBase<CardPackCollection.Key, CardPack>
+    public class CardPackCollection : ObservableSortedList<CardPackCollection.Key, CardPack>, IWriteJson, ICardPackProvider
     {
         public readonly record struct Key(DateTime Date, string ProductId) : IComparable<Key>
         {
@@ -21,7 +24,33 @@ namespace LivreNoirLibrary.YuGiOh.Data
 
         protected override Key GetKey(CardPack item) => new(item.Date, item.ProductId);
 
-        public void Load(List<Serializable.CardPack> source)
+        private bool _needRefresh = true;
+        private readonly Dictionary<string, int> _name2index = [];
+
+        private void InvalidateName2Index()
+        {
+            _needRefresh = true;
+        }
+
+        protected override void ClearItems()
+        {
+            base.ClearItems();
+            InvalidateName2Index();
+        }
+
+        protected override void AddItem(CardPack item, out bool replaced, out int index, out CardPack? oldItem)
+        {
+            base.AddItem(item, out replaced, out index, out oldItem);
+            InvalidateName2Index();
+        }
+
+        protected override int RemoveItem(CardPack item)
+        {
+            InvalidateName2Index();
+            return base.RemoveItem(item);
+        }
+
+        public void Load(List<Serializable.CardPack> source, ICardProvider provider)
         {
             ClearWithoutNotify();
             var c = source.Count;
@@ -31,50 +60,52 @@ namespace LivreNoirLibrary.YuGiOh.Data
             keyList.EnsureCapacity(c);
             foreach (var item in source.AsSpan())
             {
-                CardPack pack = new(item);
+                CardPack pack = new(item, provider);
                 list.Add(pack);
                 keyList.Add(GetKey(pack));
             }
-            NotifyCollectionReset();
+            this.NotifyCollectionReset();
+            InvalidateName2Index();
         }
 
-        internal void AddInternal(Serializable.CardPack pack)
+        private Dictionary<string, int> EnsureName2Index()
         {
-            CardPack p = new(pack);
-            _list.Add(p);
-            _key_list.Add(GetKey(p));
-        }
-
-        public bool Contains(string pid) => CheckUpdate().ContainsKey(pid);
-
-        public CardPack Get(string pid)
-        {
-            if (CheckUpdate().TryGetValue(pid, out var index))
+            var dic = _name2index;
+            if (_needRefresh)
             {
-                return _list[index];
+                dic.Clear();
+                var list = _list;
+                var c = list.Count;
+                for (var i = 0; i < c; i++)
+                {
+                    var id = list[i].ProductId;
+                    dic[id] = i;
+                }
             }
-            return [];
+            return dic;
         }
 
-        public bool Remove(string pid)
+        public bool Contains(string pid) => EnsureName2Index().ContainsKey(pid);
+
+        public bool TryGet(string pid, [MaybeNullWhen(false)] out CardPack pack)
         {
-            if (CheckUpdate().TryGetValue(pid, out var index))
+            if (EnsureName2Index().TryGetValue(pid, out var index))
             {
-                return Remove(_list[index]);
+                pack = _list[index];
+                return true;
             }
+            pack = default;
             return false;
         }
 
-        public override void Refresh()
+        public void WriteJson(Utf8JsonWriter writer, JsonSerializerOptions options)
         {
-            var dic = _name2idx;
-            dic.Clear();
-            var c = _list.Count;
-            for (var i = 0; i < c; i++)
+            writer.WriteStartArray();
+            foreach (var item in _list.AsSpan())
             {
-                var id = _list[i].ProductId;
-                dic[id] = i;
+                JsonSerializer.Serialize(writer, item, options);
             }
+            writer.WriteEndArray();
         }
     }
 }

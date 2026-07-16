@@ -8,16 +8,13 @@ namespace LivreNoirLibrary.YuGiOh.Converters
     {
         public override Ability Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
         {
-            switch (reader.TokenType)
+            return reader.TokenType switch
             {
-                case JsonTokenType.String:
-                    return Vocab.GetAbility(reader.GetString());
-                case JsonTokenType.Number:
-                    return (Ability)reader.GetInt32();
-                case JsonTokenType.Null:
-                    return 0;
-            }
-            throw new JsonException();
+                JsonTokenType.String => Vocab.GetAbility(reader.GetString()),
+                JsonTokenType.Number => (Ability)reader.GetInt32(),
+                JsonTokenType.Null => 0,
+                _ => throw new JsonException(),
+            };
         }
 
         public override void Write(Utf8JsonWriter writer, Ability value, JsonSerializerOptions options) => writer.WriteStringValue(string.Join("/", Vocab.GetNames(value)));

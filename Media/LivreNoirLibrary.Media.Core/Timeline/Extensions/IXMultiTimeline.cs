@@ -131,8 +131,7 @@ namespace LivreNoirLibrary.Media
 
             private int RemoveAll(IEnumerable<(TX, List<TValue>)> enumer, Predicate<TX, TValue> selector)
             {
-                using var o = ObjectPool.Rent<HashSet<TX>>();
-                var removeList = o.Value;
+                using var o = ObjectPool.RentHashSet<TX>(out var removeList);
                 var count = 0;
                 foreach (var (position, list) in enumer)
                 {
@@ -174,8 +173,7 @@ namespace LivreNoirLibrary.Media
             {
                 if (!EqualityComparer<TX>.Default.Equals(from, to) && obj.TryGetList(from, out var list))
                 {
-                    using var o = ObjectPool.Rent<List<TValue>>();
-                    var moveList = o.Value;
+                    using var o = ObjectPool.RentList<TValue>(out var moveList);
                     list.RemoveAll(value =>
                     {
                         if (selector(value))
@@ -192,10 +190,8 @@ namespace LivreNoirLibrary.Media
 
             private void MoveAll(IEnumerable<(TX, List<TValue>)> enumer, Predicate<TX, TValue> selector, Func<TX, TX> converter)
             {
-                using var o1 = ObjectPool.Rent<Dictionary<TX, List<TValue>>>();
-                using var o2 = ObjectPool.Rent<HashSet<TX>>();
-                var moveListList = o1.Value;
-                var removeList = o2.Value;
+                using var o1 = ObjectPool.RentDictionary<TX, List<TValue>>(out var moveListList);
+                using var o2 = ObjectPool.RentHashSet<TX>(out var removeList);
                 foreach (var (position, list) in enumer)
                 {
                     var newPosition = converter(position);

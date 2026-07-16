@@ -44,6 +44,7 @@ namespace LivreNoirLibrary.Media.VectorGraphics
         public static ElementGroup Clock { get; } = new(Elements.Circle_Outer, Elements.Clock);
 
         public static ElementGroup Download { get; } = new(Elements.Download);
+        public static ElementGroup Download_Red { get; } = new(Elements.Download_Red);
         public static ElementGroup Upload { get; } = new(Elements.Upload);
         public static ElementGroup Json { get; } = new(Elements.Json);
         public static ElementGroup Letter_A { get; } = new(Elements.Letter_A);

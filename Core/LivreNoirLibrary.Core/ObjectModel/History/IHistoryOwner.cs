@@ -25,25 +25,21 @@ namespace LivreNoirLibrary.ObjectModel
         /// <summary>
         /// Determine if the history needs to be updated.
         /// </summary>
+        /// <param name="previous">A history data that stored to the undo stack.</param>
+        /// <param name="current">A history data to compare.</param>
+        /// <returns>A <see cref="bool"/> value indicating whether if <paramref name="previous"/> is equals to <paramref name="current"/>.</returns>
+        bool HistoryEquals(T previous, T current);
+
+        /// <summary>
+        /// Ensure state before pushing <paramref name="historyData"/> to the undo history.
+        /// </summary>
         /// <param name="historyData">A history data that stored to the undo stack.</param>
-        /// <returns><see langword="true"/> if the current state changed from given <paramref name="historyData"/>.</returns>
-        bool NeedsUpdateHistory(T historyData);
+        void EnsureHistoryData(T historyData) { }
 
         /// <summary>
         /// Apply the operations from history.
         /// </summary>
         /// <param name="historyData">A history data that stored to the undo stack.</param>
         void ApplyHistory(T historyData);
-    }
-
-    public static class IHistoryOwnerExtensions
-    {
-        /// <summary>
-        /// Marks the object as edited and records the current state in the undo history.
-        /// </summary>
-        /// <param name="obj">The object that owns the history to which the edit operation applies.</param>
-        /// <param name="force">A value indicating whether to force the operation to record the current state in the undo history,
-        /// even if no changes have been detected.</param>
-        public static void OnEdit(this IHistoryOwner obj, bool force = false) => obj.History.PushUndo(force);
     }
 }

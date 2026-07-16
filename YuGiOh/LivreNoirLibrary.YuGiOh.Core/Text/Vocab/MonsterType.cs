@@ -62,81 +62,37 @@ namespace LivreNoirLibrary.YuGiOh
         public const string MT_DivineBeast = $"{DivineBeast}{MType_Suffix}";
         public const string MT_CreatorGod = $"{CreatorGod}{MType_Suffix}";
 
-        private static readonly Dictionary<MonsterType, string> _mType2name = new()
-        {
-            { YuGiOh.MonsterType.Spellcaster, MT_Spellcaster },
-            { YuGiOh.MonsterType.Dragon, MT_Dragon },
-            { YuGiOh.MonsterType.Zombie, MT_Zombie },
-            { YuGiOh.MonsterType.Warrior, MT_Warrior },
-            { YuGiOh.MonsterType.BeastWarrior, MT_BeastWarrior },
-            { YuGiOh.MonsterType.Beast, MT_Beast },
-            { YuGiOh.MonsterType.WingedBeast, MT_WingedBeast },
-            { YuGiOh.MonsterType.Machine, MT_Machine },
-            { YuGiOh.MonsterType.Fiend, MT_Fiend },
-            { YuGiOh.MonsterType.Fairy, MT_Fairy },
-            { YuGiOh.MonsterType.Insect, MT_Insect },
-            { YuGiOh.MonsterType.Dinosaur, MT_Dinosaur },
-            { YuGiOh.MonsterType.Reptile, MT_Reptile },
-            { YuGiOh.MonsterType.Fish, MT_Fish },
-            { YuGiOh.MonsterType.SeaSerpent, MT_SeaSerpent },
-            { YuGiOh.MonsterType.Aqua, MT_Aqua },
-            { YuGiOh.MonsterType.Pyro, MT_Pyro },
-            { YuGiOh.MonsterType.Thunder, MT_Thunder },
-            { YuGiOh.MonsterType.Rock, MT_Rock },
-            { YuGiOh.MonsterType.Plant, MT_Plant },
-            { YuGiOh.MonsterType.Psychic, MT_Psychic },
-            { YuGiOh.MonsterType.Wyrm, MT_Wyrm },
-            { YuGiOh.MonsterType.Cyberse, MT_Cyberse },
-            { YuGiOh.MonsterType.Illusion, MT_Illusion },
-            { YuGiOh.MonsterType.DivineBeast, MT_DivineBeast},
-            { YuGiOh.MonsterType.CreatorGod, MT_CreatorGod },
-        };
+        private static string[] MType2Name { get; } = [
+            None, MT_Spellcaster, MT_Dragon, MT_Zombie, MT_Warrior, MT_BeastWarrior, MT_Beast, MT_WingedBeast, MT_Machine, MT_Fiend,
+            MT_Fairy, MT_Insect, MT_Dinosaur, MT_Reptile, MT_Fish, MT_SeaSerpent, MT_Aqua, MT_Pyro, MT_Thunder, MT_Rock,
+            MT_Plant, MT_Psychic, MT_Wyrm, MT_Cyberse, MT_Illusion, MT_DivineBeast, MT_CreatorGod
+        ];
 
-        private static readonly Dictionary<MonsterType, string> _mType2name_short = new()
-        {
-            { YuGiOh.MonsterType.Spellcaster, Spellcaster },
-            { YuGiOh.MonsterType.Dragon, Dragon },
-            { YuGiOh.MonsterType.Zombie, Zombie },
-            { YuGiOh.MonsterType.Warrior, Warrior },
-            { YuGiOh.MonsterType.BeastWarrior, BeastWarrior },
-            { YuGiOh.MonsterType.Beast, Beast },
-            { YuGiOh.MonsterType.WingedBeast, WingedBeast },
-            { YuGiOh.MonsterType.Machine, Machine },
-            { YuGiOh.MonsterType.Fiend, Fiend },
-            { YuGiOh.MonsterType.Fairy, Fairy },
-            { YuGiOh.MonsterType.Insect, Insect },
-            { YuGiOh.MonsterType.Dinosaur, Dinosaur },
-            { YuGiOh.MonsterType.Reptile, Reptile },
-            { YuGiOh.MonsterType.Fish, Fish },
-            { YuGiOh.MonsterType.SeaSerpent, SeaSerpent },
-            { YuGiOh.MonsterType.Aqua, Aqua },
-            { YuGiOh.MonsterType.Pyro, Pyro },
-            { YuGiOh.MonsterType.Thunder, Thunder },
-            { YuGiOh.MonsterType.Rock, Rock },
-            { YuGiOh.MonsterType.Plant, Plant },
-            { YuGiOh.MonsterType.Psychic, Psychic },
-            { YuGiOh.MonsterType.Wyrm, Wyrm },
-            { YuGiOh.MonsterType.Cyberse, Cyberse },
-            { YuGiOh.MonsterType.Illusion, Illusion },
-            { YuGiOh.MonsterType.DivineBeast, DivineBeast},
-            { YuGiOh.MonsterType.CreatorGod, CreatorGod },
-        };
+        private static string[] MType2ShortName { get; } = [
+            None, Spellcaster, Dragon, Zombie, Warrior, BeastWarrior, Beast, WingedBeast, Machine, Fiend,
+            Fairy, Insect, Dinosaur, Reptile, Fish, SeaSerpent, Aqua, Pyro, Thunder, Rock,
+            Plant, Psychic, Wyrm, Cyberse, Illusion, DivineBeast, CreatorGod
+        ];
 
-        private static Dictionary<string, MonsterType>.AlternateLookup<ReadOnlySpan<char>> _name2mType = CreateName2MType();
+        private static Dictionary<string, MonsterType>.AlternateLookup<ReadOnlySpan<char>> Name2MType { get; } = CreateName2MType();
         private static Dictionary<string, MonsterType>.AlternateLookup<ReadOnlySpan<char>> CreateName2MType()
         {
-            var dic = CreateInvertedDictionary(_mType2name);
-            // "族"を除いた表記
-            foreach (var (type, name) in _mType2name_short)
+            var dic = CreateInvertedDictionary<MonsterType>();
+            var ary1 = MType2Name;
+            var ary2 = MType2ShortName;
+            foreach (var value in EnumUtils.MonsterTypes)
             {
-                dic[name] = type;
+                var index = (int)value;
+                dic[ary1[index]] = value;
+                dic[ary2[index]] = value;
+                dic[value.ToString()] = value;
             }
             return dic;
         }
 
-        public static string GetName(this MonsterType value) => GetEnumName(value, _mType2name);
-        public static string GetShortName(this MonsterType value) => GetEnumName(value, _mType2name_short);
-        public static MonsterType GetMonsterType(this ReadOnlySpan<char> name) => GetEnumValue(name, _name2mType);
-        public static bool TryGetMonsterType(this ReadOnlySpan<char> name, out MonsterType type) => TryGetEnumValue(name, _name2mType, out type);
+        public static string GetName(this MonsterType value) => GetEnumName(value, (int)value, MType2Name);
+        public static string GetShortName(this MonsterType value) => GetEnumName(value, (int)value, MType2ShortName);
+        public static MonsterType GetMonsterType(ReadOnlySpan<char> name) => GetEnumValue(name, Name2MType);
+        public static bool TryGetMonsterType(ReadOnlySpan<char> name, out MonsterType type) => TryGetEnumValue(name, Name2MType, out type);
     }
 }

@@ -1,6 +1,7 @@
 ﻿using HtmlAgilityPack;
 using LivreNoirLibrary.Collections;
 using LivreNoirLibrary.ObjectModel;
+using LivreNoirLibrary.YuGiOh.Data;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -17,7 +18,7 @@ namespace LivreNoirLibrary.YuGiOh.Scraping
 
         const string Class_LinkValue = "link_value";
 
-        public static async Task Update(Data.Regulation target, bool tcg, ProgressReporter p, CancellationToken c)
+        public static async Task Update(Data.Regulation target, ICardProvider provider, bool tcg, ProgressReporter p, CancellationToken c)
         {
             p.Report("updating regulation", "");
 
@@ -27,20 +28,20 @@ namespace LivreNoirLibrary.YuGiOh.Scraping
             c.ThrowIfCancellationRequested();
 
             List<int> list = [];
-            target.Clear(LimitCount.Forbidden);
-            target.Clear(LimitCount.Limit1);
-            target.Clear(LimitCount.Limit2);
+            target.ClearLimit(LimitCount.Forbidden);
+            target.ClearLimit(LimitCount.Limit1);
+            target.ClearLimit(LimitCount.Limit2);
 
             await GetList(list, document?.GetElementbyId(Id_Forbidden), LimitCount.Forbidden, p, c);
-            target.Set(list.AsSpan(), LimitCount.Forbidden);
+            target.Set(list.AsSpan(), LimitCount.Forbidden, provider);
             c.ThrowIfCancellationRequested();
 
             await GetList(list, document?.GetElementbyId(Id_Limited), LimitCount.Limit1, p, c);
-            target.Set(list.AsSpan(), LimitCount.Limit1);
+            target.Set(list.AsSpan(), LimitCount.Limit1, provider);
             c.ThrowIfCancellationRequested();
 
             await GetList(list, document?.GetElementbyId(Id_SemiLimited), LimitCount.Limit2, p, c);
-            target.Set(list.AsSpan(), LimitCount.Limit2);
+            target.Set(list.AsSpan(), LimitCount.Limit2, provider);
             c.ThrowIfCancellationRequested();
         }
 

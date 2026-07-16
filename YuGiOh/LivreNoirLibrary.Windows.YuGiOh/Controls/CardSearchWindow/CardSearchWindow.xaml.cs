@@ -41,6 +41,7 @@ namespace LivreNoirLibrary.Windows.YuGiOh.Controls
         public event EventHandler? Search;
 
         private CardSearchConditions? _conditions;
+        private CardSearchConditions? _defaultConditions;
 
         public CardSearchConditionsViewModel ViewModel { get; } = new();
 
@@ -64,9 +65,10 @@ namespace LivreNoirLibrary.Windows.YuGiOh.Controls
             this.RegisterCommand(Commands.Save, Executed_PresetOverwrite, ListView_Preset.CanExecute_Item);
         }
 
-        public void Setup(CardSearchConditions conditions)
+        public void Setup(CardSearchConditions conditions, CardSearchConditions defaultConditions)
         {
             _conditions = conditions;
+            _defaultConditions = defaultConditions;
             ViewModel.CopyFrom(conditions);
             TextBox_Expression.Text = ViewModel.StatusExpression.Expression;
             TextBox_Search.Text = ViewModel.SearchText;
@@ -96,7 +98,7 @@ namespace LivreNoirLibrary.Windows.YuGiOh.Controls
 
         private void OnClick_Clear(object sender, RoutedEventArgs e)
         {
-            ViewModel.Clear();
+            ViewModel.CopyFrom(_defaultConditions ?? CardSearchConditions.Default);
             e.Handled = true;
         }
 
@@ -172,7 +174,7 @@ namespace LivreNoirLibrary.Windows.YuGiOh.Controls
             if (IsCommandFromPreset(e))
             {
                 CardSearchConditionsPreset item = new();
-                ViewModel.CopyTo(item.Conditions, false);
+                ViewModel.CopyTo(item.Conditions);
                 ListView_Preset.OnExecuted_Insert(Presets, item, e);
             }
         }
@@ -205,14 +207,14 @@ namespace LivreNoirLibrary.Windows.YuGiOh.Controls
         {
             if (IsCommandFromPreset(e) && ListView_Preset.SelectedItem is CardSearchConditionsPreset p)
             {
-                ViewModel.CopyTo(p.Conditions, false);
+                ViewModel.CopyTo(p.Conditions);
                 e.Handled = true;
             }
         }
 
         private void OnApplyPreset(object sender, RoutedEventArgs<CardSearchConditionsPreset> e)
         {
-            ViewModel.CopyFrom(e.Value.Conditions, false);
+            ViewModel.CopyFrom(e.Value.Conditions);
             e.Handled = true;
         }
     }

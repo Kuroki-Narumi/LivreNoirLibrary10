@@ -1,4 +1,5 @@
-﻿using LivreNoirLibrary.IO;
+﻿using LivreNoirLibrary.Collections;
+using LivreNoirLibrary.IO;
 using LivreNoirLibrary.ObjectModel;
 using System;
 using System.Collections.Generic;
@@ -7,7 +8,7 @@ using System.IO;
 
 namespace LivreNoirLibrary.Media.Bms
 {
-    public interface IDefList : IEnumerable<(short, string)>, ICount, IClear, IDumpable, ILoadable
+    public interface IDefList : ISafeEnumerable<(short, string)>, ICount, IClear, IDumpable, ILoadable
     {
         int MaxIndex { get; }
         IEnumerable<short> Keys { get; }

@@ -32,8 +32,8 @@ namespace LivreNoirLibrary.Windows
             if (e.PropertyName is nameof(VocabData.Value))
             {
                 _value = null;
-                SendPropertyChanged(nameof(Value));
-                SendPropertyChanged(nameof(WithLeader));
+                this.NotifyPropertyChanged(nameof(Value));
+                this.NotifyPropertyChanged(nameof(WithLeader));
             }
         }
 

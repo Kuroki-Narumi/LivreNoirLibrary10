@@ -1,10 +1,12 @@
-﻿using System;
+﻿using LivreNoirLibrary.Collections;
+using LivreNoirLibrary.ObjectModel;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 
 namespace LivreNoirLibrary.Media.Bms
 {
-    public class ResolutionReport : IEnumerable<(int, Channel, long)>
+    public class ResolutionReport : ISafeEnumerable<(int, Channel, long)>, IClear
     {
         private readonly SortedDictionary<ReportKey, long> _data = [];
 
@@ -25,8 +27,6 @@ namespace LivreNoirLibrary.Media.Bms
                 yield return (key.Number, key.Channel, value);
             }
         }
-
-        IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 
         private readonly struct ReportKey(int number, Channel channel) : IComparable<ReportKey>
         {

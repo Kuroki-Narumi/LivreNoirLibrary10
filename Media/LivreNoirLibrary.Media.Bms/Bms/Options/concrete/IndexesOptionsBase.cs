@@ -19,7 +19,7 @@ namespace LivreNoirLibrary.Media.Bms
             set
             {
                 _indexes.OverwriteFrom(value);
-                SendPropertyChanged();
+                this.NotifyPropertyChanged();
             }
         }
 
@@ -27,8 +27,7 @@ namespace LivreNoirLibrary.Media.Bms
 
         public bool TrySetIndex(string? text, int radix)
         {
-            using var o = ObjectPool.Rent<RangeSet<int>>();
-            var cache = o.Value;
+            using var o = ObjectPool.RentClear<RangeSet<int>>(out var cache);
             if (BasedNumber.TryParseRangeSet(text, cache, radix))
             {
                 Indexes = cache;

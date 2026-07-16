@@ -1,144 +1,243 @@
-using System;
-using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
 using LivreNoirLibrary.Collections;
+using LivreNoirLibrary.ObjectModel;
 using LivreNoirLibrary.Text;
+using LivreNoirLibrary.Text.Convert;
+using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.Collections.Specialized;
+using System.ComponentModel;
+using System.Diagnostics.CodeAnalysis;
+using System.Text.Json;
 
 namespace LivreNoirLibrary.YuGiOh.Data
 {
-    public class CardDataCollection : DataCollectionBase<int, Card>, ICardEnumerable
+    public class CardDataCollection : IObservableCollection, ICollection<Card>, ICardProvider, IWriteJson
     {
-        protected override int GetKey(Card item) => item.Id;
+        public const int Capacity = 32768;
+
+        public event PropertyChangedEventHandler? PropertyChanged;
+        public event NotifyCollectionChangedEventHandler? CollectionChanged;
+
+        private static TextForSearchStringConverter NameConverter { get; } = new(true, false);
+        private static ConvertingStringComparer<TextForSearchStringConverter> NameComparer { get; } = new(NameConverter);
+
+        private readonly Card?[] _cards = new Card[Capacity];
+        private readonly List<int> _validIds = [];
+        private readonly Dictionary<string, List<int>>.AlternateLookup<ReadOnlySpan<char>> _name2id;
+
+        public CardDataCollection()
+        {
+            Dictionary<string, List<int>> dic = new(NameComparer);
+            _name2id = dic.GetAlternateLookup<ReadOnlySpan<char>>();
+        }
+
+        public int Count => _validIds.Count;
+
+        public void ClearWithoutNotify()
+        {
+            _cards.AsSpan().Clear();
+            _validIds.Clear();
+            _name2id.Dictionary.Clear();
+        }
+
+        public void Clear()
+        {
+            ClearWithoutNotify();
+            this.NotifyCollectionReset();
+        }
+
+        private bool AddValidId(int id, out int index)
+        {
+            index = _validIds.BinarySearch(id);
+            if (index >= 0)
+            {
+                return false;
+            }
+            index = ~index;
+            _validIds.Insert(index, id);
+            return true;
+        }
+
+        private bool RemoveValidId(int id, out int index)
+        {
+            index = _validIds.BinarySearch(id);
+            if (index >= 0)
+            {
+                _validIds.RemoveAt(index);
+                return true;
+            }
+            return false;
+        }
+
+        private void RegisterName(Card card)
+        {
+            var id = card.Id;
+            _name2id.GetOrAdd(card.Name).Add(id);
+            _name2id.GetOrAdd(card.EnName).Add(id);
+        }
+
+        private void RemoveName(Card card)
+        {
+            var id = card.Id;
+            _name2id.Remove(card.Name.ToHalf(), id);
+            _name2id.Remove(card.EnName, id);
+        }
+
+        public Card Add(Card card)
+        {
+            var id = card.Id;
+            var current = _cards[id];
+            if (current is null)
+            {
+                _cards[id] = current = card;
+            }
+            else
+            {
+                RemoveName(current);
+                current.CopyFrom(card);
+            }
+            RegisterName(current);
+            if (AddValidId(id, out var index))
+            {
+                this.NotifyCollectionAdded(index, current);
+            }
+            else
+            {
+                this.NotifyCollectionReplaced(index, current, current);
+            }
+            return current;
+        }
+
+        void ICollection<Card>.Add(Card card) => Add(card);
+
+        public bool Contains(Card card) => GetOrDefault(card.Id) == card;
+
+        public bool Remove(int id)
+        {
+            if (GetOrDefault(id) is { } old)
+            {
+                RemoveValidId(id, out var index);
+                RemoveName(old);
+                _cards[id] = null;
+                this.NotifyCollectionRemoved(index, old);
+                return true;
+            }
+            return false;
+        }
+
+        public bool Remove(Card card)
+        {
+            if (GetOrDefault(card.Id) == card)
+            {
+                return Remove(card.Id);
+            }
+            return false;
+        }
+
+        public Card? GetOrDefault(int id) => (uint)id < Capacity ? _cards[id] : default;
+
+        public bool TryGetByName(string name, [MaybeNullWhen(false)] out Card card) => TryGetByName(name.AsSpan(), out card);
+        public bool TryGetByName(ReadOnlySpan<char> name, [MaybeNullWhen(false)] out Card card)
+        {
+            if (_name2id.TryGetValue(name, out var list))
+            {
+                card = _cards[list[0]]!;
+                return true;
+            }
+            card = default;
+            return false;
+        }
 
         public void Load(List<Serializable.Card> source)
         {
             ClearWithoutNotify();
-            var c = source.Count;
-            var list = _list;
-            var keys = _key_list;
-            list.EnsureCapacity(c);
-            keys.EnsureCapacity(c);
-            foreach (var item in source.AsSpan())
+            var ids = _validIds;
+            var cards = _cards.AsSpan();
+            foreach (var s in source.AsSpan())
             {
-                Card card = new(item);
-                list.Add(card);
-                keys.Add(card.Id);
+                var id = s.Id;
+                var card = new Card(s);
+                ids.Add(id);
+                cards[id] = card;
+                RegisterName(card);
             }
-            NotifyCollectionReset();
         }
 
-        internal void AddInternal(Serializable.Card card)
+        void IObservableObject.RaisePropertyChanged(object sender, PropertyChangedEventArgs e) => PropertyChanged?.Invoke(sender, e);
+        void IObservableCollection.RaiseCollectionChanged(object sender, NotifyCollectionChangedEventArgs e) => CollectionChanged?.Invoke(sender, e);
+
+        public ReadOnlySpan<int> Ids => _validIds.AsSpan();
+
+        public void WriteJson(Utf8JsonWriter writer, JsonSerializerOptions options)
         {
-            Card c = new(card);
-            _list.Add(c);
-            _key_list.Add(c.Id);
+            writer.WriteStartArray();
+            foreach (var item in this)
+            {
+                JsonSerializer.Serialize(writer, item, options);
+            }
+            writer.WriteEndArray();
         }
 
-        public bool Contains(int id) => _key_list.Contains(id);
+        public Enumerator GetEnumerator() => new(this);
+        IEnumerator<Card> IEnumerable<Card>.GetEnumerator() => new SafeEnumerator(this);
+        IEnumerator IEnumerable.GetEnumerator() => new SafeEnumerator(this);
 
-        public Card Get(int id)
+        public ref struct Enumerator(CardDataCollection source)
         {
-            var index = IndexOfKey(id);
-            Card card;
-            if (index is >= 0)
-            {
-                card = _list[index];
-            }
-            else
-            {
-                card = new() { Id = id, Name = $"<ID{id}>" };
-                AddWithoutNotify(card);
-            }
-            return card;
-        }
+            private readonly ReadOnlySpan<Card?> _cards = source._cards;
+            private readonly ReadOnlySpan<int> _validIds = source._validIds.AsSpan();
+            private int _index = 0;
+            private Card? _current = default;
 
-        public Card Get(string name)
-        {
-            if (!string.IsNullOrEmpty(name) && CheckUpdate().TryGetValue(name.ToHalf(), out var index))
-            {
-                return _list[index];
-            }
-            return new()
-            {
-                Id = name.GetHashCode(),
-                Name = name,
-            };
-        }
+            public readonly Card Current => _current!;
 
-        public bool TryGet(int id, [MaybeNullWhen(false)] out Card card)
-        {
-            var index = IndexOfKey(id);
-            if (index is >= 0)
+            public bool MoveNext()
             {
-                card = _list[index];
-                return true;
-            }
-            else
-            {
-                card = default;
+                var ids = _validIds;
+                if (_index < ids.Length)
+                {
+                    _current = _cards[ids[_index]];
+                    _index++;
+                }
+                _current = null;
                 return false;
             }
         }
 
-        public bool TryGet(string name, [MaybeNullWhen(false)] out Card card)
+        private sealed class SafeEnumerator(CardDataCollection source) : ISafeEnumerator<Card>
         {
-            if (!string.IsNullOrEmpty(name) && CheckUpdate().TryGetValue(name.ToHalf(), out var index))
-            {
-                card = _list[index];
-                return true;
-            }
-            card = null;
-            return false;
-        }
+            private readonly Card?[] _cards = source._cards;
+            private readonly List<int> _validIds = source._validIds;
+            private int _index = 0;
+            private Card? _current = default;
 
-        public bool Remove(int id)
-        {
-            if (TryGet(id, out var card))
-            {
-                return Remove(card);
-            }
-            return false;
-        }
+            public Card Current => _current!;
 
-        public override void Refresh()
-        {
-            _name2idx.Clear();
-            var c = _list.Count;
-            for (int i = 0; i < c; i++)
+            public bool MoveNext()
             {
-                var card = _list[i];
-                RegisterName2Idx(card.Name, i);
-                RegisterName2Idx(card.EnName, i);
-            }
-        }
-
-        private void RegisterName2Idx(string name, int index)
-        {
-            if (!string.IsNullOrEmpty(name))
-            {
-                name = name.ToHalf();
-                if (_name2idx.TryGetValue(name, out var current))
+                var ids = _validIds;
+                if (_index < ids.Count)
                 {
-                    if (current > index)
-                    {
-                        _name2idx[name] = index;
-                    }
+                    _current = _cards[ids[_index]];
+                    _index++;
+                    return true;
                 }
-                else
-                {
-                    _name2idx.Add(name, index);
-                }
+                _current = null;
+                return false;
             }
+
+            public void Reset() => _index = 0;
         }
 
-        public void NotifyLimitChanged()
+        bool ICollection<Card>.IsReadOnly => false;
+        void ICollection<Card>.CopyTo(Card[] array, int arrayIndex)
         {
-            foreach (var card in _list.AsSpan())
+            ArgumentOutOfRangeException.ThrowIfGreaterThanOrEqual(arrayIndex, array.Length - Count);
+            foreach (var card in this)
             {
-                card.NotifyLimitChanged();
+                array[arrayIndex++] = card;
             }
         }
-
-        IEnumerable<Card> ICardEnumerable.EnumerateCards() => this;
     }
 }

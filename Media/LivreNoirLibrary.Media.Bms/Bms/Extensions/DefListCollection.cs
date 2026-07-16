@@ -151,7 +151,7 @@ namespace LivreNoirLibrary.Media.Bms
             public bool RemoveUnused(IDictionary<DefType, DefIndexMap> maps, DefIndexCollection used)
             {
                 var modified = false;
-                using var o = ObjectPool.Rent<List<DefType>>(out var remove);
+                using var o = ObjectPool.RentList<DefType>(out var remove);
                 foreach (var (type, list) in obj.EnumerateList())
                 {
                     var map = maps.GetOrAdd(type);
@@ -263,7 +263,7 @@ namespace LivreNoirLibrary.Media.Bms
 
             public void ProcessLoad(BinaryReader reader)
             {
-                using var o = ObjectPool.Rent<List<DefType>>(out var loaded);
+                using var o = ObjectPool.RentList<DefType>(out var loaded);
                 loaded.AddRange(obj.EnumerateList().Select(kv => kv.Item1));
                 var count = reader.ReadInt32();
                 for (var i = 0; i < count; i++)

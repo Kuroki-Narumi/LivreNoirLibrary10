@@ -23,11 +23,11 @@
     </Window.Resources>
     <Grid Margin="4" RowDefinitions="Auto, Auto">
         <Grid Grid.Row="0" ColumnDefinitions="Auto, Auto, *, Auto, Auto">
-            <ct:Button Style="{StaticResource Button_ExecSearch}" Click="OnClick_Search"/>
+            <ct:Button Style="{StaticResource Button_ExecSort}" Click="OnClick_Exec"/>
             <ct:Button Style="{StaticResource Button_ExecClear}" Click="OnClick_Clear"/>
             <ct:DropDownMenuButton Grid.Column="3" CornerRadius="3" Margin="0,0,4,4" BorderBrush="{StaticResource Brush_Border}" Content="{Binding Preset.WithLeader, Source={x:Static ygo:Vocab.Current}}">
                 <ct:DropDownMenuButton.DropDownContent>
-                    <Grid RowDefinitions="Auto, 4, Auto">
+                    <Grid Width="220" RowDefinitions="26, 4, 116">
                         <Grid ColumnDefinitions="*, *, *, *, *">
                             <ct:Button Grid.Column="0" Style="{StaticResource IconButton_Add}"/>
                             <ct:Button Grid.Column="1" Style="{StaticResource IconButton_Overwrite}"/>
@@ -35,7 +35,7 @@
                             <ct:Button Grid.Column="3" Style="{StaticResource IconButton_MoveDown}"/>
                             <ct:Button Grid.Column="4" Style="{StaticResource IconButton_Delete}"/>
                         </Grid>
-                        <ListView Grid.Row="2" x:Name="ListView_Preset" Style="{StaticResource Alt2ListBoxStyle}" Height="116" SelectionMode="Single" ItemsSource="{x:Static local:CardSortWindow.Presets}">
+                        <ListView Grid.Row="2" x:Name="ListView_Preset" Style="{StaticResource Alt2ListBoxStyle}" SelectionMode="Single" ItemsSource="{x:Static local:CardSortWindow.Presets}">
                             <ListView.ItemTemplate>
                                 <DataTemplate>
                                     <local:CardSortPresetPresenter Apply="OnApplyPreset"/>

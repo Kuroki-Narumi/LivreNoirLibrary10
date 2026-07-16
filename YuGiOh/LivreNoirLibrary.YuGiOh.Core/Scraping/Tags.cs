@@ -10,5 +10,6 @@ namespace LivreNoirLibrary.YuGiOh.Scraping
         public const string Input = "input";
         public const string Span = "span";
         public const string Br = "br";
+        public const string A = "a";
     }
 }

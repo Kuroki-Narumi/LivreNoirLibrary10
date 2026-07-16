@@ -6,9 +6,6 @@ namespace LivreNoirLibrary.Windows.Controls
 {
     public class CtListView : ListView, IListView
     {
-        public new void SetSelectedItems(IEnumerable list)
-        {
-            base.SetSelectedItems(list);
-        }
+        void IListView.SetSelectedItems(IEnumerable list) => SetSelectedItems(list);
     }
 }

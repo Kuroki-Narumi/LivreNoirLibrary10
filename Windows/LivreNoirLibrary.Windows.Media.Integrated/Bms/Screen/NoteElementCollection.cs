@@ -163,7 +163,7 @@ namespace LivreNoirLibrary.Windows.Controls.Bms
             public bool IsProcessed { get; set; }
         }
 
-        public class TimerInfoList
+        public class TimerInfoList : IClear
         {
             private readonly Dictionary<TimerId, TimerInfo> _dic = [];
 
@@ -193,7 +193,7 @@ namespace LivreNoirLibrary.Windows.Controls.Bms
             }
         }
 
-        public class TimerInfo
+        public class TimerInfo : IClear
         {
             private readonly List<double> _list = [];
 

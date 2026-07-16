@@ -4,7 +4,7 @@ using System.Text.Json;
 
 namespace LivreNoirLibrary.Media.FFmpeg
 {
-    public readonly unsafe struct OutputFormat : IJsonWriter
+    public readonly unsafe struct OutputFormat : IWriteJson
     {
         static OutputFormat()
         {

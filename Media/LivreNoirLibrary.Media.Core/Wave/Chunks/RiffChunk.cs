@@ -7,7 +7,7 @@ using LivreNoirLibrary.Media.Wave.Chunks;
 
 namespace LivreNoirLibrary.Media.Wave
 {
-    public abstract class RiffChunk : IRiffChunk, IJsonWriter
+    public abstract class RiffChunk : IRiffChunk, IWriteJson
     {
         public abstract string Chid { get; }
         public virtual uint ByteSize => 0;

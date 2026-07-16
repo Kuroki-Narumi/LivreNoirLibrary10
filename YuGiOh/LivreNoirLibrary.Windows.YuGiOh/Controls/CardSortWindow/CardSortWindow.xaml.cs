@@ -92,7 +92,7 @@ namespace LivreNoirLibrary.Windows.YuGiOh.Controls
             }
         }
 
-        private void OnClick_Search(object sender, RoutedEventArgs e)
+        private void OnClick_Exec(object sender, RoutedEventArgs e)
         {
             if (_options is { } options)
             {

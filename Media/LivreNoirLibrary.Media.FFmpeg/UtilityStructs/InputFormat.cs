@@ -3,7 +3,7 @@ using LivreNoirLibrary.Text;
 
 namespace LivreNoirLibrary.Media.FFmpeg
 {
-    public readonly unsafe struct InputFormat : IJsonWriter
+    public readonly unsafe struct InputFormat : IWriteJson
     {
         static InputFormat()
         {

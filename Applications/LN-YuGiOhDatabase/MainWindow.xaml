@@ -7,20 +7,20 @@
         xmlns:ct="clr-namespace:LivreNoirLibrary.Windows.Controls;assembly=LivreNoirLibrary.Windows.Controls"
         xmlns:media="clr-namespace:LivreNoirLibrary.Windows.Media;assembly=LivreNoirLibrary.Windows.Media"
         xmlns:yw="clr-namespace:LivreNoirLibrary.Windows.YuGiOh;assembly=LivreNoirLibrary.Windows.YuGiOh"
+        xmlns:yc="clr-namespace:LivreNoirLibrary.Windows.YuGiOh.Controls;assembly=LivreNoirLibrary.Windows.YuGiOh"
         mc:Ignorable="d" d:DataContext="{d:DesignInstance Type=local:MainViewModel}"
-        FontSize="14" UseLayoutRounding="True"
-        Title="LN YuGiOh Database" Height="690" Width="1060" FontFamily="Meiryo">
+        Style="{StaticResource ControlBase}"
+        Title="LN YuGiOh Database" Height="690" Width="1060">
     <Grid>
         <Grid x:Name="Grid_Main">
-            <TabControl ItemContainerStyle="{StaticResource TabItem_Cornered}">
+            <TabControl Padding="0">
                 <TabItem Header="{Binding Tab_Database.Value, Source={x:Static yw:Vocab.Current}}">
-                    
+                    <local:Unit_Database x:Name="Unit_Database"/>
                 </TabItem>
                 <TabItem Header="{Binding Tab_Statistics.Value, Source={x:Static yw:Vocab.Current}}">
-                    
                 </TabItem>
                 <TabItem Header="{Binding Tab_Deck.Value, Source={x:Static yw:Vocab.Current}}">
-                    
+                    <local:Unit_Deck x:Name="Unit_Deck"/>
                 </TabItem>
                 <TabItem Header="{Binding Tab_DuelLog.Value, Source={x:Static yw:Vocab.Current}}">
                     
@@ -32,12 +32,18 @@
                         <Run Text="{Binding OfficialDatabase.Value, Source={x:Static yw:Vocab.Current}}"/>
                     </Hyperlink>
                 </TextBlock>
-                <ct:Button Style="{StaticResource IconButton_Base}" Icon="{x:Static media:Icons.Help}" Click="OnClick_Help"/>
+                <ct:Button Style="{StaticResource StyleBase_IconButton}" Icon="{x:Static media:Icons.Help}" Click="OnClick_Help"/>
             </StackPanel>
         </Grid>
         <ct:CenteringPanel x:Name="OuterPanel">
             <ct:CenteringPanelChild x:Name="Area_UpdateInfo">
-                
+                <Border Padding="4" Background="White" BorderBrush="{StaticResource Brush_Border}" BorderThickness="1">
+                    <StackPanel>
+                        <TextBlock x:Name="TextBlock_Info" HorizontalAlignment="Center"/>
+                        <Rectangle Height="4"/>
+                        <ct:Button HorizontalAlignment="Center" Content="OK" Click="OnClick_Info_OK"/>
+                    </StackPanel>
+                </Border>
             </ct:CenteringPanelChild>
             <ct:CenteringPanelChild x:Name="Area_Help">
                 <Grid RowDefinitions="Auto, Auto" ColumnDefinitions="Auto, Auto" Background="White">
@@ -48,11 +54,14 @@
                         </Style>
                     </Grid.Resources>
                     <Image Grid.ColumnSpan="2" Margin="8" Source="/splash.png"/>
-                    <TextBlock x:Name="TextBlock_Version" Grid.ColumnSpan="2" HorizontalAlignment="Center" VerticalAlignment="Bottom" Padding="32,0,0,6"/>
+                    <TextBlock Grid.ColumnSpan="2" HorizontalAlignment="Left" VerticalAlignment="Bottom" Padding="134,0,0,7">
+                        Version <Run Text="{Binding Version}"/>
+                    </TextBlock>
                     <ct:Button Grid.Column="0" Icon="{x:Static media:Icons.Help}" Content="{Binding OnlineManual.Value, Source={x:Static yw:Vocab.Current}}" Click="OnClick_Help_Manual"/>
                     <ct:Button Grid.Column="1" Icon="{x:Static media:Icons.Update}" Content="{Binding CheckUpdate.Value, Source={x:Static yw:Vocab.Current}}" Click="OnClick_Help_Update"/>
                 </Grid>
             </ct:CenteringPanelChild>
         </ct:CenteringPanel>
+        <ct:TaskProgressBar x:Name="TaskProgressBar"/>
     </Grid>
 </Window>

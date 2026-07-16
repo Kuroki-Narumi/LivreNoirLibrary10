@@ -1,12 +1,16 @@
 ﻿using LivreNoirLibrary.Collections;
+using LivreNoirLibrary.ObjectModel;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Collections.Specialized;
 
 namespace LivreNoirLibrary.YuGiOh.Data
 {
-    public class PackInfoCollection() : IEnumerable<PackInfo>
+    public class PackInfoCollection() : ObservableObjectBase, ISafeEnumerable<PackInfo>, IObservableCollection
     {
+        public event NotifyCollectionChangedEventHandler? CollectionChanged;
+
         private readonly List<PackInfo> _ocgList = [];
         private readonly List<PackInfo> _tcgList = [];
 
@@ -19,23 +23,30 @@ namespace LivreNoirLibrary.YuGiOh.Data
         public int TcgCount => _tcgList.Count;
         public bool ContainsTcg => _tcgList.Count is > 0;
 
-        public void Clear()
+        private void ClearImpl()
         {
             _needCheckDate = true;
             _ocgList.Clear();
             _tcgList.Clear();
         }
 
+        public void Clear()
+        {
+            ClearImpl();
+            this.NotifyCollectionReset();
+        }
+
         public void Load(PackInfoCollection source)
         {
-            Clear();
+            ClearImpl();
             _ocgList.AddRange(source._ocgList);
             _tcgList.AddRange(source._tcgList);
+            this.NotifyCollectionReset();
         }
 
         public void Add(PackInfo item)
         {
-            if (item.IsTcg())
+            if (item.IsTcg)
             {
                 AddImpl(_tcgList, item);
             }
@@ -68,17 +79,6 @@ namespace LivreNoirLibrary.YuGiOh.Data
             foreach (var item in _tcgList)
             {
                 yield return item;
-            }
-        }
-
-        IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
-
-        public IEnumerable<PackFullInfo> EnumerateFullInfo()
-        {
-            var packs = CardPool.Instance.Packs;
-            foreach (var info in this)
-            {
-                yield return new(info, packs);
             }
         }
 
@@ -151,5 +151,7 @@ namespace LivreNoirLibrary.YuGiOh.Data
             CheckDate();
             return ContainsTcg ? _dates[LocaleType.Tcg].Last : GetPadding(ascending);
         }
+
+        void IObservableCollection.RaiseCollectionChanged(object sender, NotifyCollectionChangedEventArgs e) => CollectionChanged?.Invoke(sender, e);
     }
 }

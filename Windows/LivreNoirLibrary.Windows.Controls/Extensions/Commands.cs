@@ -52,6 +52,28 @@ namespace LivreNoirLibrary.Windows.Controls
             RegisterCommand(w, SystemCommands.CloseWindowCommand, w.OnExecuted_Close);
         }
 
+        /// <summary>
+        /// Marks the object as edited and records the current state in the undo history.
+        /// </summary>
+        /// <param name="obj">The object that owns the history to which the edit operation applies.</param>
+        /// <param name="force">A value indicating whether to force the operation to record the current state in the undo history,
+        /// even if no changes have been detected.</param>
+        public static void OnEdit<T>(this T obj, bool force = false)
+            where T : UIElement, IHistoryOwner
+        {
+            if (obj.History.PushUndo(force))
+            {
+                CommandManager.InvalidateRequerySuggested();
+            }
+        }
+
+        public static void ClearHistory<T>(this T obj)
+            where T : UIElement, IHistoryOwner
+        {
+            obj.History.Clear();
+            CommandManager.InvalidateRequerySuggested();
+        }
+
         public static void RegisterHistoryCommands<T>(this T obj)
             where T : UIElement, IHistoryOwner
         {
@@ -61,19 +83,24 @@ namespace LivreNoirLibrary.Windows.Controls
 
         public static void CanExecute_Undo(this IHistory history, object sender, CanExecuteRoutedEventArgs e) => e.CanExecute = history.UndoCount is > 0;
 
-        public static void CanExecute_Redo(this IHistory history, object sender, CanExecuteRoutedEventArgs e)
-            => e.CanExecute = history.RedoCount is > 0;
+        public static void CanExecute_Redo(this IHistory history, object sender, CanExecuteRoutedEventArgs e) => e.CanExecute = history.RedoCount is > 0;
 
         public static void OnExecuted_Undo(this IHistory history, object sender, ExecutedRoutedEventArgs e)
         {
-            history.Undo();
-            e.Handled = true;
+            if (history.Undo())
+            {
+                e.Handled = true;
+                CommandManager.InvalidateRequerySuggested();
+            }
         }
 
         public static void OnExecuted_Redo(this IHistory history, object sender, ExecutedRoutedEventArgs e)
         {
-            history.Redo();
-            e.Handled = true;
+            if (history.Redo())
+            {
+                e.Handled = true;
+                CommandManager.InvalidateRequerySuggested();
+            }
         }
     }
 }

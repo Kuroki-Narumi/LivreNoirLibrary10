@@ -25,7 +25,6 @@ namespace LivreNoirLibrary.Windows.Controls
         public static readonly DependencyProperty TextProperty = TextBlock.TextProperty.AddOwner<string>(typeof(RectangularText), null, OnTextChanged);
         public static readonly DependencyProperty FillProperty = Shape.FillProperty.AddOwner(typeof(RectangularText), DefaultFill, OnFillChanged);
         public static readonly DependencyProperty StrokeProperty = Shape.StrokeProperty.AddOwner(typeof(RectangularText), DefaultStroke, OnStrokeChanged);
-        public static readonly DependencyProperty ThicknessProperty = PropertyUtils.Register(typeof(RectangularText), DefaultThickness, OnThicknessChanged);
         public static readonly DependencyProperty StrokeThicknessProperty = Shape.StrokeThicknessProperty.AddOwner(typeof(RectangularText), DefaultStrokeThickness, OnStrokeThicknessChanged);
 
         private static void OnTextChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
@@ -56,20 +55,11 @@ namespace LivreNoirLibrary.Windows.Controls
             }
         }
 
-        private static void OnThicknessChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
-        {
-            if (d is RectangularText r)
-            {
-                r._thickness = (double)e.NewValue;
-                r.InvalidateMeasure();
-            }
-        }
-
         private static void OnStrokeThicknessChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
             if (d is RectangularText r)
             {
-                r._stroke_thickness = (double)e.NewValue;
+                r._strokeThickness = (double)e.NewValue;
                 r.InvalidateMeasure();
             }
         }
@@ -77,16 +67,17 @@ namespace LivreNoirLibrary.Windows.Controls
         private string? _text;
         private Brush? _fill = DefaultFill;
         private Brush? _stroke = DefaultStroke;
-        private double _thickness = DefaultThickness;
-        private double _stroke_thickness = DefaultStrokeThickness;
+        private double _strokeThickness = DefaultStrokeThickness;
         private double _width;
         private double _height;
+
+        [DependencyProperty(AffectsMeasure = true)]
+        private double _thickness = DefaultThickness;
 
         public string? Text { get => _text; set => SetValue(TextProperty, value); }
         public Brush? Fill { get => _fill; set => SetValue(FillProperty, value); }
         public Brush? Stroke { get => _stroke; set => SetValue(StrokeProperty, value); }
-        public double Thickness { get => _thickness; set => SetValue(ThicknessProperty, Math.Max(value, 0)); }
-        public double StrokeThickness { get => _stroke_thickness; set => SetValue(StrokeThicknessProperty, Math.Max(value, 0)); }
+        public double StrokeThickness { get => _strokeThickness; set => SetValue(StrokeThicknessProperty, Math.Max(value, 0)); }
 
         public RectangularText()
         {
@@ -94,7 +85,7 @@ namespace LivreNoirLibrary.Windows.Controls
             SnapsToDevicePixels = true;
         }
 
-        public (double Width, double Height) GetSize() => string.IsNullOrEmpty(_text) ? (0, 0) : CalcSize(_text, _thickness, _stroke_thickness);
+        public (double Width, double Height) GetSize() => string.IsNullOrEmpty(Text) ? (0, 0) : CalcSize(Text, Thickness, StrokeThickness);
 
         protected override Size MeasureOverride(Size availableSize)
         {
@@ -104,7 +95,7 @@ namespace LivreNoirLibrary.Windows.Controls
 
         protected override void OnRender(DrawingContext dc)
         {
-            Render(dc, 0, 0, _text, _fill, _stroke, _thickness, _stroke_thickness);
+            Render(dc, 0, 0, Text, Fill, Stroke, Thickness, StrokeThickness);
         }
 
         public static void Render(DrawingContext dc, double x, double y, string? text, Brush? fill, Brush? stroke, double th = DefaultThickness, double th2 = DefaultStrokeThickness)

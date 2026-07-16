@@ -548,6 +548,7 @@
         <Setter Property="Background" Value="{StaticResource Brush_Popup_Background}"/>
         <Setter Property="Control.Foreground" Value="{StaticResource Brush_Popup_Foreground}"/>
         <Setter Property="Padding" Value="4"/>
+        <Setter Property="TextBlock.FontSize" Value="12"/>
     </Style>
 
     <Style TargetType="local:PopupHelpButton">
@@ -1575,9 +1576,9 @@
                         </Grid>
                     </Grid>
                     <ControlTemplate.Triggers>
-                        <DataTrigger Binding="{Binding Icon, RelativeSource={RelativeSource Mode=TemplatedParent}}" Value="{x:Null}">
+                        <Trigger Property="Icon" Value="{x:Null}">
                             <Setter TargetName="PART_Icon" Property="Visibility" Value="Collapsed"/>
-                        </DataTrigger>
+                        </Trigger>
                         <Trigger Property="IsMinimizeVisible" Value="False">
                             <Setter TargetName="Button_Minimize" Property="Visibility" Value="Collapsed"/>
                         </Trigger>
@@ -1696,5 +1697,15 @@
         <Setter Property="Margin" Value="2,4"/>
         <Setter Property="Width" Value="1"/>
         <Setter Property="Grid.RowSpan" Value="10"/>
+    </Style>
+
+    <Style x:Key="StyleBase_IconButton" TargetType="local:Button">
+        <Setter Property="Margin" Value="0,0"/>
+        <Setter Property="Padding" Value="2,0"/>
+        <Setter Property="MinWidth" Value="0"/>
+        <Setter Property="MinHeight" Value="0"/>
+        <Setter Property="VerticalAlignment" Value="Stretch"/>
+        <Setter Property="BorderBrush" Value="Transparent"/>
+        <Setter Property="Focusable" Value="False"/>
     </Style>
 </ResourceDictionary>

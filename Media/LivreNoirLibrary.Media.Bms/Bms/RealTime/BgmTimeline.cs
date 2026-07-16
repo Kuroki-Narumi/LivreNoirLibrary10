@@ -1,10 +1,11 @@
 ﻿using LivreNoirLibrary.Collections;
 using LivreNoirLibrary.Media.Wave;
+using LivreNoirLibrary.ObjectModel;
 using System.Collections.Generic;
 
 namespace LivreNoirLibrary.Media.Bms
 {
-    public class BgmTimeline : IAudioTimeline<string>
+    public class BgmTimeline : IAudioTimeline<string>, IClear
     {
         public const int Tag_KeySound = 0;
         public const int Tag_BgmSound = 1;

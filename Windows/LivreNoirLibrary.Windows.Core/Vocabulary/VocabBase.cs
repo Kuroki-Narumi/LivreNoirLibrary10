@@ -68,7 +68,7 @@ namespace LivreNoirLibrary.Windows
             if (!current.Equals(data))
             {
                 current.Update(data);
-                SendPropertyChanged(key);
+                this.NotifyPropertyChanged(key);
                 return true;
             }
             return false;
@@ -80,7 +80,7 @@ namespace LivreNoirLibrary.Windows
             if (!current.Equals(value, keyTip))
             {
                 current.Update(value, keyTip);
-                SendPropertyChanged(key);
+                this.NotifyPropertyChanged(key);
                 return true;
             }
             return false;

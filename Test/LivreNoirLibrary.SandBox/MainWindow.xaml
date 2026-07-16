@@ -9,6 +9,7 @@
         xmlns:skinInfo="clr-namespace:LivreNoirLibrary.Windows.Media.Bms.SkinInfo;assembly=LivreNoirLibrary.Windows.Media.Integrated"
         xmlns:media="clr-namespace:LivreNoirLibrary.Windows.Media;assembly=LivreNoirLibrary.Windows.Media"
         xmlns:conv="clr-namespace:LivreNoirLibrary.Windows.Converters;assembly=LivreNoirLibrary.Windows.Controls"
+        xmlns:ctYgo="clr-namespace:LivreNoirLibrary.Windows.YuGiOh.Controls;assembly=LivreNoirLibrary.Windows.YuGiOh"
         mc:Ignorable="d" d:DataContext="{d:DesignInstance Type=local:MainWindow}"
         Title="MainWindow" Height="540" Width="880" FontSize="14" UseLayoutRounding="True">
     <TabControl>
@@ -24,8 +25,8 @@
         <TabItem Header="Icon">
             <local:Unit_Icon x:Name="Unit_Icon"/>
         </TabItem>
-        <TabItem Header="YuGiOh">
-            <local:Unit_YuGiOh x:Name="Unit_YuGiOh"/>
+        <TabItem Header="YGO">
+            <ctYgo:CardEditor/>
         </TabItem>
     </TabControl>
 </Window>

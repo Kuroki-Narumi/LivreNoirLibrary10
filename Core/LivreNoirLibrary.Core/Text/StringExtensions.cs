@@ -11,7 +11,7 @@ namespace LivreNoirLibrary.Text
 {
     public static partial class StringExtensions
     {
-        public static string GetTypeName<T>(this T obj) => GetFriendlyName(typeof(T));
+        public static string GetFriendlyTypeName<T>(this T obj) => GetFriendlyName(typeof(T));
 
         public static string GetFriendlyName(this Type type)
         {
@@ -20,14 +20,37 @@ namespace LivreNoirLibrary.Text
             {
                 return typeName;
             }
-            var baseName = typeName[..typeName.IndexOf('`')];
-            var args = type.GetGenericArguments().Select(GetFriendlyName);
-            return $"{baseName}<{string.Join(", ", args)}>";
+            using var o = ObjectPool.RentStringBuilder(out var sb);
+            BuildFriendlyName(type, sb);
+            return sb.ToString();
+        }
+
+        private static void BuildFriendlyName(Type type, StringBuilder sb)
+        {
+            var name = type.Name;
+            if (!type.IsGenericType)
+            {
+                sb.Append(name);
+                return;
+            }
+            var span = name.AsSpan();
+            sb.Append(span[..span.IndexOf('`')]);
+            var i = 0;
+            sb.Append('<');
+            foreach (var t in type.GetGenericArguments())
+            {
+                if (i++ is 0)
+                {
+                    sb.Append(", ");
+                }
+                BuildFriendlyName(t, sb);
+            }
+            sb.Append('>');
         }
 
         public static string[] SplitLines(this string? text, bool trim = false)
         {
-            var buffer = new List<string>();
+            using var o = ObjectPool.RentList<string>(out var buffer);
             foreach (var span in text.AsSpan().EnumerateLines())
             {
                 buffer.Add(new(trim ? span.Trim() : span));

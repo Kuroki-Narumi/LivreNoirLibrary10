@@ -1,5 +1,6 @@
 ﻿using LivreNoirLibrary.Collections;
 using LivreNoirLibrary.Debug;
+using LivreNoirLibrary.ObjectModel;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -8,7 +9,7 @@ using System.IO;
 
 namespace LivreNoirLibrary.Media.Wave
 {
-    public class CachedWaveBufferProvider : IWaveBufferProvider<string>
+    public class CachedWaveBufferProvider : IWaveBufferProvider<string>, IClear
     {
         private readonly Dictionary<string, WaveBuffer?> _buffers = [];
 

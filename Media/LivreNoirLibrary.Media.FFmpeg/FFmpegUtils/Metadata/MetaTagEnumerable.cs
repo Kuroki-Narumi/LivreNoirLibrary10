@@ -1,10 +1,11 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using LivreNoirLibrary.Collections;
 
 namespace LivreNoirLibrary.Media.FFmpeg
 {
-    public readonly unsafe struct MetaTagEnumerable<T> : IEnumerable<MetaTag>
+    public readonly unsafe struct MetaTagEnumerable<T> : ISafeEnumerable<MetaTag>
         where T : IMetaTag
     {
         private readonly AVDictionary** _dic;
@@ -16,9 +17,8 @@ namespace LivreNoirLibrary.Media.FFmpeg
 
         private Enumerator GetEnumerator() => new(_dic);
         IEnumerator<MetaTag> IEnumerable<MetaTag>.GetEnumerator() => GetEnumerator();
-        IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 
-        public unsafe struct Enumerator : IEnumerator<MetaTag>
+        public unsafe struct Enumerator : ISafeEnumerator<MetaTag>
         {
             private readonly AVDictionary** _dic;
             private readonly int _count;
@@ -26,7 +26,6 @@ namespace LivreNoirLibrary.Media.FFmpeg
             private MetaTag _current;
 
             public readonly MetaTag Current => _current;
-            readonly object IEnumerator.Current => Current;
 
             public readonly int Count => _count;
 
@@ -59,7 +58,6 @@ namespace LivreNoirLibrary.Media.FFmpeg
             }
 
             public void Reset() => _current_entry = null;
-            public readonly void Dispose() { }
         }
     }
 }

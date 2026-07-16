@@ -5,7 +5,7 @@ using System.Windows;
 
 namespace LivreNoirLibrary.Windows.YuGiOh
 {
-    public static class Extensions
+    public static class OpenUrl
     {
         public static void OpenUrl_Card(this FrameworkElement element, int cid, bool tcg)
         {

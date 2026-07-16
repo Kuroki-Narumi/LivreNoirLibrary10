@@ -30,7 +30,7 @@ namespace LivreNoirLibrary.Media.Bms
         {
             if (number is >= 0 and <= BmsConstants.MaxBarNumber)
             {
-                return SortedList.TryGetValue(_numbers, _values, (short)number, out value);
+                return SortedList.TryGetValue(_numbers, _values, (short)number, out _, out value);
             }
             else
             {

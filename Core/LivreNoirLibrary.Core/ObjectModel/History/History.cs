@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace LivreNoirLibrary.ObjectModel
 {
-    public class History<T> : IHistory
+    public class History<T> : IHistory, IClear
     {
         private readonly IHistoryOwner<T> _owner;
         private readonly Stack<T> _undo = new();
@@ -12,6 +12,7 @@ namespace LivreNoirLibrary.ObjectModel
 
         public int UndoCount => _undo.Count;
         public int RedoCount => _redo.Count;
+        public T LastData => _last_data;
 
         public History(IHistoryOwner<T> owner)
         {
@@ -26,27 +27,36 @@ namespace LivreNoirLibrary.ObjectModel
             _last_data = _owner.GetHistoryData();
         }
 
-        public void PushUndo(bool force = false)
+        public bool PushUndo(bool force = false)
         {
-            if (force || _owner.NeedsUpdateHistory(_last_data))
+            var data = _last_data;
+            var newData = _owner.GetHistoryData();
+            if (force || !_owner.HistoryEquals(data, newData))
             {
                 _redo.Clear();
-                _undo.Push(_last_data);
-                _last_data = _owner.GetHistoryData();
+                _owner.EnsureHistoryData(data);
+                _undo.Push(data);
+                _last_data = newData;
+                return true;
             }
+            return false;
         }
 
-        private void ProcessDo(Stack<T> from, Stack<T> to)
+        private bool ProcessDo(Stack<T> from, Stack<T> to)
         {
             if (from.TryPop(out var data))
             {
-                to.Push(_owner.GetHistoryData());
+                var newData = _owner.GetHistoryData();
+                _owner.EnsureHistoryData(newData);
+                to.Push(newData);
                 _owner.ApplyHistory(data);
                 _last_data = data;
+                return true;
             }
+            return false;
         }
 
-        public void Undo() => ProcessDo(_undo, _redo);
-        public void Redo() => ProcessDo(_redo, _undo);
+        public bool Undo() => ProcessDo(_undo, _redo);
+        public bool Redo() => ProcessDo(_redo, _undo);
     }
 }

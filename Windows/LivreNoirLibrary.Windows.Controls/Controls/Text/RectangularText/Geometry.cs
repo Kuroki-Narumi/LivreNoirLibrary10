@@ -1,4 +1,6 @@
-﻿using System;
+﻿using LivreNoirLibrary.Collections;
+using LivreNoirLibrary.Media.VectorGraphics;
+using System;
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
 using System.Windows.Media;
@@ -7,7 +9,7 @@ namespace LivreNoirLibrary.Windows.Controls
 {
     public partial class RectangularText
     {
-        public static void DrawToGeometry(StreamGeometryContext ctx, double ox, double oy, string text, double th = DefaultThickness, double th2 = DefaultStrokeThickness)
+        public static void DrawToGeometry(StreamGeometryContext ctx, double ox, double oy, ReadOnlySpan<char> text, double th = DefaultThickness, double th2 = DefaultStrokeThickness)
         {
             var x = ox + th2;
             var y = oy + th2;
@@ -35,7 +37,7 @@ namespace LivreNoirLibrary.Windows.Controls
             }
         }
 
-        public static StreamGeometry CreateGeometry(double offsetX, double offsetY, string text, double th = DefaultThickness, double th2 = DefaultStrokeThickness)
+        public static StreamGeometry CreateGeometry(double offsetX, double offsetY, ReadOnlySpan<char> text, double th = DefaultThickness, double th2 = DefaultStrokeThickness)
         {
             var g = CreateGometryCore(text, th, th2);
             TranslateTransform t = new(offsetX, offsetY);
@@ -45,29 +47,35 @@ namespace LivreNoirLibrary.Windows.Controls
             return g;
         }
 
-        public static StreamGeometry CreateGeometry(string text, double th, double th2)
+        public static StreamGeometry CreateGeometry(ReadOnlySpan<char> text, double th, double th2)
         {
             var g = CreateGometryCore(text, th, th2);
             g.Freeze();
             return g;
         }
 
-        private static readonly Dictionary<(string, double, double), StreamGeometry> _geometries = [];
-
-        private static StreamGeometry CreateGometryCore(string text, double th, double th2)
+        private static readonly Dictionary<(double, double), Dictionary<string, StreamGeometry>.AlternateLookup<ReadOnlySpan<char>>> _geometries = [];
+        private static Dictionary<string, StreamGeometry>.AlternateLookup<ReadOnlySpan<char>> CreateGeometryLookup((double, double) _)
         {
-            var key = (text, th, th2);
-            if (!_geometries.TryGetValue(key, out var sg))
+            Dictionary<string, StreamGeometry> dic = new(StringComparer.OrdinalIgnoreCase);
+            return dic.GetAlternateLookup<ReadOnlySpan<char>>();
+        }
+
+        private static StreamGeometry CreateGometryCore(ReadOnlySpan<char> text, double th, double th2)
+        {
+            var key = (th, th2);
+            var dic = _geometries.GetOrAdd(key, CreateGeometryLookup);
+            if (!dic.TryGetValue(text, out var geometry))
             {
-                sg = new();
-                using (var ctx = sg.Open())
+                geometry = new();
+                using (var ctx = geometry.Open())
                 {
                     DrawToGeometry(ctx, 0, 0, text, th, th2);
                 }
-                sg.Freeze();
-                _geometries.Add(key, sg);
+                geometry.Freeze();
+                dic[text] = geometry;
             }
-            return sg;
+            return geometry;
         }
 
         public static (double Width, double Height) CalcSize(string text, double th1 = DefaultThickness, double th2 = DefaultStrokeThickness)
@@ -107,16 +115,7 @@ namespace LivreNoirLibrary.Windows.Controls
             return (max, y);
         }
 
-        private static void InitializePathData()
-        {
-            var offset = 'A' - 'a';
-            for (var c = 'a'; c <= 'z'; c++)
-            {
-                _path_data.Add(c, _path_data[(char)(c + offset)]);
-            }
-        }
-
-        private static readonly Dictionary<char, (double Width, PathParser Parser)> _path_data = new()
+        private static readonly Dictionary<char, (double Width, Path Parser)> _path_data = new()
         {
             {'0', (3, "M0,0 h3 v5 h-3 Z M1,1 h1 v3 h-1 Z")},
             {'1', (3, "M1,0 h1 v5 h-1 Z")},
@@ -175,128 +174,53 @@ namespace LivreNoirLibrary.Windows.Controls
             {'#', (3, "M0,1 h0.5 v-1 h0.75 v1 h0.5 v-1 h0.75 v1 h0.5 v1 h-0.5 v1 h0.5 v1 h-0.5 v1 h-0.75 v-1 h-0.5 v1 h-0.75 v-1 h-0.5 v-1 h0.5 v-1 h-0.5 Z M1.25,2 h0.5 v1 h-0.5 Z")},
         };
 
-        private enum MoveType
+        private static void InitializePathData()
         {
-            BeginFigure,
-            HorizontalAbsolute,
-            HorizontalRelative,
-            VerticalAbsolute,
-            VerticalRelative,
-            LineTo,
-        }
-
-        private class PathMethod(MoveType type, double x, double y)
-        {
-            public MoveType Type { get; } = type;
-            public double X { get; } = x;
-            public double Y { get; } = y;
-        }
-
-        private partial class PathParser
-        {
-            public static implicit operator PathParser(string text) => new(text);
-
-            private const string Number = @"-?\d+(?:\.\d+)?(?:[Ee]-?\d+)?";
-            private const string X = "X";
-            private const string Y = "Y";
-
-            [GeneratedRegex($@"M(?<{X}>{Number}),(?<{Y}>{Number})")]
-            private static partial Regex Regex_Begin { get; }
-
-            [GeneratedRegex($@"H(?<{X}>{Number})")]
-            private static partial Regex Regex_HA { get; }
-
-            [GeneratedRegex($@"h(?<{X}>{Number})")]
-            private static partial Regex Regex_HR { get; }
-
-            [GeneratedRegex($@"V(?<{Y}>{Number})")]
-            private static partial Regex Regex_VA { get; }
-
-            [GeneratedRegex($@"v(?<{Y}>{Number})")]
-            private static partial Regex Regex_VR { get; }
-
-            [GeneratedRegex($@"L?(?<{X}>{Number}),(?<{Y}>{Number})")]
-            private static partial Regex Regex_Point { get; }
-
-            private readonly List<PathMethod> _methods = [];
-
-            public PathParser(string text)
+            var offset = 'A' - 'a';
+            for (var c = 'a'; c <= 'z'; c++)
             {
-                static double P(Capture cap) => double.Parse(cap.Value);
-                foreach (var f in text.Split(' '))
-                {
-                    var match = Regex_Begin.Match(f);
-                    if (match.Success)
-                    {
-                        _methods.Add(new(MoveType.BeginFigure, P(match.Groups[X]), P(match.Groups[Y])));
-                        continue;
-                    }
-                    match = Regex_HA.Match(f);
-                    if (match.Success)
-                    {
-                        _methods.Add(new(MoveType.HorizontalAbsolute, P(match.Groups[X]), 0));
-                        continue;
-                    }
-                    match = Regex_HR.Match(f);
-                    if (match.Success)
-                    {
-                        _methods.Add(new(MoveType.HorizontalRelative, P(match.Groups[X]), 0));
-                        continue;
-                    }
-                    match = Regex_VA.Match(f);
-                    if (match.Success)
-                    {
-                        _methods.Add(new(MoveType.VerticalAbsolute, 0, P(match.Groups[Y])));
-                        continue;
-                    }
-                    match = Regex_VR.Match(f);
-                    if (match.Success)
-                    {
-                        _methods.Add(new(MoveType.VerticalRelative, 0, P(match.Groups[Y])));
-                        continue;
-                    }
-                    match = Regex_Point.Match(f);
-                    if (match.Success)
-                    {
-                        _methods.Add(new(MoveType.LineTo, P(match.Groups[X]), P(match.Groups[Y])));
-                    }
-                }
+                _path_data[c] = _path_data[(char)(c + offset)];
             }
+        }
+
+        private class Path(string data)
+        {
+            public static implicit operator Path(string data) => new(data);
+
+            private readonly List<PathData> _data = PathParser.Parse(data);
 
             public void Draw(StreamGeometryContext ctx, double ox, double oy, double th)
             {
                 // current position
-                var cx = ox;
-                var cy = oy;
-                double P(double p) => p * th;
-                for (int i = 0; i < _methods.Count; i++)
+                var x = ox;
+                var y = oy;
+
+                static void Update(ref double current, double origin, float value, double th, bool relative)
                 {
-                    var method = _methods[i];
-                    switch (method.Type)
+                    current = (relative ? current : origin) + value * th;
+                }
+
+                foreach (var data in _data.AsSpan())
+                {
+                    switch (data.Command)
                     {
-                        case MoveType.BeginFigure:
-                            cx = ox + P(method.X);
-                            cy = oy + P(method.Y);
-                            ctx.BeginFigure(new(cx, cy), true, true);
+                        case PathCommand.Moveto:
+                            Update(ref x, ox, data.Arg1, th, data.Relative);
+                            Update(ref y, oy, data.Arg2, th, data.Relative);
+                            ctx.BeginFigure(new(x, y), true, true);
                             continue;
-                        case MoveType.HorizontalAbsolute:
-                            cx = ox + P(method.X);
+                        case PathCommand.Lineto:
+                            Update(ref x, ox, data.Arg1, th, data.Relative);
+                            Update(ref y, oy, data.Arg2, th, data.Relative);
                             break;
-                        case MoveType.HorizontalRelative:
-                            cx += P(method.X);
+                        case PathCommand.HorizontalLineto:
+                            Update(ref x, ox, data.Arg1, th, data.Relative);
                             break;
-                        case MoveType.VerticalAbsolute:
-                            cy = oy + P(method.Y);
-                            break;
-                        case MoveType.VerticalRelative:
-                            cy += P(method.Y);
-                            break;
-                        case MoveType.LineTo:
-                            cx = ox + P(method.X);
-                            cy = oy + P(method.Y);
+                        case PathCommand.VerticalLineto:
+                            Update(ref y, oy, data.Arg1, th, data.Relative);
                             break;
                     }
-                    ctx.LineTo(new(cx, cy), true, false);
+                    ctx.LineTo(new(x, y), true, false);
                 }
             }
         }

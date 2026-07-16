@@ -17,20 +17,19 @@ namespace LivreNoirLibrary.YuGiOh.Media
                     result = effect ? CardIconType.Effect : CardIconType.Normal;
                     break;
                 case CardType.Fusion_Monster:
-                    result = CardIconType.Fusion;
-                    break;
                 case CardType.Ritual_Monster:
-                    result = CardIconType.Ritual;
-                    break;
                 case CardType.Synchro_Monster:
-                    result = CardIconType.Synchro;
-                    break;
                 case CardType.Xyz_Monster:
-                    result = CardIconType.Xyz;
-                    break;
                 case CardType.Link_Monster:
-                    result = CardIconType.Link;
+                case CardType.Token:
+                    result = (CardIconType)type;
                     break;
+                case CardType.Spell_Monster:
+                    return CardIconType.Spell;
+                case CardType.Trap_Monster:
+                    return CardIconType.Trap;
+                case CardType.CTrap_Monster:
+                    return CardIconType.Continuous_Trap;
                 default:
                     return (CardIconType)type;
             }
@@ -41,7 +40,7 @@ namespace LivreNoirLibrary.YuGiOh.Media
             return result;
         }
 
-        public static CardIconType GetIconType(ICard card) => GetIconType(card.CardType, card.HasEffect, card.Ability);
+        public static CardIconType GetIconType(Card card) => GetIconType(card.CardType, card.HasEffect, card.Ability);
 
         public static CardIconType GetIconType(CardType type, bool effect, Ability ability) => GetIconType(type, effect, ability.IsPendulum());
 
@@ -72,7 +71,7 @@ namespace LivreNoirLibrary.YuGiOh.Media
                         brush = new GradientBrush(
                             GradientType.Vertical,
                             (0, 0),
-                            [new(0.5, c1), new(1, c2)]
+                            [new(0.4, c1), new(1, c2)]
                             );
                     }
                     else

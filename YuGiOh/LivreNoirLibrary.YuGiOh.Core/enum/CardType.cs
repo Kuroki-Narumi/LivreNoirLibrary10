@@ -14,7 +14,10 @@ namespace LivreNoirLibrary.YuGiOh
         Synchro_Monster,// シンクロモンスター
         Xyz_Monster,    // エクシーズモンスター
         Link_Monster,   // リンクモンスター
-        Token = 0x0f,   // モンスタートークン
+        Token,          // モンスタートークン
+        Spell_Monster,  // 魔法モンスター
+        Trap_Monster,   // 罠モンスター
+        CTrap_Monster,  // 永続罠モンスター
 
         Normal_Spell = 0x10, // 通常魔法
         Field_Spell,  // フィールド魔法
@@ -22,13 +25,10 @@ namespace LivreNoirLibrary.YuGiOh
         Continuous_Spell, // 永続魔法
         Quick_Spell,  // 速攻魔法
         Ritual_Spell, // 儀式魔法
-        SpellMonster = 0x18, // 魔法モンスター
 
         Normal_Trap = 0x20, // 通常罠
         Continuous_Trap, // 永続罠
         Counter_Trap,    // カウンター罠
-        TrapMonster = 0x28, // 罠モンスター
-        Continuous_TrapMonster = 0x29, // 永続罠モンスター
 
         Type_Filter = 0xf0, // 種類判別用のフィルタ
     }

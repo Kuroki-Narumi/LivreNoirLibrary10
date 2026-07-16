@@ -221,20 +221,20 @@ namespace LivreNoirLibrary.Windows.Media.Bms
             RaiseRequestRedraw();
         }
 
-        public void SelectRange(in Rect rect, SelectionMode mode, Selection selection)
+        public void SelectRange(in Rect rect, ElementSelectionMode mode, Selection selection)
         {
             switch (mode)
             {
-                case SelectionMode.New:
+                case ElementSelectionMode.New:
                     SelectNew(rect, selection);
                     break;
-                case SelectionMode.Union:
+                case ElementSelectionMode.Union:
                     SelectUnion(rect, selection);
                     break;
-                case SelectionMode.Except:
+                case ElementSelectionMode.Except:
                     SelectExcept(rect, selection);
                     break;
-                case SelectionMode.Intersect:
+                case ElementSelectionMode.Intersect:
                     SelectIntersect(rect, selection);
                     break;
             }

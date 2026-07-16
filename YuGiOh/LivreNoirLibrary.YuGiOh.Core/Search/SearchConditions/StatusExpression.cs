@@ -28,7 +28,7 @@ namespace LivreNoirLibrary.YuGiOh.Search
             InnerException = ex;
         }
 
-        public bool TryEvaluate(ICard card, out double result, out Exception? ex)
+        public bool TryEvaluate(Card card, out double result, out Exception? ex)
         {
             result = default;
             ex = null;
@@ -70,7 +70,7 @@ namespace LivreNoirLibrary.YuGiOh.Search
             return (checker.Monster, checker.Def, checker.Pendulum);
         }
 
-        public bool IsMatch(ICard card) => TryEvaluate(card, out var value, out _) && value != 0;
+        public bool IsMatch(Card card) => TryEvaluate(card, out var value, out _) && value != 0;
 
         private static readonly Card _testCard = new()
         {

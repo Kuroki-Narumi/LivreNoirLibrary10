@@ -6,6 +6,46 @@ namespace LivreNoirLibrary.Text
 {
     public static class JsonSerializeExtensions
     {
+        public static void WriteNumberIfNotZero(this Utf8JsonWriter writer, string propertyName, long value)
+        {
+            if (value is not 0)
+            {
+                writer.WriteNumber(propertyName, value);
+            }
+        }
+
+        public static void WriteNumberIfNotZero(this Utf8JsonWriter writer, string propertyName, ulong value)
+        {
+            if (value is not 0)
+            {
+                writer.WriteNumber(propertyName, value);
+            }
+        }
+
+        public static void WriteNumberIfNotZero(this Utf8JsonWriter writer, string propertyName, float value)
+        {
+            if (value is not 0)
+            {
+                writer.WriteNumber(propertyName, value);
+            }
+        }
+
+        public static void WriteNumberIfNotZero(this Utf8JsonWriter writer, string propertyName, double value)
+        {
+            if (value is not 0)
+            {
+                writer.WriteNumber(propertyName, value);
+            }
+        }
+
+        public static void WriteNumberIfNotZero(this Utf8JsonWriter writer, string propertyName, decimal value)
+        {
+            if (value is not 0)
+            {
+                writer.WriteNumber(propertyName, value);
+            }
+        }
+
         public static void WriteStringIfNotNull(this Utf8JsonWriter writer, string propertyName, string? value)
         {
             if (!string.IsNullOrWhiteSpace(value))

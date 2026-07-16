@@ -1,0 +1,30 @@
+﻿<Window x:Class="LivreNoir.YuGiOhDatabase.CardListWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:LivreNoir.YuGiOhDatabase"
+        xmlns:yc="clr-namespace:LivreNoirLibrary.Windows.YuGiOh.Controls;assembly=LivreNoirLibrary.Windows.YuGiOh"
+        xmlns:ygo="clr-namespace:LivreNoirLibrary.Windows.YuGiOh;assembly=LivreNoirLibrary.Windows.YuGiOh"
+        xmlns:ct="clr-namespace:LivreNoirLibrary.Windows.Controls;assembly=LivreNoirLibrary.Windows.Controls"
+        xmlns:md="clr-namespace:LivreNoirLibrary.Windows.Media;assembly=LivreNoirLibrary.Windows.Media"
+        xmlns:ygd="clr-namespace:LivreNoirLibrary.YuGiOh.Data;assembly=LivreNoirLibrary.YuGiOh.Core"
+        mc:Ignorable="d" d:DataContext="{d:DesignInstance Type=local:CardListWindowViewModel}"
+        ShowInTaskbar="{Binding ShowInTaskbar}"
+        UseLayoutRounding="True" SnapsToDevicePixels="True" Width="960" Height="580" ResizeMode="CanResizeWithGrip" >
+    <Window.Effect>
+        <DropShadowEffect BlurRadius="8" Opacity="0.5" ShadowDepth="0"/>
+    </Window.Effect>
+    <Grid ColumnDefinitions="2*, 4, 5*" Margin="4,0,4,4" TextBlock.FontFamily="Meiryo" TextBlock.FontSize="14">
+        <Grid RowDefinitions="Auto, 4, *">
+            <yc:SearchBar SearchText="{Binding CardSearchText, Mode=TwoWay}" ItemsCount="{Binding Items.Count, ElementName=ListView_CardList}" RequestSearch="CardList_RequestSearch"/>
+            <ListView x:Name="ListView_CardList" Grid.Row="2" Style="{StaticResource Alt2ListBoxStyle}" SelectionMode="Single" ItemTemplate="{StaticResource ItemTemplate_FullText}" ItemsSource="{Binding Cards}" SelectedItem="{Binding SelectedCard, Mode=TwoWay}"/>
+        </Grid>
+        <yc:CardInfoView Grid.Column="2" Source="{Binding SelectedItem, ElementName=ListView_CardList}" 
+                         yc:HyperLinks.CardLinkClicked="CardInfoView_CardLinkClicked"
+                         yc:HyperLinks.RelatedTextClicked="CardList_RequestSearch"/>
+        <ct:ToggleButton Grid.Column="2" Style="{StaticResource TitleBar_ToggleButton}" Icon="{x:Static md:Icons.ShowInTaskbar}"
+                         HorizontalAlignment="Right" VerticalAlignment="Top" Margin="3"
+                         IsChecked="{Binding ShowInTaskbar}" ToolTip="{Binding ShowInTaskbar.Value, Source={x:Static ygo:Vocab.Current}}"/>
+    </Grid>
+</Window>

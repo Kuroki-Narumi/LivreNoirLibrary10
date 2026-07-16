@@ -53,7 +53,7 @@ namespace LivreNoirLibrary.Media.Bms
                 if (value is not null)
                 {
                     _targets.UnionWith(value);
-                    SendPropertyChanged(nameof(TargetList));
+                    this.NotifyPropertyChanged(nameof(TargetList));
                 }
             }
         }

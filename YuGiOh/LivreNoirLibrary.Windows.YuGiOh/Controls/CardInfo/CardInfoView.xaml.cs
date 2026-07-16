@@ -1,7 +1,6 @@
-﻿using LivreNoirLibrary.YuGiOh;
+﻿using LivreNoirLibrary.Windows.Controls;
+using LivreNoirLibrary.Windows.YuGiOh.Converters;
 using LivreNoirLibrary.YuGiOh.Data;
-using System;
-using System.Globalization;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
@@ -16,52 +15,22 @@ namespace LivreNoirLibrary.Windows.YuGiOh.Controls
         public const double DefaultPackListHeight = 104;
         public const double ExpandedPackListHeight = 224;
 
+        private readonly CardInfoViewModel _viewModel = new(true);
+
         [DependencyProperty]
         private Card? _source;
-        [DependencyProperty(SetterScope = Scope.Private)]
-        private bool _canDetach;
-
-        [DependencyProperty(SetterScope = Scope.Private)]
-        private bool _isMonster;
-        [DependencyProperty(SetterScope = Scope.Private)]
-        private bool _isLink;
-        [DependencyProperty(SetterScope = Scope.Private)]
-        private LinkDirection _linkMarker;
-        [DependencyProperty(SetterScope = Scope.Private)]
-        private bool _isPendulum;
-        [DependencyProperty(SetterScope = Scope.Private)]
-        private VocabData? _levelName;
 
         public CardInfoView()
         {
-            DataContext = this;
             InitializeComponent();
+            MainGrid.DataContext = _viewModel;
         }
 
         private void OnSourceChanged(Card? value)
         {
             if (value is not null)
             {
-                IsMonster = value.IsMonster();
-                IsPendulum = value.IsPendulum();
-                if (value.IsLink())
-                {
-                    IsLink = true;
-                    LevelName = Vocab.Current.CInfo.Link;
-                    LinkMarker = value.GetLinkDirections();
-                }
-                else
-                {
-                    IsLink = false;
-                    LevelName = value.IsXyz() ? Vocab.Current.CInfo.Rank : Vocab.Current.CInfo.Level;
-                    LinkMarker = 0;
-                }
-            }
-            else
-            {
-                IsMonster = false;
-                IsLink = false;
-                IsPendulum = false;
+                _viewModel.CopyFrom(value);
             }
         }
 
@@ -69,6 +38,7 @@ namespace LivreNoirLibrary.Windows.YuGiOh.Controls
         {
             if (_source is { } card)
             {
+                e.Handled = true;
                 this.RaiseCardLinkClicked(card.Id, false);
             }
         }
@@ -77,6 +47,7 @@ namespace LivreNoirLibrary.Windows.YuGiOh.Controls
         {
             if (_source is { } card)
             {
+                e.Handled = true;
                 this.RaiseCardLinkClicked(card.Id, true);
             }
         }
@@ -85,6 +56,7 @@ namespace LivreNoirLibrary.Windows.YuGiOh.Controls
         {
             if (sender is FrameworkContentElement { DataContext: PackInfo info })
             {
+                e.Handled = true;
                 this.RaisePackLinkClicked(info.ProductId);
             }
         }
@@ -99,7 +71,13 @@ namespace LivreNoirLibrary.Windows.YuGiOh.Controls
 
         private void OnClick_Copy(object sender, RoutedEventArgs e)
         {
-            if (sender is FrameworkElement { Tag: TextBox {Text: string text } })
+            e.Handled = true;
+            SetTextBoxToClipboard(sender);
+        }
+
+        public static void SetTextBoxToClipboard(object sender)
+        {
+            if (sender is FrameworkElement { Tag: TextBox { Text: string text } })
             {
                 if (!string.IsNullOrEmpty(text))
                 {
@@ -111,6 +89,30 @@ namespace LivreNoirLibrary.Windows.YuGiOh.Controls
                     {
 
                     }
+                }
+            }
+        }
+
+        private int _detachListenerCount;
+
+        public static readonly RoutedEvent DetachEvent = Events.Register<CardInfoView, RoutedEventHandler<Card>>();
+
+        public event RoutedEventHandler<Card>? Detach
+        {
+            add
+            {
+                AddHandler(DetachEvent, value);
+                if (++_detachListenerCount > 0)
+                {
+                    _viewModel.CanDetach = true;
+                }
+            }
+            remove
+            {
+                RemoveHandler(DetachEvent, value);
+                if (--_detachListenerCount <= 0)
+                {
+                    _viewModel.CanDetach = false;
                 }
             }
         }

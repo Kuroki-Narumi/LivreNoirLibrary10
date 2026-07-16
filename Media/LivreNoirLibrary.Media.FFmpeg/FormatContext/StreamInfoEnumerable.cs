@@ -1,10 +1,9 @@
 ﻿using System;
-using System.Collections;
-using System.Collections.Generic;
+using LivreNoirLibrary.Collections;
 
 namespace LivreNoirLibrary.Media.FFmpeg
 {
-    public readonly unsafe struct StreamInfoEnumerable : IEnumerable<StreamInfo>
+    public readonly unsafe struct StreamInfoEnumerable : ISafeEnumerable<StreamInfo>
     {
         private readonly AVFormatContext* _context;
         private readonly AVMediaType _type;
@@ -17,9 +16,8 @@ namespace LivreNoirLibrary.Media.FFmpeg
 
         private Enumerator GetEnumerator() => new(_context, _type);
         IEnumerator<StreamInfo> IEnumerable<StreamInfo>.GetEnumerator() => GetEnumerator();
-        IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 
-        public struct Enumerator : IEnumerator<StreamInfo>
+        public struct Enumerator : ISafeEnumerator<StreamInfo>
         {
             private readonly AVFormatContext* _context;
             private readonly AVMediaType _type;
@@ -28,7 +26,6 @@ namespace LivreNoirLibrary.Media.FFmpeg
             private StreamInfo _current;
 
             public readonly StreamInfo Current => _current;
-            readonly object IEnumerator.Current => Current;
 
             internal Enumerator(AVFormatContext* context, AVMediaType type)
             {
@@ -52,7 +49,6 @@ namespace LivreNoirLibrary.Media.FFmpeg
             }
 
             public void Reset() => _next_index = 0;
-            public readonly void Dispose() { }
         }
     }
 }
