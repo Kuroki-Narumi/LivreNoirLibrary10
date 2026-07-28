@@ -26,6 +26,7 @@ namespace LivreNoirLibrary.Debug
             if (_tweet)
             {
                 ExConsole.Write($"{_name} in {ElapsedTime:mm\\:ss\\.fff}");
+                Console.WriteLine($"{_name} in {ElapsedTime:mm\\:ss\\.fff}");
             }
         }
     }

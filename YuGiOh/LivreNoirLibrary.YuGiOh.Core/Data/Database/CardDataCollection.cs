@@ -26,13 +26,15 @@ namespace LivreNoirLibrary.YuGiOh.Data
         private readonly List<int> _validIds = [];
         private readonly Dictionary<string, List<int>>.AlternateLookup<ReadOnlySpan<char>> _name2id;
 
+        public int Count => _validIds.Count;
+        public int MaxCardId => _validIds.Count is > 0 ? _validIds[^1] : 0;
+        public ReadOnlySpan<int> Ids => _validIds.AsSpan();
+
         public CardDataCollection()
         {
             Dictionary<string, List<int>> dic = new(NameComparer);
             _name2id = dic.GetAlternateLookup<ReadOnlySpan<char>>();
         }
-
-        public int Count => _validIds.Count;
 
         public void ClearWithoutNotify()
         {
@@ -167,8 +169,6 @@ namespace LivreNoirLibrary.YuGiOh.Data
         void IObservableObject.RaisePropertyChanged(object sender, PropertyChangedEventArgs e) => PropertyChanged?.Invoke(sender, e);
         void IObservableCollection.RaiseCollectionChanged(object sender, NotifyCollectionChangedEventArgs e) => CollectionChanged?.Invoke(sender, e);
 
-        public ReadOnlySpan<int> Ids => _validIds.AsSpan();
-
         public void WriteJson(Utf8JsonWriter writer, JsonSerializerOptions options)
         {
             writer.WriteStartArray();
@@ -180,8 +180,9 @@ namespace LivreNoirLibrary.YuGiOh.Data
         }
 
         public Enumerator GetEnumerator() => new(this);
-        IEnumerator<Card> IEnumerable<Card>.GetEnumerator() => new SafeEnumerator(this);
-        IEnumerator IEnumerable.GetEnumerator() => new SafeEnumerator(this);
+        public SafeEnumerator GetSaveEnumerator() => new(this);
+        IEnumerator<Card> IEnumerable<Card>.GetEnumerator() => GetSaveEnumerator();
+        IEnumerator IEnumerable.GetEnumerator() => GetSaveEnumerator();
 
         public ref struct Enumerator(CardDataCollection source)
         {
@@ -199,13 +200,14 @@ namespace LivreNoirLibrary.YuGiOh.Data
                 {
                     _current = _cards[ids[_index]];
                     _index++;
+                    return true;
                 }
                 _current = null;
                 return false;
             }
         }
 
-        private sealed class SafeEnumerator(CardDataCollection source) : ISafeEnumerator<Card>
+        public sealed class SafeEnumerator(CardDataCollection source) : ISafeEnumerator<Card>
         {
             private readonly Card?[] _cards = source._cards;
             private readonly List<int> _validIds = source._validIds;
@@ -233,7 +235,7 @@ namespace LivreNoirLibrary.YuGiOh.Data
         bool ICollection<Card>.IsReadOnly => false;
         void ICollection<Card>.CopyTo(Card[] array, int arrayIndex)
         {
-            ArgumentOutOfRangeException.ThrowIfGreaterThanOrEqual(arrayIndex, array.Length - Count);
+            ArgumentOutOfRangeException.ThrowIfGreaterThanOrEqual(arrayIndex, array.Length - arrayIndex);
             foreach (var card in this)
             {
                 array[arrayIndex++] = card;

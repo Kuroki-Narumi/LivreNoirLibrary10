@@ -2,7 +2,7 @@
   "profiles": {
     "プロファイル 1": {
       "commandName": "DebugRoslynComponent",
-      "targetProject": "..\\LivreNoirLibrary.Windows.Core\\LivreNoirLibrary.Windows.Core.csproj"
+      "targetProject": "..\\..\\YuGiOh\\LivreNoirLibrary.Windows.YuGiOh\\LivreNoirLibrary.Windows.YuGiOh.csproj"
     }
   }
 }

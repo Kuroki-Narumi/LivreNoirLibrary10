@@ -7,12 +7,13 @@ using P = System.Windows.Controls.Primitives;
 
 namespace LivreNoirLibrary.Windows.YuGiOh.Controls
 {
-    public abstract class PresetPresenterBase : Control
+    public abstract partial class PresetPresenterBase : Control
     {
         public const string PART_Name = nameof(PART_Name);
 
         public static RoutedCommand ApplyCommand { get; } = Commands.Create();
         public static RoutedCommand SetToDefaultCommand { get; } = Commands.Create();
+        public static RoutedCommand DefaultChangedCommand { get; } = Commands.Create();
 
         static PresetPresenterBase()
         {
@@ -56,6 +57,7 @@ namespace LivreNoirLibrary.Windows.YuGiOh.Controls
             {
                 t.IsChecked = false;
             }
+            DefaultChangedCommand.Execute(DataContext, this);
             e.Handled = true;
         }
 

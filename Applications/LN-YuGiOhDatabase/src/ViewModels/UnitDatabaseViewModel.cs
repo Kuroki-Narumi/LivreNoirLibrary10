@@ -6,12 +6,12 @@ using System.Collections.Generic;
 
 namespace LivreNoir.YuGiOhDatabase
 {
-    public class UnitDatabaseViewModel : CardSortViewModel
+    public class UnitDatabaseViewModel : ObservableObjectBase
     {
         public bool IsUpdateVisible { get; set => SetValue(ref field, value); }
         public Card? SelectedCard { get; set => SetValue(ref field, value); }
         public CardPack? SelectedPack { get; set => SetValue(ref field, value); }
-        public string PackSearchText { get; set => SetValue(ref field, value); } = "";
-        public PackSearchConditions PackSearchConditions { get; } = new();
+        public CardSearchConditions DefaultCardSearchConditions { get; } = new();
+        public CardSortOptionCollection DefaultCardSortOptions { get; } = [];
     }
 }

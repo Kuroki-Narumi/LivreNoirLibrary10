@@ -1,14 +1,17 @@
-﻿using LivreNoirLibrary.Text;
+﻿using LivreNoirLibrary.Collections;
+using LivreNoirLibrary.Text;
 using LivreNoirLibrary.YuGiOh.Data;
 using System;
 using System.Collections.Generic;
 using System.Text.Json.Serialization;
+using System.Text.RegularExpressions;
 
 namespace LivreNoirLibrary.YuGiOh.Search
 {
-    public partial class CardSearchConditions
+    public partial class CardSearchConditions : TextSearchConditions
     {
         public static CardSearchConditions Default { get; } = new();
+        public static CardSearchConditions Usable { get; } = new() { Limits = [LimitCount.Forbidden, LimitCount.Limit1, LimitCount.Limit2, LimitCount.Unlimited, LimitCount.Specified] };
 
         [JsonPropertyName(JsonPropertyNames.Search_CardTypes)]
         public HashSet<CardType> CardTypes { get; set; } = [];
@@ -70,11 +73,11 @@ namespace LivreNoirLibrary.YuGiOh.Search
         [JsonPropertyName(JsonPropertyNames.Search_PTextLength)]
         public NumberRange PTextLength { get; set; } = new(0, 999, false, false);
 
-        [JsonIgnore]
-        public string SearchText { get; set; } = "";
-
-        [JsonPropertyName(JsonPropertyNames.Search_TextFlags)]
-        public TextSearchFlags TextFlags { get; set; } = TextSearchFlags.Default;
+        public CardSearchConditions() { }
+        public CardSearchConditions(CardSearchConditions source)
+        {
+            Copy(source, this, true);
+        }
 
         private bool _req_monster;
         private bool _req_normal;
@@ -88,7 +91,15 @@ namespace LivreNoirLibrary.YuGiOh.Search
         private bool _req_date;
 
         private readonly StatusExpression _expr = new();
-        private readonly TextSearchConditions _textConds = new();
+
+        private bool _name;
+        private bool _ruby;
+        private bool _enName;
+        private bool _text;
+        private bool _pText;
+        private Regex? _regexForText;
+        private TextForSearchStringConverter _converterForText;
+        private readonly List<SearchSegment> _inputForText = [];
 
         public void Prepare()
         {
@@ -124,9 +135,66 @@ namespace LivreNoirLibrary.YuGiOh.Search
 
             _req_date = FirstDate.IsEnabled || LastDate.IsEnabled;
 
-            _textConds.Text = SearchText;
-            _textConds.Flags = TextFlags;
-            _textConds.Prepare();
+            PrepareText();
+        }
+
+        public override void PrepareText()
+        {
+            var input1 = _inputText;
+            var input2 = _inputForText;
+            input1.Clear();
+            input2.Clear();
+            _regex = null;
+            _regexForText = null;
+            _textNotEffective = true;
+
+            var text = SearchText.AsSpan();
+            var flags = TextFlags;
+            if (text.IsWhiteSpace() || (flags & TextSearchFlags.CheckText) is 0)
+            {
+                return;
+            }
+
+            // フラグの整理
+            _name = (flags & TextSearchFlags.Name) is not 0;
+            _ruby = (flags & TextSearchFlags.Ruby) is not 0;
+            _enName = (flags & TextSearchFlags.EnName) is not 0;
+            _text = (flags & TextSearchFlags.Text) is not 0;
+            _pText = (flags & TextSearchFlags.PText) is not 0;
+            var ignoreCase = (flags & TextSearchFlags.IgnoreCase) is not 0;
+            var ignoreTextCase = (flags & TextSearchFlags.TextIgnoreCase) is not 0;
+            var regex = (flags & TextSearchFlags.UseRegex) is not 0;
+            var ignoreSymbols = (flags & TextSearchFlags.IgnoreSymbols) is not 0;
+            var ignoreTextSymbols = (flags & TextSearchFlags.TextIgnoreSymbols) is not 0;
+            var converter = _textConverter = new(ignoreCase, ignoreSymbols);
+            var converterForText = _converterForText = new(ignoreTextCase, ignoreTextSymbols);
+
+            // 正規表現が有効な場合は生成して終了
+            if (regex)
+            {
+                try
+                {
+                    _regex = new(text.ToHalfRegex(ignoreCase), ignoreCase ? RegexOptions.IgnoreCase : RegexOptions.None);
+                    _regexForText = new(text.ToHalfRegex(ignoreTextCase), ignoreTextCase ? RegexOptions.IgnoreCase : RegexOptions.None);
+                    _textNotEffective = false;
+                    return;
+                }
+                catch
+                {
+                    // 正規表現の生成に失敗した場合は通常検索に切り替える
+                }
+            }
+
+            // 検索語の整理
+            foreach (var (segment, flag) in text.EnumerateSearchSegments())
+            {
+                var t1 = converter.Convert(segment);
+                input1.Add(new(t1, flag));
+                var t2 = converterForText.Convert(segment);
+                input2.Add(new(t2, flag));
+            }
+
+            _textNotEffective = input1.Count is 0;
         }
 
         public bool IsMatch(object? obj, ICardProvider? provider)
@@ -229,13 +297,44 @@ namespace LivreNoirLibrary.YuGiOh.Search
             }
 
             // テキスト内容
-            return _textConds.IsMatch(card);
+            return IsTextMatch(card);
+        }
+
+        public bool IsTextMatch(Card card)
+        {
+            if (_textNotEffective)
+            {
+                return true;
+            }
+            var buffer = StringBuffer.Get();
+            var converter1 = _textConverter;
+            var converter2 = _converterForText;
+            if (_regex is { } regex1)
+            {
+                var regex2 = _regexForText!;
+                return SearchUtils.IsMatch(_name, card.Name, buffer, regex1, converter1) ||
+                       SearchUtils.IsMatch(_ruby, card.Ruby, buffer, regex1, converter1) ||
+                       SearchUtils.IsMatch(_enName, card.EnName, buffer, regex1, converter1) ||
+                       SearchUtils.IsMatch(_text, card.Text, buffer, regex2, converter2) ||
+                       SearchUtils.IsMatch(_pText, card.PendulumText, buffer, regex2, converter2);
+            }
+            else
+            {
+                var segments1 = _inputText.AsSpan();
+                var segments2 = _inputForText.AsSpan();
+                return SearchUtils.IsMatch(_name, card.Name, buffer, segments1, converter1) ||
+                       SearchUtils.IsMatch(_ruby, card.Ruby, buffer, segments1, converter1) ||
+                       SearchUtils.IsMatch(_enName, card.EnName, buffer, segments1, converter1) ||
+                       SearchUtils.IsMatch(_text, card.Text, buffer, segments2, converter2) ||
+                       SearchUtils.IsMatch(_pText, card.PendulumText, buffer, segments2, converter2);
+            }
         }
 
         public static void Copy(CardSearchConditions from, CardSearchConditions to, bool copyText)
         {
             SearchUtils.CopyHashSet(from.CardTypes, to.CardTypes);
             SearchUtils.CopyHashSet(from.Limits, to.Limits);
+            SearchUtils.CopyHashSet(from.Attributes, to.Attributes);
             SearchUtils.CopyHashSet(from.MonsterTypes, to.MonsterTypes);
             to.StatusFlags = from.StatusFlags;
             to.Abilities = from.Abilities;

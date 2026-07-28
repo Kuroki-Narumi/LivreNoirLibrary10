@@ -15,9 +15,6 @@ namespace LivreNoirLibrary.YuGiOh
         Xyz_Monster,    // エクシーズモンスター
         Link_Monster,   // リンクモンスター
         Token,          // モンスタートークン
-        Spell_Monster,  // 魔法モンスター
-        Trap_Monster,   // 罠モンスター
-        CTrap_Monster,  // 永続罠モンスター
 
         Normal_Spell = 0x10, // 通常魔法
         Field_Spell,  // フィールド魔法
@@ -30,6 +27,19 @@ namespace LivreNoirLibrary.YuGiOh
         Continuous_Trap, // 永続罠
         Counter_Trap,    // カウンター罠
 
-        Type_Filter = 0xf0, // 種類判別用のフィルタ
+        MonsterLike = 0x40, // モンスター化したカード
+        Normal_Spell_Monster = MonsterLike | Normal_Spell,
+        Field_Spell_Monster = MonsterLike | Field_Spell,
+        Equip_Spell_Monster = MonsterLike | Equip_Spell,
+        Continuous_Spell_Monster = MonsterLike | Continuous_Spell,
+        Quick_Spell_Monster = MonsterLike | Quick_Spell,
+        Ritual_Spell_Monster = MonsterLike | Ritual_Spell,
+
+        Normal_Trap_Monster = MonsterLike | Normal_Trap,
+        Continuous_Trap_Monster = MonsterLike | Continuous_Trap,
+        Counter_Trap_Monster = MonsterLike | Counter_Trap,
+
+        Type_Filter = 0x30, // 種類判別用のフィルタ
+        MonsterLike_Filter = 0x3f // モンスター化したカードから元のカードタイプに戻すフィルタ
     }
 }

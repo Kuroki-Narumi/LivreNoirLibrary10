@@ -20,16 +20,15 @@ namespace LivreNoirLibrary.Windows.Controls
             BackgroundProperty.OverrideMetadata(typeof(CenteringPanel), PropertyUtils.GetMeta(DefaultBackground));
         }
 
-        public static readonly RoutedEvent ClosedEvent = Events.Register<CenteringPanel, RoutedEventHandler>();
-        public static readonly RoutedEvent OpenedEvent = Events.Register<CenteringPanel, RoutedEventHandler>();
-
         public static readonly DependencyProperty ClickModeProperty = ButtonBase.ClickModeProperty.AddOwner(typeof(CenteringPanel), ClickMode.Release, OnClickModeChanged);
 
         private static void OnVisibilityChanged(DependencyObject d, DependencyPropertyChangedEventArgs e) => (d as CenteringPanel)!.OnVisibilityChanged(e.NewValue is Visibility.Visible);
         private static void OnClickModeChanged(DependencyObject d, DependencyPropertyChangedEventArgs e) => (d as CenteringPanel)!._mode = (ClickMode)e.NewValue;
 
-        public event RoutedEventHandler? Closed { add => AddHandler(ClosedEvent, value); remove => RemoveHandler(ClosedEvent, value); }
-        public event RoutedEventHandler? Opened { add => AddHandler(OpenedEvent, value); remove => RemoveHandler(OpenedEvent, value); }
+        [RoutedEvent]
+        public partial event RoutedEventHandler? Closed;
+        [RoutedEvent]
+        public partial event RoutedEventHandler? Opened;
 
         [DependencyProperty]
         private int _visibleIndex = -1;

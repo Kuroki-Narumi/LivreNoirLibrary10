@@ -30,7 +30,7 @@ namespace LivreNoirLibrary.Windows.YuGiOh.Controls
             CardSearchWindow.CreateDateContextMenu(DatePicker_Until);
         }
 
-        public void Setup(PackSearchConditions conditions, PackSearchConditions defaultConditions)
+        public void Setup(PackSearchConditions conditions, PackSearchConditions? defaultConditions)
         {
             _conditions = conditions;
             _defaultConditions = defaultConditions;

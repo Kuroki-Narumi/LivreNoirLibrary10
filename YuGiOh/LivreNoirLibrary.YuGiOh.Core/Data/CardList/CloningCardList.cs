@@ -47,8 +47,7 @@ namespace LivreNoirLibrary.YuGiOh.Data
         private void Source_CollectionChanged(object? sender, NotifyCollectionChangedEventArgs e) => CollectionChanged?.Invoke(this, e);
 
         public IEnumerator<Card> GetEnumerator() => Source.GetEnumerator();
-        IEnumerable<ICard> ICardEnumerable.EnumerateCards() => this;
-        public IEnumerable<int> EnumerateIds() => this.Select(static card => card.Id);
+        IEnumerable<Card> ICardEnumerable.CardEnumerable => this;
 
         Card? ICardProvider.GetOrDefault(int id) => Source?.GetOrDefault(id);
         bool ICardProvider.TryGetByName(string name, [MaybeNullWhen(false)] out Card card)

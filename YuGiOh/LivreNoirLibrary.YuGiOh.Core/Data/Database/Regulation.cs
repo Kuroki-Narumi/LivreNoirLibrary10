@@ -39,7 +39,7 @@ namespace LivreNoirLibrary.YuGiOh.Data
                 Load(data, provider);
                 return true;
             }
-            if (Json.TryOpen<Serializable.StringRegulation>(path, out var sData))
+            if (Json.TryOpen<Serializable.StringRegulation>(path, out var sData, true))
             {
                 Load(sData, provider);
                 return true;

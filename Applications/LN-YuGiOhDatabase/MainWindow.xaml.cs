@@ -5,23 +5,17 @@ using LivreNoirLibrary.Windows.Controls;
 using LivreNoirLibrary.Windows.YuGiOh;
 using LivreNoirLibrary.Windows.YuGiOh.Controls;
 using LivreNoirLibrary.YuGiOh.Data;
-using S = LivreNoirLibrary.YuGiOh.Scraping;
-using System.Text;
+using LivreNoirLibrary.YuGiOh.Search;
+using System;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Diagnostics;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
 using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
 using System.Windows.Threading;
-using System;
-using System.ComponentModel;
-using LivreNoirLibrary.Windows.YuGiOh.Converters;
+using S = LivreNoirLibrary.YuGiOh.Scraping;
 
 namespace LivreNoir.YuGiOhDatabase
 {
@@ -48,9 +42,18 @@ namespace LivreNoir.YuGiOhDatabase
             InitializeComponent();
             this.SetDispatcher(CheckUpdate_Auto);
 
+            YgoEvents.AddRequestOpenCardUrlHandler(this, OnRequestOpenCardUrl);
+            YgoEvents.AddRequestOpenPackUrlHandler(this, OnRequestOpenPackUrl);
+
             this.RegisterCommand(YgoCommands.UpdateDatabase, Executed_UpdateDatabase);
             this.RegisterCommand(YgoCommands.LoadOcgRegulation, Executed_LoadOcgRegulation);
             this.RegisterCommand(YgoCommands.LoadTcgRegulation, Executed_LoadTcgRegulation);
+
+            this.RegisterCommand(YgoCommands.DetachCardInfo, OnExecuted_DetachCardInfo, CanExecute_DetachCardInfo);
+            this.RegisterCommand(YgoCommands.DetachCardList, OnExecuted_DetachCardList);
+            this.RegisterCommand(YgoCommands.CardLink, CardInfoWindow_CardLink);
+            this.RegisterCommand(YgoCommands.PackLink, CardInfoWindow_PackLink);
+            this.RegisterCommand(YgoCommands.RelatedText, CardInfoWindow_RelatedText);
         }
 
         private void InitializeResources()
@@ -69,7 +72,7 @@ namespace LivreNoir.YuGiOhDatabase
         {
             ViewModel.WindowLeft = Left;
             ViewModel.WindowTop = Top;
-            //MainViewModel.Save();
+            MainViewModel.Save();
             base.OnClosing(e);
         }
 
@@ -140,7 +143,8 @@ namespace LivreNoir.YuGiOhDatabase
             var database = ViewModel.CardPool;
             var ids = await S.CardPack.GetCardList(database.Packs, p, c);
             await S.Card.UpdateAllCards(ids, database.Cards, database.Packs, p, c);
-            database.SaveJson(CardPool.ResourceFilePath);
+            database.LastUpdate = DateTime.Now;
+            Json.Save(CardPool.ResourceFilePath, database);
 
             await Dispatcher.BeginInvoke(() =>
             {
@@ -171,6 +175,99 @@ namespace LivreNoir.YuGiOhDatabase
         {
             await S.Regulation.Update(ViewModel.Regulation, ViewModel.CardPool.Cards, _regulation_tcg, p, c);
             Unit_Database.OnRegulationLoad();
+        }
+
+        private void OnRequestOpenCardUrl(object sender, CardLinkClickedEventArgs e)
+        {
+            e.Handled = true;
+            this.OpenUrl_Card(e.Id, e.IsTcg);
+        }
+
+        private void OnRequestOpenPackUrl(object sender, RoutedEventArgs<string> e)
+        {
+            e.Handled = true;
+            this.OpenUrl_Pack(e.Value);
+        }
+
+        private void OnExecuted_DetachCardList(object sender, ExecutedRoutedEventArgs e)
+        {
+            e.Handled = true;
+            OpenCardListWindow();
+        }
+
+        private void CanExecute_DetachCardInfo(object sender, CanExecuteRoutedEventArgs e)
+        {
+            e.CanExecute = Card.TryGetCard(e.Parameter, ViewModel.CardPool.Cards, out _);
+        }
+
+        private void OnExecuted_DetachCardInfo(object sender, ExecutedRoutedEventArgs e)
+        {
+            e.Handled = true;
+            if (Card.TryGetCard(e.Parameter, ViewModel.CardPool.Cards, out var card))
+            {
+                var id = card.Id;
+                if (_windowCache.TryGetValue(id, out var window))
+                {
+                    window.Activate();
+                }
+                else
+                {
+                    window = new(card, this);
+                    window.RegisterCommand(YgoCommands.CardLink, CardInfoWindow_CardLink);
+                    window.RegisterCommand(YgoCommands.PackLink, CardInfoWindow_PackLink);
+                    window.RegisterCommand(YgoCommands.RelatedText, CardInfoWindow_RelatedText);
+                    window.Closed += CardInfoWindow_Closed;
+                    _windowCache.Add(id, window);
+                    window.Show();
+                }
+            }
+        }
+
+        private readonly Dictionary<int, CardInfoWindow> _windowCache = [];
+
+        private void CardInfoWindow_Closed(object? sender, EventArgs e)
+        {
+            if (sender is CardInfoWindow w)
+            {
+                _windowCache.Remove(w.ReferenceId);
+            }
+        }
+
+        public void OpenCardListWindow()
+        {
+            CardListWindow window = new(this, ViewModel.CardPool.Cards);
+            window.RegisterCommand(YgoCommands.PackLink, CardInfoWindow_PackLink);
+            window.Show();
+        }
+
+        private void CardInfoWindow_CardLink(object sender, ExecutedRoutedEventArgs e)
+        {
+            if (e.Parameter is int id)
+            {
+                Activate();
+                Tab_Database.IsSelected = true;
+                Unit_Database.SelectCard(id);
+            }
+        }
+
+        private void CardInfoWindow_PackLink(object sender, ExecutedRoutedEventArgs e)
+        {
+            if (e.Parameter is string pid)
+            {
+                Activate();
+                Tab_Database.IsSelected = true;
+                Unit_Database.SelectPack(pid);
+            }
+        }
+
+        private void CardInfoWindow_RelatedText(object sender, ExecutedRoutedEventArgs e)
+        {
+            if (e.Parameter is string text)
+            {
+                Activate();
+                Tab_Database.IsSelected = true;
+                Unit_Database.SearchCard(text);
+            }
         }
     }
 }

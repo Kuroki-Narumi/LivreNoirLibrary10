@@ -78,6 +78,12 @@ namespace LivreNoirLibrary.Windows.Input
         public static RoutedUICommand Merge { get; } = Create(Key.M, ModifierKeys.Control);
         public static RoutedUICommand Split { get; } = Create(Key.L, ModifierKeys.Control);
 
+        // search
+        public static RoutedUICommand TextSearch { get; } = Create();
+        public static RoutedUICommand TextSearchClear { get; } = Create();
+        public static RoutedUICommand OpenSearchDialog { get; } = Create();
+        public static RoutedUICommand OpenSortDialog { get; } = Create();
+
         // dialog
         public static RoutedUICommand Decide { get; } = Create(Key.Enter);
         public static RoutedUICommand AltDecide { get; } = Create(Key.Enter, ModifierKeys.Alt);

@@ -15,12 +15,7 @@
             <ResourceDictionary.MergedDictionaries>
                 <ResourceDictionary Source="/LivreNoirLibrary.Windows.YuGiOh;component/Themes/Generic.xaml"/>
             </ResourceDictionary.MergedDictionaries>
-            <Style TargetType="TextBox">
-                <Setter Property="Margin" Value="2,2,0,2"/>
-                <Setter Property="Padding" Value="2"/>
-                <Setter Property="VerticalContentAlignment" Value="Center"/>
-                <Setter Property="Grid.Column" Value="2"/>
-            </Style>
+            <Style TargetType="TextBox" BasedOn="{StaticResource TextBox_CardInfo}"/>
             <Style x:Key="TextBox_Text" TargetType="TextBox" BasedOn="{StaticResource TextBox_Scrollable}">
                 <Setter Property="Margin" Value="0"/>
             </Style>
@@ -30,43 +25,13 @@
                 <Setter Property="VerticalAlignment" Value="Center"/>
                 <Setter Property="Margin" Value="4,0"/>
             </Style>
-            <Style x:Key="TextBlock_TextLength" TargetType="TextBlock">
-                <Setter Property="Background" Value="{ct:BrushProvider #8fff}"/>
-                <Setter Property="VerticalAlignment" Value="Bottom"/>
-                <Setter Property="HorizontalAlignment" Value="Right"/>
-                <Setter Property="Margin" Value="0,0,1,1"/>
-                <Setter Property="Padding" Value="2,0"/>
-                <Setter Property="IsHitTestVisible" Value="False"/>
-            </Style>
             <Style TargetType="ct:IconPresenter">
                 <Setter Property="Height" Value="16"/>
                 <Setter Property="VerticalAlignment" Value="Center"/>
             </Style>
-
-            <Style x:Key="IconButtonBase" TargetType="ct:Button">
-                <Setter Property="BorderBrush" Value="{x:Null}"/>
-                <Setter Property="BorderThickness" Value="0"/>
-                <Setter Property="CornerRadius" Value="0"/>
-                <Setter Property="Margin" Value="0"/>
-                <Setter Property="Padding" Value="0"/>
-                <Setter Property="VerticalAlignment" Value="Stretch"/>
-            </Style>
-            <Style x:Key="CopyButton" TargetType="ct:Button" BasedOn="{StaticResource IconButtonBase}">
-                <Setter Property="Background" Value="{StaticResource Brush_HeaderBackground}"/>
-                <Setter Property="Icon" Value="{x:Static md:Icons.Copy}"/>
-                <Setter Property="HorizontalAlignment" Value="Left"/>
-                <Setter Property="Grid.Column" Value="1"/>
+            <Style x:Key="CopyButton" TargetType="ct:Button" BasedOn="{StaticResource CardInfo_CopyButton}">
                 <EventSetter Event="Click" Handler="OnClick_Copy"/>
             </Style>
-            
-            <Style x:Key="ListBox_Link" TargetType="ListBox" BasedOn="{StaticResource Alt2ListBoxStyle}">
-                <Setter Property="Height" Value="{x:Static local:CardInfoView.DefaultPackListHeight}"/>
-                <Setter Property="FontSize" Value="11"/>
-                <Setter Property="SelectionMode" Value="Single"/>
-                <Setter Property="Grid.Row" Value="1"/>
-                <Setter Property="ScrollViewer.HorizontalScrollBarVisibility" Value="Disabled"/>
-            </Style>
-            <local:ExpanderStateConverter x:Key="ExpConv"/>
         </ResourceDictionary>
     </UserControl.Resources>
     <Grid RowDefinitions="Auto, *, 6, Auto" x:Name="MainGrid" d:DataContext="{d:DesignInstance Type=local:CardInfoViewModel}">
@@ -84,7 +49,7 @@
             <ct:Button Grid.Row="2" Style="{StaticResource CopyButton}" Tag="{Binding ElementName=TextBox_EnName}"/>
             <TextBox Grid.Row="2" x:Name="TextBox_EnName" Text="{Binding Card.EnName, Mode=OneWay}"/>
 
-            <ct:Button Grid.Column="2" Style="{StaticResource IconButtonBase}" Content="{Binding Detach.Value, Source={x:Static ygo:Vocab.Current}}" Icon="{x:Static md:Icons.NewWindow}" Background="Transparent" HorizontalAlignment="Right" Click="OnClick_Detach" Visibility="{Binding CanDetach, Converter={StaticResource BVConv}}" Margin="1,3" Padding="3,0"/>
+            <ct:Button Grid.Column="2" Style="{StaticResource IconButtonBase}" Content="{Binding Detach.Value, Source={x:Static ygo:Vocab.Current}}" Icon="{x:Static md:Icons.NewWindow}" Background="Transparent" HorizontalAlignment="Right" Command="ygo:YgoCommands.DetachCardInfo" CommandParameter="{Binding Source}" Visibility="{Binding IsEnabled, RelativeSource={RelativeSource Mode=Self}, Converter={StaticResource BVConv}}" Margin="1,3" Padding="3,0"/>
         </Grid>
         <!-- card info -->
         <Grid Grid.Row="1" ColumnDefinitions="*, 8, *" RowDefinitions="Auto, *">
@@ -93,7 +58,7 @@
                 <Label Content="{Binding CInfo.CardType.Value, Source={x:Static ygo:Vocab.Current}}"/>
                 <Grid Grid.Column="1" ColumnDefinitions="Auto, *, Auto, Auto">
                     <ct:IconPresenter Grid.Column="0" Source="{Binding Card.Icon}" Margin="4,0,2,0"/>
-                    <TextBlock Grid.Column="1" Text="{Binding Card.CardTypeText}" Margin="0"/>
+                    <TextBlock Grid.Column="1" Margin="0" Text="{Binding Card.CardTypeText}"/>
                     <ct:IconPresenter Grid.Column="2" Margin="8,0,2,0" Source="{Binding Card.LimitIcon}"/>
                     <TextBlock Grid.Column="3" Margin="0,0,4,0" Text="{Binding Card.LimitText}"/>
                 </Grid>
@@ -179,14 +144,14 @@
                     </StackPanel>
                 </Expander.Header>
             </Expander>
-            <ListBox Grid.Column="0" Style="{StaticResource ListBox_Link}" ItemsSource="{Binding Card.PackInfo}" Height="{Binding IsExpanded, ElementName=Expander_PackList, Converter={StaticResource ExpConv}}">
+            <ListBox Grid.Column="0" Style="{StaticResource CardInfo_ListBox}" ItemsSource="{Binding Card.PackInfo}" Height="{Binding IsExpanded, ElementName=Expander_PackList, Converter={StaticResource ExpConv}}">
                 <ListBox.ItemTemplate>
                     <DataTemplate DataType="ygd:PackInfo">
                         <Grid Background="Transparent" ColumnDefinitions="Auto, 4, Auto, 4, *">
                             <TextBlock Grid.Column="0" Text="{Binding DateText}" Margin="0"/>
                             <TextBlock Grid.Column="2" Text="{Binding Number}" FontFamily="Consolas" FontSize="9" VerticalAlignment="Bottom" Margin="0,0,0,1" />
                             <TextBlock Grid.Column="4" x:Name="Link" Margin="0">
-                                <Hyperlink Focusable="False" Click="OnClick_Pack">
+                                <Hyperlink Focusable="False" Command="ygo:YgoCommands.PackLink" CommandParameter="{Binding ProductId}">
                                     <Run Text="{Binding Name, Mode=OneWay}"/>
                                 </Hyperlink>
                             </TextBlock>
@@ -218,12 +183,12 @@
                 <TextBlock Text="{Binding RelatedTexts.Count}"/>
                 <TextBlock Text=")"/>
             </StackPanel>
-            <ListBox Grid.Column="2" Style="{StaticResource ListBox_Link}" ItemsSource="{Binding RelatedTexts}">
+            <ListBox Grid.Column="2" Style="{StaticResource CardInfo_ListBox}" ItemsSource="{Binding RelatedTexts}">
                 <ListBox.ItemTemplate>
                     <DataTemplate DataType="string">
                         <Grid Background="Transparent">
                             <TextBlock x:Name="Link" Margin="0">
-                                <Hyperlink Focusable="False" Click="OnClick_RelatedText">
+                                <Hyperlink Focusable="False" Command="ygo:YgoCommands.RelatedText" CommandParameter="{Binding}">
                                     <Run Text="{Binding Mode=OneWay}"/>
                                 </Hyperlink>
                             </TextBlock>

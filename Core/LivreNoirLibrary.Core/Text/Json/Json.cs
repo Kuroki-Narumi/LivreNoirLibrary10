@@ -14,6 +14,7 @@ namespace LivreNoirLibrary.Text
     public static partial class Json
     {
         private static readonly JsonSerializerOptions _readOptions;
+        private static readonly JsonSerializerOptions _readOptions_ignoreCase;
         private static readonly JsonSerializerOptions _writeOptions;
         private static readonly JsonSerializerOptions _prettyWriteOptions;
 
@@ -28,6 +29,11 @@ namespace LivreNoirLibrary.Text
             converters.Add(new DrawingPointJsonConverter());
             converters.Add(new DrawingSizeJsonConverter());
             converters.Add(new RectangleJsonConverter());
+
+            _readOptions_ignoreCase = new(_readOptions)
+            {
+                PropertyNameCaseInsensitive = true,
+            };
 
             _writeOptions = new(_readOptions)
             {
@@ -51,35 +57,37 @@ namespace LivreNoirLibrary.Text
             }
         }
 
-        public static T Parse<T>(string json)
+        private static JsonSerializerOptions GetReadOptions(bool ignoreCase) => ignoreCase ? _readOptions_ignoreCase : _readOptions;
+
+        public static T Parse<T>(string json, bool ignorePropertyCase = false)
             where T : class
         {
-            var obj = JsonSerializer.Deserialize<T>(json, _readOptions);
+            var obj = JsonSerializer.Deserialize<T>(json, GetReadOptions(ignorePropertyCase));
             return GetValueOrThrow(obj);
         }
 
-        public static T Parse<T>(ReadOnlySpan<byte> utf8json)
+        public static T Parse<T>(ReadOnlySpan<byte> utf8json, bool ignorePropertyCase = false)
             where T : class
         {
-            var obj = JsonSerializer.Deserialize<T>(utf8json, _readOptions);
+            var obj = JsonSerializer.Deserialize<T>(utf8json, GetReadOptions(ignorePropertyCase));
             return GetValueOrThrow(obj);
         }
 
-        public static T Open<T>(string path)
+        public static T Open<T>(string path, bool ignorePropertyCase = false)
             where T : class
         {
             using var file = File.OpenRead(path);
-            return Load<T>(file);
+            return Load<T>(file, ignorePropertyCase);
         }
 
-        public static T Load<T>(Stream utf8json)
+        public static T Load<T>(Stream utf8json, bool ignorePropertyCase = false)
             where T : class
         {
-            var obj = JsonSerializer.Deserialize<T>(utf8json, _readOptions);
+            var obj = JsonSerializer.Deserialize<T>(utf8json, GetReadOptions(ignorePropertyCase));
             return GetValueOrThrow(obj);
         }
 
-        public static bool TryParse<T>(string? json, [MaybeNullWhen(false)] out T obj)
+        public static bool TryParse<T>(string? json, [MaybeNullWhen(false)] out T obj, bool ignorePropertyCase = false)
             where T : class
         {
             if (string.IsNullOrEmpty(json))
@@ -89,39 +97,41 @@ namespace LivreNoirLibrary.Text
             }
             try
             {
-                obj = Parse<T>(json);
+                obj = Parse<T>(json, ignorePropertyCase);
                 return true;
             }
-            catch
+            catch (Exception e)
             {
+                Console.WriteLine(e);
                 obj = null;
                 return false;
             }
         }
 
-        public static bool TryParse<T>(ReadOnlySpan<byte> utf8json, [MaybeNullWhen(false)] out T obj)
+        public static bool TryParse<T>(ReadOnlySpan<byte> utf8json, [MaybeNullWhen(false)] out T obj, bool ignorePropertyCase = false)
             where T : class
         {
             try
             {
-                obj = Parse<T>(utf8json);
+                obj = Parse<T>(utf8json, ignorePropertyCase);
                 return true;
             }
-            catch
+            catch (Exception e)
             {
+                Console.WriteLine(e);
                 obj = null;
                 return false;
             }
         }
 
-        public static bool TryOpen<T>(string path, [MaybeNullWhen(false)]out T result)
+        public static bool TryOpen<T>(string path, [MaybeNullWhen(false)]out T result, bool ignorePropertyCase = false)
             where T : class
         {
             try
             {
                 if (File.Exists(path))
                 {
-                    result = Open<T>(path);
+                    result = Open<T>(path, ignorePropertyCase);
                     return true;
                 }
             }
@@ -133,12 +143,12 @@ namespace LivreNoirLibrary.Text
             return false;
         }
 
-        public static bool TryLoad<T>(Stream utf8json, [MaybeNullWhen(false)] out T result)
+        public static bool TryLoad<T>(Stream utf8json, [MaybeNullWhen(false)] out T result, bool ignorePropertyCase = false)
             where T : class
         {
             try
             {
-                result = Load<T>(utf8json);
+                result = Load<T>(utf8json, ignorePropertyCase);
                 return true;
             }
             catch
@@ -148,27 +158,72 @@ namespace LivreNoirLibrary.Text
             }
         }
 
-        public static void Save(string path, object obj, bool pretty = true)
+        public static void Save(string path, object? obj, bool pretty = true)
         {
+            if (obj is null)
+            {
+                return;
+            }
             using var file = General.CreateSafe(path);
             Dump(file, obj, pretty);
+        }
+
+        public static void Save(string path, IWriteJson? w, bool pretty = true)
+        {
+            if (w is null)
+            {
+                return;
+            }
+            using var file = General.CreateSafe(path);
+            Dump(file, w, pretty);
         }
 
         public static void Dump(Stream utf8json, object obj, bool pretty = true)
         {
             using Utf8JsonWriter writer = new(utf8json, GetStructWriteOptions(pretty));
-            JsonSerializer.Serialize(writer, obj, pretty ? _prettyWriteOptions : _writeOptions);
+            JsonSerializer.Serialize(writer, obj, GetWriteOptions(pretty));
+        }
+
+        public static void Dump(Stream utf8json, IWriteJson obj, bool pretty = true)
+        {
+            using Utf8JsonWriter writer = new(utf8json, GetStructWriteOptions(pretty));
+            obj.WriteJson(writer, GetWriteOptions(pretty));
         }
 
         public static string GetJsonText<T>(this T obj, bool pretty = false)
         {
-            return JsonSerializer.Serialize(obj, pretty ? _prettyWriteOptions : _writeOptions);
+            if (obj is IWriteJson w)
+            {
+                return Encoding.UTF8.GetString(GetJsonBytes(w, pretty));
+            }
+            else
+            {
+                return JsonSerializer.Serialize(obj, GetWriteOptions(pretty));
+            }
         }
 
         public static byte[] GetJsonBytes<T>(this T obj, bool pretty = false)
         {
-            return JsonSerializer.SerializeToUtf8Bytes(obj, pretty ? _prettyWriteOptions : _writeOptions);
+            if (obj is IWriteJson w)
+            {
+                var ms = _msBuffer.Value!;
+                try
+                {
+                    Dump(ms, w, pretty);
+                    return ms.ToArray();
+                }
+                finally
+                {
+                    ms.SetLength(0);
+                }
+            }
+            else
+            {
+                return JsonSerializer.SerializeToUtf8Bytes(obj, pretty ? _prettyWriteOptions : _writeOptions);
+            }
         }
+
+        private static readonly ThreadLocal<MemoryStream> _msBuffer = new(() => new());
 
         public static JsonSerializerOptions GetWriteOptions(bool pretty) => pretty ? _prettyWriteOptions : _writeOptions;
         public static JsonWriterOptions GetStructWriteOptions(bool pretty)
@@ -185,15 +240,6 @@ namespace LivreNoirLibrary.Text
             {
                 return default;
             }
-        }
-
-        public static T Clone<T>(T source)
-            where T : class
-        {
-            using MemoryStream ms = new();
-            Dump(ms, source, false);
-            ms.Position = 0;
-            return Load<T>(ms);
         }
 
         private static readonly Lock _equals_lock = new();

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Windows;
 using System.Windows.Controls;
 
 namespace LivreNoirLibrary.Windows.Controls
@@ -27,7 +28,7 @@ namespace LivreNoirLibrary.Windows.Controls
                 else if (control is IValidityCheck s)
                 {
                     flag = s.IsInputValid;
-                    s.ValidityChanged += CheckS;
+                    IValidityCheck.AddValidityChangedHandler((s as DependencyObject)!, CheckS);
                 }
                 else
                 {

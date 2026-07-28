@@ -7,7 +7,8 @@
         xmlns:ygo="clr-namespace:LivreNoirLibrary.Windows.YuGiOh"
         mc:Ignorable="d"
         FontSize="14" FontFamily="Meiryo" UseLayoutRounding="True"
-        Height="600" Width="720" 
+        Height="600" Width="740"
+        local:YgoEvents.RequestOpenCardUrl="OnRequestOpenCardUrl"
         SnapsToDevicePixels="True" ShowInTaskbar="False" ResizeMode="NoResize">
     <Window.ContextMenu>
         <ContextMenu>

@@ -3,13 +3,14 @@ using System.Collections.Generic;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using LivreNoirLibrary.Collections;
+using LivreNoirLibrary.ObjectModel;
 using LivreNoirLibrary.Text;
 using LivreNoirLibrary.YuGiOh.Converters;
 
 namespace LivreNoirLibrary.YuGiOh.Data
 {
     [JsonConverter(typeof(IWriteJsonJsonConverter<CardPack>))]
-    public partial class CardPack : ObservableSortedList<CardPackItem.SortKey, CardPackItem>, IWriteJson
+    public partial class CardPack : ObservableSortedList<CardPackItem.SortKey, CardPackItem>, IWriteJson, INamedObject
     {
         public static bool IsTcgPack(string pid) => pid.EndsWith('e');
 

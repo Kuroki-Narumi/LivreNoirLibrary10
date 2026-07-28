@@ -24,7 +24,7 @@
     <Grid Margin="4" RowDefinitions="Auto, Auto">
         <Grid Grid.Row="0" ColumnDefinitions="Auto, Auto, *, Auto, Auto">
             <ct:Button Style="{StaticResource Button_ExecSort}" Click="OnClick_Exec"/>
-            <ct:Button Style="{StaticResource Button_ExecClear}" Click="OnClick_Clear"/>
+            <ct:Button Style="{StaticResource Button_ExecDefault}" Click="OnClick_Clear"/>
             <ct:DropDownMenuButton Grid.Column="3" CornerRadius="3" Margin="0,0,4,4" BorderBrush="{StaticResource Brush_Border}" Content="{Binding Preset.WithLeader, Source={x:Static ygo:Vocab.Current}}">
                 <ct:DropDownMenuButton.DropDownContent>
                     <Grid Width="220" RowDefinitions="26, 4, 116">
@@ -47,12 +47,12 @@
             </ct:DropDownMenuButton>
             <ct:Button Grid.Column="4" Style="{StaticResource Button_ExecClose}" Click="OnClick_Close"/>
         </Grid>
-        <ListBox Grid.Row="1" Padding="4" Background="{ct:BrushProvider #fefffd}" Style="{StaticResource Alt2ListBoxStyle}" ItemsSource="{Binding ViewModels}">
-            <ListBox.ItemTemplate>
+        <ItemsControl Grid.Row="1" Padding="4" BorderThickness="1" BorderBrush="{StaticResource Brush_Border}" Background="{ct:BrushProvider #fefffd}" AlternationCount="2" ItemsSource="{Binding ViewModels}">
+            <ItemsControl.ItemTemplate>
                 <DataTemplate>
-                    <local:SortOptionView Header="{Binding Header}" SourceItem="{Binding SourceItem}" IsAscending="{Binding IsAscending}" IsDescending="{Binding IsDescending}"/>
+                    <local:SortOptionView Margin="2" Header="{Binding Header}" SourceItem="{Binding SourceItem}" IsAscending="{Binding IsAscending}" IsDescending="{Binding IsDescending}"/>
                 </DataTemplate>
-            </ListBox.ItemTemplate>
-        </ListBox>
+            </ItemsControl.ItemTemplate>
+        </ItemsControl>
     </Grid>
 </Window>

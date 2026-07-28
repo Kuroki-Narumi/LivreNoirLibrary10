@@ -3,11 +3,11 @@ using System.Windows;
 
 namespace LivreNoirLibrary.Windows.Controls
 {
-    public interface IValidityCheck
+    public partial interface IValidityCheck : IInputElement
     {
-        static readonly RoutedEvent ValidityChangedEvent = Events.Register<IInputElement, RoutedEventHandler<bool>>();
+        [RoutedEvent(typeof(IInputElement), typeof(RoutedEventHandler<bool>))]
+        public static readonly RoutedEvent ValidityChangedEvent = RegisterEvent();
 
-        event RoutedEventHandler<bool>? ValidityChanged;
         bool IsInputValid { get; }
     }
 }

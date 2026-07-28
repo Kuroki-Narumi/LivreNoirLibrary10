@@ -33,30 +33,6 @@ namespace LivreNoir.YuGiOhDatabase
         {
             (sender as Panel)?.ChangeRadioButtonByWheel(e);
         }
-
-        private void CardListView_PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
-        {
-            if (KeyInput.IsShiftDown() && sender is ListViewItem { DataContext: ICard c })
-            {
-                try
-                {
-                    Clipboard.SetText(c.NameWithBracket());
-                }
-                catch { }
-            }
-        }
-
-        private void CardListView_PreviewMouseLeftButtonDown_Alt(object sender, MouseButtonEventArgs e)
-        {
-            if (KeyInput.IsAltDown() && sender is ListViewItem { DataContext: ICard c })
-            {
-                try
-                {
-                    Clipboard.SetText(c.NameWithBracket());
-                }
-                catch { }
-            }
-        }
     }
 
 }

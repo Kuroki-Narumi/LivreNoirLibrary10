@@ -11,6 +11,17 @@ namespace LivreNoirLibrary.Windows.YuGiOh.Controls
 {
     public class CardInfoViewModel(bool isReadOnly) : ObservableObjectBase
     {
+        public Card? Source
+        {
+            get;
+            set
+            {
+                if (SetValue(ref field, value) && value is not null)
+                {
+                    CopyFrom(value);
+                }
+            }
+        }
         public Card Card { get; } = new();
         public bool IsReadOnly { get; } = isReadOnly;
 
@@ -145,8 +156,6 @@ namespace LivreNoirLibrary.Windows.YuGiOh.Controls
                 }
             }
         }
-
-        public bool CanDetach { get; set => SetValue(ref field, value); }
 
         public RelatedTextCollection RelatedTexts { get; } = new();
 

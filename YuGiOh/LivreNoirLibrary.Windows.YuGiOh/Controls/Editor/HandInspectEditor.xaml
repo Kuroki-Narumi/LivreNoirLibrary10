@@ -1,0 +1,215 @@
+﻿<local:HandInspectEditor_Base x:Class="LivreNoirLibrary.Windows.YuGiOh.Controls.HandInspectEditor"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:LivreNoirLibrary.Windows.YuGiOh.Controls"
+             xmlns:ct="clr-namespace:LivreNoirLibrary.Windows.Controls;assembly=LivreNoirLibrary.Windows.Controls"
+             xmlns:media="clr-namespace:LivreNoirLibrary.Windows.Media;assembly=LivreNoirLibrary.Windows.Media"
+             xmlns:yw="clr-namespace:LivreNoirLibrary.Windows.YuGiOh;assembly=LivreNoirLibrary.Windows.YuGiOh"
+             xmlns:ygo="clr-namespace:LivreNoirLibrary.YuGiOh.Data;assembly=LivreNoirLibrary.YuGiOh.Core"
+             xmlns:yins="clr-namespace:LivreNoirLibrary.YuGiOh.Inspect;assembly=LivreNoirLibrary.YuGiOh.Core"
+             mc:Ignorable="d" Background="White"
+             d:DesignHeight="450" d:DesignWidth="800">
+    <UserControl.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="/LivreNoirLibrary.Windows.YuGiOh;component/Themes/Generic.xaml"/>
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </UserControl.Resources>
+    <Grid x:Name="MainGrid" ColumnDefinitions="2*, 5*" d:DataContext="{d:DesignInstance Type=local:HandInspectEditor}">
+        <Grid ColumnDefinitions="*, Auto" RowDefinitions="Auto, 4, *, 2, Auto">
+            <Grid ColumnDefinitions="*, Auto">
+                <StackPanel Style="{StaticResource EditBarStackPanel}">
+                    <ct:Button Style="{StaticResource IconButton_Undo}"/>
+                    <ct:Button Style="{StaticResource IconButton_Redo}"/>
+                    <Rectangle Width="8"/>
+                    <ct:Button Style="{StaticResource IconButton_AllClear}"/>
+                    <ct:Button Style="{StaticResource IconButton_Open}"/>
+                    <ct:Button Style="{StaticResource IconButton_Save}"/>
+                </StackPanel>
+                <ct:Button Grid.Column="1" Style="{StaticResource IconButtonBase_Sort}" ToolTip="{Binding Sort.Value, Source={x:Static yw:Vocab.Current}}"/>
+            </Grid>
+            <ct:CtListView x:Name="ListView_Main" Grid.Row="2" Style="{StaticResource Alt2ListBoxStyle}" SelectionMode="Single" ItemsSource="{Binding Conditions}" SelectedItem="{Binding SelectedItem, Mode=TwoWay}">
+                <ListView.ItemContainerStyle>
+                    <Style TargetType="ListViewItem" BasedOn="{StaticResource Alt2ListBoxItemContainerStyle}">
+                        <Setter Property="ContextMenu">
+                            <Setter.Value>
+                                <ContextMenu>
+                                    <MenuItem Style="{StaticResource MenuItem_Add}"/>
+                                    <MenuItem Style="{StaticResource MenuItem_MoveUp}"/>
+                                    <MenuItem Style="{StaticResource MenuItem_MoveDown}"/>
+                                    <MenuItem Style="{StaticResource MenuItem_Delete}"/>
+                                    <Separator/>
+                                    <MenuItem Style="{StaticResource MenuItem_Cut}"/>
+                                    <MenuItem Style="{StaticResource MenuItem_Copy}"/>
+                                    <MenuItem Style="{StaticResource MenuItem_Paste}"/>
+                                    <MenuItem Style="{StaticResource MenuItem_Duplicate}"/>
+                                </ContextMenu>
+                            </Setter.Value>
+                        </Setter>
+                    </Style>
+                </ListView.ItemContainerStyle>
+                <ListView.ItemTemplate>
+                    <DataTemplate>
+                        <TextBlock Text="{Binding Name}"/>
+                    </DataTemplate>
+                </ListView.ItemTemplate>
+                <ListView.ContextMenu>
+                    <ContextMenu>
+                        <MenuItem Style="{StaticResource MenuItem_Add}" CommandTarget="{Binding PlacementTarget, RelativeSource={RelativeSource AncestorType=ContextMenu}}"/>
+                        <MenuItem Style="{StaticResource MenuItem_Paste}" CommandTarget="{Binding PlacementTarget, RelativeSource={RelativeSource AncestorType=ContextMenu}}"/>
+                    </ContextMenu>
+                </ListView.ContextMenu>
+            </ct:CtListView>
+            <Grid Grid.Row="4" Style="{StaticResource EditBarPanel}">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" MaxWidth="8"/>
+                    <ColumnDefinition Width="*" MinWidth="22"/>
+                    <ColumnDefinition Width="*" MinWidth="22"/>
+                    <ColumnDefinition Width="*" MinWidth="22"/>
+                    <ColumnDefinition Width="*" MinWidth="22"/>
+                    <ColumnDefinition Width="*" MaxWidth="8"/>
+                    <ColumnDefinition Width="*" MinWidth="22"/>
+                    <ColumnDefinition Width="*" MinWidth="22"/>
+                    <ColumnDefinition Width="*" MinWidth="22"/>
+                    <ColumnDefinition Width="*" MinWidth="22"/>
+                    <ColumnDefinition Width="*" MaxWidth="8"/>
+                </Grid.ColumnDefinitions>
+                <ct:Button Grid.Column="1" Style="{StaticResource IconButton_Add}" CommandTarget="{Binding ElementName=ListView_Main}"/>
+                <ct:Button Grid.Column="2" Style="{StaticResource IconButton_MoveUp}" CommandTarget="{Binding ElementName=ListView_Main}"/>
+                <ct:Button Grid.Column="3" Style="{StaticResource IconButton_MoveDown}" CommandTarget="{Binding ElementName=ListView_Main}"/>
+                <ct:Button Grid.Column="4" Style="{StaticResource IconButton_Delete}" CommandTarget="{Binding ElementName=ListView_Main}"/>
+                <ct:Button Grid.Column="6" Style="{StaticResource IconButton_Cut}" CommandTarget="{Binding ElementName=ListView_Main}"/>
+                <ct:Button Grid.Column="7" Style="{StaticResource IconButton_Copy}" CommandTarget="{Binding ElementName=ListView_Main}"/>
+                <ct:Button Grid.Column="8" Style="{StaticResource IconButton_Paste}" CommandTarget="{Binding ElementName=ListView_Main}"/>
+                <ct:Button Grid.Column="9" Style="{StaticResource IconButton_Duplicate}" CommandTarget="{Binding ElementName=ListView_Main}"/>
+            </Grid>
+            <Grid Grid.Row="2" Grid.Column="1" RowDefinitions="*, *" IsEnabled="{Binding SelectedItem, ElementName=ListView_Main, Converter={StaticResource BooleanConverter}}">
+                <ct:Button Style="{StaticResource LargeButton_Blue}" Click="OnClick_Apply">
+                    <StackPanel Style="{StaticResource LargeButtonStackPanel}">
+                        <ct:IconPresenter Style="{StaticResource LargeButtonIcon}" Source="{x:Static media:Icons.ArrowLeft}"/>
+                        <ct:VerticalTextBlock Text="{Binding Save.Value, Source={x:Static yw:Vocab.Current}}"/>
+                    </StackPanel>
+                </ct:Button>
+                <ct:Button Style="{StaticResource LargeButton_Red}" Click="OnClick_Load">
+                    <StackPanel Style="{StaticResource LargeButtonStackPanel}">
+                        <ct:IconPresenter Style="{StaticResource LargeButtonIcon}" Source="{x:Static media:Icons.ArrowRight}"/>
+                        <ct:VerticalTextBlock Text="{Binding Reload.Value, Source={x:Static yw:Vocab.Current}}"/>
+                    </StackPanel>
+                </ct:Button>
+            </Grid>
+        </Grid>
+        <Grid x:Name="ItemGrid" Grid.Column="2" RowDefinitions="Auto, *" IsEnabled="{Binding SelectedItem, ElementName=ListView_Main, Converter={StaticResource BooleanConverter}}">
+            <Grid.Resources>
+                <Style TargetType="TextBox" x:Key="TextBoxBase">
+                    <Setter Property="Margin" Value="2,2,0,2"/>
+                    <Setter Property="Padding" Value="2"/>
+                    <Setter Property="VerticalContentAlignment" Value="Center"/>
+                    <Setter Property="Grid.Column" Value="2"/>
+                </Style>
+                <Style TargetType="ct:IntTextBox" BasedOn="{StaticResource TextBoxBase}">
+                    <Setter Property="Minimum" Value="0"/>
+                    <Setter Property="Maximum" Value="1000"/>
+                    <Setter Property="WheelStep"  Value="1"/>
+                </Style>
+                <Style TargetType="ct:DoubleTextBox" BasedOn="{StaticResource TextBoxBase}">
+                    <Setter Property="Minimum" Value="-1000"/>
+                    <Setter Property="Maximum" Value="1000"/>
+                    <Setter Property="WheelStep"  Value="5"/>
+                </Style>
+                <Style TargetType="Label" BasedOn="{StaticResource Label_Header}"/>
+                <Style x:Key="ClearButton" TargetType="ct:Button" BasedOn="{StaticResource IconButton_ListClear}">
+                    <Setter Property="Grid.Column" Value="2"/>
+                    <Setter Property="HorizontalAlignment" Value="Right"/>
+                    <EventSetter Event="Click" Handler="Item_OnClick_ClearButton"/>
+                </Style>
+                <Style TargetType="ListViewItem" x:Key="ListViewItemStyle" BasedOn="{StaticResource Alt2ListBoxItemContainerStyle}">
+                    <EventSetter Event="PreviewMouseLeftButtonDown" Handler="ListView_PreviewMouseLeftButtonDown"/>
+                    <EventSetter Event="PreviewMouseRightButtonDown" Handler="ListView_PreviewMouseRightButtonDown"/>
+                    <EventSetter Event="PreviewMouseRightButtonUp" Handler="ListView_PreviewMouseRightButtonUp"/>
+                    <EventSetter Event="PreviewMouseMove" Handler="IDragDrop_PreviewMouseMove"/>
+                </Style>
+                <Style TargetType="ct:CtListView" BasedOn="{StaticResource CardListView_MultiSelect}">
+                    <Setter Property="ItemTemplate" Value="{StaticResource ItemTemplate_FullText}"/>
+                    <Setter Property="AllowDrop" Value="True"/>
+                    <Setter Property="ItemContainerStyle" Value="{StaticResource ListViewItemStyle}"/>
+                    <EventSetter Event="GotFocus" Handler="ListView_OnGotFocus"/>
+                    <EventSetter Event="DragOver" Handler="IDragDrop_DragOver"/>
+                    <EventSetter Event="Drop" Handler="IDragDrop_Drop"/>
+                </Style>
+            </Grid.Resources>
+            <Grid RowDefinitions="Auto, Auto" ColumnDefinitions="Auto, *, Auto, *">
+                <Label Grid.Row="0" Grid.Column="0" Content="{Binding Inspect_Name.Value, Source={x:Static yw:Vocab.Current}}"/>
+                <TextBox Grid.Row="0" Grid.Column="1" Style="{StaticResource TextBoxBase}" Text="{Binding EditingItem.Name, Mode=TwoWay}"/>
+                <Label Grid.Row="1" Grid.Column="0" Content="{Binding Inspect_GroupId.Value, Source={x:Static yw:Vocab.Current}}"/>
+                <ct:IntTextBox Grid.Row="1" Grid.Column="1" Value="{Binding EditingItem.GroupId, Mode=TwoWay}"/>
+                <Label Grid.Row="0" Grid.Column="2" Content="{Binding Inspect_Value1.Value, Source={x:Static yw:Vocab.Current}}"/>
+                <ct:DoubleTextBox Grid.Row="0" Grid.Column="3" Value="{Binding EditingItem.Value1, Mode=TwoWay}"/>
+                <Label Grid.Row="1" Grid.Column="2" Content="{Binding Inspect_Value2.Value, Source={x:Static yw:Vocab.Current}}"/>
+                <ct:DoubleTextBox Grid.Row="1" Grid.Column="3" Value="{Binding EditingItem.Value2, Mode=TwoWay}"/>
+            </Grid>
+            <Grid Grid.Row="1" RowDefinitions="Auto, *" ColumnDefinitions="*, Auto, *">
+                <Label Grid.Column="0" Content="{Binding Inspect_Deck.Value, Source={x:Static yw:Vocab.Current}}" HorizontalAlignment="Left"/>
+                <Label Grid.Column="2" Content="{Binding Inspect_Hand.Value, Source={x:Static yw:Vocab.Current}}" HorizontalAlignment="Left"/>
+                <ct:Button Style="{StaticResource ClearButton}"/>
+                <Grid Grid.Row="1" Grid.Column="1" RowDefinitions="*,*,*">
+                    <ct:Button Style="{StaticResource LargeButton_Blue}" IsEnabled="{Binding SelectedItems.Count, ElementName=ListView_Deck, Converter={StaticResource BooleanConverter}}" Click="Item_OnClick_Or">
+                        <ct:Button.Content>
+                            <StackPanel Style="{StaticResource LargeButtonStackPanel}">
+                                <ct:IconPresenter Style="{StaticResource LargeButtonIcon}" Source="{x:Static media:Icons.ArrowRight}"/>
+                                <ct:VerticalTextBlock Text="{Binding Inspect_Or.Value, Source={x:Static yw:Vocab.Current}}"/>
+                            </StackPanel>
+                        </ct:Button.Content>
+                    </ct:Button>
+                    <ct:Button Style="{StaticResource LargeButton_Green}" IsEnabled="{Binding SelectedItems.Count, ElementName=ListView_Deck, Converter={StaticResource BooleanConverter}}" Click="Item_OnClick_And">
+                        <ct:Button.Content>
+                            <StackPanel Style="{StaticResource LargeButtonStackPanel}">
+                                <ct:IconPresenter Style="{StaticResource LargeButtonIcon}" Source="{x:Static media:Icons.ArrowRight}"/>
+                                <ct:VerticalTextBlock Text="{Binding Inspect_And.Value, Source={x:Static yw:Vocab.Current}}"/>
+                            </StackPanel>
+                        </ct:Button.Content>
+                    </ct:Button>
+                    <ct:Button Style="{StaticResource LargeButton_Red}" IsEnabled="{Binding LastFocusedListView, Converter={StaticResource BooleanConverter}}" Click="Item_OnClick_Remove">
+                        <ct:Button.Content>
+                            <StackPanel Style="{StaticResource LargeButtonStackPanel}">
+                                <ct:IconPresenter Style="{StaticResource LargeButtonIcon}" Source="{x:Static media:Icons.ArrowLeft}"/>
+                                <ct:VerticalTextBlock Text="{Binding Delete.Value, Source={x:Static yw:Vocab.Current}}"/>
+                            </StackPanel>
+                        </ct:Button.Content>
+                    </ct:Button>
+                </Grid>
+                <ct:CtListView x:Name="ListView_Deck" Grid.Row="1" ItemsSource="{Binding CardSource, RelativeSource={RelativeSource AncestorType=local:HandInspectEditor}}"/>
+                <ItemsControl x:Name="ItemsControl_Hand" Grid.Row="1" Grid.Column="2" ItemsSource="{Binding EditingItem.Items}" AllowDrop="True" DragOver="IDragDrop_DragOver" Drop="IDragDrop_Drop">
+                    <ItemsControl.Template>
+                        <ControlTemplate TargetType="ItemsControl">
+                            <Border BorderBrush="{StaticResource Brush_Border}" BorderThickness="1" Background="{StaticResource Brush_Background}">
+                                <ScrollViewer HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto">
+                                    <ItemsPresenter/>
+                                </ScrollViewer>
+                            </Border>
+                        </ControlTemplate>
+                    </ItemsControl.Template>
+                    <ItemsControl.ItemsPanel>
+                        <ItemsPanelTemplate>
+                            <StackPanel Orientation="Vertical"/>
+                        </ItemsPanelTemplate>
+                    </ItemsControl.ItemsPanel>
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate>
+                            <StackPanel>
+                                <TextBlock Text="&amp;" Foreground="Red" Visibility="{Binding IsFirst, Converter={StaticResource TVConvI}}" HorizontalAlignment="Center"/>
+                                <ct:CtListView ItemsSource="{Binding Cards}" Margin="4">
+                                    <ListView.CommandBindings>
+                                        <CommandBinding Command="ApplicationCommands.Delete" Executed="Hand_OnExecuted_Delete" CanExecute="CanExecute_Always"/>
+                                    </ListView.CommandBindings>
+                                </ct:CtListView>
+                            </StackPanel>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+            </Grid>
+        </Grid>
+    </Grid>
+</local:HandInspectEditor_Base>

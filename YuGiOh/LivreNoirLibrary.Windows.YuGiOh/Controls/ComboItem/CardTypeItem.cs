@@ -5,7 +5,7 @@ using System.Linq;
 
 namespace LivreNoirLibrary.Windows.YuGiOh.Controls
 {
-    public class CardTypeItem : ComboItemBase<CardType>
+    public sealed class CardTypeItem : AltBackgroundComboItem<CardType>
     {
         public ElementGroup Icon => LivreNoirLibrary.YuGiOh.Media.Icons.GetCardIcon(Value, true, false);
 
@@ -25,7 +25,7 @@ namespace LivreNoirLibrary.Windows.YuGiOh.Controls
             _items = CreateMap(Items);
         }
 
-        private static VocabData? SelectVocabData(CardType type) => type switch
+        private static IVocabData? SelectVocabData(CardType type) => type switch
         {
             CardType.Main_Monster => Vocab.Current.CType.Monster,
             CardType.Fusion_Monster => Vocab.Current.CType.Fusion,

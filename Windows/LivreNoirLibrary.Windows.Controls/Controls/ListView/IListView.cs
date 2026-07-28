@@ -5,6 +5,7 @@ namespace LivreNoirLibrary.Windows.Controls
 {
     public interface IListView
     {
+        object? DataContext { get; }
         object? Tag { get; }
         int SelectedIndex { get; set; }
         IList SelectedItems { get; }

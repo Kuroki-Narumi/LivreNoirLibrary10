@@ -22,6 +22,6 @@ namespace LivreNoirLibrary.Windows.YuGiOh.Controls
         protected sealed override RegulationHistoryData GetHistoryData() => new(Regulation);
         protected sealed override void ProcessNew() => Regulation?.Clear();
         protected sealed override bool ProcessOpen(string path) => Regulation is { } r && r.LoadFile(path, CardProvider);
-        protected sealed override void ProcessSave(string path) => Regulation?.SaveJson(path);
+        protected sealed override void ProcessSave(string path) => Json.Save(path, Regulation);
     }
 }

@@ -24,6 +24,7 @@ namespace LivreNoirLibrary.Windows.YuGiOh.Vocabulary
         public VocabData Def { get => GetData(); set => SetData(value); }
         public VocabData Atk_S { get => GetData(); set => SetData(value); }
         public VocabData Def_S { get => GetData(); set => SetData(value); }
+        public VocabData AtkDef { get => GetData(); set => SetData(value); }
         public VocabData LinkMarker { get => GetData(); set => SetData(value); }
         public VocabData PendulumScale { get => GetData(); set => SetData(value); }
         public VocabData PendulumText { get => GetData(); set => SetData(value); }
@@ -57,6 +58,7 @@ namespace LivreNoirLibrary.Windows.YuGiOh.Vocabulary
             SetData(nameof(Link), LivreNoirLibrary.YuGiOh.Vocab.Link);
             SetData(nameof(Atk), LivreNoirLibrary.YuGiOh.Vocab.Atk);
             SetData(nameof(Def), LivreNoirLibrary.YuGiOh.Vocab.Def);
+            SetData(nameof(AtkDef), LivreNoirLibrary.YuGiOh.Vocab.AtkDef);
             SetData(nameof(Atk_S), "ATK");
             SetData(nameof(Def_S), "DEF");
             SetData(nameof(LinkMarker), LivreNoirLibrary.YuGiOh.Vocab.Marker);

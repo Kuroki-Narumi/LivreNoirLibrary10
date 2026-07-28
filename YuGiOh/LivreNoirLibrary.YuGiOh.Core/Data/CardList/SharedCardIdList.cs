@@ -1,4 +1,5 @@
 ﻿using LivreNoirLibrary.Collections;
+using LivreNoirLibrary.ObjectModel;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -29,7 +30,7 @@ namespace LivreNoirLibrary.YuGiOh.Data
         public bool Remove(int id) => RemoveKey(id);
         public bool RemoveWithoutNotify(int id) => RemoveKeyWithoutNotify(id);
 
-        public IEnumerable<int> EnumerateIds() => this.Select(static i => i.Id);
+        public IEnumerable<int> IdEnumerable => _key_list.Select(i => i);
 
         public void Load(CardDataCollection source)
         {

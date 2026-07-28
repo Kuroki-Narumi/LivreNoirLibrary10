@@ -32,8 +32,12 @@ namespace LivreNoirLibrary.YuGiOh.Converters
                             }
                             break;
                         case 1:
-                            if (span.Length > 0 && DateTime.TryParse(span, out until))
+                            if (span.Length > 0)
                             {
+                                if (!DateTime.TryParse(span, out until))
+                                {
+                                    until = DateTime.Now + TimeSpan.FromDays(365);
+                                }
                                 index++;
                             }
                             else
@@ -63,7 +67,9 @@ namespace LivreNoirLibrary.YuGiOh.Converters
                 (false, true) => ",x",
                 _ => ""
             };
-            var text = $"{value.Since:yyyy-MM-dd},{value.Until:yyyy-MM-dd}{Suffix(value)}";
+            static string ToString(DateTime dt) => dt >= DateTime.Now ? "*" : dt.ToString("yyyy-MM-dd");
+
+            var text = $"{value.Since:yyyy-MM-dd},{ToString(value.Until)}{Suffix(value)}";
             writer.WriteStringValue(text);
         }
     }

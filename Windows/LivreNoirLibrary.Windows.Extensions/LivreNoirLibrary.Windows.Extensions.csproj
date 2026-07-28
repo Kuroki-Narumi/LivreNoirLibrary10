@@ -18,6 +18,10 @@
 	<ItemGroup>
 	  <ProjectReference Include="..\LivreNoirLibrary.Windows.Core\LivreNoirLibrary.Windows.Core.csproj" />
 	  <ProjectReference Include="..\LivreNoirLibrary.Windows.Media\LivreNoirLibrary.Windows.Media.csproj" />
+		<ProjectReference Include="..\LivreNoirLibrary.Windows.SourceGenerator\LivreNoirLibrary.Windows.SourceGenerator.csproj">
+			<OutputItemType>Analyzer</OutputItemType>
+			<ReferenceOutputAssembly>false</ReferenceOutputAssembly>
+		</ProjectReference>
 	</ItemGroup>
 
 </Project>

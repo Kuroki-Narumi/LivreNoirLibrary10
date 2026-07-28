@@ -10,7 +10,7 @@
              xmlns:ygo="clr-namespace:LivreNoirLibrary.YuGiOh.Data;assembly=LivreNoirLibrary.YuGiOh.Core"
              xmlns:yg="clr-namespace:LivreNoirLibrary.YuGiOh;assembly=LivreNoirLibrary.YuGiOh.Core"
              xmlns:input="clr-namespace:LivreNoirLibrary.Windows.Input;assembly=LivreNoirLibrary.Windows.Core"
-             mc:Ignorable="d" 
+             mc:Ignorable="d" Background="White"
              d:DesignHeight="450" d:DesignWidth="800">
     <UserControl.Resources>
         <ResourceDictionary>
@@ -20,14 +20,14 @@
         </ResourceDictionary>
     </UserControl.Resources>
     <Grid ColumnDefinitions="2*, 5*">
-        <Grid RowDefinitions="Auto, 4, *" ColumnDefinitions="*, Auto">
+        <Grid RowDefinitions="Auto, 4, *, 2, Auto" ColumnDefinitions="*, Auto">
             <StackPanel Style="{StaticResource EditBarStackPanel}">
                 <ct:Button Style="{StaticResource IconButton_Undo}"/>
                 <ct:Button Style="{StaticResource IconButton_Redo}"/>
                 <Rectangle Width="8"/>
                 <ct:Button Style="{StaticResource IconButton_AllClear}"/>
                 <ct:Button Style="{StaticResource IconButton_Open}"/>
-                <ct:Button Style="{StaticResource StyleBase_IconButton}" Icon="{x:Static media:Icons.Merge}" ToolTip="{Binding Merge.Value, Source={x:Static yw:Vocab.Current}}" Click="OnClick_Merge"/>
+                <ct:Button Style="{StaticResource IconButtonBase}" Icon="{x:Static media:Icons.Merge}" ToolTip="{Binding Merge.Value, Source={x:Static yw:Vocab.Current}}" Click="OnClick_Merge"/>
                 <ct:Button Style="{StaticResource IconButton_Save}"/>
             </StackPanel>
             <ct:CtListView x:Name="ListView_CardList" Grid.Row="2" Style="{StaticResource CardListView}">
@@ -36,48 +36,15 @@
                         <Setter Property="ContextMenu">
                             <Setter.Value>
                                 <ContextMenu>
-                                    <MenuItem Header="{Binding Add.MenuHeader, Source={x:Static yw:Vocab.Current}}" Command="input:Commands.Insert">
-                                        <MenuItem.Icon>
-                                            <ct:IconPresenter Source="{x:Static media:Icons.Plus}"/>
-                                        </MenuItem.Icon>
-                                    </MenuItem>
-                                    <MenuItem Header="{Binding Duplicate.MenuHeader, Source={x:Static yw:Vocab.Current}}" Command="input:Commands.Duplicate">
-                                        <MenuItem.Icon>
-                                            <ct:IconPresenter Source="{x:Static media:Icons.Copy}"/>
-                                        </MenuItem.Icon>
-                                    </MenuItem>
-                                    <MenuItem Header="{Binding Delete.MenuHeader, Source={x:Static yw:Vocab.Current}}" Command="input:Commands.Delete">
-                                        <MenuItem.Icon>
-                                            <ct:IconPresenter Source="{x:Static media:Icons.Delete}"/>
-                                        </MenuItem.Icon>
-                                    </MenuItem>
+                                    <MenuItem Style="{StaticResource MenuItem_Add}"/>
+                                    <MenuItem Style="{StaticResource MenuItem_MoveUp}"/>
+                                    <MenuItem Style="{StaticResource MenuItem_MoveDown}"/>
+                                    <MenuItem Style="{StaticResource MenuItem_Delete}"/>
                                     <Separator/>
-                                    <MenuItem Header="{Binding Cut.MenuHeader, Source={x:Static yw:Vocab.Current}}" Command="input:Commands.Cut">
-                                        <MenuItem.Icon>
-                                            <ct:IconPresenter Source="{x:Static media:Icons.Cut}"/>
-                                        </MenuItem.Icon>
-                                    </MenuItem>
-                                    <MenuItem Header="{Binding Copy.MenuHeader, Source={x:Static yw:Vocab.Current}}" Command="input:Commands.Copy">
-                                        <MenuItem.Icon>
-                                            <ct:IconPresenter Source="{x:Static media:Icons.Copy}"/>
-                                        </MenuItem.Icon>
-                                    </MenuItem>
-                                    <MenuItem Header="{Binding Paste.MenuHeader, Source={x:Static yw:Vocab.Current}}" Command="input:Commands.Paste">
-                                        <MenuItem.Icon>
-                                            <ct:IconPresenter Source="{x:Static media:Icons.Paste}"/>
-                                        </MenuItem.Icon>
-                                    </MenuItem>
-                                    <Separator/>
-                                    <MenuItem Header="{Binding MoveUp.MenuHeader, Source={x:Static yw:Vocab.Current}}" Command="input:Commands.MoveUp">
-                                        <MenuItem.Icon>
-                                            <ct:IconPresenter Source="{x:Static media:Icons.ArrowUp}"/>
-                                        </MenuItem.Icon>
-                                    </MenuItem>
-                                    <MenuItem Header="{Binding MoveUp.MenuHeader, Source={x:Static yw:Vocab.Current}}" Command="input:Commands.MoveDown">
-                                        <MenuItem.Icon>
-                                            <ct:IconPresenter Source="{x:Static media:Icons.ArrowDown}"/>
-                                        </MenuItem.Icon>
-                                    </MenuItem>
+                                    <MenuItem Style="{StaticResource MenuItem_Cut}"/>
+                                    <MenuItem Style="{StaticResource MenuItem_Copy}"/>
+                                    <MenuItem Style="{StaticResource MenuItem_Paste}"/>
+                                    <MenuItem Style="{StaticResource MenuItem_Duplicate}"/>
                                 </ContextMenu>
                             </Setter.Value>
                         </Setter>
@@ -86,28 +53,47 @@
                 </ct:CtListView.ItemContainerStyle>
                 <ct:CtListView.ContextMenu>
                     <ContextMenu>
-                        <MenuItem Header="{Binding Add.MenuHeader, Source={x:Static yw:Vocab.Current}}" Command="input:Commands.Insert">
-                            <MenuItem.Icon>
-                                <ct:IconPresenter Source="{x:Static media:Icons.Plus}"/>
-                            </MenuItem.Icon>
-                        </MenuItem>
-                        <MenuItem Header="{Binding Paste.MenuHeader, Source={x:Static yw:Vocab.Current}}" Command="input:Commands.Paste">
-                            <MenuItem.Icon>
-                                <ct:IconPresenter Source="{x:Static media:Icons.Paste}"/>
-                            </MenuItem.Icon>
-                        </MenuItem>
+                        <MenuItem Style="{StaticResource MenuItem_Add}" CommandTarget="{Binding PlacementTarget, RelativeSource={RelativeSource AncestorType=ContextMenu}}"/>
+                        <MenuItem Style="{StaticResource MenuItem_Paste}" CommandTarget="{Binding PlacementTarget, RelativeSource={RelativeSource AncestorType=ContextMenu}}"/>
                     </ContextMenu>
                 </ct:CtListView.ContextMenu>
             </ct:CtListView>
-            <Grid Grid.Row="2" Grid.Column="1" RowDefinitions="*, *">
-                <Grid.Resources>
-                    <Style TargetType="ct:Button">
-                        <Setter Property="CornerRadius" Value="0"/>
-                        <Setter Property="BorderThickness" Value="0"/>
-                    </Style>
-                </Grid.Resources>
-                <ct:Button Background="{ct:BrushProvider #f8f8ff}" Icon="{x:Static media:Icons.ArrowLeft}" ToolTip="{Binding Save.Value, Source={x:Static yw:Vocab.Current}}" IsEnabled="{Binding Source, ElementName=CardInfoEditor, Converter={StaticResource BooleanConverter}}" Click="OnClick_Apply"/>
-                <ct:Button Grid.Row="1" Background="{ct:BrushProvider #fff8f8}" Icon="{x:Static media:Icons.ArrowRight}" ToolTip="{Binding Reload.Value, Source={x:Static yw:Vocab.Current}}" IsEnabled="{Binding SelectedItem, ElementName=ListView_CardList, Converter={StaticResource BooleanConverter}}" Click="OnClick_Load"/>
+            <Grid Grid.Row="4" Style="{StaticResource EditBarPanel}">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" MaxWidth="8"/>
+                    <ColumnDefinition Width="*" MinWidth="22"/>
+                    <ColumnDefinition Width="*" MinWidth="22"/>
+                    <ColumnDefinition Width="*" MinWidth="22"/>
+                    <ColumnDefinition Width="*" MinWidth="22"/>
+                    <ColumnDefinition Width="*" MaxWidth="8"/>
+                    <ColumnDefinition Width="*" MinWidth="22"/>
+                    <ColumnDefinition Width="*" MinWidth="22"/>
+                    <ColumnDefinition Width="*" MinWidth="22"/>
+                    <ColumnDefinition Width="*" MinWidth="22"/>
+                    <ColumnDefinition Width="*" MaxWidth="8"/>
+                </Grid.ColumnDefinitions>
+                <ct:Button Grid.Column="1" Style="{StaticResource IconButton_Add}" CommandTarget="{Binding ElementName=ListView_CardList}"/>
+                <ct:Button Grid.Column="2" Style="{StaticResource IconButton_MoveUp}" CommandTarget="{Binding ElementName=ListView_CardList}"/>
+                <ct:Button Grid.Column="3" Style="{StaticResource IconButton_MoveDown}" CommandTarget="{Binding ElementName=ListView_CardList}"/>
+                <ct:Button Grid.Column="4" Style="{StaticResource IconButton_Delete}" CommandTarget="{Binding ElementName=ListView_CardList}"/>
+                <ct:Button Grid.Column="6" Style="{StaticResource IconButton_Cut}" CommandTarget="{Binding ElementName=ListView_CardList}"/>
+                <ct:Button Grid.Column="7" Style="{StaticResource IconButton_Copy}" CommandTarget="{Binding ElementName=ListView_CardList}"/>
+                <ct:Button Grid.Column="8" Style="{StaticResource IconButton_Paste}" CommandTarget="{Binding ElementName=ListView_CardList}"/>
+                <ct:Button Grid.Column="9" Style="{StaticResource IconButton_Duplicate}" CommandTarget="{Binding ElementName=ListView_CardList}"/>
+            </Grid>
+            <Grid Grid.Row="2" Grid.Column="1" RowDefinitions="*, *" IsEnabled="{Binding SelectedItem, ElementName=ListView_CardList, Converter={StaticResource BooleanConverter}}">
+                <ct:Button Style="{StaticResource LargeButton_Blue}" Click="OnClick_Apply">
+                    <StackPanel Style="{StaticResource LargeButtonStackPanel}">
+                        <ct:IconPresenter Style="{StaticResource LargeButtonIcon}" Source="{x:Static media:Icons.ArrowLeft}"/>
+                        <ct:VerticalTextBlock Text="{Binding Save.Value, Source={x:Static yw:Vocab.Current}}"/>
+                    </StackPanel>
+                </ct:Button>
+                <ct:Button Style="{StaticResource LargeButton_Red}" Click="OnClick_Load">
+                    <StackPanel Style="{StaticResource LargeButtonStackPanel}">
+                        <ct:IconPresenter Style="{StaticResource LargeButtonIcon}" Source="{x:Static media:Icons.ArrowRight}"/>
+                        <ct:VerticalTextBlock Text="{Binding Reload.Value, Source={x:Static yw:Vocab.Current}}"/>
+                    </StackPanel>
+                </ct:Button>
             </Grid>
         </Grid>
         <local:CardInfoEditor x:Name="CardInfoEditor" Grid.Column="2" Source="{Binding SelectedItem, ElementName=ListView_CardList}"/>

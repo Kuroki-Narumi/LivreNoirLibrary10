@@ -8,6 +8,7 @@ using System.Runtime.Intrinsics;
 using LivreNoirLibrary.Numerics;
 using LivreNoirLibrary.Text;
 using System.Diagnostics;
+using System.Text.RegularExpressions;
 
 namespace LivreNoirLibrary.Benchmark
 {
@@ -90,7 +91,7 @@ namespace LivreNoirLibrary.Benchmark
             Console.WriteLine("Finished.");
             //*/
 
-            ///*
+            /*
             // 357686312646216567629137
             const long origNum = 629137;
             const long origDen = 1209600;
@@ -143,6 +144,19 @@ namespace LivreNoirLibrary.Benchmark
                 }
                 return upper;
             }
+            //*/
+
+            ///*
+            var source = "あ・いう・・え/お";
+            var reg = new Regex("[・/]");
+            foreach (var range in reg.EnumerateSplits(source))
+            {
+                Console.WriteLine(source.AsSpan()[range]);
+            }
+            var ranges = (stackalloc Range[6]);
+            var count = source.AsSpan().Split(ranges, "・/", StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries);
+            Console.WriteLine(count);
+
             //*/
         }
     }

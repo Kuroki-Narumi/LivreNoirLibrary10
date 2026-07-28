@@ -13,8 +13,6 @@ namespace LivreNoirLibrary.Windows.YuGiOh.Controls
         [DependencyProperty]
         private Deck? _deck;
 
-        public virtual CardSearchConditions DefaultCardSearchConditions { get; } = new();
-
         private static ICardProvider CoerceCardProvider(ICardProvider value) => value ?? EmptyCardProvider.Instance;
         protected virtual void OnCardProviderChanged(ICardProvider value) { }
 
@@ -26,6 +24,6 @@ namespace LivreNoirLibrary.Windows.YuGiOh.Controls
         protected sealed override DeckHistoryData GetHistoryData() => new(Deck);
         protected sealed override void ProcessNew() => Deck?.Clear();
         protected sealed override bool ProcessOpen(string path) => Deck is { } deck && deck.LoadFile(path, CardProvider);
-        protected sealed override void ProcessSave(string path) => Deck?.SaveJson(path);
+        protected sealed override void ProcessSave(string path) => Json.Save(path, Deck);
     }
 }

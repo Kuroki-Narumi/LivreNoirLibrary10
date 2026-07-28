@@ -8,11 +8,20 @@ namespace LivreNoirLibrary.Windows.Converters
 {
     public class StarGridLengthConverter : IValueConverter
     {
-        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+        private static object Convert(object value)
         {
-            if (NumberExtensions.TryGetDouble(value, out var v))
+            if (value is GridLength g)
             {
-                if (!double.IsNaN(v))
+                return g.GridUnitType switch
+                {
+                    GridUnitType.Pixel => g.Value,
+                    GridUnitType.Star => -g.Value,
+                    _ => double.NaN,
+                };
+            }
+            else if (NumberExtensions.TryGetDouble(value, out var v))
+            {
+                if (double.IsNaN(v))
                 {
                     return GridLength.Auto;
                 }
@@ -28,18 +37,8 @@ namespace LivreNoirLibrary.Windows.Converters
             return value;
         }
 
-        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
-        {
-            if (value is GridLength g)
-            {
-                return g.GridUnitType switch
-                {
-                    GridUnitType.Pixel => g.Value,
-                    GridUnitType.Star => -g.Value,
-                    _ => double.NaN,
-                };
-            }
-            return value;
-        }
+        public object Convert(object value, Type targetType, object parameter, CultureInfo culture) => Convert(value);
+
+        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture) => Convert(value);
     }
 }

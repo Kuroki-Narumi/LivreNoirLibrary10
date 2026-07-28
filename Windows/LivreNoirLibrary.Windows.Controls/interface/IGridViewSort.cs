@@ -6,6 +6,7 @@ namespace LivreNoirLibrary.Windows.Controls
 {
     public interface IGridViewSort
     {
+        bool ClearSortIfEmptyTag => false;
         void SortBy(ListBox control, string key);
     }
 
@@ -13,13 +14,18 @@ namespace LivreNoirLibrary.Windows.Controls
     {
         public static void OnClick_ColumnHeader(this IGridViewSort owner, object sender, RoutedEventArgs e)
         {
-            var obj = sender as DependencyObject;
-            if (obj.TryGetAncestor<ListBox>(out var control) &&
-                obj.TryGetFirstDescendant<FrameworkElement>(f => f.Tag is string, out var f) &&
-                f.Tag is string tag)
+            var header = (sender as GridViewColumnHeader) ?? (e.OriginalSource as GridViewColumnHeader);
+            if (header.TryGetAncestor<ListBox>(out var control))
             {
-                owner.SortBy(control, tag);
                 e.Handled = true;
+                if (header.TryGetFirstDescendant<FrameworkElement>(f => f.Tag is string, out var f))
+                {
+                    owner.SortBy(control, (f.Tag as string)!);
+                }
+                else if (owner.ClearSortIfEmptyTag)
+                {
+                    control.Items.SortDescriptions.Clear();
+                }
             }
         }
     }

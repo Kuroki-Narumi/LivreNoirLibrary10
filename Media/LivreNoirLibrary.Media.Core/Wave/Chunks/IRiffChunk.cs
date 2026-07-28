@@ -1,4 +1,5 @@
-﻿using System;
+﻿using LivreNoirLibrary.ObjectModel;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
@@ -33,9 +34,8 @@ namespace LivreNoirLibrary.Media.Wave
         byte[] Data { get; set; }
     }
 
-    public interface IIdChunk : IRiffChunk
+    public interface IIdChunk : IRiffChunk, IId
     {
-        int Id { get; set; }
     }
 
     public interface IRiffChunk<TSelf> : IRiffChunk

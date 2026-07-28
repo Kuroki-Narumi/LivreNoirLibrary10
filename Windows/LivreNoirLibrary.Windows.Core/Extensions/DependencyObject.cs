@@ -133,16 +133,22 @@ namespace LivreNoirLibrary.Windows
             }
         }
 
+        private static readonly DoubleEndedQueue<DependencyObject> _queue = [];
+
         public static IEnumerable<DependencyObject> EnumerateDescendantsByQueue(this DependencyObject? obj)
         {
             if (obj is null)
             {
                 yield break;
             }
-            using var o1 = ObjectPool.RentQueue<DependencyObject>(out var queue);
+            var queue = _queue;
             queue.Enqueue(obj);
             while (queue.TryDequeue(out var o))
             {
+                if (o is not (Visual or Visual3D))
+                {
+                    continue;
+                }
                 var count = VisualTreeHelper.GetChildrenCount(o);
                 for (var i = 0; i < count; i++)
                 {
@@ -162,10 +168,14 @@ namespace LivreNoirLibrary.Windows
             {
                 yield break;
             }
-            using var o1 = ObjectPool.RentStack<DependencyObject>(out var stack);
+            var stack = _queue;
             stack.Push(obj);
             while (stack.TryPop(out var o))
             {
+                if (o is not (Visual or Visual3D))
+                {
+                    continue;
+                }
                 var count = VisualTreeHelper.GetChildrenCount(o);
                 for (var i = 0; i < count; i++)
                 {

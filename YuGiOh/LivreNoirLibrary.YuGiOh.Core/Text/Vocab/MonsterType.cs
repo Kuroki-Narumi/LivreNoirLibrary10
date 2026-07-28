@@ -63,13 +63,13 @@ namespace LivreNoirLibrary.YuGiOh
         public const string MT_CreatorGod = $"{CreatorGod}{MType_Suffix}";
 
         private static string[] MType2Name { get; } = [
-            None, MT_Spellcaster, MT_Dragon, MT_Zombie, MT_Warrior, MT_BeastWarrior, MT_Beast, MT_WingedBeast, MT_Machine, MT_Fiend,
+            Unknown, MT_Spellcaster, MT_Dragon, MT_Zombie, MT_Warrior, MT_BeastWarrior, MT_Beast, MT_WingedBeast, MT_Machine, MT_Fiend,
             MT_Fairy, MT_Insect, MT_Dinosaur, MT_Reptile, MT_Fish, MT_SeaSerpent, MT_Aqua, MT_Pyro, MT_Thunder, MT_Rock,
             MT_Plant, MT_Psychic, MT_Wyrm, MT_Cyberse, MT_Illusion, MT_DivineBeast, MT_CreatorGod
         ];
 
         private static string[] MType2ShortName { get; } = [
-            None, Spellcaster, Dragon, Zombie, Warrior, BeastWarrior, Beast, WingedBeast, Machine, Fiend,
+            Unknown, Spellcaster, Dragon, Zombie, Warrior, BeastWarrior, Beast, WingedBeast, Machine, Fiend,
             Fairy, Insect, Dinosaur, Reptile, Fish, SeaSerpent, Aqua, Pyro, Thunder, Rock,
             Plant, Psychic, Wyrm, Cyberse, Illusion, DivineBeast, CreatorGod
         ];

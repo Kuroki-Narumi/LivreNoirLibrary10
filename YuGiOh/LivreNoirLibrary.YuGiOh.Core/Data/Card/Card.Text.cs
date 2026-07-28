@@ -8,14 +8,14 @@ namespace LivreNoirLibrary.YuGiOh.Data
     {
         public string CardTypeText => Vocab.GetName(CardType, true);
         public string CTypeText => Vocab.GetName(CardType, false);
-        public string AttributeText => Vocab.GetName(Attribute);
-        public string AttrText => Vocab.GetShortName(Attribute);
-        public string MonsterTypeText => Vocab.GetName(MonsterType);
-        public string MTypeText => Vocab.GetShortName(MonsterType);
+        public string AttributeText => CardType.IsMonster() ? Vocab.GetName(Attribute) : Vocab.None;
+        public string AttrText => CardType.IsMonster() ? Vocab.GetShortName(Attribute) : Vocab.None;
+        public string MonsterTypeText => CardType.IsMonster() ? Vocab.GetName(MonsterType) : Vocab.None;
+        public string MTypeText => CardType.IsMonster() ? Vocab.GetShortName(MonsterType) : Vocab.None;
         public string EffectText => HasEffect ? "◯" : "";
         public string AbilityText => Vocab.GetName(Ability);
         public string AbilityTextWithType => GetAbilityTextWithType(true);
-        public string LevelText => Level is < 0 ? Vocab.None : Level.ToString();
+        public string LevelText => CardType.IsMonster() ? Vocab.GetStatusText(Level) : Vocab.None;
         public string AtkText => CardType.IsMonster() ? Vocab.GetStatusText(Atk) : Vocab.None;
         public string DefText => CardType.HasDef() ? Vocab.GetStatusText(Def) : Vocab.None;
         public string MonsterInfoText => CardType.IsMonster() ? GetMonsterInfoText() : "";

@@ -2,15 +2,16 @@
 using LivreNoirLibrary.Text;
 using LivreNoirLibrary.Windows.Controls;
 using LivreNoirLibrary.YuGiOh.Data;
+using System.Collections.Generic;
 
 namespace LivreNoirLibrary.Windows.YuGiOh.Controls
 {
     public abstract partial class CardEditor_Base : FileEditorBase<CardEditorHistoryData>
     {
         [DependencyProperty]
-        private ObservableList<Card>? _itemsSource;
+        private ICardList? _itemsSource;
 
-        protected virtual void OnItemsSourceChanged(ObservableList<Card>? value)
+        protected virtual void OnItemsSourceChanged(ICardList? value)
         {
             this.ClearHistory();
         }
@@ -22,7 +23,7 @@ namespace LivreNoirLibrary.Windows.YuGiOh.Controls
         {
             if (ItemsSource is { } items && Json.TryOpen<Card[]>(path, out var cards))
             {
-                items.ClearWithoutNotify();
+                items.Clear();
                 items.AddRange(cards);
                 return true;
             }

@@ -10,7 +10,7 @@ namespace LivreNoirLibrary.YuGiOh
         public const string Unlimited = "無制限";
         public const string Specified = "特別指定";
 
-        public static string GetLimitText(int limit)
+        public static string GetLimitText(int limit, bool unlimited = false)
         {
             return limit switch
             {
@@ -19,7 +19,7 @@ namespace LivreNoirLibrary.YuGiOh
                 LimitCount.Limit1 => Limit1,
                 LimitCount.Limit2 => Limit2,
                 LimitCount.Specified => Specified,
-                _ => "",
+                _ => unlimited ? Unlimited : "",
             };
         }
     }

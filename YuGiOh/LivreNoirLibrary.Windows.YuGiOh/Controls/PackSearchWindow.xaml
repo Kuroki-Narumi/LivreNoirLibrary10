@@ -12,7 +12,7 @@
         xmlns:ygc="clr-namespace:LivreNoirLibrary.YuGiOh;assembly=LivreNoirLibrary.YuGiOh.Core"
         mc:Ignorable="d" d:DataContext="{d:DesignInstance Type=search:PackSearchConditionsViewModel}"
         Title="Search" ShowInTaskbar="False" WindowStyle="None" AllowsTransparency="True" Background="{ct:BrushProvider #1fff}"
-        Width="500" SizeToContent="Height" ResizeMode="NoResize" FontSize="14" FontFamily="Meiryo" UseLayoutRounding="True"
+        Width="440" SizeToContent="Height" ResizeMode="NoResize" FontSize="14" FontFamily="Meiryo" UseLayoutRounding="True"
         >
     <Window.Resources>
         <ResourceDictionary>
@@ -35,7 +35,7 @@
     <Grid Margin="4" RowDefinitions="Auto, Auto">
         <Grid Grid.Row="0" ColumnDefinitions="Auto, Auto, *, Auto">
             <ct:Button Style="{StaticResource Button_ExecSearch}" Click="OnClick_Search"/>
-            <ct:Button Style="{StaticResource Button_ExecClear}" Click="OnClick_Clear"/>
+            <ct:Button Style="{StaticResource Button_ExecDefault}" Click="OnClick_Clear"/>
             <ct:Button Style="{StaticResource Button_ExecClose}" Click="OnClick_Close"/>
         </Grid>
         <Border Grid.Row="1" Padding="4" Background="{ct:BrushProvider #fffefd}" BorderThickness="1" BorderBrush="{StaticResource Brush_Border}">

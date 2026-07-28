@@ -7,12 +7,12 @@ using LivreNoirLibrary.YuGiOh.MasterDuel;
 
 namespace LivreNoirLibrary.Windows.YuGiOh.Controls
 {
-    public class RankItem(Rank value) : Windows.ComboItemBase<Rank>(value)
+    public sealed class RankItem(Rank value) : Windows.ComboItemBase<Rank>(value)
     {
         public string Name { get; } = value.GetName();
         protected override int GetRow(Rank value) => (int)value % 5;
         protected override int GetColumn(Rank value) => (int)value / 5;
-        protected override Brush? GetBackground(int row, int column) => AttributeItem.GetBackgroundStatic(row, column);
+        protected override Brush? GetBackground(int row, int column) => AltBackgroundComboItem.GetBackground(row, column);
 
         public static RankItem[] Items { get; }
         private static readonly Dictionary<Rank, RankItem> _items;

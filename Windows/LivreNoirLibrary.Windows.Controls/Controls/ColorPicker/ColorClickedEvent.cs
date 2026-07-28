@@ -20,9 +20,8 @@ namespace LivreNoirLibrary.Windows.Controls
 
     public partial class ColorPalette
     {
-        public static readonly RoutedEvent ClickEvent = Events.Register<ColorPalette, ColorClickEventHandler>();
-
-        public event ColorClickEventHandler Click { add => AddHandler(ClickEvent, value); remove => RemoveHandler(ClickEvent, value); }
+        [RoutedEvent]
+        public partial event ColorClickEventHandler Click;
 
         private void RaiseClick(int index, Color color, MouseButton button, int clickCount)
         {

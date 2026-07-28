@@ -1,10 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
+using LivreNoirLibrary.ObjectModel;
 
 namespace LivreNoirLibrary.YuGiOh.Data
 {
-    public interface ICardEnumerable
+    public interface ICardEnumerable : IIdEnumerable
     {
-        public IEnumerable<ICard> EnumerateCards();
+        public IEnumerable<Card> CardEnumerable { get; }
+
+        IEnumerable<int> IIdEnumerable.IdEnumerable => CardEnumerable.Select(IId.GetId);
     }
 }

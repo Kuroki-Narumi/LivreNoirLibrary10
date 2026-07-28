@@ -300,6 +300,25 @@ namespace LivreNoirLibrary.Collections
             }
         }
 
+        public static int RemoveAll<Tkey, TValue>(List<Tkey> keys, List<TValue> values, Func<Tkey, TValue, bool> predicate)
+        {
+            var count = 0;
+            for (var i = 0; i < keys.Count;)
+            {
+                if (predicate(keys[i], values[i]))
+                {
+                    keys.RemoveAt(i);
+                    values.RemoveAt(i);
+                    count++;
+                }
+                else
+                {
+                    i++;
+                }
+            }
+            return count;
+        }
+
         /// <summary>
         /// Copies key-value pairs from the source lists to the target lists, merging them in sorted order and updating
         /// or inserting entries as needed.

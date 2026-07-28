@@ -50,13 +50,13 @@ namespace LivreNoirLibrary.YuGiOh.Data
             get
             {
                 var result = Type_index_list[CardType];
-                if (this.IsMonster())
+                if (CardType.IsMonster())
                 {
-                    if (CardType is 0 && !HasEffect)
+                    if (CardType.IsMainMonster() && !HasEffect)
                     {
                         result = 0;
                     }
-                    if (this.IsPendulum())
+                    if (Ability.IsPendulum())
                     {
                         result += 16;
                     }

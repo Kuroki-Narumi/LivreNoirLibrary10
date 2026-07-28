@@ -48,6 +48,9 @@ namespace LivreNoirLibrary.YuGiOh.Data
         public bool TryGetItem(Card card, [MaybeNullWhen(false)] out CountedCard item) => SortedList.TryGetValue(_keyList, _valueList, card.TypeIdIndex, out _, out item);
         public int GetCount(Card card) => TryGetItem(card, out var item) ? item.Count : 0;
 
+        public bool CanAdd(Card card) => !TryGetItem(card, out var item) || item.Count < MaxCount;
+        public bool CanRemove(Card card) => TryGetItem(card, out _);
+
         public bool Add(Card card)
         {
             switch (AddWithoutNotify(card, out var index, out var current))
@@ -213,8 +216,8 @@ namespace LivreNoirLibrary.YuGiOh.Data
             }
         }
 
-        public IEnumerable<int> EnumerateIds() => new IdEnumerator(this);
-        public IEnumerable<ICard> EnumerateCards() => new CardEnumerator(this);
+        public IEnumerable<int> IdEnumerable => new IdEnumerator(this);
+        public IEnumerable<Card> CardEnumerable => this.Select(c => c.ThisCard);
 
         private sealed class IdEnumerator(DeckCardList source) : ISafeEnumerator<int>
         {
@@ -251,14 +254,14 @@ namespace LivreNoirLibrary.YuGiOh.Data
             }
         }
 
-        private sealed class CardEnumerator(DeckCardList source) : ISafeEnumerator<ICard>
+        private sealed class CardEnumerator(DeckCardList source) : ISafeEnumerator<Card>
         {
             private readonly List<CountedCard> _list = source._valueList;
             private readonly int _maxIndex = source._valueList.Count;
             private int _index;
             private int _count;
 
-            public ICard Current { get; private set; } = null!;
+            public Card Current { get; private set; } = null!;
 
             public bool MoveNext()
             {

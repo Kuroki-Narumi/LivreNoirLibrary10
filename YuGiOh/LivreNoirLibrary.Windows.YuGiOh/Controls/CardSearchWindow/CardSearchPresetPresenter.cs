@@ -4,11 +4,10 @@ using LivreNoirLibrary.YuGiOh.Search;
 
 namespace LivreNoirLibrary.Windows.YuGiOh.Controls
 {
-    public class CardSearchPresetPresenter : PresetPresenterBase
+    public partial class CardSearchPresetPresenter : PresetPresenterBase
     {
-        public static readonly RoutedEvent ApplyEvent = Events.Register<CardSearchPresetPresenter, RoutedEventHandler<CardSearchConditionsPreset>>();
-
-        public event RoutedEventHandler<CardSearchConditionsPreset>? Apply { add => AddHandler(ApplyEvent, value); remove => RemoveHandler(ApplyEvent, value); }
+        [RoutedEvent]
+        public partial event RoutedEventHandler<CardSearchConditionsPreset>? Apply;
 
         protected override void TryRaiseApplyEvent()
         {

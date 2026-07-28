@@ -4,7 +4,7 @@ using System.Linq;
 
 namespace LivreNoirLibrary.Windows.YuGiOh.Controls
 {
-    public class MonsterTypeItem : ComboItemBase<MonsterType>
+    public sealed class MonsterTypeItem : AltBackgroundComboItem<MonsterType>
     {
         public static MonsterTypeItem[] Items { get; }
         public static MonsterTypeItem? GetItem(MonsterType value) => _items.GetValueOrDefault(value);

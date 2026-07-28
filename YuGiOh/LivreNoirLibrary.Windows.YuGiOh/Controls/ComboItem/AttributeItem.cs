@@ -7,7 +7,7 @@ using System.Windows.Media;
 
 namespace LivreNoirLibrary.Windows.YuGiOh.Controls
 {
-    public class AttributeItem : ComboItemBase<Attribute>
+    public sealed class AttributeItem : AltBackgroundComboItem<Attribute>
     {
         public ElementGroup Icon => LivreNoirLibrary.YuGiOh.Media.Icons.GetAttributeIcon(Value);
 
@@ -38,8 +38,5 @@ namespace LivreNoirLibrary.Windows.YuGiOh.Controls
             Attribute.Divine => Vocab.Current.Attr.Divine,
             _ => null
         };
-
-        private static SolidColorBrush AltBackground { get; } = MediaUtils.GetBrush("#08000080");
-        internal static SolidColorBrush? GetBackgroundStatic(int row, int column) => ((row + column) % 2) is 1 ? AltBackground : null;
     }
 }

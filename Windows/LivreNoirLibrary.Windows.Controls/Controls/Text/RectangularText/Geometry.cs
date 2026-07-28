@@ -219,6 +219,8 @@ namespace LivreNoirLibrary.Windows.Controls
                         case PathCommand.VerticalLineto:
                             Update(ref y, oy, data.Arg1, th, data.Relative);
                             break;
+                        case PathCommand.Closepath:
+                            break;
                     }
                     ctx.LineTo(new(x, y), true, false);
                 }

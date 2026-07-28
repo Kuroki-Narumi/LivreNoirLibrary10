@@ -57,13 +57,10 @@ namespace LivreNoirLibrary.YuGiOh
             { CardType.Continuous_Spell, Continuous_Spell },
             { CardType.Quick_Spell,  Quick_Spell },
             { CardType.Ritual_Spell, Ritual_Spell },
-            { CardType.Spell_Monster, SpellMonster },
 
             { CardType.Normal_Trap,     Normal_Trap },
             { CardType.Continuous_Trap, Continuous_Trap },
             { CardType.Counter_Trap,    Counter_Trap },
-            { CardType.Trap_Monster, TrapMonster },
-            { CardType.CTrap_Monster, ContinuousTrapMonster },
         };
 
         private static Dictionary<string, CardType>.AlternateLookup<ReadOnlySpan<char>> Name2CType { get; } = CreateName2CType();
@@ -86,6 +83,7 @@ namespace LivreNoirLibrary.YuGiOh
 
         public static string GetName(this CardType value, bool appendMonster = false)
         {
+            value &= CardType.MonsterLike_Filter;
             if (CType2Name.TryGetValue(value, out var name))
             {
                 if (appendMonster && value is >= CardType.Fusion_Monster and < CardType.Normal_Spell)

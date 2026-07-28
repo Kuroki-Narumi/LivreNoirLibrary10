@@ -1,0 +1,144 @@
+﻿<UserControl x:Class="LivreNoirLibrary.Windows.YuGiOh.Controls.NumbersView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:LivreNoirLibrary.Windows.YuGiOh.Controls"
+             xmlns:ct="clr-namespace:LivreNoirLibrary.Windows.Controls;assembly=LivreNoirLibrary.Windows.Controls"
+             xmlns:media="clr-namespace:LivreNoirLibrary.Windows.Media;assembly=LivreNoirLibrary.Windows.Media"
+             xmlns:yw="clr-namespace:LivreNoirLibrary.Windows.YuGiOh;assembly=LivreNoirLibrary.Windows.YuGiOh"
+             xmlns:ygo="clr-namespace:LivreNoirLibrary.YuGiOh.Data;assembly=LivreNoirLibrary.YuGiOh.Core"
+             xmlns:ys="clr-namespace:LivreNoirLibrary.YuGiOh.Search;assembly=LivreNoirLibrary.YuGiOh.Core"
+             mc:Ignorable="d" Background="White"
+             d:DesignHeight="450" d:DesignWidth="800">
+    <UserControl.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="/LivreNoirLibrary.Windows.YuGiOh;component/Themes/Generic.xaml"/>
+            </ResourceDictionary.MergedDictionaries>
+            <Style TargetType="TextBlock">
+                <Setter Property="VerticalAlignment" Value="Center"/>
+            </Style>
+        </ResourceDictionary>
+    </UserControl.Resources>
+    <Grid x:Name="MainGrid" d:DataContext="{d:DesignInstance Type=local:NumbersView}" ColumnDefinitions="1.2*, Auto, 160, Auto, 2*">
+        <Grid RowDefinitions="AUto, 4, *">
+            <Grid ColumnDefinitions="Auto, 4, *">
+                <ct:Button Style="{StaticResource RefreshButton}"/>
+                <ct:SearchBar Grid.Column="2" x:Name="SearchBar" ItemsCount="{Binding Items.Count, ElementName=ListView_Candidates}"/>
+            </Grid>
+            <ListView x:Name="ListView_Candidates" Grid.Row="2" Style="{StaticResource CardListView}" ItemsSource="{Binding NumbersCollection.Candidates}" SelectedItem="{Binding SelectedCandidate}"/>
+        </Grid>
+        <TextBlock Style="{StaticResource TextBlock_RightArrow}"/>
+        <Grid Grid.Column="2" RowDefinitions="Auto, 4, *">
+            <Grid ColumnDefinitions="*, 32">
+                <ct:DropDownMenuButton Height="27" DropDownClosed="Keys_DropDownClosed">
+                    <Grid ColumnDefinitions="Auto, *, Auto">
+                        <TextBlock Text="{Binding Numbers_Filter.Value, Source={x:Static yw:Vocab.Current}}"/>
+                        <TextBlock Grid.Column="1" FontSize="12" Visibility="{Binding Flags.CheckedCount, Converter={StaticResource TVConv}}">
+                                (<Run Text="{Binding Flags.CheckedCount, Mode=OneWay}"/>)
+                        </TextBlock>
+                        <ct:Button Grid.Column="2" Margin="4,0,-4,0" Style="{StaticResource IconButton_ListClear}" Click="Keys_Click_Clear"/>
+                    </Grid>
+                    <ct:DropDownMenuButton.DropDownContent>
+                        <StackPanel>
+                            <local:MatchTypeSelector MatchType="{Binding KeyMatchType}"/>
+                            <ItemsControl ItemsSource="{Binding Flags}">
+                                <ItemsControl.Resources>
+                                    <Style TargetType="ct:ToggleButton">
+                                        <Setter Property="CornerRadius" Value="0"/>
+                                        <Setter Property="BorderThickness" Value="0"/>
+                                        <Setter Property="Background" Value="{Binding Background}"/>
+                                        <Setter Property="Content" Value="{Binding Number}"/>
+                                        <Setter Property="IsChecked" Value="{Binding IsChecked}"/>
+                                        <EventSetter Event="PreviewMouseLeftButtonDown" Handler="OnMouseLeftButtonDown_ToggleButton"/>
+                                        <EventSetter Event="MouseEnter" Handler="OnMouseEnter_ToggleButton"/>
+                                    </Style>
+                                </ItemsControl.Resources>
+                                <ItemsControl.ItemsPanel>
+                                    <ItemsPanelTemplate>
+                                        <UniformGrid Columns="10"/>
+                                    </ItemsPanelTemplate>
+                                </ItemsControl.ItemsPanel>
+                                <ItemsControl.ItemContainerStyle>
+                                    <Style TargetType="ContentPresenter">
+                                        <Setter Property="HorizontalAlignment" Value="Stretch"/>
+                                        <Setter Property="VerticalAlignment" Value="Stretch"/>
+                                        <Setter Property="Grid.Column" Value="{Binding Column}"/>
+                                        <Setter Property="Grid.Row" Value="{Binding Row}"/>
+                                    </Style>
+                                </ItemsControl.ItemContainerStyle>
+                                <ItemsControl.ItemTemplate>
+                                    <DataTemplate>
+                                        <ct:ToggleButton/>
+                                    </DataTemplate>
+                                </ItemsControl.ItemTemplate>
+                            </ItemsControl>
+                        </StackPanel>
+                    </ct:DropDownMenuButton.DropDownContent>
+                </ct:DropDownMenuButton>
+                <TextBlock Grid.Column="2" Style="{StaticResource TextBlock_SearchBarCount}" Text="{Binding Items.Count, ElementName=ListView_Keys}"/>
+            </Grid>
+            <ListView x:Name="ListView_Keys" Grid.Row="2" Style="{StaticResource Alt2ListBoxStyle}" SelectionMode="Single"  SelectedItem="{Binding SelectedKey}">
+                <ListView.Resources>
+                    <Style TargetType="TextBlock" x:Key="Plus">
+                        <Setter Property="Text" Value="+"/>
+                        <Setter Property="Margin" Value="1,0"/>
+                    </Style>
+                </ListView.Resources>
+                <ListView.ItemTemplate>
+                    <DataTemplate DataType="ys:NumbersKey">
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Text="{Binding Value1, Mode=OneWay}"/>
+                            <TextBlock Style="{StaticResource Plus}"/>
+                            <TextBlock Text="{Binding Value2, Mode=OneWay}"/>
+                            <TextBlock Style="{StaticResource Plus}"/>
+                            <TextBlock Text="{Binding Value3, Mode=OneWay}"/>
+                            <TextBlock Style="{StaticResource Plus}"/>
+                            <TextBlock Text="{Binding Value4, Mode=OneWay}"/>
+                        </StackPanel>
+                    </DataTemplate>
+                </ListView.ItemTemplate>
+            </ListView>
+        </Grid>
+        <TextBlock Grid.Column="3" Style="{StaticResource TextBlock_RightArrow}"/>
+        <Grid Grid.Column="4" ColumnDefinitions="*, 4, *" RowDefinitions="Auto, *, 4, Auto, *">
+            <Grid Grid.Column="0" Grid.Row="0" ColumnDefinitions="Auto, Auto">
+                <Label Style="{StaticResource Label_Header}">
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock Text="{Binding Numbers_Material.Value, Source={x:Static yw:Vocab.Current}}"/>
+                        <TextBlock>(<Run Text="{Binding SelectedKey.Value1, Mode=OneWay}"/>)</TextBlock>
+                    </StackPanel>
+                </Label>
+            </Grid>
+            <Grid Grid.Column="2" Grid.Row="0" ColumnDefinitions="Auto, Auto">
+                <Label Style="{StaticResource Label_Header}">
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock Text="{Binding Numbers_Material.Value, Source={x:Static yw:Vocab.Current}}"/>
+                        <TextBlock>(<Run Text="{Binding SelectedKey.Value2, Mode=OneWay}"/>)</TextBlock>
+                    </StackPanel>
+                </Label>
+            </Grid>
+            <Grid Grid.Column="0" Grid.Row="3" ColumnDefinitions="Auto, Auto">
+                <Label Style="{StaticResource Label_Header}">
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock Text="{Binding Numbers_Material.Value, Source={x:Static yw:Vocab.Current}}"/>
+                        <TextBlock>(<Run Text="{Binding SelectedKey.Value3, Mode=OneWay}"/>)</TextBlock>
+                    </StackPanel>
+                </Label>
+            </Grid>
+            <Grid Grid.Column="2" Grid.Row="3" ColumnDefinitions="Auto, Auto">
+                <Label Style="{StaticResource Label_Header}">
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock Text="{Binding Numbers_Material.Value, Source={x:Static yw:Vocab.Current}}"/>
+                        <TextBlock>(<Run Text="{Binding SelectedKey.Value4, Mode=OneWay}"/>)</TextBlock>
+                    </StackPanel>
+                </Label>
+            </Grid>
+            <ListView x:Name="ListView_Material1" Grid.Column="0" Grid.Row="1" Style="{StaticResource CardListView}" ItemTemplate="{StaticResource ItemTemplate_FullTextWithLink}"/>
+            <ListView x:Name="ListView_Material2" Grid.Column="2" Grid.Row="1" Style="{StaticResource CardListView}" ItemTemplate="{StaticResource ItemTemplate_FullTextWithLink}"/>
+            <ListView x:Name="ListView_Material3" Grid.Column="0" Grid.Row="4" Style="{StaticResource CardListView}" ItemTemplate="{StaticResource ItemTemplate_FullTextWithLink}"/>
+            <ListView x:Name="ListView_Material4" Grid.Column="2" Grid.Row="4" Style="{StaticResource CardListView}" ItemTemplate="{StaticResource ItemTemplate_FullTextWithLink}"/>
+        </Grid>
+    </Grid>
+</UserControl>

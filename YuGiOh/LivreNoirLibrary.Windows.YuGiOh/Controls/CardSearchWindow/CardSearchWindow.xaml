@@ -56,7 +56,7 @@
         <ct:WithPanelTabControl.LeftPanel>
             <StackPanel Orientation="Horizontal">
                 <ct:Button Style="{StaticResource Button_ExecSearch}" Click="OnClick_Search"/>
-                <ct:Button Style="{StaticResource Button_ExecClear}" Click="OnClick_Clear"/>
+                <ct:Button Style="{StaticResource Button_ExecDefault}" Click="OnClick_Clear"/>
             </StackPanel>
         </ct:WithPanelTabControl.LeftPanel>
         <ct:WithPanelTabControl.RightPanel>

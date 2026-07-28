@@ -20,7 +20,6 @@ namespace LivreNoirLibrary.Windows.Controls
             EventManager.RegisterClassHandler(typeof(DropDownBase), Mouse.MouseUpEvent, new MouseButtonEventHandler(OnMouseButtonUp), true);
         }
 
-        public static readonly RoutedEvent ClickEvent = Events.Register<DropDownBase, RoutedEventHandler>();
         public static readonly DependencyProperty PlacementProperty = Popup.PlacementProperty.AddOwner(typeof(DropDownBase));
 
         private static object CoerceToolTipIsEnabled(DependencyObject d, object value) => !(d is DropDownBase { IsDropDownOpen: true });
@@ -46,11 +45,8 @@ namespace LivreNoirLibrary.Windows.Controls
         public event EventHandler? DropDownOpened;
         public event EventHandler? DropDownClosed;
 
-        public event RoutedEventHandler Click
-        {
-            add => AddHandler(ClickEvent, value);
-            remove => RemoveHandler(ClickEvent, value);
-        }
+        [RoutedEvent]
+        public partial event RoutedEventHandler Click;
 
         public PlacementMode Placement { get => (PlacementMode)GetValue(PlacementProperty); set => SetValue(PlacementProperty, value); }
 
@@ -58,6 +54,7 @@ namespace LivreNoirLibrary.Windows.Controls
         protected bool _autoOpen;
         [DependencyProperty(BindsTwoWayByDefault = true)]
         protected bool _isDropDownOpen;
+
         protected Popup? _popup;
 
         private void OnIsDropDownOpenChanged(bool value)

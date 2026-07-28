@@ -22,11 +22,6 @@ namespace LivreNoirLibrary.Windows.YuGiOh.Controls
             MainGrid.DataContext = this;
         }
 
-        private void OnCardProviderChanged(ICardProvider? value)
-        {
-
-        }
-
         private void OnClick_Copy(object sender, RoutedEventArgs e)
         {
             e.Handled = true;
@@ -38,16 +33,7 @@ namespace LivreNoirLibrary.Windows.YuGiOh.Controls
             if (_source is { } pack)
             {
                 e.Handled = true;
-                this.RaisePackLinkClicked(pack.ProductId);
-            }
-        }
-
-        private void OnClick_CardName(object sender, RoutedEventArgs e)
-        {
-            if (sender is FrameworkContentElement { DataContext: CardPackItem item })
-            {
-                e.Handled = true;
-                this.RaiseCardLinkClicked(item.Card.Id, false);
+                this.RaiseRequestOpenPackUrl(pack.ProductId);
             }
         }
     }

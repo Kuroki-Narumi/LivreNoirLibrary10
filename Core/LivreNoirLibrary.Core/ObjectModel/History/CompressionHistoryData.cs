@@ -29,17 +29,17 @@ namespace LivreNoirLibrary.ObjectModel
 
         protected abstract void Dump(Stream stream, T source);
 
-        public void ConvertBack(T? target)
+        public void ConvertBack(T? target, object? state = null)
         {
             if (target is not null && _ms is { } ms)
             {
                 ms.Position = 0;
                 using DeflateStream buffer = new(ms, CompressionMode.Decompress, true);
-                Load(buffer, target);
+                Load(buffer, target, state);
             }
         }
 
-        protected abstract void Load(Stream stream, T target);
+        protected abstract void Load(Stream stream, T target, object? state);
 
         public unsafe bool EqualsAll(CompressionHistoryData<T> other)
         {

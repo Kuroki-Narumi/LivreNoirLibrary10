@@ -35,26 +35,6 @@
                 <Setter Property="ItemContainerStyle" Value="{StaticResource Alt2ListBoxItemContainerStyle}"/>
                 <EventSetter Event="PreviewMouseWheel" Handler="ComboBox_PreviewMouseWheel"/>
             </Style>
-
-            <Style x:Key="ItemContainerStyle_CardNameCopy" TargetType="ListViewItem" BasedOn="{StaticResource Alt2ListBoxItemContainerStyle}">
-                <EventSetter Event="PreviewMouseLeftButtonDown" Handler="CardListView_PreviewMouseLeftButtonDown"/>
-            </Style>
-
-            <Style x:Key="ItemContainerStyle_CardNameCopy_Alt" TargetType="ListViewItem" BasedOn="{StaticResource Alt2ListBoxItemContainerStyle}">
-                <EventSetter Event="PreviewMouseLeftButtonDown" Handler="CardListView_PreviewMouseLeftButtonDown_Alt"/>
-            </Style>
-
-            <Style TargetType="ListView" x:Key="CardListView" BasedOn="{StaticResource Alt2ListBoxStyle}">
-                <Setter Property="SelectionMode" Value="Single"/>
-                <Setter Property="ItemContainerStyle" Value="{StaticResource ItemContainerStyle_CardNameCopy}"/>
-                <Setter Property="ItemTemplate" Value="{StaticResource ItemTemplate_FullText}"/>
-            </Style>
-
-            <Style TargetType="ListView" x:Key="CardListView_MultiSelect" BasedOn="{StaticResource Alt2ListBoxStyle}">
-                <Setter Property="SelectionMode" Value="Extended"/>
-                <Setter Property="ItemContainerStyle" Value="{StaticResource ItemContainerStyle_CardNameCopy_Alt}"/>
-                <Setter Property="ItemTemplate" Value="{StaticResource ItemTemplate_FullText}"/>
-            </Style>
         </ResourceDictionary>
     </Application.Resources>
 </Application>

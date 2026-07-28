@@ -63,9 +63,9 @@ namespace LivreNoirLibrary.YuGiOh
             foreach (var range in Regex_Separators.EnumerateSplits(text))
             {
                 var name = text[range].Trim();
-                if (TryGetEnumValue(name, _name2abi, out var val))
+                if (TryGetSingleAbility(name, out var value))
                 {
-                    result |= val;
+                    result |= value;
                 }
                 else
                 {
@@ -74,6 +74,8 @@ namespace LivreNoirLibrary.YuGiOh
             }
             return result;
         }
+
+        public static bool TryGetSingleAbility(ReadOnlySpan<char> name, out Ability value) => TryGetEnumValue(name, _name2abi, out value);
 
         public static Ability GetAbility(IEnumerable<string> names)
         {

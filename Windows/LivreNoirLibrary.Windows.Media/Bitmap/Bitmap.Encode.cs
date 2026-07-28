@@ -5,6 +5,7 @@ using System.Threading;
 using System.Windows;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
+using System.Windows.Media.Media3D;
 
 namespace LivreNoirLibrary.Windows.Media
 {
@@ -88,29 +89,39 @@ namespace LivreNoirLibrary.Windows.Media
         private static readonly PngBitmapEncoder _clipboard_encoder = new();
         private static readonly MemoryStream _clipboard = new(32768);
 
+        public static DataObject CreateDataObject(this BitmapSource bitmap)
+        {
+            Clipboard.SetImage(bitmap);
+            DataObject obj = new();
+            PngBitmapEncoder encoder = new();
+            encoder.Frames.Add(BitmapFrame.Create(bitmap));
+            _clipboard.SetLength(0);
+            encoder.Save(_clipboard);
+            _clipboard.Position = 0;
+            obj.SetData("PNG", _clipboard, false);
+            AddData(obj, DataFormats.Bitmap);
+            return obj;
+        }
+
         private static void ToClipboardImpl(BitmapSource bitmap)
         {
-            lock (_clipboard_lock)
+            try
             {
-                Clipboard.SetImage(bitmap);
-                DataObject obj = new();
-                var encoder = _clipboard_encoder;
-                encoder.Frames.Add(BitmapFrame.Create(bitmap));
-                _clipboard.SetLength(0);
-                encoder.Save(_clipboard);
-                _clipboard.Position = 0;
-                encoder.Frames.Clear();
-                obj.SetData("PNG", _clipboard, false);
-                AddData(obj, DataFormats.Bitmap);
+                var obj = CreateDataObject(bitmap);
                 Clipboard.SetDataObject(obj);
+            }
+            catch (System.Runtime.InteropServices.COMException)
+            {
+                Thread.Sleep(10);
+                ToClipboardImpl(bitmap);
             }
         }
 
         private static void AddData(DataObject obj, string format)
         {
-            if (Clipboard.ContainsData(format))
+            if (obj is not null && Clipboard.GetData(format) is { } data)
             {
-                obj.SetData(format, Clipboard.GetData(format));
+                obj.SetData(format, data);
             }
         }
 
@@ -125,5 +136,7 @@ namespace LivreNoirLibrary.Windows.Media
         }
 
         public static void ToClipboard(this Visual visual, in RenderVisualOptions options = default) => ToClipboardImpl(GetSourceFromVisual(visual, options));
+
+        public static DataObject CreateDataObject(this Visual visual, in RenderVisualOptions options = default) => CreateDataObject(GetSourceFromVisual(visual, options));
     }
 }

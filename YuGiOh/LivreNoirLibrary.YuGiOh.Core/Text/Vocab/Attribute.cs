@@ -24,8 +24,8 @@ namespace LivreNoirLibrary.YuGiOh
         public const string Attr_Wind = $"{Wind}{Attribute}";
         public const string Attr_Divine = $"{Divine}{Attribute}";
 
-        private static string[] Attr2Name { get; } = [None, Attr_Light, Attr_Dark, Attr_Water, Attr_Fire, Attr_Earth, Attr_Wind, Attr_Divine];
-        private static string[] Attr2ShortName { get; } = [None, Light, Dark, Water, Fire, Earth, Wind, Divine];
+        private static string[] Attr2Name { get; } = [Unknown, Attr_Light, Attr_Dark, Attr_Water, Attr_Fire, Attr_Earth, Attr_Wind, Attr_Divine];
+        private static string[] Attr2ShortName { get; } = [Unknown, Light, Dark, Water, Fire, Earth, Wind, Divine];
 
         private static Dictionary<string, Attribute>.AlternateLookup<ReadOnlySpan<char>> Name2Attr { get; } = CreateName2Attr();
         private static Dictionary<string, Attribute>.AlternateLookup<ReadOnlySpan<char>> CreateName2Attr()
@@ -46,5 +46,6 @@ namespace LivreNoirLibrary.YuGiOh
         public static string GetName(this Attribute value) => GetEnumName(value, (int)value, Attr2Name);
         public static string GetShortName(this Attribute value) => GetEnumName(value, (int)value, Attr2ShortName);
         public static Attribute GetAttribute(ReadOnlySpan<char> name) => GetEnumValue(name, Name2Attr);
+        public static bool TryGetAttribute(ReadOnlySpan<char> name, out Attribute value) => TryGetEnumValue(name, Name2Attr, out value);
     }
 }

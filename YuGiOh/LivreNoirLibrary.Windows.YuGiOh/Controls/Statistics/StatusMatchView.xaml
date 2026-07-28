@@ -1,0 +1,144 @@
+﻿<UserControl x:Class="LivreNoirLibrary.Windows.YuGiOh.Controls.StatusMatchView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:LivreNoirLibrary.Windows.YuGiOh.Controls"
+             xmlns:ct="clr-namespace:LivreNoirLibrary.Windows.Controls;assembly=LivreNoirLibrary.Windows.Controls"
+             xmlns:media="clr-namespace:LivreNoirLibrary.Windows.Media;assembly=LivreNoirLibrary.Windows.Media"
+             xmlns:yw="clr-namespace:LivreNoirLibrary.Windows.YuGiOh;assembly=LivreNoirLibrary.Windows.YuGiOh"
+             xmlns:ygo="clr-namespace:LivreNoirLibrary.YuGiOh.Data;assembly=LivreNoirLibrary.YuGiOh.Core"
+             mc:Ignorable="d" 
+             d:DesignHeight="450" d:DesignWidth="800">
+    <UserControl.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="/LivreNoirLibrary.Windows.YuGiOh;component/Themes/Generic.xaml"/>
+            </ResourceDictionary.MergedDictionaries>
+            <Style TargetType="Panel" x:Key="RadioContainer" BasedOn="{StaticResource RadioContainerBase}">
+                <Setter Property="Grid.Column" Value="1"/>
+                <EventSetter Event="MouseWheel" Handler="OnMouseWheel_RadioContainer"/>
+            </Style>
+        </ResourceDictionary>
+    </UserControl.Resources>
+    <Grid>
+        <Grid x:Name="MainGrid" d:DataContext="{d:DesignInstance Type=local:StatusMatchView}" ColumnDefinitions="*, Auto, 2*">
+            <Grid RowDefinitions="Auto, 4, Auto, 4, *">
+                <Grid Grid.Row="0" ColumnDefinitions="Auto, *">
+                    <ct:Button Style="{StaticResource RefreshButton}"/>
+                    <ct:DropDownMenuButton Grid.Column="1" Content="{Binding Settings.Value, Source={x:Static yw:Vocab.Current}}" BorderBrush="Transparent">
+                        <ct:DropDownMenuButton.DropDownContent>
+                            <StackPanel Margin="4">
+                                <StackPanel.Resources>
+                                    <Style TargetType="Label">
+                                        <Setter Property="VerticalContentAlignment" Value="Center"/>
+                                        <Setter Property="HorizontalAlignment" Value="Right"/>
+                                        <Setter Property="Padding" Value="0"/>
+                                        <Setter Property="Margin" Value="0,0,4,0"/>
+                                    </Style>
+                                    <Style TargetType="ct:Button">
+                                        <Setter Property="Margin" Value="2"/>
+                                    </Style>
+                                    <Style TargetType="ct:ToggleButton">
+                                        <Setter Property="Margin" Value="2"/>
+                                        <Setter Property="VerticalAlignment" Value="Center"/>
+                                        <EventSetter Event="PreviewMouseLeftButtonDown" Handler="OnMouseLeftButtonDown_ToggleButton"/>
+                                        <EventSetter Event="MouseEnter" Handler="OnMouseEnter_ToggleButton"/>
+                                    </Style>
+                                    <Style TargetType="RadioButton">
+                                        <Setter Property="Margin" Value="2,0"/>
+                                    </Style>
+                                    <Style TargetType="ct:RadioButton">
+                                        <Setter Property="Margin" Value="2"/>
+                                        <Setter Property="VerticalAlignment" Value="Center"/>
+                                    </Style>
+                                </StackPanel.Resources>
+                                <Grid ColumnDefinitions="Auto, *">
+                                    <Label Content="{Binding Match_Flags.Value, Source={x:Static yw:Vocab.Current}}"/>
+                                    <Grid Grid.Column="1" ColumnDefinitions="*, *, *" RowDefinitions="Auto, Auto">
+                                        <ct:ToggleButton Grid.Row="0" Grid.Column="0" Content="{Binding CInfo.Attribute.Value, Source={x:Static yw:Vocab.Current}}" IsChecked="{Binding MatchConditions.Attribute}"/>
+                                        <ct:ToggleButton Grid.Row="0" Grid.Column="1" Content="{Binding CInfo.MonsterType.Value, Source={x:Static yw:Vocab.Current}}" IsChecked="{Binding MatchConditions.MonsterType}"/>
+                                        <ct:ToggleButton Grid.Row="0" Grid.Column="2" Content="{Binding CInfo.Level.Value, Source={x:Static yw:Vocab.Current}}" IsChecked="{Binding MatchConditions.Level}"/>
+                                        <ct:ToggleButton Grid.Row="1" Grid.Column="0" Content="{Binding CInfo.Atk.Value, Source={x:Static yw:Vocab.Current}}" IsChecked="{Binding MatchConditions.Atk}"/>
+                                        <ct:ToggleButton Grid.Row="1" Grid.Column="1" Content="{Binding CInfo.Def.Value, Source={x:Static yw:Vocab.Current}}" IsChecked="{Binding MatchConditions.Def}"/>
+                                        <ct:ToggleButton Grid.Row="1" Grid.Column="2" Content="{Binding CInfo.AtkDef.Value, Source={x:Static yw:Vocab.Current}}" IsChecked="{Binding MatchConditions.AtkDef}"/>
+                                    </Grid>
+                                </Grid>
+                                <Border Style="{StaticResource HorizontalSeparator}"/>
+                                <Grid ColumnDefinitions="*, Auto, 8, Auto">
+                                    <ct:LabeledSlider Margin="4,0" Minimum="0" Maximum="6" TickFrequency="1" Header="{Binding Match_Count.Value, Source={x:Static yw:Vocab.Current}}" Value="{Binding MatchConditions.Count}"/>
+                                    <StackPanel Style="{StaticResource RadioContainer}">
+                                        <RadioButton Content="{Binding Match_Greater.Value, Source={x:Static yw:Vocab.Current}}"  IsChecked="{Binding MatchConditions.AllowsGreater}"/>
+                                        <RadioButton Content="{Binding Match_Equal.Value, Source={x:Static yw:Vocab.Current}}"  IsChecked="{Binding MatchConditions.AllowsGreater, Converter={StaticResource InvertConverter}}"/>
+                                    </StackPanel>
+                                    <ct:ToggleButton Grid.Column="3" Content="{Binding Match_ExceptSelf.Value, Source={x:Static yw:Vocab.Current}}" IsChecked="{Binding MatchConditions.ExceptSelf}"/>
+                                </Grid>
+                                <Border Style="{StaticResource HorizontalSeparator}"/>
+                                <Grid RowDefinitions="Auto, Auto" ColumnDefinitions="Auto, *">
+                                    <Label Grid.Row="0" Content="{Binding Match_Candidate.Value, Source={x:Static yw:Vocab.Current}}"/>
+                                    <Grid Grid.Row="0" Style="{StaticResource RadioContainer}" ColumnDefinitions="*, *">
+                                        <ct:RadioButton Content="{Binding Match_All.Value, Source={x:Static yw:Vocab.Current}}"  IsChecked="{Binding MatchConditions.Candidate_Main, Converter={StaticResource InvertConverter}}"/>
+                                        <ct:RadioButton Grid.Column="1" Content="{Binding Match_MainDeck.Value, Source={x:Static yw:Vocab.Current}}"  IsChecked="{Binding MatchConditions.Candidate_Main}"/>
+                                    </Grid>
+                                    <Label Grid.Row="1" Content="{Binding Match_Target.Value, Source={x:Static yw:Vocab.Current}}"/>
+                                    <Grid Grid.Row="1" Style="{StaticResource RadioContainer}" ColumnDefinitions="*, *">
+                                        <ct:RadioButton Content="{Binding Match_All.Value, Source={x:Static yw:Vocab.Current}}"  IsChecked="{Binding MatchConditions.Target_Main, Converter={StaticResource InvertConverter}}"/>
+                                        <ct:RadioButton Grid.Column="1" Content="{Binding Match_MainDeck.Value, Source={x:Static yw:Vocab.Current}}"  IsChecked="{Binding MatchConditions.Target_Main}"/>
+                                    </Grid>
+                                </Grid>
+                                <Border Style="{StaticResource HorizontalSeparator}"/>
+                                <Grid ColumnDefinitions="Auto, *, *, *, *">
+                                    <Label Content="{Binding Preset.Value, Source={x:Static yw:Vocab.Current}}"/>
+                                    <ct:Button Grid.Column="1" Content="{Binding Match_Sculptor.Value, Source={x:Static yw:Vocab.Current}}" Click="OnClick_Preset_Sculptor"/>
+                                    <ct:Button Grid.Column="2" Content="{Binding Match_SmallWorld.Value, Source={x:Static yw:Vocab.Current}}" Click="OnClick_Preset_SmallWorld"/>
+                                    <ct:Button Grid.Column="3" Content="{Binding Match_Nightmell.Value, Source={x:Static yw:Vocab.Current}}" Click="OnClick_Preset_Nightmell"/>
+                                    <ct:Button Grid.Column="4" Content="{Binding Match_Hedgehog.Value, Source={x:Static yw:Vocab.Current}}" Click="OnClick_Preset_Hedgehog"/>
+                                </Grid>
+                            </StackPanel>
+                        </ct:DropDownMenuButton.DropDownContent>
+                    </ct:DropDownMenuButton>
+                </Grid>
+                <local:CardSearchBar Grid.Row="2" ListBox="{Binding ElementName=ListView_Candidates}"/>
+                <ListView Grid.Row="4" x:Name="ListView_Candidates" Style="{StaticResource CardListView}" SelectedItem="{Binding SelectedItem, Mode=TwoWay}">
+                    <ListView.View>
+                        <GridView>
+                            <GridViewColumn HeaderTemplate="{StaticResource GridViewHeader_Name}" CellTemplate="{StaticResource ItemTemplate_Name}"/>
+                            <GridViewColumn>
+                                <GridViewColumn.HeaderTemplate>
+                                    <DataTemplate>
+                                        <TextBlock Text="{Binding Matched.Value, Source={x:Static yw:Vocab.Current}}" Tag="MatchCount"/>
+                                    </DataTemplate>
+                                </GridViewColumn.HeaderTemplate>
+                                <GridViewColumn.CellTemplate>
+                                    <DataTemplate>
+                                        <TextBlock Text="{Binding MatchCount}" HorizontalAlignment="Right"/>
+                                    </DataTemplate>
+                                </GridViewColumn.CellTemplate>
+                            </GridViewColumn>
+                            <GridViewColumn HeaderTemplate="{StaticResource GridViewHeader_Details}" CellTemplate="{StaticResource ItemTemplate_Detail}"/>
+                        </GridView>
+                    </ListView.View>
+                </ListView>
+            </Grid>
+            <TextBlock Style="{StaticResource TextBlock_RightArrow}"/>
+            <Grid Grid.Column="2" RowDefinitions="Auto, 4, *">
+                <local:CardSearchBar ListBox="{Binding ElementName=ListView_Targets}"/>
+                <ListView Grid.Row="2" x:Name="ListView_Targets" Style="{StaticResource CardListView}">
+                    <ListView.View>
+                        <GridView>
+                            <GridViewColumn HeaderTemplate="{StaticResource GridViewHeader_Name}" CellTemplate="{StaticResource ItemTemplate_NameWithLink}"/>
+                            <GridViewColumn HeaderTemplate="{StaticResource GridViewHeader_CardType}" CellTemplate="{StaticResource ItemTemplate_CardType}"/>
+                            <GridViewColumn HeaderTemplate="{StaticResource GridViewHeader_Attribute}" CellTemplate="{StaticResource ItemTemplate_Attribute}"/>
+                            <GridViewColumn Width="96" HeaderTemplate="{StaticResource GridViewHeader_MonsterType}" CellTemplate="{StaticResource ItemTemplate_MonsterType}"/>
+                            <GridViewColumn Width="28" HeaderTemplate="{StaticResource GridViewHeader_Level}" CellTemplate="{StaticResource ItemTemplate_Level}"/>
+                            <GridViewColumn Width="48" HeaderTemplate="{StaticResource GridViewHeader_Atk}" CellTemplate="{StaticResource ItemTemplate_Atk}"/>
+                            <GridViewColumn Width="48" HeaderTemplate="{StaticResource GridViewHeader_Def}" CellTemplate="{StaticResource ItemTemplate_Def}"/>
+                            <GridViewColumn HeaderTemplate="{StaticResource GridViewHeader_Details}" CellTemplate="{StaticResource ItemTemplate_Detail}"/>
+                        </GridView>
+                    </ListView.View>
+                </ListView>
+            </Grid>
+        </Grid>
+        <ct:TaskProgressBar x:Name="TaskProgressBar"/>
+    </Grid>
+</UserControl>

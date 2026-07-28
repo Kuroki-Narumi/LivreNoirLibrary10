@@ -8,53 +8,68 @@
              xmlns:media="clr-namespace:LivreNoirLibrary.Windows.Media;assembly=LivreNoirLibrary.Windows.Media"
              xmlns:yw="clr-namespace:LivreNoirLibrary.Windows.YuGiOh;assembly=LivreNoirLibrary.Windows.YuGiOh"
              xmlns:ygo="clr-namespace:LivreNoirLibrary.YuGiOh.Data;assembly=LivreNoirLibrary.YuGiOh.Core"
-             mc:Ignorable="d" 
+             mc:Ignorable="d" Background="White"
              d:DesignHeight="450" d:DesignWidth="800">
     <UserControl.Resources>
-        <Style TargetType="ListViewItem" x:Key="ItemContainerStyle" BasedOn="{StaticResource Alt2ListBoxItemContainerStyle}">
-            <EventSetter Event="PreviewMouseLeftButtonDown" Handler="ListViewItem_PreviewMouseLeftButtonDown"/>
-            <EventSetter Event="PreviewMouseMove" Handler="IDragDrop_PreviewMouseMove"/>
-            <EventSetter Event="PreviewMouseRightButtonDown" Handler="OnMouseRightButtonDown"/>
-            <EventSetter Event="PreviewMouseRightButtonUp" Handler="OnMouseRightButtonUp"/>
-        </Style>
-        <Style x:Key="ListViewStyle" TargetType="ct:CtListView" BasedOn="{StaticResource CardListView_MultiSelect}">
-            <Setter Property="AllowDrop" Value="True"/>
-            <Setter Property="ItemContainerStyle" Value="{StaticResource ItemContainerStyle}"/>
-            <EventSetter Event="SelectionChanged" Handler="ListView_OnSelectionChanged"/>
-            <EventSetter Event="GotFocus" Handler="ListView_OnGotFocus"/>
-            <EventSetter Event="DragOver" Handler="IDragDrop_DragOver"/>
-            <EventSetter Event="Drop" Handler="IDragDrop_Drop"/>
-        </Style>
-        <Style x:Key="DeckCardListStyle" TargetType="ct:CtListView" BasedOn="{StaticResource ListViewStyle}">
-            <Setter Property="ItemTemplate">
-                <Setter.Value>
-                    <DataTemplate DataType="ygo:CountedCard">
-                        <StackPanel Orientation="Horizontal">
-                            <TextBlock Text="{Binding Count}"/>
-                            <TextBlock Text="x" Margin="2,0"/>
-                            <ct:IconPresenter Height="16" Source="{Binding ThisCard.Icon}" Margin="0,0,2,0"/>
-                            <ct:IconPresenter Height="16" Source="{Binding ThisCard.LimitIcon}"/>
-                            <TextBlock Text="{Binding ThisCard.Name}"/>
-                        </StackPanel>
-                    </DataTemplate>
-                </Setter.Value>
-            </Setter>
-        </Style>
-        <Style TargetType="Grid" x:Key="ListViewHeader">
-            <Setter Property="VerticalAlignment" Value="Bottom"/>
-        </Style>
-        <Style TargetType="ct:ToggleButton" x:Key="ListViewHeader_Switch" BasedOn="{StaticResource HelpToggleButton}">
-            <Setter Property="Icon" Value="{x:Static media:Icons.Update_Mono}"/>
-        </Style>
-        <Style TargetType="TextBlock" x:Key="ListViewHeader_Text">
-            <Setter Property="VerticalAlignment" Value="Bottom"/>
-        </Style>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="/LivreNoirLibrary.Windows.YuGiOh;component/Themes/Generic.xaml"/>
+            </ResourceDictionary.MergedDictionaries>
+            <Style TargetType="ListViewItem" x:Key="ItemContainerStyle" BasedOn="{StaticResource Alt2ListBoxItemContainerStyle}">
+                <EventSetter Event="PreviewMouseLeftButtonDown" Handler="ListViewItem_PreviewMouseLeftButtonDown"/>
+                <EventSetter Event="PreviewMouseMove" Handler="IDragDrop_PreviewMouseMove"/>
+                <EventSetter Event="PreviewMouseRightButtonDown" Handler="OnMouseRightButtonDown"/>
+                <EventSetter Event="PreviewMouseRightButtonUp" Handler="OnMouseRightButtonUp"/>
+            </Style>
+            <Style x:Key="ListViewStyle" TargetType="ct:CtListView" BasedOn="{StaticResource CardListView_MultiSelect}">
+                <Setter Property="AllowDrop" Value="True"/>
+                <Setter Property="ItemContainerStyle" Value="{StaticResource ItemContainerStyle}"/>
+                <EventSetter Event="SelectionChanged" Handler="ListView_OnSelectionChanged"/>
+                <EventSetter Event="GotFocus" Handler="ListView_OnGotFocus"/>
+                <EventSetter Event="DragOver" Handler="IDragDrop_DragOver"/>
+                <EventSetter Event="Drop" Handler="IDragDrop_Drop"/>
+            </Style>
+            <Style x:Key="DeckCardListStyle" TargetType="ct:CtListView" BasedOn="{StaticResource ListViewStyle}">
+                <Setter Property="ItemTemplate">
+                    <Setter.Value>
+                        <DataTemplate DataType="ygo:CountedCard">
+                            <StackPanel Orientation="Horizontal">
+                                <TextBlock Text="{Binding Count}"/>
+                                <TextBlock Text="x" Margin="2,0"/>
+                                <ct:IconPresenter Height="16" Source="{Binding ThisCard.Icon}" Margin="0,0,2,0"/>
+                                <ct:IconPresenter Height="16" Source="{Binding ThisCard.LimitIcon}"/>
+                                <TextBlock Text="{Binding ThisCard.Name}"/>
+                                <StackPanel.ToolTip>
+                                    <StackPanel>
+                                        <TextBlock Text="{Binding ThisCard.Name}"/>
+                                        <TextBlock Style="{StaticResource ToolTipText}"/>
+                                    </StackPanel>
+                                </StackPanel.ToolTip>
+                            </StackPanel>
+                        </DataTemplate>
+                    </Setter.Value>
+                </Setter>
+            </Style>
+            <Style TargetType="Grid" x:Key="ListViewHeader">
+                <Setter Property="VerticalAlignment" Value="Bottom"/>
+            </Style>
+            <Style TargetType="ct:ToggleButton" x:Key="ListViewHeader_Switch" BasedOn="{StaticResource HelpToggleButton}">
+                <Setter Property="Icon" Value="{x:Static media:Icons.Update_Mono}"/>
+            </Style>
+            <Style TargetType="TextBlock" x:Key="ListViewHeader_Text">
+                <Setter Property="VerticalAlignment" Value="Bottom"/>
+            </Style>
+            <Style x:Key="ClearButton" TargetType="ct:Button" BasedOn="{StaticResource IconButton_ListClear}">
+                <Setter Property="Grid.Column" Value="6"/>
+                <EventSetter Event="Click" Handler="OnClick_ClearButton"/>
+            </Style>
+        </ResourceDictionary>
     </UserControl.Resources>
     <Grid>
         <Grid x:Name="MainGrid" d:DataContext="{d:DesignInstance Type=local:DeckEditor}">
             <Grid RowDefinitions="Auto, 4, *" ColumnDefinitions="5*, Auto, 2*">
                 <Grid ColumnDefinitions="*, Auto">
-                    <local:SearchBar x:Name="SearchBar" ItemsCount="{Binding Items.Count, ElementName=ListView_CardList}" RequestSearch="CardList_RequestSearch"/>
+                    <local:CardSearchBar ListBox="{Binding ElementName=ListView_CardList}" DefaultSearchConditions="{Binding DefaultCardSearchConditions}"/>
                     <StackPanel Grid.Column="1" Style="{StaticResource EditBarStackPanel}">
                         <ct:Button Style="{StaticResource IconButton_Undo}"/>
                         <ct:Button Style="{StaticResource IconButton_Redo}"/>
@@ -63,17 +78,12 @@
                         <ct:Button Style="{StaticResource IconButton_Open}"/>
                         <ct:Button Style="{StaticResource IconButton_Save}"/>
                         <Rectangle Width="8"/>
-                        <ct:Button Style="{StaticResource StyleBase_IconButton}" Icon="{x:Static media:Icons.Download}" ToolTip="{Binding Deck_Import, Source={x:Static yw:Vocab.Current}}" Click="OnClick_Import1"/>
-                        <ct:Button Style="{StaticResource StyleBase_IconButton}" Icon="{x:Static media:Icons.Download_Red}" ToolTip="{Binding Deck_ImportJS, Source={x:Static yw:Vocab.Current}}" Click="OnClick_Import2"/>
-                        <ct:Button Style="{StaticResource StyleBase_IconButton}" Icon="{x:Static media:Icons.Upload}" ToolTip="{Binding Deck_Export, Source={x:Static yw:Vocab.Current}}" Click="OnClick_Export"/>
+                        <ct:Button Style="{StaticResource IconButtonBase}" Icon="{x:Static media:Icons.Download}" ToolTip="{Binding Deck_Import, Source={x:Static yw:Vocab.Current}}" Click="OnClick_Import1"/>
+                        <ct:Button Style="{StaticResource IconButtonBase}" Icon="{x:Static media:Icons.Download_Red}" ToolTip="{Binding Deck_ImportJS, Source={x:Static yw:Vocab.Current}}" Click="OnClick_Import2"/>
+                        <ct:Button Style="{StaticResource IconButtonBase}" Icon="{x:Static media:Icons.Upload}" ToolTip="{Binding Deck_Export, Source={x:Static yw:Vocab.Current}}" Click="OnClick_Export"/>
                     </StackPanel>
                 </Grid>
                 <ct:CtListView x:Name="ListView_CardList" Grid.Row="2" Style="{StaticResource ListViewStyle}" ItemsSource="{Binding CardProvider}">
-                    <ListView.Resources>
-                        <Style TargetType="GridViewColumnHeader">
-                            <EventSetter Event="Click" Handler="OnClick_ColumnHeader"/>
-                        </Style>
-                    </ListView.Resources>
                     <ListView.View>
                         <GridView>
                             <GridViewColumn HeaderTemplate="{StaticResource GridViewHeader_Name}" CellTemplate="{StaticResource ItemTemplate_NameWithLimit}"/>
@@ -89,16 +99,20 @@
                     </ListView.View>
                 </ct:CtListView>
                 <Grid Grid.Row="2" Grid.Column="1" RowDefinitions="*, *">
-                    <Grid.Resources>
-                        <Style TargetType="ct:Button">
-                            <Setter Property="CornerRadius" Value="0"/>
-                            <Setter Property="BorderThickness" Value="0"/>
-                        </Style>
-                    </Grid.Resources>
-                    <ct:Button Background="{ct:BrushProvider #f8f8ff}" Icon="{x:Static media:Icons.ArrowRight}" ToolTip="{Binding Add.Value, Source={x:Static yw:Vocab.Current}}"  Click="OnClick_Add"/>
-                    <ct:Button Grid.Row="1" Background="{ct:BrushProvider #fff8f8}" Icon="{x:Static media:Icons.ArrowLeft}" ToolTip="{Binding Delete.Value, Source={x:Static yw:Vocab.Current}}" Click="OnClick_Remove"/>
+                    <ct:Button Style="{StaticResource LargeButton_Blue}" Click="OnClick_Add">
+                        <StackPanel Style="{StaticResource LargeButtonStackPanel}">
+                            <ct:IconPresenter Style="{StaticResource LargeButtonIcon}" Source="{x:Static media:Icons.ArrowRight}"/>
+                            <ct:VerticalTextBlock Text="{Binding Add.Value, Source={x:Static yw:Vocab.Current}}"/>
+                        </StackPanel>
+                    </ct:Button>
+                    <ct:Button Style="{StaticResource LargeButton_Red}" Click="OnClick_Remove">
+                        <StackPanel Style="{StaticResource LargeButtonStackPanel}">
+                            <ct:IconPresenter Style="{StaticResource LargeButtonIcon}" Source="{x:Static media:Icons.ArrowLeft}"/>
+                            <ct:VerticalTextBlock Text="{Binding Delete.Value, Source={x:Static yw:Vocab.Current}}"/>
+                        </StackPanel>
+                    </ct:Button>
                 </Grid>
-                <Grid Grid.Column="2" Style="{StaticResource ListViewHeader}" ColumnDefinitions="Auto, *, 24, Auto, 24, Auto, 8" Visibility="{Binding IsSideDeckVisible, Converter={StaticResource TVConvI}}">
+                <Grid Grid.Column="2" Style="{StaticResource ListViewHeader}" ColumnDefinitions="Auto, *, 24, Auto, 24, Auto, Auto" Visibility="{Binding IsSideDeckVisible, Converter={StaticResource TVConvI}}">
                     <Grid.Resources>
                         <Style TargetType="ct:ToggleButton" BasedOn="{StaticResource ListViewHeader_Switch}"/>
                         <Style TargetType="TextBlock" BasedOn="{StaticResource ListViewHeader_Text}"/>
@@ -108,9 +122,10 @@
                     <TextBlock Grid.Column="2" Text="{Binding Deck.MainDeck.UniqueCount}" HorizontalAlignment="Right"/>
                     <TextBlock Grid.Column="3" Text="{Binding Deck_Unique.Value, Source={x:Static yw:Vocab.Current}}"/>
                     <TextBlock Grid.Column="4" Text="{Binding Deck.MainDeck.Count}" HorizontalAlignment="Right"/>
-                    <TextBlock Grid.Column="5" Text="{Binding Deck_Count.Value, Source={x:Static yw:Vocab.Current}}"/>
+                    <TextBlock Grid.Column="5" Text="{Binding Deck_TotalCount.Value, Source={x:Static yw:Vocab.Current}}"/>
+                    <ct:Button Style="{StaticResource ClearButton}" Tag="{Binding Deck.MainDeck}"/>
                 </Grid>
-                <Grid Grid.Column="2" Style="{StaticResource ListViewHeader}" ColumnDefinitions="Auto, *, 24, Auto, 24, Auto, 8" Visibility="{Binding IsSideDeckVisible, Converter={StaticResource BVConv}}">
+                <Grid Grid.Column="2" Style="{StaticResource ListViewHeader}" ColumnDefinitions="Auto, *, 24, Auto, 24, Auto, Auto" Visibility="{Binding IsSideDeckVisible, Converter={StaticResource BVConv}}">
                     <Grid.Resources>
                         <Style TargetType="ct:ToggleButton" BasedOn="{StaticResource ListViewHeader_Switch}"/>
                         <Style TargetType="TextBlock" BasedOn="{StaticResource ListViewHeader_Text}"/>
@@ -120,7 +135,8 @@
                     <TextBlock Grid.Column="2" Text="{Binding Deck.SideDeck.UniqueCount}" HorizontalAlignment="Right"/>
                     <TextBlock Grid.Column="3" Text="{Binding Deck_Unique.Value, Source={x:Static yw:Vocab.Current}}"/>
                     <TextBlock Grid.Column="4" Text="{Binding Deck.SideDeck.Count}" HorizontalAlignment="Right"/>
-                    <TextBlock Grid.Column="5" Text="{Binding Deck_Count.Value, Source={x:Static yw:Vocab.Current}}"/>
+                    <TextBlock Grid.Column="5" Text="{Binding Deck_TotalCount.Value, Source={x:Static yw:Vocab.Current}}"/>
+                    <ct:Button Style="{StaticResource ClearButton}" Tag="{Binding Deck.SideDeck}"/>
                 </Grid>
                 <Grid Grid.Column="2" Grid.Row="2">
                     <Grid.RowDefinitions>
@@ -130,12 +146,16 @@
                     </Grid.RowDefinitions>
                     <ct:CtListView x:Name="ListView_MainDeck" Style="{StaticResource DeckCardListStyle}" ItemsSource="{Binding Deck.MainDeck}" Visibility="{Binding IsSideDeckVisible, Converter={StaticResource TVConvI}}"/>
                     <ct:CtListView x:Name="ListView_SideDeck" Style="{StaticResource DeckCardListStyle}" ItemsSource="{Binding Deck.SideDeck}" Visibility="{Binding IsSideDeckVisible, Converter={StaticResource BVConv}}"/>
-                    <Grid Grid.Row="1" Style="{StaticResource ListViewHeader}" ColumnDefinitions="24, *, 24, Auto, 24, Auto, 8">
+                    <Grid Grid.Row="1" Style="{StaticResource ListViewHeader}" ColumnDefinitions="24, *, 24, Auto, 24, Auto, Auto">
+                        <Grid.Resources>
+                            <Style TargetType="TextBlock" BasedOn="{StaticResource ListViewHeader_Text}"/>
+                        </Grid.Resources>
                         <TextBlock Grid.Column="1" Text="{Binding Deck_Extra.Value, Source={x:Static yw:Vocab.Current}}"/>
                         <TextBlock Grid.Column="2" Text="{Binding Deck.ExtraDeck.UniqueCount}" HorizontalAlignment="Right"/>
                         <TextBlock Grid.Column="3" Text="{Binding Deck_Unique.Value, Source={x:Static yw:Vocab.Current}}"/>
                         <TextBlock Grid.Column="4" Text="{Binding Deck.ExtraDeck.Count}" HorizontalAlignment="Right"/>
-                        <TextBlock Grid.Column="5" Text="{Binding Deck_Count.Value, Source={x:Static yw:Vocab.Current}}"/>
+                        <TextBlock Grid.Column="5" Text="{Binding Deck_TotalCount.Value, Source={x:Static yw:Vocab.Current}}"/>
+                        <ct:Button Style="{StaticResource ClearButton}" Tag="{Binding Deck.ExtraDeck}"/>
                     </Grid>
                     <ct:CtListView x:Name="ListView_ExtraDeck" Grid.Row="2" Style="{StaticResource DeckCardListStyle}" ItemsSource="{Binding Deck.ExtraDeck}" />
                 </Grid>

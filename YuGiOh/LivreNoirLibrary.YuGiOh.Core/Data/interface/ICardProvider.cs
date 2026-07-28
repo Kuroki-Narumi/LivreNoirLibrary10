@@ -7,10 +7,12 @@ using System.Text;
 
 namespace LivreNoirLibrary.YuGiOh.Data
 {
-    public interface ICardProvider : IEnumerable<Card>
+    public interface ICardProvider : IEnumerable<Card>, ICardEnumerable
     {
         Card? GetOrDefault(int id);
         bool TryGetByName(string name, [MaybeNullWhen(false)] out Card card);
+
+        IEnumerable<Card> ICardEnumerable.CardEnumerable => this;
     }
 
     public class EmptyCardProvider : ICardProvider, ISafeEnumerator<Card>
@@ -26,20 +28,17 @@ namespace LivreNoirLibrary.YuGiOh.Data
             return false;
         }
 
-        public IEnumerator<Card> GetEnumerator() => this;
-        IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
-
         Card IEnumerator<Card>.Current => null!;
         bool IEnumerator.MoveNext() => false;
     }
 
     public static partial class Extensions
     {
-        extension (ICardProvider p)
+        extension (ICardProvider? p)
         {
             public bool TryGet(int id, [MaybeNullWhen(false)] out Card card)
             {
-                card = p.GetOrDefault(id);
+                card = p?.GetOrDefault(id);
                 return card is not null;
             }
         }

@@ -13,7 +13,7 @@ namespace LivreNoirLibrary.YuGiOh
         public const string Rank = "ランク";
         public const string Atk = "攻撃力";
         public const string Def = "守備力";
-        public const string AD = "攻+守=";
+        public const string AtkDef = "攻+守";
         public const string Scale = "スケール";
         public const string Scale_Short = $"P{Scale}";
         public const string Scale_Full = $"{Pendulum}{Scale}";

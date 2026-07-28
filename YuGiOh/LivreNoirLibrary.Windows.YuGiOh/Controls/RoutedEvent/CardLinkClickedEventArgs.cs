@@ -1,11 +1,12 @@
-﻿using System;
+﻿using LivreNoirLibrary.ObjectModel;
+using System;
 using System.Windows;
 
 namespace LivreNoirLibrary.Windows.YuGiOh
 {
     public delegate void CardLinkClickedEventHandler(object sender, CardLinkClickedEventArgs e);
 
-    public class CardLinkClickedEventArgs : RoutedEventArgs
+    public class CardLinkClickedEventArgs : RoutedEventArgs, IId
     {
         public required int Id { get; init; }
         public bool IsTcg { get; init; }

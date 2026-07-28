@@ -272,9 +272,13 @@ namespace LivreNoirLibrary.YuGiOh.Search
         public NumberRange TextLength { get; } = new(0, 999, false, false);
         public NumberRange PTextLength { get; } = new(0, 999, false, false);
 
-        public void CopyFrom(CardSearchConditions conditions)
+        public void CopyFrom(CardSearchConditions? source)
         {
-            var ctype = conditions.CardTypes;
+            if (source is null)
+            {
+                return;
+            }
+            var ctype = source.CardTypes;
             CardType_MainMonster = ctype.Contains(CardType.Main_Monster);
             CardType_FusionMonster = ctype.Contains(CardType.Fusion_Monster);
             CardType_RitualMonster = ctype.Contains(CardType.Ritual_Monster);
@@ -291,7 +295,7 @@ namespace LivreNoirLibrary.YuGiOh.Search
             CardType_ContinuousTrap = ctype.Contains(CardType.Continuous_Trap);
             CardType_CounterTrap = ctype.Contains(CardType.Counter_Trap);
 
-            var limits = conditions.Limits;
+            var limits = source.Limits;
             Limit_Forbidden = limits.Contains(LimitCount.Forbidden);
             Limit_Limit1 = limits.Contains(LimitCount.Limit1);
             Limit_Limit2 = limits.Contains(LimitCount.Limit2);
@@ -299,7 +303,7 @@ namespace LivreNoirLibrary.YuGiOh.Search
             Limit_Unusable = limits.Contains(LimitCount.Unusable);
             Limit_Specified = limits.Contains(LimitCount.Specified);
 
-            var attr = conditions.Attributes;
+            var attr = source.Attributes;
             Attribute_Light = attr.Contains(Attribute.Light);
             Attribute_Dark = attr.Contains(Attribute.Dark);
             Attribute_Water = attr.Contains(Attribute.Water);
@@ -308,7 +312,7 @@ namespace LivreNoirLibrary.YuGiOh.Search
             Attribute_Wind = attr.Contains(Attribute.Wind);
             Attribute_Divine = attr.Contains(Attribute.Divine);
 
-            var mtype = conditions.MonsterTypes;
+            var mtype = source.MonsterTypes;
             MonsterType_Spellcaster = mtype.Contains(MonsterType.Spellcaster);
             MonsterType_Dragon = mtype.Contains(MonsterType.Dragon);
             MonsterType_Zombie = mtype.Contains(MonsterType.Zombie);
@@ -336,14 +340,14 @@ namespace LivreNoirLibrary.YuGiOh.Search
             MonsterType_DivineBeast = mtype.Contains(MonsterType.DivineBeast);
             MonsterType_CreatorGod = mtype.Contains(MonsterType.CreatorGod);
 
-            var stFlag = conditions.StatusFlags;
+            var stFlag = source.StatusFlags;
             Status_Normal = (stFlag & StatusFlags.Normal) is not 0;
             Status_Effect = (stFlag & StatusFlags.Effect) is not 0;
 
             var abiOr = (stFlag & StatusFlags.AbilityPerf) is 0;
             Ability_Or = abiOr;
             Ability_And = !abiOr;
-            var abi = conditions.Abilities;
+            var abi = source.Abilities;
             Ability_SpecialSummon = (abi & Ability.SpecialSummon) is not 0;
             Ability_Pendulum = (abi & Ability.Pendulum) is not 0;
             Ability_Toon = (abi & Ability.Toon) is not 0;
@@ -352,7 +356,7 @@ namespace LivreNoirLibrary.YuGiOh.Search
             Ability_Spirit = (abi & Ability.Spirit) is not 0;
             Ability_Tuner = (abi & Ability.Tuner) is not 0;
             Ability_Flip = (abi & Ability.Flip) is not 0;
-            abi = conditions.AbilitiesExcept;
+            abi = source.AbilitiesExcept;
             AbilityEx_SpecialSummon = (abi & Ability.SpecialSummon) is not 0;
             AbilityEx_Pendulum = (abi & Ability.Pendulum) is not 0;
             AbilityEx_Toon = (abi & Ability.Toon) is not 0;
@@ -362,7 +366,7 @@ namespace LivreNoirLibrary.YuGiOh.Search
             AbilityEx_Tuner = (abi & Ability.Tuner) is not 0;
             AbilityEx_Flip = (abi & Ability.Flip) is not 0;
 
-            var level = conditions.Levels;
+            var level = source.Levels;
             Level_0 = level.Contains(0);
             Level_1 = level.Contains(1);
             Level_2 = level.Contains(2);
@@ -378,10 +382,10 @@ namespace LivreNoirLibrary.YuGiOh.Search
             Level_12 = level.Contains(12);
             Level_13 = level.Contains(13);
 
-            Atk.CopyFrom(conditions.Atk);
-            Def.CopyFrom(conditions.Def);
+            Atk.CopyFrom(source.Atk);
+            Def.CopyFrom(source.Def);
 
-            var scale = conditions.PendulumScales;
+            var scale = source.PendulumScales;
             PScale_0 = scale.Contains(0);
             PScale_1 = scale.Contains(1);
             PScale_2 = scale.Contains(2);
@@ -400,12 +404,12 @@ namespace LivreNoirLibrary.YuGiOh.Search
             var linkOr = (stFlag & StatusFlags.LinkMarkerPerf) is 0;
             LinkMarker_Or = linkOr;
             LinkMarker_And = !linkOr;
-            LinkMarkers = conditions.LinkMarkers;
+            LinkMarkers = source.LinkMarkers;
 
             IsStatusExpressionEnabled = (stFlag & StatusFlags.StatusExpression) is not 0;
-            StatusExpression.Expression = conditions.StatusExpression;
+            StatusExpression.Expression = source.StatusExpression;
 
-            var locale = (int)conditions.OcgState + (int)conditions.TcgState * 3;
+            var locale = (int)source.OcgState + (int)source.TcgState * 3;
             Locale_Any = locale is 0; // Any & Any
             Locale_OcgExists = locale is 1; // Released & Any
             Locale_OnlyOcg = locale is 6 or 7; // (Any | Released) & Unreleased
@@ -413,22 +417,26 @@ namespace LivreNoirLibrary.YuGiOh.Search
             Locale_OnlyTcg = locale is 2 or 5; // Unreleased & (Any | Released)
             Locale_Both = locale is 4; // Released & Released
 
-            FirstDate.CopyFrom(conditions.FirstDate);
-            LastDate.CopyFrom(conditions.LastDate);
-            var dateLocale = conditions.DateLocale;
+            FirstDate.CopyFrom(source.FirstDate);
+            LastDate.CopyFrom(source.LastDate);
+            var dateLocale = source.DateLocale;
             Date_Ocg = (dateLocale & LocaleType.Ocg) is not 0;
             Date_Tcg = (dateLocale & LocaleType.Tcg) is not 0;
 
-            TextLength.CopyFrom(conditions.TextLength);
-            PTextLength.CopyFrom(conditions.PTextLength);
+            TextLength.CopyFrom(source.TextLength);
+            PTextLength.CopyFrom(source.PTextLength);
 
-            SearchText = conditions.SearchText;
-            SetTextFlags(conditions.TextFlags);
+            SearchText = source.SearchText;
+            SetTextFlags(source.TextFlags);
         }
 
-        public void CopyTo(CardSearchConditions conditions)
+        public void CopyTo(CardSearchConditions? target)
         {
-            var ctype = conditions.CardTypes;
+            if (target is null)
+            {
+                return;
+            }
+            var ctype = target.CardTypes;
             ctype.Clear();
             if (CardType_MainMonster) ctype.Add(CardType.Main_Monster);
             if (CardType_FusionMonster) ctype.Add(CardType.Fusion_Monster);
@@ -446,7 +454,7 @@ namespace LivreNoirLibrary.YuGiOh.Search
             if (CardType_ContinuousTrap) ctype.Add(CardType.Continuous_Trap);
             if (CardType_CounterTrap) ctype.Add(CardType.Counter_Trap);
 
-            var limits = conditions.Limits;
+            var limits = target.Limits;
             limits.Clear();
             if (Limit_Forbidden) limits.Add(LimitCount.Forbidden);
             if (Limit_Limit1) limits.Add(LimitCount.Limit1);
@@ -455,7 +463,7 @@ namespace LivreNoirLibrary.YuGiOh.Search
             if (Limit_Unusable) limits.Add(LimitCount.Unusable);
             if (Limit_Specified) limits.Add(LimitCount.Specified);
 
-            var attr = conditions.Attributes;
+            var attr = target.Attributes;
             attr.Clear();
             if (Attribute_Light) attr.Add(Attribute.Light);
             if (Attribute_Dark) attr.Add(Attribute.Dark);
@@ -465,7 +473,7 @@ namespace LivreNoirLibrary.YuGiOh.Search
             if (Attribute_Wind) attr.Add(Attribute.Wind);
             if (Attribute_Divine) attr.Add(Attribute.Divine);
 
-            var mtype = conditions.MonsterTypes;
+            var mtype = target.MonsterTypes;
             mtype.Clear();
             if (MonsterType_Spellcaster) mtype.Add(MonsterType.Spellcaster);
             if (MonsterType_Dragon) mtype.Add(MonsterType.Dragon);
@@ -500,7 +508,7 @@ namespace LivreNoirLibrary.YuGiOh.Search
             if (Ability_And) sFlags |= StatusFlags.AbilityPerf;
             if (LinkMarker_And) sFlags |= StatusFlags.LinkMarkerPerf;
             if (IsStatusExpressionEnabled) sFlags |= StatusFlags.StatusExpression;
-            conditions.StatusFlags = sFlags;
+            target.StatusFlags = sFlags;
 
             var abi = Ability.Normal;
             if (Ability_SpecialSummon) abi |= Ability.SpecialSummon;
@@ -511,7 +519,7 @@ namespace LivreNoirLibrary.YuGiOh.Search
             if (Ability_Spirit) abi |= Ability.Spirit;
             if (Ability_Tuner) abi |= Ability.Tuner;
             if (Ability_Flip) abi |= Ability.Flip;
-            conditions.Abilities = abi;
+            target.Abilities = abi;
             abi = Ability.Normal;
             if (AbilityEx_SpecialSummon) abi |= Ability.SpecialSummon;
             if (AbilityEx_Pendulum) abi |= Ability.Pendulum;
@@ -521,9 +529,9 @@ namespace LivreNoirLibrary.YuGiOh.Search
             if (AbilityEx_Spirit) abi |= Ability.Spirit;
             if (AbilityEx_Tuner) abi |= Ability.Tuner;
             if (AbilityEx_Flip) abi |= Ability.Flip;
-            conditions.AbilitiesExcept = abi;
+            target.AbilitiesExcept = abi;
 
-            var level = conditions.Levels;
+            var level = target.Levels;
             level.Clear();
             if (Level_0) level.Add(0);
             if (Level_1) level.Add(1);
@@ -540,10 +548,10 @@ namespace LivreNoirLibrary.YuGiOh.Search
             if (Level_12) level.Add(12);
             if (Level_13) level.Add(13);
 
-            conditions.Atk.CopyFrom(Atk);
-            conditions.Def.CopyFrom(Def);
+            target.Atk.CopyFrom(Atk);
+            target.Def.CopyFrom(Def);
 
-            var scale = conditions.PendulumScales;
+            var scale = target.PendulumScales;
             scale.Clear();
             if (PScale_0) scale.Add(0);
             if (PScale_1) scale.Add(1);
@@ -560,27 +568,27 @@ namespace LivreNoirLibrary.YuGiOh.Search
             if (PScale_12) scale.Add(12);
             if (PScale_13) scale.Add(13);
 
-            conditions.LinkMarkers = LinkMarkers;
+            target.LinkMarkers = LinkMarkers;
 
-            conditions.StatusExpression = StatusExpression.Expression ?? "";
+            target.StatusExpression = StatusExpression.Expression ?? "";
 
-            conditions.OcgState = Locale_OnlyTcg ? LocaleState.Unreleased :
+            target.OcgState = Locale_OnlyTcg ? LocaleState.Unreleased :
                 ((Locale_OcgExists || Locale_Both) ? LocaleState.Released : LocaleState.Any);
-            conditions.TcgState = Locale_OnlyOcg ? LocaleState.Unreleased :
+            target.TcgState = Locale_OnlyOcg ? LocaleState.Unreleased :
                 ((Locale_TcgExists || Locale_Both) ? LocaleState.Released : LocaleState.Any);
 
-            conditions.FirstDate.CopyFrom(FirstDate);
-            conditions.LastDate.CopyFrom(LastDate);
+            target.FirstDate.CopyFrom(FirstDate);
+            target.LastDate.CopyFrom(LastDate);
             var locale = LocaleType.None;
             if (Date_Ocg) locale |= LocaleType.Ocg;
             if (Date_Tcg) locale |= LocaleType.Tcg;
-            conditions.DateLocale = locale;
+            target.DateLocale = locale;
 
-            conditions.TextLength.CopyFrom(TextLength);
-            conditions.PTextLength.CopyFrom(PTextLength);
+            target.TextLength.CopyFrom(TextLength);
+            target.PTextLength.CopyFrom(PTextLength);
 
-            conditions.SearchText = SearchText ?? "";
-            conditions.TextFlags = GetTextFlags();
+            target.SearchText = SearchText ?? "";
+            target.TextFlags = GetTextFlags();
         }
     }
 }

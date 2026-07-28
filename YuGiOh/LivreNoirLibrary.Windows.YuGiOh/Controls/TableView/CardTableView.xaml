@@ -1,0 +1,102 @@
+﻿<local:SaveImageBase x:Class="LivreNoirLibrary.Windows.YuGiOh.Controls.CardTableView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:LivreNoirLibrary.Windows.YuGiOh.Controls"
+             xmlns:ct="clr-namespace:LivreNoirLibrary.Windows.Controls;assembly=LivreNoirLibrary.Windows.Controls"
+             xmlns:media="clr-namespace:LivreNoirLibrary.Windows.Media;assembly=LivreNoirLibrary.Windows.Media"
+             xmlns:yw="clr-namespace:LivreNoirLibrary.Windows.YuGiOh;assembly=LivreNoirLibrary.Windows.YuGiOh"
+             xmlns:ygo="clr-namespace:LivreNoirLibrary.YuGiOh.Data;assembly=LivreNoirLibrary.YuGiOh.Core"
+             xmlns:yg="clr-namespace:LivreNoirLibrary.YuGiOh;assembly=LivreNoirLibrary.YuGiOh.Core"
+             xmlns:input="clr-namespace:LivreNoirLibrary.Windows.Input;assembly=LivreNoirLibrary.Windows.Core"
+             mc:Ignorable="d" Background="White"
+             d:DesignHeight="450" d:DesignWidth="800">
+    <UserControl.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="/LivreNoirLibrary.Windows.YuGiOh;component/Themes/Generic.xaml"/>
+            </ResourceDictionary.MergedDictionaries>
+            <Style TargetType="ComboBox" BasedOn="{StaticResource ComboBoxBase}">
+                <Setter Property="MinWidth" Value="64"/>
+                <Setter Property="VerticalAlignment" Value="Center"/>
+                <Setter Property="ItemsSource" Value="{x:Static local:CardTableView.Selectors}"/>
+                <Setter Property="ItemTemplate">
+                    <Setter.Value>
+                        <DataTemplate>
+                            <TextBlock Text="{Binding Name.Value}"/>
+                        </DataTemplate>
+                    </Setter.Value>
+                </Setter>
+                <EventSetter Event="PreviewMouseWheel" Handler="ComboBox_PreviewMouseWheel"/>
+            </Style>
+        </ResourceDictionary>
+    </UserControl.Resources>
+    <Grid x:Name="MainGrid" RowDefinitions="Auto, Auto, *" d:DataContext="{d:DesignInstance Type=local:CardTableView}">
+        <Grid.Resources>
+            <Style TargetType="TextBlock">
+                <Setter Property="VerticalAlignment" Value="Center"/>
+                <Setter Property="Margin" Value="4,0,2,0"/>
+            </Style>
+            <Style TargetType="ct:Button">
+                <Setter Property="Margin" Value="4,0,4,0"/>
+                <Setter Property="VerticalAlignment" Value="Center"/>
+            </Style>
+        </Grid.Resources>
+        <Grid ColumnDefinitions="Auto, *, Auto" Margin="0,0,0,4">
+            <ct:Button Style="{StaticResource RefreshButton}" Margin="0,0,4,0"/>
+            <ct:SearchBar x:Name="SearchBar" Grid.Column="1" ItemsCount="{Binding ItemsCount, ElementName=TableView}"/>
+            <StackPanel Grid.Column="2" Orientation="Horizontal">
+                <TextBlock Text="{Binding Table_Vertical.Value, Source={x:Static yw:Vocab.Current}}"/>
+                <ComboBox SelectedItem="{Binding VerticalSelector, Mode=TwoWay}" />
+                <TextBlock Text="{Binding Table_Horizontal.Value, Source={x:Static yw:Vocab.Current}}"/>
+                <ComboBox SelectedItem="{Binding HorizontalSelector, Mode=TwoWay}" />
+                <ct:Button Icon="{x:Static media:Icons.Picture}" Content="{Binding SaveAsImage, Source={x:Static yw:Vocab.Current}}" Click="OnClick_SaveAsImage"/>
+                <ct:Button Icon="{x:Static media:Icons.Copy}" Content="{Binding CopyImage, Source={x:Static yw:Vocab.Current}}" Click="OnClick_CopyImage"/>
+            </StackPanel>
+        </Grid>
+        <Grid Grid.Row="1" ColumnDefinitions="*, Auto" Margin="0,0,0,4">
+            <StackPanel Orientation="Horizontal">
+                <ct:AlignSelector SelectionMode="Horizontal" IsHorizontalStretchEnabled="False" SelectedHorizontalAlignment="{Binding HorizontalCellAlignment, ElementName=TableView}"/>
+                <TextBlock Text="{Binding Table_Zero.Value, Source={x:Static yw:Vocab.Current}}"/>
+                <TextBox MinWidth="40" Text="{Binding ZeroText, ElementName=TableView}" TextChanged="ZeroText_TextChanged" HorizontalContentAlignment="Center" VerticalAlignment="Center"/>
+                <TextBlock Text="{Binding Table_Style.Value, Source={x:Static yw:Vocab.Current}}"/>
+                <ComboBox ItemsSource="{x:Static local:TableValueStyleItem.Items}" SelectedItem="{Binding CellValueStyle, ElementName=TableView, Converter={StaticResource CIConv}}"/>
+                <ct:LabeledSlider Margin="4,0" Header="{Binding Table_Digits.Value, Source={x:Static yw:Vocab.Current}}"
+                              Minimum="0" Maximum="10" SliderWidth="50" TickFrequency="1" IsSnapToTickEnabled="True" Value="{Binding RatioDigits, ElementName=TableView}"/>
+                <ComboBox ItemsSource="{x:Static local:TableDigitModeItem.Items}" SelectedItem="{Binding RatioDigitMode, ElementName=TableView, Converter={StaticResource CIConv}}"/>
+                <ct:ToggleButton Margin="4,0" VerticalAlignment="Center" Content="{Binding Table_Total.Value, Source={x:Static yw:Vocab.Current}}" IsChecked="{Binding TotalVisibility, ElementName=TableView, Converter={StaticResource TVConv}}"/>
+            </StackPanel>
+            <TextBlock Grid.Column="1">
+                <Run Text="{Binding ActualWidth, Mode=OneWay, ElementName=TableView, StringFormat={}{0:0}}"/> x <Run Text="{Binding ActualHeight, Mode=OneWay, ElementName=TableView, StringFormat={}{0:0}}"/>
+            </TextBlock>
+        </Grid>
+        <ScrollViewer Grid.Row="2" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Auto">
+            <ct:TableView x:Name="TableView" VerticalSelector="{Binding VerticalSelector}" HorizontalSelector="{Binding HorizontalSelector}" DetailText="{Binding Table_Detail.Value, Source={x:Static yw:Vocab.Current}}" CellClick="TableView_CellClick"/>
+        </ScrollViewer>
+        <Popup x:Name="Popup_NameList" d:DataContext="{d:DesignInstance Type=ct:TableDataCell}" DataContext="{x:Null}" StaysOpen="False" Closed="Popup_Closed" PreviewMouseRightButtonDown="Popup_PreviewMouseDown">
+            <Border Style="{StaticResource DDMB_Border}">
+                <ListBox x:Name="ListView_Popup" Style="{StaticResource CardListView}" ItemsSource="{Binding Items}" MaxWidth="180" MaxHeight="180" FontSize="12">
+                    <ListBox.ItemTemplate>
+                        <DataTemplate>
+                            <StackPanel Orientation="Horizontal">
+                                <ct:IconPresenter Height="16" Source="{Binding ThisCard.LinkIcon}" Margin="0,0,2,0"/>
+                                <TextBlock>
+                                    <Hyperlink Focusable="False" Command="yw:YgoCommands.DetachCardInfo" CommandParameter="{Binding ThisCard}" Click="OnClick_Hyperlink">
+                                        <Run Text="{Binding ThisCard.Name}"/>
+                                    </Hyperlink>
+                                </TextBlock>
+                                <StackPanel.ToolTip>
+                                    <StackPanel>
+                                        <TextBlock Text="{Binding ThisCard.Name}"/>
+                                        <TextBlock Style="{StaticResource ToolTipText}"/>
+                                    </StackPanel>
+                                </StackPanel.ToolTip>
+                            </StackPanel>
+                        </DataTemplate>
+                    </ListBox.ItemTemplate>
+                </ListBox>
+            </Border>
+        </Popup>
+    </Grid>
+</local:SaveImageBase>

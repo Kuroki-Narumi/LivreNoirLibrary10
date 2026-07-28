@@ -9,7 +9,7 @@
     xmlns:wpf="clr-namespace:LivreNoirLibrary.Windows"
     xmlns:conv="clr-namespace:LivreNoirLibrary.Windows.Converters"
     xmlns:input="clr-namespace:LivreNoirLibrary.Windows.Input;assembly=LivreNoirLibrary.Windows.Core"
-    xmlns:media="clr-namespace:LivreNoirLibrary.Windows.Media;assembly=LivreNoirLibrary.Windows.Media"
+    xmlns:md="clr-namespace:LivreNoirLibrary.Windows.Media;assembly=LivreNoirLibrary.Windows.Media"
     xmlns:text="clr-namespace:LivreNoirLibrary.Text;assembly=LivreNoirLibrary.Core"
     >
     <BooleanToVisibilityConverter x:Key="BVConv"/>
@@ -251,7 +251,7 @@
                             <Border x:Name="PART_PopupContent" Padding="4" Background="White" BorderThickness="1" BorderBrush="{StaticResource Brush_Popup_Border}"/>
                         </Popup>
                         <Grid>
-                            <Rectangle Fill="{x:Static media:MediaUtils.TransparentCheckerBrush}" IsHitTestVisible="False"/>
+                            <Rectangle Fill="{x:Static md:MediaUtils.TransparentCheckerBrush}" IsHitTestVisible="False"/>
                             <Rectangle x:Name="rect" Stroke="{TemplateBinding BorderBrush}" StrokeThickness="{TemplateBinding BorderThickness}">
                                 <Rectangle.Fill>
                                     <SolidColorBrush x:Name="PART_Indicator" Color="{TemplateBinding SelectedColor}"/>
@@ -280,6 +280,21 @@
         </Setter>
     </Style>
 
+    <Style TargetType="local:TableView">
+        <Setter Property="FontSize" Value="16"/>
+        <Setter Property="BorderBrush" Value="{local:BrushProvider #80808080}"/>
+        <Setter Property="BorderThickness" Value="0,0,1,1"/>
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="local:TableView">
+                    <Grid x:Name="MainGrid">
+                        
+                    </Grid>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
     <Style x:Key="TextBlockStyle_FontName" TargetType="TextBlock">
         <Setter Property="Text" Value="{Binding FriendlyName}"/>
         <Setter Property="FontFamily" Value="{Binding FontFamily}"/>
@@ -295,11 +310,11 @@
         <Setter Property="VerticalAlignment" Value="Bottom"/>
     </Style>
 
-    <DataTemplate x:Key="FontSelectorTemplate_NoSource" DataType="media:FontInfo">
+    <DataTemplate x:Key="FontSelectorTemplate_NoSource" DataType="md:FontInfo">
         <TextBlock Style="{StaticResource TextBlockStyle_FontName}" Margin="0,2" VerticalAlignment="Center" HorizontalAlignment="Left"/>
     </DataTemplate>
 
-    <DataTemplate x:Key="FontSelectorTemplate_WithSource" DataType="media:FontInfo">
+    <DataTemplate x:Key="FontSelectorTemplate_WithSource" DataType="md:FontInfo">
         <StackPanel Orientation="Horizontal" Margin="0,2" VerticalAlignment="Center" HorizontalAlignment="Left">
             <TextBlock Style="{StaticResource TextBlockStyle_FontName}"/>
             <TextBlock Style="{StaticResource TextBlockStyle_FontSource}"/>
@@ -315,6 +330,37 @@
                 <Setter Property="ItemTemplate" Value="{StaticResource FontSelectorTemplate_WithSource}"/>
             </Trigger>
         </Style.Triggers>
+    </Style>
+
+    <Style TargetType="local:VerticalTextBlock">
+        <Setter Property="VerticalContentAlignment" Value="Center"/>
+        <Setter Property="HorizontalContentAlignment" Value="Center"/>
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="local:VerticalTextBlock">
+                    <ItemsControl ItemsSource="{TemplateBinding Text}">
+                        <ItemsControl.ItemsPanel>
+                            <ItemsPanelTemplate>
+                                <StackPanel Orientation="Vertical" HorizontalAlignment="Stretch" 
+                                            VerticalAlignment="{Binding VerticalContentAlignment, RelativeSource={RelativeSource AncestorType=local:VerticalTextBlock}}"/>
+                            </ItemsPanelTemplate>
+                        </ItemsControl.ItemsPanel>
+                        <ItemsControl.ItemContainerStyle>
+                            <Style TargetType="ContentPresenter">
+                                <Setter Property="HorizontalAlignment" Value="Stretch"/>
+                            </Style>
+                        </ItemsControl.ItemContainerStyle>
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate>
+                                <TextBlock Text="{Binding}"
+                                           Margin="{Binding CharMargin, RelativeSource={RelativeSource AncestorType=local:VerticalTextBlock}}" 
+                                           HorizontalAlignment="{Binding HorizontalContentAlignment, RelativeSource={RelativeSource AncestorType=local:VerticalTextBlock}}"/>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
     </Style>
 
     <Style TargetType="local:Button">
@@ -402,7 +448,7 @@
                                 <ColumnDefinition Width="Auto"/>
                                 <ColumnDefinition Width="*"/>
                             </Grid.ColumnDefinitions>
-                            <Border x:Name="border_option" Background="{TemplateBinding Background}" BorderBrush="{StaticResource Brush_Border}" BorderThickness="1" VerticalAlignment="Center" Margin="0,0,2,0">
+                            <Border x:Name="border_option" Background="White" BorderBrush="{StaticResource Brush_Border}" BorderThickness="1" VerticalAlignment="Center" Margin="0,0,2,0">
                                 <Grid>
                                     <Path x:Name="optionMark" Data="F1 M 9.97498,1.22334L 4.6983,9.09834L 4.52164,9.09834L 0,5.19331L 1.27664,3.52165L 4.255,6.08833L 8.33331,1.52588e-005L 9.97498,1.22334 Z " Fill="{StaticResource OptionMark.Static.Glyph}" Margin="1" Opacity="0" Stretch="None"/>
                                     <Rectangle x:Name="indeterminateMark" Fill="{StaticResource OptionMark.Static.Glyph}" Margin="2" Opacity="0"/>
@@ -481,7 +527,7 @@
                                 <ColumnDefinition Width="Auto"/>
                                 <ColumnDefinition Width="*"/>
                             </Grid.ColumnDefinitions>
-                            <Border x:Name="border_option" Background="{TemplateBinding Background}" BorderBrush="{StaticResource Brush_Border}" BorderThickness="1" CornerRadius="100" Margin="0,0,2,0" VerticalAlignment="Center">
+                            <Border x:Name="border_option" Background="White" BorderBrush="{StaticResource Brush_Border}" BorderThickness="1" CornerRadius="100" Margin="0,0,2,0" VerticalAlignment="Center">
                                 <Ellipse x:Name="optionMark" Margin="2" Fill="{StaticResource OptionMark.Static.Glyph}" MinWidth="6" MinHeight="6" Opacity="0"/>
                             </Border>
                             <local:IconPresenter x:Name="icon" Grid.Column="1" VerticalAlignment="Center" Height="{TemplateBinding IconSize}" Source="{TemplateBinding Icon}" Stretch="{TemplateBinding IconStretch}" FontFamily="{TemplateBinding IconFontFamily}" Foreground="{TemplateBinding Foreground}"/>
@@ -536,7 +582,7 @@
     <Style x:Key="HelpToggleButton" TargetType="local:ToggleButton">
         <Setter Property="VerticalContentAlignment" Value="Center"/>
         <Setter Property="HorizontalContentAlignment" Value="Center"/>
-        <Setter Property="Icon" Value="{x:Static media:Icons.Help}"/>
+        <Setter Property="Icon" Value="{x:Static md:Icons.Help}"/>
         <Setter Property="IsOptionMarkVisible" Value="False"/>
         <Setter Property="BorderThickness" Value="0"/>
         <Setter Property="BorderBrush" Value="{x:Null}"/>
@@ -569,7 +615,7 @@
                 <ControlTemplate TargetType="local:PopupHelpButton">
                     <Grid>
                         <Border x:Name="templateRoot" CornerRadius="{TemplateBinding CornerRadius}" Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}">
-                            <local:IconPresenter Margin="{TemplateBinding IconPadding}" VerticalAlignment="{TemplateBinding VerticalContentAlignment}" HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}" Height="{TemplateBinding IconSize}" Source="{x:Static media:Icons.Help}"/>
+                            <local:IconPresenter Margin="{TemplateBinding IconPadding}" VerticalAlignment="{TemplateBinding VerticalContentAlignment}" HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}" Height="{TemplateBinding IconSize}" Source="{x:Static md:Icons.Help}"/>
                         </Border>
                         <Popup x:Name="popup" PlacementTarget="{Binding ElementName=templateRoot}" Placement="{TemplateBinding PopupPlacement}">
                             <Border Style="{StaticResource HelpPopupContent}">
@@ -603,6 +649,225 @@
         </Style.Triggers>
     </Style>
 
+
+    <Style TargetType="Border" x:Key="SeparatorBase">
+        <Setter Property="Background" Value="Gray"/>
+        <Setter Property="BorderThickness" Value="0"/>
+        <Setter Property="Opacity" Value="0.5"/>
+    </Style>
+
+    <Style TargetType="Border" x:Key="HorizontalSeparator" BasedOn="{StaticResource SeparatorBase}">
+        <Setter Property="Margin" Value="4,2"/>
+        <Setter Property="Height" Value="1"/>
+        <Setter Property="Grid.ColumnSpan" Value="10"/>
+    </Style>
+
+    <Style TargetType="Border" x:Key="VerticalSeparator" BasedOn="{StaticResource SeparatorBase}">
+        <Setter Property="Margin" Value="2,4"/>
+        <Setter Property="Width" Value="1"/>
+        <Setter Property="Grid.RowSpan" Value="10"/>
+    </Style>
+
+    <Style x:Key="IconButtonBase" TargetType="local:Button">
+        <Setter Property="Margin" Value="0"/>
+        <Setter Property="Padding" Value="2"/>
+        <Setter Property="MinWidth" Value="16"/>
+        <Setter Property="MinHeight" Value="16"/>
+        <Setter Property="VerticalAlignment" Value="Stretch"/>
+        <Setter Property="BorderBrush" Value="Transparent"/>
+        <Setter Property="Focusable" Value="False"/>
+    </Style>
+
+    <Style x:Key="IconButtonBase_Add" TargetType="local:Button" BasedOn="{StaticResource IconButtonBase}">
+        <Setter Property="Icon" Value="{x:Static md:Icons.Plus}"/>
+        <Setter Property="Command" Value="input:Commands.Insert"/>
+    </Style>
+    <Style x:Key="IconButtonBase_MoveUp" TargetType="local:Button" BasedOn="{StaticResource IconButtonBase}">
+        <Setter Property="Icon" Value="{x:Static md:Icons.ArrowUp}"/>
+        <Setter Property="Command" Value="input:Commands.MoveUp"/>
+    </Style>
+    <Style x:Key="IconButtonBase_MoveDown" TargetType="local:Button" BasedOn="{StaticResource IconButtonBase}">
+        <Setter Property="Icon" Value="{x:Static md:Icons.ArrowDown}"/>
+        <Setter Property="Command" Value="input:Commands.MoveDown"/>
+    </Style>
+    <Style x:Key="IconButtonBase_Delete" TargetType="local:Button" BasedOn="{StaticResource IconButtonBase}">
+        <Setter Property="Icon" Value="{x:Static md:Icons.Delete}"/>
+        <Setter Property="Command" Value="input:Commands.Delete"/>
+    </Style>
+    <Style x:Key="IconButtonBase_Undo" TargetType="local:Button" BasedOn="{StaticResource IconButtonBase}">
+        <Setter Property="Icon" Value="{x:Static md:Icons.Undo}"/>
+        <Setter Property="Command" Value="input:Commands.Undo"/>
+    </Style>
+    <Style x:Key="IconButtonBase_Redo" TargetType="local:Button" BasedOn="{StaticResource IconButtonBase}">
+        <Setter Property="Icon" Value="{x:Static md:Icons.Redo}"/>
+        <Setter Property="Command" Value="input:Commands.Redo"/>
+    </Style>
+    <Style x:Key="IconButtonBase_New" TargetType="local:Button" BasedOn="{StaticResource IconButtonBase}">
+        <Setter Property="Icon" Value="{x:Static md:Icons.New}"/>
+        <Setter Property="Command" Value="input:Commands.New"/>
+    </Style>
+    <Style x:Key="IconButtonBase_Open" TargetType="local:Button" BasedOn="{StaticResource IconButtonBase}">
+        <Setter Property="Icon" Value="{x:Static md:Icons.Open}"/>
+        <Setter Property="Command" Value="input:Commands.Open"/>
+    </Style>
+    <Style x:Key="IconButtonBase_Save" TargetType="local:Button" BasedOn="{StaticResource IconButtonBase}">
+        <Setter Property="Icon" Value="{x:Static md:Icons.Save}"/>
+        <Setter Property="Command" Value="input:Commands.Save"/>
+    </Style>
+    <Style x:Key="IconButtonBase_SaveAs" TargetType="local:Button" BasedOn="{StaticResource IconButtonBase}">
+        <Setter Property="Icon" Value="{x:Static md:Icons.SaveAs}"/>
+        <Setter Property="Command" Value="input:Commands.SaveAs"/>
+    </Style>
+    <Style x:Key="IconButtonBase_Cut" TargetType="local:Button" BasedOn="{StaticResource IconButtonBase}">
+        <Setter Property="Icon" Value="{x:Static md:Icons.Cut}"/>
+        <Setter Property="Command" Value="input:Commands.Cut"/>
+    </Style>
+    <Style x:Key="IconButtonBase_Copy" TargetType="local:Button" BasedOn="{StaticResource IconButtonBase}">
+        <Setter Property="Icon" Value="{x:Static md:Icons.Copy}"/>
+        <Setter Property="Command" Value="input:Commands.Copy"/>
+    </Style>
+    <Style x:Key="IconButtonBase_Paste" TargetType="local:Button" BasedOn="{StaticResource IconButtonBase}">
+        <Setter Property="Icon" Value="{x:Static md:Icons.Paste}"/>
+        <Setter Property="Command" Value="input:Commands.Paste"/>
+    </Style>
+    <Style x:Key="IconButtonBase_Duplicate" TargetType="local:Button" BasedOn="{StaticResource IconButtonBase}">
+        <Setter Property="Icon" Value="{x:Static md:Icons.Copy}"/>
+        <Setter Property="Command" Value="input:Commands.Duplicate"/>
+    </Style>
+    <Style x:Key="IconButtonBase_Sort" TargetType="local:Button" BasedOn="{StaticResource IconButtonBase}">
+        <Setter Property="Icon" Value="{x:Static md:Icons.UpDown}"/>
+        <Setter Property="Command" Value="input:Commands.OpenSortDialog"/>
+    </Style>
+    <Style x:Key="IconButtonBase_Search" TargetType="local:Button" BasedOn="{StaticResource IconButtonBase}">
+        <Setter Property="Icon" Value="{x:Static md:Icons.ZoomUp}"/>
+        <Setter Property="Command" Value="input:Commands.OpenSearchDialog"/>
+    </Style>
+    <Style x:Key="IconButtonBase_SearchClear" TargetType="local:Button" BasedOn="{StaticResource IconButtonBase}">
+        <Setter Property="Icon" Value="{x:Static md:Icons.Delete_Mono}"/>
+        <Setter Property="Command" Value="input:Commands.TextSearchClear"/>
+    </Style>
+
+    <Style x:Key="MenuItemBase_Add" TargetType="MenuItem">
+        <Setter Property="Command" Value="input:Commands.Insert"/>
+        <Setter Property="Icon">
+            <Setter.Value>
+                <local:IconPresenter Style="{StaticResource MenuItemIconStyle}" Source="{x:Static md:Icons.Plus}"/>
+            </Setter.Value>
+        </Setter>
+    </Style>
+    <Style x:Key="MenuItemBase_Overwrite" TargetType="MenuItem">
+        <Setter Property="Command" Value="input:Commands.Save"/>
+        <Setter Property="Icon">
+            <Setter.Value>
+                <local:IconPresenter Style="{StaticResource MenuItemIconStyle}" Source="{x:Static md:Icons.Save}"/>
+            </Setter.Value>
+        </Setter>
+    </Style>
+    <Style x:Key="MenuItemBase_MoveUp" TargetType="MenuItem">
+        <Setter Property="Command" Value="input:Commands.MoveUp"/>
+        <Setter Property="Icon">
+            <Setter.Value>
+                <local:IconPresenter Style="{StaticResource MenuItemIconStyle}" Source="{x:Static md:Icons.ArrowUp}"/>
+            </Setter.Value>
+        </Setter>
+    </Style>
+    <Style x:Key="MenuItemBase_MoveDown" TargetType="MenuItem">
+        <Setter Property="Command" Value="input:Commands.MoveDown"/>
+        <Setter Property="Icon">
+            <Setter.Value>
+                <local:IconPresenter Style="{StaticResource MenuItemIconStyle}" Source="{x:Static md:Icons.ArrowDown}"/>
+            </Setter.Value>
+        </Setter>
+    </Style>
+    <Style x:Key="MenuItemBase_Delete" TargetType="MenuItem">
+        <Setter Property="Command" Value="input:Commands.Delete"/>
+        <Setter Property="Icon">
+            <Setter.Value>
+                <local:IconPresenter Style="{StaticResource MenuItemIconStyle}" Source="{x:Static md:Icons.Delete}"/>
+            </Setter.Value>
+        </Setter>
+    </Style>
+    <Style x:Key="MenuItemBase_Undo" TargetType="MenuItem">
+        <Setter Property="Command" Value="input:Commands.Undo"/>
+        <Setter Property="Icon">
+            <Setter.Value>
+                <local:IconPresenter Style="{StaticResource MenuItemIconStyle}" Source="{x:Static md:Icons.Undo}"/>
+            </Setter.Value>
+        </Setter>
+    </Style>
+    <Style x:Key="MenuItemBase_Redo" TargetType="MenuItem">
+        <Setter Property="Command" Value="input:Commands.Redo"/>
+        <Setter Property="Icon">
+            <Setter.Value>
+                <local:IconPresenter Style="{StaticResource MenuItemIconStyle}" Source="{x:Static md:Icons.Redo}"/>
+            </Setter.Value>
+        </Setter>
+    </Style>
+    <Style x:Key="MenuItemBase_New" TargetType="MenuItem">
+        <Setter Property="Command" Value="input:Commands.New"/>
+        <Setter Property="Icon">
+            <Setter.Value>
+                <local:IconPresenter Style="{StaticResource MenuItemIconStyle}" Source="{x:Static md:Icons.New}"/>
+            </Setter.Value>
+        </Setter>
+    </Style>
+    <Style x:Key="MenuItemBase_Open" TargetType="MenuItem">
+        <Setter Property="Command" Value="input:Commands.Open"/>
+        <Setter Property="Icon">
+            <Setter.Value>
+                <local:IconPresenter Style="{StaticResource MenuItemIconStyle}" Source="{x:Static md:Icons.Open}"/>
+            </Setter.Value>
+        </Setter>
+    </Style>
+    <Style x:Key="MenuItemBase_Save" TargetType="MenuItem">
+        <Setter Property="Command" Value="input:Commands.Save"/>
+        <Setter Property="Icon">
+            <Setter.Value>
+                <local:IconPresenter Style="{StaticResource MenuItemIconStyle}" Source="{x:Static md:Icons.Save}"/>
+            </Setter.Value>
+        </Setter>
+    </Style>
+    <Style x:Key="MenuItemBase_SaveAs" TargetType="MenuItem">
+        <Setter Property="Command" Value="input:Commands.SaveAs"/>
+        <Setter Property="Icon">
+            <Setter.Value>
+                <local:IconPresenter Style="{StaticResource MenuItemIconStyle}" Source="{x:Static md:Icons.SaveAs}"/>
+            </Setter.Value>
+        </Setter>
+    </Style>
+    <Style x:Key="MenuItemBase_Cut" TargetType="MenuItem">
+        <Setter Property="Command" Value="input:Commands.Cut"/>
+        <Setter Property="Icon">
+            <Setter.Value>
+                <local:IconPresenter Style="{StaticResource MenuItemIconStyle}" Source="{x:Static md:Icons.Cut}"/>
+            </Setter.Value>
+        </Setter>
+    </Style>
+    <Style x:Key="MenuItemBase_Copy" TargetType="MenuItem">
+        <Setter Property="Command" Value="input:Commands.Copy"/>
+        <Setter Property="Icon">
+            <Setter.Value>
+                <local:IconPresenter Style="{StaticResource MenuItemIconStyle}" Source="{x:Static md:Icons.Copy}"/>
+            </Setter.Value>
+        </Setter>
+    </Style>
+    <Style x:Key="MenuItemBase_Paste" TargetType="MenuItem">
+        <Setter Property="Command" Value="input:Commands.Paste"/>
+        <Setter Property="Icon">
+            <Setter.Value>
+                <local:IconPresenter Style="{StaticResource MenuItemIconStyle}" Source="{x:Static md:Icons.Paste}"/>
+            </Setter.Value>
+        </Setter>
+    </Style>
+    <Style x:Key="MenuItemBase_Duplicate" TargetType="MenuItem">
+        <Setter Property="Command" Value="input:Commands.Duplicate"/>
+        <Setter Property="Icon">
+            <Setter.Value>
+                <local:IconPresenter Style="{StaticResource MenuItemIconStyle}" Source="{x:Static md:Icons.Copy}"/>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
     <Style x:Key="AlignSelector_RadioButton" TargetType="local:RadioButton">
         <Setter Property="IsOptionMarkVisible" Value="False"/>
         <Setter Property="BorderBrush" Value="{x:Null}"/>
@@ -624,10 +889,10 @@
                                         <Setter Property="GroupName" Value="VerticalAlignment"/>
                                     </Style>
                                 </StackPanel.Resources>
-                                <local:RadioButton x:Name="Button_V1" Icon="{x:Static media:Icons.VerticalAlign_Top}"/>
-                                <local:RadioButton x:Name="Button_V2" Icon="{x:Static media:Icons.VerticalAlign_Center}"/>
-                                <local:RadioButton x:Name="Button_V3" Icon="{x:Static media:Icons.VerticalAlign_Bottom}"/>
-                                <local:RadioButton x:Name="Button_V4" Icon="{x:Static media:Icons.VerticalAlign_Stretch}" Visibility="{TemplateBinding IsVerticalStretchEnabled, Converter={StaticResource BVConv}}"/>
+                                <local:RadioButton x:Name="Button_V1" Icon="{x:Static md:Icons.VerticalAlign_Top}"/>
+                                <local:RadioButton x:Name="Button_V2" Icon="{x:Static md:Icons.VerticalAlign_Center}"/>
+                                <local:RadioButton x:Name="Button_V3" Icon="{x:Static md:Icons.VerticalAlign_Bottom}"/>
+                                <local:RadioButton x:Name="Button_V4" Icon="{x:Static md:Icons.VerticalAlign_Stretch}" Visibility="{TemplateBinding IsVerticalStretchEnabled, Converter={StaticResource BVConv}}"/>
                             </StackPanel>
                             <Border x:Name="Padding" Width="8" Height="4" Visibility="Collapsed"/>
                             <StackPanel x:Name="PART_Horizontal" Orientation="Horizontal">
@@ -636,10 +901,10 @@
                                         <Setter Property="GroupName" Value="HorizontalAlignment"/>
                                     </Style>
                                 </StackPanel.Resources>
-                                <local:RadioButton x:Name="Button_H1" Icon="{x:Static media:Icons.HorizontalAlign_Left}"/>
-                                <local:RadioButton x:Name="Button_H2" Icon="{x:Static media:Icons.HorizontalAlign_Center}"/>
-                                <local:RadioButton x:Name="Button_H3" Icon="{x:Static media:Icons.HorizontalAlign_Right}"/>
-                                <local:RadioButton x:Name="Button_H4" Icon="{x:Static media:Icons.HorizontalAlign_Stretch}" Visibility="{TemplateBinding IsHorizontalStretchEnabled, Converter={StaticResource BVConv}}"/>
+                                <local:RadioButton x:Name="Button_H1" Icon="{x:Static md:Icons.HorizontalAlign_Left}"/>
+                                <local:RadioButton x:Name="Button_H2" Icon="{x:Static md:Icons.HorizontalAlign_Center}"/>
+                                <local:RadioButton x:Name="Button_H3" Icon="{x:Static md:Icons.HorizontalAlign_Right}"/>
+                                <local:RadioButton x:Name="Button_H4" Icon="{x:Static md:Icons.HorizontalAlign_Stretch}" Visibility="{TemplateBinding IsHorizontalStretchEnabled, Converter={StaticResource BVConv}}"/>
                             </StackPanel>
                         </StackPanel>
                     </Border>
@@ -790,9 +1055,9 @@
                                                     <Setter Property="Background" Value="White"/>
                                                 </Style>
                                             </StackPanel.Resources>
-                                            <local:Button Icon="{x:Static media:Icons.Check_Green}" Content="{TemplateBinding DecideText}" Command="local:EditableTextCommands.Decide" Margin="0"/>
-                                            <local:Button Icon="{x:Static media:Icons.Cross_Red}" Content="{TemplateBinding CancelText}" Command="local:EditableTextCommands.Cancel"/>
-                                            <local:Button Icon="{x:Static media:Icons.Delete}" Content="{TemplateBinding ClearText}" Command="local:EditableTextCommands.Clear" x:Name="clearButton"/>
+                                            <local:Button Icon="{x:Static md:Icons.Check_Green}" Content="{TemplateBinding DecideText}" Command="local:EditableTextCommands.Decide" Margin="0"/>
+                                            <local:Button Icon="{x:Static md:Icons.Cross_Red}" Content="{TemplateBinding CancelText}" Command="local:EditableTextCommands.Cancel"/>
+                                            <local:Button Icon="{x:Static md:Icons.Delete}" Content="{TemplateBinding ClearText}" Command="local:EditableTextCommands.Clear" x:Name="clearButton"/>
                                         </StackPanel>
                                     </Border>
                                 </Grid>
@@ -822,6 +1087,41 @@
                             <Setter TargetName="templateRoot" Property="BorderBrush" Value="{local:BrushProvider e44}"/>
                         </Trigger>
                     </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <Style x:Key="TextBlock_SearchBarCount" TargetType="TextBlock">
+        <Setter Property="HorizontalAlignment" Value="Right"/>
+        <Setter Property="VerticalAlignment" Value="Bottom"/>
+        <Setter Property="Margin" Value="0"/>
+        <Setter Property="FontSize" Value="12"/>
+    </Style>
+    <Style x:Key="DefaultTextBox_SearchBar" TargetType="local:DefaultTextBox">
+        <Setter Property="DefaultText" Value="(search)"/>
+        <Setter Property="Margin" Value="0"/>
+        <Setter Property="Padding" Value="2"/>
+    </Style>
+    <Style TargetType="local:SearchBar">
+        <Setter Property="Focusable" Value="False"/>
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="local:SearchBar">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" MaxWidth="288"/>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="*" MaxWidth="40"/>
+                        </Grid.ColumnDefinitions>
+                        <local:DefaultTextBox x:Name="PART_TextBox" Style="{StaticResource DefaultTextBox_SearchBar}" Text="{TemplateBinding SearchText}"/>
+                        <local:Button Grid.Column="1" Style="{StaticResource IconButtonBase_Sort}" Visibility="{Binding IsEnabled, RelativeSource={RelativeSource Mode=Self}, Converter={StaticResource BVConv}}" ToolTip="{TemplateBinding OpenSortText}"/>
+                        <local:Button Grid.Column="2" Style="{StaticResource IconButtonBase_Search}" Visibility="{Binding IsEnabled, RelativeSource={RelativeSource Mode=Self}, Converter={StaticResource BVConv}}" ToolTip="{TemplateBinding OpenSearchText}"/>
+                        <local:Button Grid.Column="3" Style="{StaticResource IconButtonBase_SearchClear}" Visibility="{Binding IsEnabled, RelativeSource={RelativeSource Mode=Self}, Converter={StaticResource BVConv}}" ToolTip="{TemplateBinding ClearText}"/>
+                        <TextBlock Grid.Column="4" Style="{StaticResource TextBlock_SearchBarCount}" Text="{Binding ItemsCount, Mode=OneWay, RelativeSource={RelativeSource Mode=TemplatedParent}}" Visibility="{TemplateBinding ItemsCount, Converter={StaticResource TVConv}}"/>
+                    </Grid>
                 </ControlTemplate>
             </Setter.Value>
         </Setter>
@@ -1005,7 +1305,7 @@
         <Setter Property="MinWidth" Value="0"/>
         <Setter Property="MinHeight" Value="0"/>
         <Setter Property="BorderBrush" Value="Transparent"/>
-        <Setter Property="Icon" Value="{x:Static media:Icons.Clock}"/>
+        <Setter Property="Icon" Value="{x:Static md:Icons.Clock}"/>
         <Setter Property="VerticalAlignment" Value="Center"/>
         <Setter Property="HorizontalAlignment" Value="Center"/>
         <Setter Property="Focusable" Value="False"/>
@@ -1433,6 +1733,11 @@
         </Style.Triggers>
     </Style>
 
+    <Style TargetType="local:GraphView">
+        <Setter Property="TextOutline" Value="White"/>
+        <Setter Property="TextOutlineThickness" Value="4"/>
+    </Style>
+
     <Style TargetType="local:ConsoleViewer">
         <Setter Property="Background" Value="Black"/>
         <Setter Property="Foreground" Value="White"/>
@@ -1451,12 +1756,12 @@
                                 <ContextMenu>
                                     <MenuItem Header="{TemplateBinding CopyText}" Command="local:ConsoleCommands.Copy">
                                         <MenuItem.Icon>
-                                            <local:IconPresenter Style="{StaticResource MenuItemIconStyle}" Source="{x:Static media:Icons.Copy}"/>
+                                            <local:IconPresenter Style="{StaticResource MenuItemIconStyle}" Source="{x:Static md:Icons.Copy}"/>
                                         </MenuItem.Icon>
                                     </MenuItem>
                                     <MenuItem Header="{TemplateBinding FlushText}" Command="local:ConsoleCommands.Flush">
                                         <MenuItem.Icon>
-                                            <local:IconPresenter Style="{StaticResource MenuItemIconStyle}" Source="{x:Static media:Icons.Delete}"/>
+                                            <local:IconPresenter Style="{StaticResource MenuItemIconStyle}" Source="{x:Static md:Icons.Delete}"/>
                                         </MenuItem.Icon>
                                     </MenuItem>
                                 </ContextMenu>
@@ -1500,7 +1805,7 @@
                             <ColumnDefinition Width="Auto"/>
                             <ColumnDefinition Width="Auto"/>
                         </Grid.ColumnDefinitions>
-                        <Image x:Name="PART_Icon" Width="16" Height="16" Margin="4,0,0,0" VerticalAlignment="Center" SnapsToDevicePixels="True" Source="{TemplateBinding Icon}" Stretch="Uniform"/>
+                        <Image x:Name="PART_Icon" Width="16" Height="16" Margin="4,0,0,0" VerticalAlignment="Center" SnapsToDevicePixels="True" Stretch="Uniform" Visibility="{TemplateBinding Icon, Converter={StaticResource BVConv}}"/>
                         <ItemsControl x:Name="PART_LeftPanel" Grid.Column="1" Focusable="False" ItemsSource="{Binding LeftPanelItems, Mode=OneWay, RelativeSource={RelativeSource Mode=TemplatedParent}}">
                             <ItemsControl.ItemsPanel>
                                 <ItemsPanelTemplate>
@@ -1576,9 +1881,6 @@
                         </Grid>
                     </Grid>
                     <ControlTemplate.Triggers>
-                        <Trigger Property="Icon" Value="{x:Null}">
-                            <Setter TargetName="PART_Icon" Property="Visibility" Value="Collapsed"/>
-                        </Trigger>
                         <Trigger Property="IsMinimizeVisible" Value="False">
                             <Setter TargetName="Button_Minimize" Property="Visibility" Value="Collapsed"/>
                         </Trigger>
@@ -1679,33 +1981,5 @@
         <Setter Property="HorizontalContentAlignment" Value="Center"/>
         <Setter Property="VerticalContentAlignment" Value="Center"/>
         <Setter Property="Padding" Value="32"/>
-    </Style>
-
-    <Style TargetType="Border" x:Key="SeparatorBase">
-        <Setter Property="Background" Value="Gray"/>
-        <Setter Property="BorderThickness" Value="0"/>
-        <Setter Property="Opacity" Value="0.5"/>
-    </Style>
-
-    <Style TargetType="Border" x:Key="HorizontalSeparator" BasedOn="{StaticResource SeparatorBase}">
-        <Setter Property="Margin" Value="4,2"/>
-        <Setter Property="Height" Value="1"/>
-        <Setter Property="Grid.ColumnSpan" Value="10"/>
-    </Style>
-
-    <Style TargetType="Border" x:Key="VerticalSeparator" BasedOn="{StaticResource SeparatorBase}">
-        <Setter Property="Margin" Value="2,4"/>
-        <Setter Property="Width" Value="1"/>
-        <Setter Property="Grid.RowSpan" Value="10"/>
-    </Style>
-
-    <Style x:Key="StyleBase_IconButton" TargetType="local:Button">
-        <Setter Property="Margin" Value="0,0"/>
-        <Setter Property="Padding" Value="2,0"/>
-        <Setter Property="MinWidth" Value="0"/>
-        <Setter Property="MinHeight" Value="0"/>
-        <Setter Property="VerticalAlignment" Value="Stretch"/>
-        <Setter Property="BorderBrush" Value="Transparent"/>
-        <Setter Property="Focusable" Value="False"/>
     </Style>
 </ResourceDictionary>

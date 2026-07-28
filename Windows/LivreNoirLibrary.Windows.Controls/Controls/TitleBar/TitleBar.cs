@@ -14,6 +14,7 @@ namespace LivreNoirLibrary.Windows.Controls
         public const double DefaultButtonWidth = 40;
         public const double MoveThreshold = 8 * 8;
 
+        private const string PART_Icon = nameof(PART_Icon);
         private const string PART_LeftPanel = nameof(PART_LeftPanel);
         private const string PART_RightPanel = nameof(PART_RightPanel);
         private const string Button_Maximize = nameof(Button_Maximize);
@@ -40,6 +41,7 @@ namespace LivreNoirLibrary.Windows.Controls
         private bool _isCloseVisible = true;
 
         private Window? _owner;
+        private Image? _iconView;
         private PToggleButton? _maximize_button;
 
         public ObservableList<UIElement> LeftPanelItems { get; } = [];
@@ -50,8 +52,21 @@ namespace LivreNoirLibrary.Windows.Controls
 
         public override void OnApplyTemplate()
         {
+            if (_iconView is not null)
+            {
+                BindingOperations.ClearAllBindings(_iconView);
+            }
             base.OnApplyTemplate();
             _maximize_button = GetTemplateChild(Button_Maximize) as PToggleButton;
+            if (GetTemplateChild(PART_Icon) is Image image)
+            {
+                _iconView = image;
+                image.SetBinding(Image.SourceProperty, new Binding(nameof(Icon)) { Source = this });
+            }
+            else
+            {
+                _iconView = null;
+            }
         }
 
         protected override void OnVisualParentChanged(DependencyObject oldParent)

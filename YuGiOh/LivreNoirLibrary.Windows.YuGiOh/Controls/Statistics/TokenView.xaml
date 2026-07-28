@@ -1,0 +1,109 @@
+﻿<UserControl x:Class="LivreNoirLibrary.Windows.YuGiOh.Controls.TokenView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:LivreNoirLibrary.Windows.YuGiOh.Controls"
+             xmlns:ct="clr-namespace:LivreNoirLibrary.Windows.Controls;assembly=LivreNoirLibrary.Windows.Controls"
+             xmlns:media="clr-namespace:LivreNoirLibrary.Windows.Media;assembly=LivreNoirLibrary.Windows.Media"
+             xmlns:yw="clr-namespace:LivreNoirLibrary.Windows.YuGiOh;assembly=LivreNoirLibrary.Windows.YuGiOh"
+             xmlns:ygo="clr-namespace:LivreNoirLibrary.YuGiOh.Data;assembly=LivreNoirLibrary.YuGiOh.Core"
+             xmlns:yg="clr-namespace:LivreNoirLibrary.YuGiOh;assembly=LivreNoirLibrary.YuGiOh.Core"
+             xmlns:input="clr-namespace:LivreNoirLibrary.Windows.Input;assembly=LivreNoirLibrary.Windows.Core"
+             mc:Ignorable="d" Background="White"
+             d:DesignHeight="450" d:DesignWidth="800">
+    <UserControl.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="/LivreNoirLibrary.Windows.YuGiOh;component/Themes/Generic.xaml"/>
+            </ResourceDictionary.MergedDictionaries>
+            <Style TargetType="TextBox" BasedOn="{StaticResource TextBox_CardInfo}"/>
+            <Style x:Key="TextBox_Text" TargetType="TextBox" BasedOn="{StaticResource TextBox_Scrollable}">
+                <Setter Property="Margin" Value="0"/>
+            </Style>
+            <Style TargetType="Label" BasedOn="{StaticResource Label_Header}"/>
+            <Style TargetType="TextBlock">
+                <Setter Property="Margin" Value="2,0"/>
+                <Setter Property="VerticalAlignment" Value="Center"/>
+            </Style>
+        </ResourceDictionary>
+    </UserControl.Resources>
+    <Grid ColumnDefinitions="2*, 4, 1*" x:Name="MainGrid" d:DataContext="{d:DesignInstance Type=ygo:TokenCollection}">
+        <Grid RowDefinitions="Auto, 4, *">
+            <Grid ColumnDefinitions="Auto, 4, *, Auto">
+                <ct:Button Style="{StaticResource RefreshButton}"/>
+                <local:CardSearchBar Grid.Column="2" ListBox="{Binding ElementName=ListView_Main}" CanOpenSearchDialog="False"/>
+                <ct:Button Grid.Column="3" Content="{Binding Token_Unselect.Value, Source={x:Static yw:Vocab.Current}}" Click="OnClick_Unselect"/>
+            </Grid>
+            <ListView x:Name="ListView_Main" Grid.Row="2" Style="{StaticResource CardListView}" ItemsSource="{Binding}">
+                <ListView.View>
+                    <GridView>
+                        <GridViewColumn HeaderTemplate="{StaticResource GridViewHeader_Name}" CellTemplate="{StaticResource ItemTemplate_NameWithLimit}"/>
+                        <GridViewColumn HeaderTemplate="{StaticResource GridViewHeader_Attribute}" CellTemplate="{StaticResource ItemTemplate_Attribute}"/>
+                        <GridViewColumn Width="96" HeaderTemplate="{StaticResource GridViewHeader_MonsterType}" CellTemplate="{StaticResource ItemTemplate_MonsterType}"/>
+                        <GridViewColumn Width="28" HeaderTemplate="{StaticResource GridViewHeader_Level}" CellTemplate="{StaticResource ItemTemplate_Level}"/>
+                        <GridViewColumn Width="48" HeaderTemplate="{StaticResource GridViewHeader_Atk}" CellTemplate="{StaticResource ItemTemplate_Atk}"/>
+                        <GridViewColumn Width="48" HeaderTemplate="{StaticResource GridViewHeader_Def}" CellTemplate="{StaticResource ItemTemplate_Def}"/>
+                        <GridViewColumn Width="26" HeaderTemplate="{StaticResource GridViewHeader_Tuner}" CellTemplate="{StaticResource ItemTemplate_Tuner}"/>
+                        <GridViewColumn>
+                            <GridViewColumn.HeaderTemplate>
+                                <DataTemplate>
+                                    <TextBlock Text="{Binding Token_Header_Generator.Value, Source={x:Static yw:Vocab.Current}}" Tag="Generators.Count"/>
+                                </DataTemplate>
+                            </GridViewColumn.HeaderTemplate>
+                            <GridViewColumn.CellTemplate>
+                                <DataTemplate>
+                                    <TextBlock Text="{Binding Generators.Count}" HorizontalAlignment="Right"/>
+                                </DataTemplate>
+                            </GridViewColumn.CellTemplate>
+                        </GridViewColumn>
+                        <GridViewColumn>
+                            <GridViewColumn.HeaderTemplate>
+                                <DataTemplate>
+                                    <TextBlock Text="{Binding Token_Header_Referer.Value, Source={x:Static yw:Vocab.Current}}" Tag="Referers.Count"/>
+                                </DataTemplate>
+                            </GridViewColumn.HeaderTemplate>
+                            <GridViewColumn.CellTemplate>
+                                <DataTemplate>
+                                    <TextBlock Text="{Binding Referers.Count}" HorizontalAlignment="Right"/>
+                                </DataTemplate>
+                            </GridViewColumn.CellTemplate>
+                        </GridViewColumn>
+                        <GridViewColumn CellTemplate="{StaticResource ItemTemplate_Detail}">
+                            <GridViewColumn.HeaderTemplate>
+                                <DataTemplate>
+                                    <TextBlock Text="{Binding Token_Text.Value, Source={x:Static yw:Vocab.Current}}" Tag="Id"/>
+                                </DataTemplate>
+                            </GridViewColumn.HeaderTemplate>
+                        </GridViewColumn>
+                    </GridView>
+                </ListView.View>
+            </ListView>
+        </Grid>
+        <Grid Grid.Column="2" Visibility="{Binding SelectedItem, ElementName=ListView_Main, Converter={StaticResource TVConvI}}" RowDefinitions="Auto, *, 4, Auto, *">
+            <Grid ColumnDefinitions="Auto, *">
+                <Label Content="{Binding Token_Referer.Value, Source={x:Static yw:Vocab.Current}}"/>
+                <TextBlock Grid.Column="1" Text="{Binding Items.Count, ElementName=ListView_GenericReferer}"/>
+            </Grid>
+            <ListView x:Name="ListView_GenericReferer" Grid.Row="1" Style="{StaticResource CardListView}" ItemsSource="{Binding Referers}" ItemTemplate="{StaticResource ItemTemplate_FullTextWithLink}"/>
+            <Grid Grid.Row="3" ColumnDefinitions="Auto, *">
+                <Label Content="{Binding Token_NegativeReferer.Value, Source={x:Static yw:Vocab.Current}}"/>
+                <TextBlock Grid.Column="1" Text="{Binding Items.Count, ElementName=ListView_GenericNegativeReferer}"/>
+            </Grid>
+            <ListView x:Name="ListView_GenericNegativeReferer" Grid.Row="4" Style="{StaticResource CardListView}" ItemsSource="{Binding NegativeReferers}" ItemTemplate="{StaticResource ItemTemplate_FullTextWithLink}"/>
+        </Grid>
+        <Grid Grid.Column="2" Visibility="{Binding SelectedItem, ElementName=ListView_Main, Converter={StaticResource TVConv}}" RowDefinitions="Auto, *, 4, Auto, *"
+              DataContext="{Binding SelectedItem, ElementName=ListView_Main}" d:DataContext="{d:DesignInstance Type=ygo:Token}">
+            <Grid ColumnDefinitions="Auto, *">
+                <Label Content="{Binding Token_Generator.Value, Source={x:Static yw:Vocab.Current}}"/>
+                <TextBlock Grid.Column="1" Text="{Binding Items.Count, ElementName=ListView_Generator}"/>
+            </Grid>
+            <ListView x:Name="ListView_Generator" Grid.Row="1" Style="{StaticResource CardListView}" ItemsSource="{Binding Generators}" ItemTemplate="{StaticResource ItemTemplate_FullTextWithLink}"/>
+            <Grid Grid.Row="3" ColumnDefinitions="Auto, *">
+                <Label Content="{Binding Token_Referer.Value, Source={x:Static yw:Vocab.Current}}"/>
+                <TextBlock Grid.Column="1" Text="{Binding Items.Count, ElementName=ListView_Referer}"/>
+            </Grid>
+            <ListView x:Name="ListView_Referer" Grid.Row="4" Style="{StaticResource CardListView}" ItemsSource="{Binding Referers}" ItemTemplate="{StaticResource ItemTemplate_FullTextWithLink}"/>
+        </Grid>
+    </Grid>
+</UserControl>

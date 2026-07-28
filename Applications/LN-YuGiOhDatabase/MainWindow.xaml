@@ -14,16 +14,17 @@
     <Grid>
         <Grid x:Name="Grid_Main">
             <TabControl Padding="0">
-                <TabItem Header="{Binding Tab_Database.Value, Source={x:Static yw:Vocab.Current}}">
+                <TabItem x:Name="Tab_Database" Header="{Binding Tab_Database.Value, Source={x:Static yw:Vocab.Current}}">
                     <local:Unit_Database x:Name="Unit_Database"/>
                 </TabItem>
                 <TabItem Header="{Binding Tab_Statistics.Value, Source={x:Static yw:Vocab.Current}}">
+                    <local:Unit_Statistics x:Name="Unit_Statistics"/>
                 </TabItem>
                 <TabItem Header="{Binding Tab_Deck.Value, Source={x:Static yw:Vocab.Current}}">
                     <local:Unit_Deck x:Name="Unit_Deck"/>
                 </TabItem>
                 <TabItem Header="{Binding Tab_DuelLog.Value, Source={x:Static yw:Vocab.Current}}">
-                    
+                    <local:Unit_DuelLog x:Name="Unit_DuelLog"/>
                 </TabItem>
             </TabControl>
             <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Top" Margin="4,2">
@@ -32,7 +33,7 @@
                         <Run Text="{Binding OfficialDatabase.Value, Source={x:Static yw:Vocab.Current}}"/>
                     </Hyperlink>
                 </TextBlock>
-                <ct:Button Style="{StaticResource StyleBase_IconButton}" Icon="{x:Static media:Icons.Help}" Click="OnClick_Help"/>
+                <ct:Button Style="{StaticResource IconButtonBase}" Icon="{x:Static media:Icons.Help}" Click="OnClick_Help"/>
             </StackPanel>
         </Grid>
         <ct:CenteringPanel x:Name="OuterPanel">
@@ -54,7 +55,7 @@
                         </Style>
                     </Grid.Resources>
                     <Image Grid.ColumnSpan="2" Margin="8" Source="/splash.png"/>
-                    <TextBlock Grid.ColumnSpan="2" HorizontalAlignment="Left" VerticalAlignment="Bottom" Padding="134,0,0,7">
+                    <TextBlock Grid.ColumnSpan="2" HorizontalAlignment="Right" VerticalAlignment="Bottom" Padding="0,0,12,6">
                         Version <Run Text="{Binding Version}"/>
                     </TextBlock>
                     <ct:Button Grid.Column="0" Icon="{x:Static media:Icons.Help}" Content="{Binding OnlineManual.Value, Source={x:Static yw:Vocab.Current}}" Click="OnClick_Help_Manual"/>

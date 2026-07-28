@@ -1,9 +1,10 @@
-﻿using System;
+﻿using LivreNoirLibrary.ObjectModel;
+using System;
 using System.Diagnostics.CodeAnalysis;
 
 namespace LivreNoirLibrary.YuGiOh.Data
 {
-    public class PackInfo(string pid, string number, string name, DateTime date) : IEquatable<PackInfo>, IComparable<PackInfo>
+    public class PackInfo(string pid, string number, string name, DateTime date) : IEquatable<PackInfo>, IComparable<PackInfo>, INamedObject
     {
         public string ProductId { get; } = pid;
         public string Number { get; } = number;

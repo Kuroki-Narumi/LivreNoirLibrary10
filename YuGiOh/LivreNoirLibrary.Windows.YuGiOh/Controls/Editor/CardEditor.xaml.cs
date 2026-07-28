@@ -36,7 +36,7 @@ namespace LivreNoirLibrary.Windows.YuGiOh.Controls
             InitializeComponent();
         }
 
-        protected override void OnItemsSourceChanged(ObservableList<Card>? value)
+        protected override void OnItemsSourceChanged(ICardList? value)
         {
             base.OnItemsSourceChanged(value);
             ListView_CardList.ItemsSource = value;

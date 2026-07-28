@@ -65,21 +65,5 @@ namespace LivreNoirLibrary.Numerics
                 return false;
             }
         }
-
-        public IEnumerable<T> EvaluateAll(TryGetFunc<T> variables)
-        {
-            using var obj = ObjectPool.RentList<LazyNode<T>>(out var nodes);
-            if (TryGetLazyNode(nodes, out _))
-            {
-                foreach (var node in nodes)
-                {
-                    var r = node.Execute(variables);
-                    if (r.IsSuccessful && CheckResult(r.Value, out _))
-                    {
-                        yield return r.Value;
-                    }
-                }
-            }
-        }
     }
 }

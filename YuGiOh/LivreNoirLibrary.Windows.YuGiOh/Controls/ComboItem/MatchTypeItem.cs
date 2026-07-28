@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace LivreNoirLibrary.Windows.YuGiOh.Controls
 {
-    public class MatchTypeItem : ComboItemBase<MatchType>
+    public sealed class MatchTypeItem : AltBackgroundComboItem<MatchType>
     {
         public static MatchTypeItem[] Items { get; }
         public static MatchTypeItem? GetItem(MatchType value) => _items.GetValueOrDefault(value);

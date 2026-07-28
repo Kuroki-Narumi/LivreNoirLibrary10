@@ -6,10 +6,8 @@ namespace LivreNoirLibrary.Windows
 {
     public static partial class Events
     {
-        public static readonly RoutedEvent ModifiedEvent = Register<Control, RoutedEventHandler>();
-
-        public static void AddModifiedHandler(this DependencyObject d, RoutedEventHandler handler) => (d as IInputElement)?.AddHandler(ModifiedEvent, handler);
-        public static void RemoveModifiedHandler(this DependencyObject d, RoutedEventHandler handler) => (d as IInputElement)?.RemoveHandler(ModifiedEvent, handler);
+        [RoutedEvent(typeof(Control))]
+        public static readonly RoutedEvent ModifiedEvent = RegisterEvent();
 
         public static void RaiseModifiedEvent(this Control control, bool raise = true)
         {

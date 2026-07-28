@@ -1,0 +1,110 @@
+﻿<UserControl x:Class="LivreNoirLibrary.Windows.YuGiOh.Controls.HandTestView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:LivreNoirLibrary.Windows.YuGiOh.Controls"
+             xmlns:ct="clr-namespace:LivreNoirLibrary.Windows.Controls;assembly=LivreNoirLibrary.Windows.Controls"
+             xmlns:media="clr-namespace:LivreNoirLibrary.Windows.Media;assembly=LivreNoirLibrary.Windows.Media"
+             xmlns:yw="clr-namespace:LivreNoirLibrary.Windows.YuGiOh;assembly=LivreNoirLibrary.Windows.YuGiOh"
+             xmlns:ygo="clr-namespace:LivreNoirLibrary.YuGiOh.Data;assembly=LivreNoirLibrary.YuGiOh.Core"
+             xmlns:ys="clr-namespace:LivreNoirLibrary.YuGiOh.Search;assembly=LivreNoirLibrary.YuGiOh.Core"
+             mc:Ignorable="d" 
+             d:DesignHeight="450" d:DesignWidth="800">
+    <UserControl.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="/LivreNoirLibrary.Windows.YuGiOh;component/Themes/Generic.xaml"/>
+            </ResourceDictionary.MergedDictionaries>
+            <Style TargetType="ct:IntTextBox">
+                <Setter Property="Grid.Column" Value="1"/>
+                <Setter Property="Margin" Value="2"/>
+                <Setter Property="HorizontalContentAlignment" Value="Right"/>
+            </Style>
+        </ResourceDictionary>
+    </UserControl.Resources>
+    <Grid x:Name="MainGrid" d:DataContext="{d:DesignInstance Type=local:HandTestView}" ColumnDefinitions="*, 4, 2*, 4, 3*">
+        <StackPanel>
+            <Grid RowDefinitions="Auto, Auto, Auto" ColumnDefinitions="Auto, *">
+                <Label Grid.Row="0" Style="{StaticResource Label_Header}" Content="{Binding InspectTest_Count.Value, Source={x:Static yw:Vocab.Current}}" />
+                <ct:IntTextBox Grid.Row="0" Minimum="1000" Maximum="10000000" WheelStep="1000" Value="{Binding TestParams.RepeatCount}"/>
+                <Label Grid.Row="1" Style="{StaticResource Label_Header}" Content="{Binding InspectTest_Hand.Value, Source={x:Static yw:Vocab.Current}}" />
+                <ct:IntTextBox Grid.Row="1" Minimum="1" Maximum="60" WheelStep="1" Value="{Binding TestParams.NumberOfHand}"/>
+                <Label Grid.Row="2" Style="{StaticResource Label_Header}" Content="{Binding InspectTest_Priority.Value, Source={x:Static yw:Vocab.Current}}" />
+                <Grid Grid.Row="2" Grid.Column="1" ColumnDefinitions="*, *">
+                    <ct:Button Style="{StaticResource IconButton_MoveUp}" CommandTarget="{Binding ElementName=ListView_Priority}"/>
+                    <ct:Button Grid.Column="1" Style="{StaticResource IconButton_MoveDown}" CommandTarget="{Binding ElementName=ListView_Priority}"/>
+                </Grid>
+            </Grid>
+            <ListView x:Name="ListView_Priority" Style="{StaticResource Alt2ListBoxStyle}" ItemsSource="{Binding TestParams.DrawSourcePriority}">
+                
+            </ListView>
+            <Border Height="4"/>
+            <ct:Button HorizontalAlignment="Center" Icon="{x:Static media:Icons.Check_Green}" Content="{Binding InspectTest_Start.Value, Source={x:Static yw:Vocab.Current}}" Click="OnClick_Start"/>
+        </StackPanel>
+        <Grid Grid.Column="2" RowDefinitions="Auto, *">
+            <Label Style="{StaticResource Label_Header}" Content="{Binding InspectTest_Result.Value, Source={x:Static yw:Vocab.Current}}" HorizontalAlignment="Left"/>
+            <TextBox Grid.Row="1" Style="{StaticResource TextBox_Scrollable}" Margin="0" Text="{Binding ResultText, Mode=OneWay}"/>
+        </Grid>
+        <ListView Grid.Column="4" Style="{StaticResource Alt2ListBoxStyle}" ItemsSource="{Binding Results}" SelectionMode="Extended" SelectionChanged="Result_SelectionChanged">
+            <ListView.Resources>
+                <Style TargetType="GridViewColumnHeader">
+                    <EventSetter Event="Click" Handler="OnClick_ColumnHeader"/>
+                </Style>
+            </ListView.Resources>
+            <ListView.View>
+                <GridView>
+                    <GridViewColumn>
+                        <GridViewColumn.HeaderTemplate>
+                            <DataTemplate>
+                                <TextBlock Text="{Binding InspectTest_Header_Name.Value, Source={x:Static yw:Vocab.Current}}" Tag="Name"/>
+                            </DataTemplate>
+                        </GridViewColumn.HeaderTemplate>
+                        <GridViewColumn.CellTemplate>
+                            <DataTemplate>
+                                <TextBlock Text="{Binding Name}"/>
+                            </DataTemplate>
+                        </GridViewColumn.CellTemplate>
+                    </GridViewColumn>
+                    <GridViewColumn>
+                        <GridViewColumn.HeaderTemplate>
+                            <DataTemplate>
+                                <TextBlock Text="{Binding InspectTest_Header_Group.Value, Source={x:Static yw:Vocab.Current}}" Tag="GroupId"/>
+                            </DataTemplate>
+                        </GridViewColumn.HeaderTemplate>
+                        <GridViewColumn.CellTemplate>
+                            <DataTemplate>
+                                <TextBlock Text="{Binding GroupId}" HorizontalAlignment="Center"/>
+                            </DataTemplate>
+                        </GridViewColumn.CellTemplate>
+                    </GridViewColumn>
+                    <GridViewColumn>
+                        <GridViewColumn.HeaderTemplate>
+                            <DataTemplate>
+                                <TextBlock Text="{Binding InspectTest_Header_Count.Value, Source={x:Static yw:Vocab.Current}}" Tag="Count"/>
+                            </DataTemplate>
+                        </GridViewColumn.HeaderTemplate>
+                        <GridViewColumn.CellTemplate>
+                            <DataTemplate>
+                                <TextBlock Text="{Binding Count}" HorizontalAlignment="Right"/>
+                            </DataTemplate>
+                        </GridViewColumn.CellTemplate>
+                    </GridViewColumn>
+                    <GridViewColumn>
+                        <GridViewColumn.HeaderTemplate>
+                            <DataTemplate>
+                                <TextBlock Text="{Binding InspectTest_Header_Probability.Value, Source={x:Static yw:Vocab.Current}}" Tag="Probability"/>
+                            </DataTemplate>
+                        </GridViewColumn.HeaderTemplate>
+                        <GridViewColumn.CellTemplate>
+                            <DataTemplate>
+                                <TextBlock Text="{Binding ProbText}" HorizontalAlignment="Right"/>
+                            </DataTemplate>
+                        </GridViewColumn.CellTemplate>
+                    </GridViewColumn>
+                </GridView>
+            </ListView.View>
+        </ListView>
+        <TextBlock Grid.Column="4" Style="{StaticResource TextBlock_TextLength}" Text="{Binding SumText}"/>
+    </Grid>
+</UserControl>

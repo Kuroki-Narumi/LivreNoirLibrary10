@@ -4,7 +4,7 @@ using System.Text.Json.Serialization;
 
 namespace LivreNoirLibrary.YuGiOh.MasterDuel
 {
-    public  class DeckTag : ObservableObjectBase, IComparable<DeckTag>
+    public  class DeckTag : ObservableObjectBase, IComparable<DeckTag>, INamedObject
     {
         [JsonPropertyName(JsonPropertyNames.Name)]
         public string Name { get; set => SetValue(ref field, value); } = "";

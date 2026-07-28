@@ -25,15 +25,12 @@ namespace LivreNoirLibrary.ObjectModel
         protected static T Load<T>(string appName, string settingName = DefaultSettingFileName)
             where T : AppSettingsBase, new()
         {
-            if (Json.TryOpen<T>(GetFilePath(appName, settingName), out var setting))
+            if (!Json.TryOpen<T>(GetFilePath(appName, settingName), out var setting))
             {
-                setting.OnLoad();
-                return setting;
+                setting = new();
             }
-            else
-            {
-                return new();
-            }
+            setting.OnLoad();
+            return setting;
         }
 
         protected static T Load<T>(string appName, params ReadOnlySpan<string> settingNames)

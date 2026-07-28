@@ -22,6 +22,7 @@
     <conv:TextLengthConveter x:Key="TextLengthConverter"/>
     <conv:LineFeedConverter x:Key="LFConv"/>
     <conv:ComboItemConverter x:Key="CIConv"/>
+    <local:ExpanderStateConverter x:Key="ExpConv"/>
 
     <Style TargetType="Control" x:Key="ControlBase">
         <Setter Property="FontFamily" Value="Meiryo"/>
@@ -38,11 +39,20 @@
         <Setter Property="MinHeight" Value="26"/>
     </Style>
     
-    <Style x:Key="Label_Text" TargetType="Label">
-        <Setter Property="VerticalContentAlignment" Value="Bottom"/>
-        <Setter Property="HorizontalContentAlignment" Value="Left"/>
-        <Setter Property="Margin" Value="0"/>
-        <Setter Property="Padding" Value="8,0,0,0"/>
+    <Style TargetType="TextBlock" x:Key="TextBlock_RightArrow">
+        <Setter Property="Text" Value="＞"/>
+        <Setter Property="Margin" Value="4,0"/>
+        <Setter Property="HorizontalAlignment" Value="Center"/>
+        <Setter Property="VerticalAlignment" Value="Center"/>
+        <Setter Property="Grid.Column" Value="1"/>
+        <Setter Property="Grid.Row" Value="2"/>
+    </Style>
+
+    <Style TargetType="TextBox" x:Key="TextBox_CardInfo">
+        <Setter Property="Margin" Value="2,2,0,2"/>
+        <Setter Property="Padding" Value="2"/>
+        <Setter Property="VerticalContentAlignment" Value="Center"/>
+        <Setter Property="Grid.Column" Value="2"/>
     </Style>
 
     <Style x:Key="TextBox_Scrollable" TargetType="TextBox">
@@ -54,7 +64,44 @@
         <Setter Property="HorizontalScrollBarVisibility" Value="Disabled"/>
         <Setter Property="VerticalScrollBarVisibility" Value="Auto"/>
     </Style>
+    
+    <Style x:Key="TextBlock_TextLength" TargetType="TextBlock">
+        <Setter Property="Background" Value="{ct:BrushProvider #8fff}"/>
+        <Setter Property="VerticalAlignment" Value="Bottom"/>
+        <Setter Property="HorizontalAlignment" Value="Right"/>
+        <Setter Property="Margin" Value="0,0,1,1"/>
+        <Setter Property="Padding" Value="2,0"/>
+        <Setter Property="IsHitTestVisible" Value="False"/>
+    </Style>
+    
+    <Style x:Key="CardInfo_ButtonBase" TargetType="ct:Button">
+        <Setter Property="BorderBrush" Value="{x:Null}"/>
+        <Setter Property="BorderThickness" Value="0"/>
+        <Setter Property="CornerRadius" Value="0"/>
+        <Setter Property="Margin" Value="0"/>
+        <Setter Property="Padding" Value="0"/>
+        <Setter Property="VerticalAlignment" Value="Stretch"/>
+    </Style>
+    <Style x:Key="CardInfo_CopyButton" TargetType="ct:Button" BasedOn="{StaticResource CardInfo_ButtonBase}">
+        <Setter Property="Background" Value="{StaticResource Brush_HeaderBackground}"/>
+        <Setter Property="Icon" Value="{x:Static md:Icons.Copy}"/>
+        <Setter Property="HorizontalAlignment" Value="Left"/>
+        <Setter Property="Grid.Column" Value="1"/>
+    </Style>
+    <Style x:Key="CardInfo_ListBox" TargetType="ListBox" BasedOn="{StaticResource Alt2ListBoxStyle}">
+        <Setter Property="Height" Value="{x:Static local:CardInfoView.DefaultPackListHeight}"/>
+        <Setter Property="FontSize" Value="11"/>
+        <Setter Property="SelectionMode" Value="Single"/>
+        <Setter Property="Grid.Row" Value="1"/>
+        <Setter Property="ScrollViewer.HorizontalScrollBarVisibility" Value="Disabled"/>
+    </Style>
 
+    <Style x:Key="RefreshButton" TargetType="ct:Button">
+        <Setter Property="Icon" Value="{x:Static md:Icons.Update}"/>
+        <Setter Property="Content" Value="{Binding Reload.Value, Source={x:Static ygo:Vocab.Current}}"/>
+        <Setter Property="Command" Value="ygo:YgoCommands.RefreshItems"/>
+    </Style>
+    
     <Style x:Key="ButtonBase_Execute" TargetType="ct:Button">
         <Setter Property="Margin" Value="0,0,4,4"/>
         <Setter Property="Padding" Value="6,4"/>
@@ -75,9 +122,10 @@
         <Setter Property="Grid.Column" Value="0"/>
     </Style>
 
-    <Style x:Key="Button_ExecClear" TargetType="ct:Button" BasedOn="{StaticResource ButtonBase_Execute}">
+    <Style x:Key="Button_ExecDefault" TargetType="ct:Button" BasedOn="{StaticResource ButtonBase_Execute}">
         <Setter Property="Icon" Value="{x:Static md:Icons.Delete_Mono}"/>
-        <Setter Property="Content" Value="{Binding Clear.Value, Source={x:Static ygo:Vocab.Current}}"/>
+        <Setter Property="Content" Value="{Binding DefaultPreset.Value, Source={x:Static ygo:Vocab.Current}}"/>
+        <Setter Property="ToolTip" Value="{Binding Desc_DefaultPreset.Value, Source={x:Static ygo:Vocab.Current}}"/>
         <Setter Property="Grid.Column" Value="1"/>
     </Style>
 
@@ -89,169 +137,131 @@
         <Setter Property="Margin" Value="0,0,0,4"/>
     </Style>
 
-    <Style x:Key="IconButton_Sort" TargetType="ct:Button" BasedOn="{StaticResource StyleBase_IconButton}">
-        <Setter Property="Icon" Value="{x:Static md:Icons.UpDown}"/>
-        <Setter Property="ToolTip" Value="{Binding Sort.Value, Source={x:Static ygo:Vocab.Current}}"/>
-        <Setter Property="Command" Value="ygo:YgoCommands.OpenSort"/>
-    </Style>
-    <Style x:Key="IconButton_Search" TargetType="ct:Button" BasedOn="{StaticResource StyleBase_IconButton}">
-        <Setter Property="Icon" Value="{x:Static md:Icons.ZoomUp}"/>
-        <Setter Property="ToolTip" Value="{Binding Search.Value, Source={x:Static ygo:Vocab.Current}}"/>
-        <Setter Property="Command" Value="ygo:YgoCommands.OpenSearch"/>
-    </Style>
-    <Style x:Key="IconButton_SearchClear" TargetType="ct:Button" BasedOn="{StaticResource StyleBase_IconButton}">
-        <Setter Property="Icon" Value="{x:Static md:Icons.Delete_Mono}"/>
-        <Setter Property="ToolTip" Value="{Binding Clear.Value, Source={x:Static ygo:Vocab.Current}}"/>
-        <Setter Property="Command" Value="ygo:YgoCommands.SearchClear"/>
-    </Style>
-
-    <Style x:Key="IconButton_Add" TargetType="ct:Button" BasedOn="{StaticResource StyleBase_IconButton}">
-        <Setter Property="Icon" Value="{x:Static md:Icons.Plus}"/>
+    <Style x:Key="IconButton_Add" TargetType="ct:Button" BasedOn="{StaticResource IconButtonBase_Add}">
         <Setter Property="ToolTip" Value="{Binding Add.Value, Source={x:Static ygo:Vocab.Current}}"/>
-        <Setter Property="Command" Value="input:Commands.Insert"/>
     </Style>
-    <Style x:Key="IconButton_Overwrite" TargetType="ct:Button" BasedOn="{StaticResource StyleBase_IconButton}">
-        <Setter Property="Icon" Value="{x:Static md:Icons.Save}"/>
+    <Style x:Key="IconButton_Overwrite" TargetType="ct:Button" BasedOn="{StaticResource IconButtonBase_Save}">
         <Setter Property="ToolTip" Value="{Binding Overwrite.Value, Source={x:Static ygo:Vocab.Current}}"/>
-        <Setter Property="Command" Value="input:Commands.Save"/>
     </Style>
-    <Style x:Key="IconButton_MoveUp" TargetType="ct:Button" BasedOn="{StaticResource StyleBase_IconButton}">
-        <Setter Property="Icon" Value="{x:Static md:Icons.ArrowUp}"/>
+    <Style x:Key="IconButton_MoveUp" TargetType="ct:Button" BasedOn="{StaticResource IconButtonBase_MoveUp}">
         <Setter Property="ToolTip" Value="{Binding MoveUp.Value, Source={x:Static ygo:Vocab.Current}}"/>
-        <Setter Property="Command" Value="input:Commands.MoveUp"/>
     </Style>
-    <Style x:Key="IconButton_MoveDown" TargetType="ct:Button" BasedOn="{StaticResource StyleBase_IconButton}">
-        <Setter Property="Icon" Value="{x:Static md:Icons.ArrowDown}"/>
+    <Style x:Key="IconButton_MoveDown" TargetType="ct:Button" BasedOn="{StaticResource IconButtonBase_MoveDown}">
         <Setter Property="ToolTip" Value="{Binding MoveDown.Value, Source={x:Static ygo:Vocab.Current}}"/>
-        <Setter Property="Command" Value="input:Commands.MoveDown"/>
     </Style>
-    <Style x:Key="IconButton_Delete" TargetType="ct:Button" BasedOn="{StaticResource StyleBase_IconButton}">
-        <Setter Property="Icon" Value="{x:Static md:Icons.Delete}"/>
+    <Style x:Key="IconButton_Delete" TargetType="ct:Button" BasedOn="{StaticResource IconButtonBase_Delete}">
         <Setter Property="ToolTip" Value="{Binding Delete.Value, Source={x:Static ygo:Vocab.Current}}"/>
-        <Setter Property="Command" Value="input:Commands.Delete"/>
     </Style>
-    <Style x:Key="IconButton_Undo" TargetType="ct:Button" BasedOn="{StaticResource StyleBase_IconButton}">
-        <Setter Property="Icon" Value="{x:Static md:Icons.Undo}"/>
+    <Style x:Key="IconButton_Undo" TargetType="ct:Button" BasedOn="{StaticResource IconButtonBase_Undo}">
         <Setter Property="ToolTip" Value="{Binding Undo.Value, Source={x:Static ygo:Vocab.Current}}"/>
-        <Setter Property="Command" Value="input:Commands.Undo"/>
     </Style>
-    <Style x:Key="IconButton_Redo" TargetType="ct:Button" BasedOn="{StaticResource StyleBase_IconButton}">
-        <Setter Property="Icon" Value="{x:Static md:Icons.Redo}"/>
+    <Style x:Key="IconButton_Redo" TargetType="ct:Button" BasedOn="{StaticResource IconButtonBase_Redo}">
         <Setter Property="ToolTip" Value="{Binding Redo.Value, Source={x:Static ygo:Vocab.Current}}"/>
-        <Setter Property="Command" Value="input:Commands.Redo"/>
     </Style>
-    <Style x:Key="IconButton_AllClear" TargetType="ct:Button" BasedOn="{StaticResource StyleBase_IconButton}">
-        <Setter Property="Icon" Value="{x:Static md:Icons.New}"/>
+    <Style x:Key="IconButton_AllClear" TargetType="ct:Button" BasedOn="{StaticResource IconButtonBase_New}">
         <Setter Property="ToolTip" Value="{Binding AllClear.Value, Source={x:Static ygo:Vocab.Current}}"/>
-        <Setter Property="Command" Value="input:Commands.New"/>
     </Style>
-    <Style x:Key="IconButton_Open" TargetType="ct:Button" BasedOn="{StaticResource StyleBase_IconButton}">
-        <Setter Property="Icon" Value="{x:Static md:Icons.Open}"/>
+    <Style x:Key="IconButton_Open" TargetType="ct:Button" BasedOn="{StaticResource IconButtonBase_Open}">
         <Setter Property="ToolTip" Value="{Binding Open.Value, Source={x:Static ygo:Vocab.Current}}"/>
-        <Setter Property="Command" Value="input:Commands.Open"/>
     </Style>
-    <Style x:Key="IconButton_Save" TargetType="ct:Button" BasedOn="{StaticResource StyleBase_IconButton}">
-        <Setter Property="Icon" Value="{x:Static md:Icons.Save}"/>
+    <Style x:Key="IconButton_Save" TargetType="ct:Button" BasedOn="{StaticResource IconButtonBase_Save}">
         <Setter Property="ToolTip" Value="{Binding Save.Value, Source={x:Static ygo:Vocab.Current}}"/>
-        <Setter Property="Command" Value="input:Commands.Save"/>
     </Style>
-    <Style x:Key="IconButton_Cut" TargetType="ct:Button" BasedOn="{StaticResource StyleBase_IconButton}">
-        <Setter Property="Icon" Value="{x:Static md:Icons.Cut}"/>
+    <Style x:Key="IconButton_Cut" TargetType="ct:Button" BasedOn="{StaticResource IconButtonBase_Cut}">
         <Setter Property="ToolTip" Value="{Binding Cut.Value, Source={x:Static ygo:Vocab.Current}}"/>
-        <Setter Property="Command" Value="input:Commands.Cut"/>
     </Style>
-    <Style x:Key="IconButton_Copy" TargetType="ct:Button" BasedOn="{StaticResource StyleBase_IconButton}">
-        <Setter Property="Icon" Value="{x:Static md:Icons.Copy}"/>
+    <Style x:Key="IconButton_Copy" TargetType="ct:Button" BasedOn="{StaticResource IconButtonBase_Copy}">
         <Setter Property="ToolTip" Value="{Binding Copy.Value, Source={x:Static ygo:Vocab.Current}}"/>
-        <Setter Property="Command" Value="input:Commands.Copy"/>
     </Style>
-    <Style x:Key="IconButton_Paste" TargetType="ct:Button" BasedOn="{StaticResource StyleBase_IconButton}">
-        <Setter Property="Icon" Value="{x:Static md:Icons.Paste}"/>
+    <Style x:Key="IconButton_Paste" TargetType="ct:Button" BasedOn="{StaticResource IconButtonBase_Paste}">
         <Setter Property="ToolTip" Value="{Binding Paste.Value, Source={x:Static ygo:Vocab.Current}}"/>
-        <Setter Property="Command" Value="input:Commands.Paste"/>
+    </Style>
+    <Style x:Key="IconButton_Duplicate" TargetType="ct:Button" BasedOn="{StaticResource IconButtonBase_Duplicate}">
+        <Setter Property="ToolTip" Value="{Binding Duplicate.Value, Source={x:Static ygo:Vocab.Current}}"/>
+    </Style>
+    
+    <Style x:Key="IconButton_ListClear" TargetType="ct:Button" BasedOn="{StaticResource IconButtonBase}">
+        <Setter Property="Icon" Value="{x:Static md:Icons.Cross}"/>
+        <Setter Property="ToolTip" Value="{Binding Clear.Value, Source={x:Static ygo:Vocab.Current}}"/>
+        <Setter Property="Margin" Value="4,0,0,0"/>
     </Style>
 
-    <Style x:Key="TextBlock_Count" TargetType="TextBlock">
-        <Setter Property="HorizontalAlignment" Value="Right"/>
-        <Setter Property="VerticalAlignment" Value="Bottom"/>
-        <Setter Property="Margin" Value="0"/>
-        <Setter Property="FontSize" Value="12"/>
+    <Style x:Key="MenuItem_Add" TargetType="MenuItem" BasedOn="{StaticResource MenuItemBase_Add}">
+        <Setter Property="Header" Value="{Binding Add.MenuHeader, Source={x:Static ygo:Vocab.Current}}"/>
     </Style>
-    <Style x:Key="DefaultTextBox_SearchBar" TargetType="ct:DefaultTextBox">
-        <Setter Property="DefaultText" Value="(search)"/>
-        <Setter Property="Margin" Value="0"/>
-        <Setter Property="Padding" Value="2"/>
+    <Style x:Key="MenuItem_Delete" TargetType="MenuItem" BasedOn="{StaticResource MenuItemBase_Delete}">
+        <Setter Property="Header" Value="{Binding Delete.MenuHeader, Source={x:Static ygo:Vocab.Current}}"/>
     </Style>
-    <Style TargetType="local:SearchBar">
-        <Setter Property="Focusable" Value="False"/>
-        <Setter Property="Template">
-            <Setter.Value>
-                <ControlTemplate TargetType="local:SearchBar">
-                    <Grid>
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="*" MaxWidth="288"/>
-                            <ColumnDefinition Width="Auto"/>
-                            <ColumnDefinition Width="Auto"/>
-                            <ColumnDefinition Width="Auto"/>
-                            <ColumnDefinition Width="*" MaxWidth="40"/>
-                        </Grid.ColumnDefinitions>
-                        <ct:DefaultTextBox x:Name="PART_TextBox" Style="{StaticResource DefaultTextBox_SearchBar}" Text="{TemplateBinding SearchText}"/>
-                        <ct:Button Grid.Column="1" Style="{StaticResource IconButton_Sort}" Visibility="{Binding IsEnabled, RelativeSource={RelativeSource Mode=Self}, Converter={StaticResource BVConv}}"/>
-                        <ct:Button Grid.Column="2" Style="{StaticResource IconButton_Search}" Visibility="{Binding IsEnabled, RelativeSource={RelativeSource Mode=Self}, Converter={StaticResource BVConv}}"/>
-                        <ct:Button Grid.Column="3" Style="{StaticResource IconButton_SearchClear}" Visibility="{Binding IsEnabled, RelativeSource={RelativeSource Mode=Self}, Converter={StaticResource BVConv}}"/>
-                        <TextBlock Grid.Column="4" Style="{StaticResource TextBlock_Count}" Text="{Binding ItemsCount, Mode=OneWay, RelativeSource={RelativeSource Mode=TemplatedParent}}" Visibility="{TemplateBinding ItemsCount, Converter={StaticResource TVConv}}"/>
-                    </Grid>
-                </ControlTemplate>
-            </Setter.Value>
-        </Setter>
+    <Style x:Key="MenuItem_MoveUp" TargetType="MenuItem" BasedOn="{StaticResource MenuItemBase_MoveUp}">
+        <Setter Property="Header" Value="{Binding MoveUp.MenuHeader, Source={x:Static ygo:Vocab.Current}}"/>
+    </Style>
+    <Style x:Key="MenuItem_MoveDown" TargetType="MenuItem" BasedOn="{StaticResource MenuItemBase_MoveDown}">
+        <Setter Property="Header" Value="{Binding MoveDown.MenuHeader, Source={x:Static ygo:Vocab.Current}}"/>
+    </Style>
+    <Style x:Key="MenuItem_Undo" TargetType="MenuItem" BasedOn="{StaticResource MenuItemBase_Undo}">
+        <Setter Property="Header" Value="{Binding Undo.MenuHeader, Source={x:Static ygo:Vocab.Current}}"/>
+    </Style>
+    <Style x:Key="MenuItem_Redo" TargetType="MenuItem" BasedOn="{StaticResource MenuItemBase_Redo}">
+        <Setter Property="Header" Value="{Binding Redo.MenuHeader, Source={x:Static ygo:Vocab.Current}}"/>
+    </Style>
+    <Style x:Key="MenuItem_AllClear" TargetType="MenuItem" BasedOn="{StaticResource MenuItemBase_New}">
+        <Setter Property="Header" Value="{Binding AllClear.MenuHeader, Source={x:Static ygo:Vocab.Current}}"/>
+    </Style>
+    <Style x:Key="MenuItem_New" TargetType="MenuItem" BasedOn="{StaticResource MenuItemBase_New}">
+        <Setter Property="Header" Value="{Binding New.MenuHeader, Source={x:Static ygo:Vocab.Current}}"/>
+    </Style>
+    <Style x:Key="MenuItem_Open" TargetType="MenuItem" BasedOn="{StaticResource MenuItemBase_Open}">
+        <Setter Property="Header" Value="{Binding Open.MenuHeader, Source={x:Static ygo:Vocab.Current}}"/>
+    </Style>
+    <Style x:Key="MenuItem_Save" TargetType="MenuItem" BasedOn="{StaticResource MenuItemBase_Save}">
+        <Setter Property="Header" Value="{Binding Save.MenuHeader, Source={x:Static ygo:Vocab.Current}}"/>
+    </Style>
+    <Style x:Key="MenuItem_Overwrite" TargetType="MenuItem" BasedOn="{StaticResource MenuItemBase_New}">
+        <Setter Property="Header" Value="{Binding Overwrite.MenuHeader, Source={x:Static ygo:Vocab.Current}}"/>
+    </Style>
+    <Style x:Key="MenuItem_Cut" TargetType="MenuItem" BasedOn="{StaticResource MenuItemBase_Cut}">
+        <Setter Property="Header" Value="{Binding Cut.MenuHeader, Source={x:Static ygo:Vocab.Current}}"/>
+    </Style>
+    <Style x:Key="MenuItem_Copy" TargetType="MenuItem" BasedOn="{StaticResource MenuItemBase_Copy}">
+        <Setter Property="Header" Value="{Binding Copy.MenuHeader, Source={x:Static ygo:Vocab.Current}}"/>
+    </Style>
+    <Style x:Key="MenuItem_Paste" TargetType="MenuItem" BasedOn="{StaticResource MenuItemBase_Paste}">
+        <Setter Property="Header" Value="{Binding Paste.MenuHeader, Source={x:Static ygo:Vocab.Current}}"/>
+    </Style>
+    <Style x:Key="MenuItem_Duplicate" TargetType="MenuItem" BasedOn="{StaticResource MenuItemBase_Duplicate}">
+        <Setter Property="Header" Value="{Binding Duplicate.MenuHeader, Source={x:Static ygo:Vocab.Current}}"/>
     </Style>
 
-    <Style x:Key="Button_PresetApply" TargetType="ct:Button" BasedOn="{StaticResource StyleBase_IconButton}">
-        <Setter Property="Icon" Value="{x:Static md:Icons.Check}"/>
-        <Setter Property="ToolTip" Value="{Binding Apply.Value, Source={x:Static ygo:Vocab.Current}}"/>
-        <Setter Property="Command" Value="local:PresetPresenterBase.ApplyCommand"/>
+    <Style x:Key="LargeButtonBase" TargetType="ct:Button">
+        <Setter Property="CornerRadius" Value="0"/>
+        <Setter Property="BorderThickness" Value="0"/>
+        <Setter Property="HorizontalAlignment" Value="Stretch"/>
+        <Setter Property="VerticalAlignment" Value="Stretch"/>
     </Style>
-    <Style x:Key="TextBox_PresetName" TargetType="TextBox">
-        <Setter Property="VerticalContentAlignment" Value="Center"/>
-        <Setter Property="Text" Value="{Binding Name, Mode=TwoWay}"/>
-        <Setter Property="Grid.Column" Value="1"/>
+
+    <Style x:Key="LargeButton_Blue" TargetType="ct:Button" BasedOn="{StaticResource LargeButtonBase}">
+        <Setter Property="Background" Value="{ct:BrushProvider #f8f8ff}"/>
     </Style>
-    <Style x:Key="RadioButton_PresetDefault" TargetType="ct:RadioButton">
-        <Setter Property="Focusable" Value="False"/>
-        <Setter Property="Margin" Value="2,0"/>
-        <Setter Property="Padding" Value="0"/>
-        <Setter Property="Width" Value="16"/>
+
+    <Style x:Key="LargeButton_Green" TargetType="ct:Button" BasedOn="{StaticResource LargeButtonBase}">
+        <Setter Property="Background" Value="{ct:BrushProvider #f8fff8}"/>
+        <Setter Property="Grid.Row" Value="1"/>
+    </Style>
+
+    <Style x:Key="LargeButton_Red" TargetType="ct:Button" BasedOn="{StaticResource LargeButtonBase}">
+        <Setter Property="Background" Value="{ct:BrushProvider #fff8f8}"/>
+        <Setter Property="Grid.Row" Value="2"/>
+    </Style>
+
+    <Style x:Key="LargeButtonStackPanel" TargetType="StackPanel">
+        <Setter Property="Orientation" Value="Vertical"/>
+    </Style>
+
+    <Style x:Key="LargeButtonIcon" TargetType="ct:IconPresenter">
+        <Setter Property="HorizontalAlignment" Value="Center"/>
         <Setter Property="Height" Value="16"/>
-        <Setter Property="BorderBrush" Value="Transparent"/>
-        <Setter Property="HorizontalContentAlignment" Value="Center"/>
-        <Setter Property="VerticalAlignment" Value="Center"/>
-        <Setter Property="GroupName" Value="DefaultPreset"/>
-        <Setter Property="IsOptionMarkVisible" Value="False"/>
-        <Setter Property="Icon" Value="{x:Static md:Icons.Download}"/>
-        <Setter Property="ToolTip" Value="{Binding SetToDefault.Value, Source={x:Static ygo:Vocab.Current}}"/>
-        <Setter Property="IsChecked" Value="{Binding IsDefault, Mode=TwoWay}"/>
-        <Setter Property="Command" Value="local:PresetPresenterBase.SetToDefaultCommand"/>
-        <Setter Property="Grid.Column" Value="2"/>
-        <Style.Triggers>
-            <Trigger Property="IsChecked" Value="True">
-                <Setter Property="Icon" Value="{x:Static md:Icons.Upload}"/>
-            </Trigger>
-        </Style.Triggers>
     </Style>
-    <Style TargetType="local:PresetPresenterBase">
-        <Setter Property="Template">
-            <Setter.Value>
-                <ControlTemplate TargetType="local:PresetPresenterBase">
-                    <Grid ColumnDefinitions="Auto, *, Auto">
-                        <ct:Button x:Name="PART_Apply" Style="{StaticResource Button_PresetApply}"/>
-                        <TextBox x:Name="PART_Name" Style="{StaticResource TextBox_PresetName}"/>
-                        <ct:RadioButton x:Name="PART_Default" Style="{StaticResource RadioButton_PresetDefault}"/>
-                    </Grid>
-                </ControlTemplate>
-            </Setter.Value>
-        </Setter>
-    </Style>
-
+    
     <Style x:Key="SearchWindow_Header" TargetType="TextBlock">
         <Setter Property="HorizontalAlignment" Value="Center"/>
         <Setter Property="VerticalAlignment" Value="Center"/>
@@ -286,49 +296,6 @@
         <Setter Property="VerticalAlignment" Value="Center"/>
     </Style>
 
-    <Style TargetType="local:SortOptionView">
-        <Setter Property="Focusable" Value="False"/>
-        <Setter Property="Template">
-            <Setter.Value>
-                <ControlTemplate TargetType="local:SortOptionView">
-                    <Border Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}">
-                        <Grid>
-                            <Grid.Resources>
-                                <Style TargetType="ct:RadioButton">
-                                    <Setter Property="Margin" Value="0,0,4,0"/>
-                                    <Setter Property="IsOptionMarkVisible" Value="False"/>
-                                </Style>
-                            </Grid.Resources>
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="Auto"/>
-                                <ColumnDefinition Width="*"/>
-                                <ColumnDefinition Width="Auto"/>
-                                <ColumnDefinition Width="Auto"/>
-                                <ColumnDefinition Width="Auto"/>
-                            </Grid.ColumnDefinitions>
-                            <Label x:Name="header" Grid.Column="0" VerticalContentAlignment="Center" Margin="0,0,4,0" Padding="0" Content="{TemplateBinding Header}"/>
-                            <ComboBox x:Name="ComboBox" Grid.Column="1" Style="{StaticResource ComboBoxBase}" Margin="0,0,4,0" ItemsSource="{x:Static local:SortSelectionItem.Items}" SelectedItem="{Binding SourceItem, Mode=TwoWay, RelativeSource={RelativeSource Mode=TemplatedParent}}">
-                                <ComboBox.ItemTemplate>
-                                    <DataTemplate>
-                                        <TextBlock Margin="0" Text="{Binding VocabData.Value}"/>
-                                    </DataTemplate>
-                                </ComboBox.ItemTemplate>
-                            </ComboBox>
-                            <ct:RadioButton Grid.Column="2" Icon="{x:Static md:Icons.ArrowUp}" ToolTip="{Binding Ascending, Source={x:Static ygo:Vocab.Current}}" IsChecked="{Binding IsAscending, Mode=TwoWay, RelativeSource={RelativeSource Mode=TemplatedParent}}"/>
-                            <ct:RadioButton Grid.Column="3" Icon="{x:Static md:Icons.ArrowDown}" ToolTip="{Binding Descending, Source={x:Static ygo:Vocab.Current}}" IsChecked="{Binding IsDescending, Mode=TwoWay, RelativeSource={RelativeSource Mode=TemplatedParent}}"/>
-                            <ct:Button Grid.Column="4" Margin="0" Icon="{x:Static md:Icons.Delete}" ToolTip="{Binding Clear, Source={x:Static ygo:Vocab.Current}}" Command="ygo:YgoCommands.SearchClear"/>
-                        </Grid>
-                    </Border>
-                    <ControlTemplate.Triggers>
-                        <Trigger Property="Header" Value="{x:Null}">
-                            <Setter TargetName="header" Property="Visibility" Value="Collapsed"/>
-                        </Trigger>
-                    </ControlTemplate.Triggers>
-                </ControlTemplate>
-            </Setter.Value>
-        </Setter>
-    </Style>
-
     <Style x:Key="ToolTipBorder" TargetType="Border" BasedOn="{StaticResource HelpPopupContent}">
         <Setter Property="Control.FontFamily" Value="Yu Gothic UI"/>
     </Style>
@@ -359,7 +326,7 @@
         <StackPanel Orientation="Horizontal">
             <ct:IconPresenter Height="16" Source="{Binding ThisCard.Icon}" Margin="0,0,2,0"/>
             <TextBlock>
-                <Hyperlink Focusable="False" Command="ygo:YgoCommands.CardLink">
+                <Hyperlink Focusable="False" Command="ygo:YgoCommands.DetachCardInfo" CommandParameter="{Binding ThisCard}">
                     <Run Text="{Binding ThisCard.Name}"/>
                 </Hyperlink>
             </TextBlock>
@@ -411,7 +378,7 @@
         <StackPanel Orientation="Horizontal">
             <ct:IconPresenter Height="16" Source="{Binding ThisCard.Icon}" Margin="0,0,2,0"/>
             <TextBlock>
-                <Hyperlink Focusable="False" Command="ygo:YgoCommands.CardLink">
+                <Hyperlink Focusable="False" Command="ygo:YgoCommands.DetachCardInfo" CommandParameter="{Binding ThisCard}">
                     <Run Text="{Binding ThisCard.Name}"/>
                 </Hyperlink>
             </TextBlock>
@@ -439,7 +406,7 @@
     </DataTemplate>
 
     <DataTemplate x:Key="ItemTemplate_CheckableFullText" DataType="data:CheckableCard">
-        <StackPanel x:Name="panel" Orientation="Horizontal">
+        <StackPanel x:Name="panel" Orientation="Horizontal" HorizontalAlignment="Stretch">
             <CheckBox IsChecked="{Binding IsChecked, Mode=OneWay}" Focusable="False" IsHitTestVisible="False" Margin="0,0,2,0" VerticalContentAlignment="Center"/>
             <ct:IconPresenter Height="16" Source="{Binding ThisCard.Icon}" Margin="0,0,2,0"/>
             <TextBlock Text="{Binding ThisCard.Name}"/>
@@ -528,12 +495,12 @@
         </DataTemplate.Triggers>
     </DataTemplate>
 
-    <Style TargetType="ListView" x:Key="CardListView" BasedOn="{StaticResource Alt2ListBoxStyle}">
+    <Style TargetType="ListBox" x:Key="CardListView" BasedOn="{StaticResource Alt2ListBoxStyle}">
         <Setter Property="SelectionMode" Value="Single"/>
         <Setter Property="ItemTemplate" Value="{StaticResource ItemTemplate_FullText}"/>
     </Style>
 
-    <Style TargetType="ListView" x:Key="CardListView_MultiSelect" BasedOn="{StaticResource Alt2ListBoxStyle}">
+    <Style TargetType="ListBox" x:Key="CardListView_MultiSelect" BasedOn="{StaticResource Alt2ListBoxStyle}">
         <Setter Property="SelectionMode" Value="Extended"/>
         <Setter Property="ItemTemplate" Value="{StaticResource ItemTemplate_FullText}"/>
     </Style>
@@ -546,5 +513,303 @@
 
     <Style x:Key="EditBarStackPanel" TargetType="StackPanel" BasedOn="{StaticResource EditBarPanel}">
         <Setter Property="Orientation" Value="Horizontal"/>
+    </Style>
+
+    <Style TargetType="ct:SearchBar">
+        <Setter Property="OpenSortText" Value="{Binding Sort.Value, Source={x:Static ygo:Vocab.Current}}"/>
+        <Setter Property="OpenSearchText" Value="{Binding Search.Value, Source={x:Static ygo:Vocab.Current}}"/>
+        <Setter Property="ClearText" Value="{Binding Clear.Value, Source={x:Static ygo:Vocab.Current}}"/>
+    </Style>
+
+    <Style x:Key="Button_PresetApply" TargetType="ct:Button" BasedOn="{StaticResource IconButtonBase}">
+        <Setter Property="Icon" Value="{x:Static md:Icons.Check}"/>
+        <Setter Property="ToolTip" Value="{Binding Apply.Value, Source={x:Static ygo:Vocab.Current}}"/>
+        <Setter Property="Command" Value="local:PresetPresenterBase.ApplyCommand"/>
+    </Style>
+    <Style x:Key="TextBox_PresetName" TargetType="TextBox">
+        <Setter Property="VerticalContentAlignment" Value="Center"/>
+        <Setter Property="Text" Value="{Binding Name, Mode=TwoWay}"/>
+        <Setter Property="Grid.Column" Value="1"/>
+    </Style>
+    <Style x:Key="RadioButton_PresetDefault" TargetType="ct:RadioButton">
+        <Setter Property="Focusable" Value="False"/>
+        <Setter Property="Margin" Value="2,0"/>
+        <Setter Property="Padding" Value="0"/>
+        <Setter Property="Width" Value="16"/>
+        <Setter Property="Height" Value="16"/>
+        <Setter Property="BorderBrush" Value="Transparent"/>
+        <Setter Property="HorizontalContentAlignment" Value="Center"/>
+        <Setter Property="VerticalAlignment" Value="Center"/>
+        <Setter Property="GroupName" Value="DefaultPreset"/>
+        <Setter Property="IsOptionMarkVisible" Value="False"/>
+        <Setter Property="Icon" Value="{x:Static md:Icons.Download}"/>
+        <Setter Property="ToolTip" Value="{Binding SetToDefault.Value, Source={x:Static ygo:Vocab.Current}}"/>
+        <Setter Property="IsChecked" Value="{Binding IsDefault, Mode=TwoWay}"/>
+        <Setter Property="Command" Value="local:PresetPresenterBase.SetToDefaultCommand"/>
+        <Setter Property="Grid.Column" Value="2"/>
+        <Style.Triggers>
+            <Trigger Property="IsChecked" Value="True">
+                <Setter Property="Icon" Value="{x:Static md:Icons.Upload}"/>
+            </Trigger>
+        </Style.Triggers>
+    </Style>
+    <Style TargetType="local:PresetPresenterBase">
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="local:PresetPresenterBase">
+                    <Grid ColumnDefinitions="Auto, *, Auto">
+                        <ct:Button x:Name="PART_Apply" Style="{StaticResource Button_PresetApply}"/>
+                        <TextBox x:Name="PART_Name" Style="{StaticResource TextBox_PresetName}"/>
+                        <ct:RadioButton x:Name="PART_Default" Style="{StaticResource RadioButton_PresetDefault}"/>
+                    </Grid>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <Style TargetType="local:SortOptionView">
+        <Setter Property="Focusable" Value="False"/>
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="local:SortOptionView">
+                    <Border Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}">
+                        <Grid>
+                            <Grid.Resources>
+                                <Style TargetType="ct:RadioButton">
+                                    <Setter Property="Margin" Value="0,0,4,0"/>
+                                    <Setter Property="IsOptionMarkVisible" Value="False"/>
+                                </Style>
+                            </Grid.Resources>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="Auto"/>
+                            </Grid.ColumnDefinitions>
+                            <Label x:Name="header" Grid.Column="0" VerticalContentAlignment="Center" Margin="0,0,4,0" Padding="0" Content="{TemplateBinding Header}"/>
+                            <ComboBox x:Name="ComboBox" Grid.Column="1" Style="{StaticResource ComboBoxBase}" Margin="0,0,4,0" ItemsSource="{x:Static local:SortSelectionItem.Items}" SelectedItem="{Binding SourceItem, Mode=TwoWay, RelativeSource={RelativeSource Mode=TemplatedParent}}">
+                                <ComboBox.ItemTemplate>
+                                    <DataTemplate>
+                                        <TextBlock Margin="0" Text="{Binding VocabData.Value}"/>
+                                    </DataTemplate>
+                                </ComboBox.ItemTemplate>
+                            </ComboBox>
+                            <ct:RadioButton Grid.Column="2" Icon="{x:Static md:Icons.ArrowUp}" ToolTip="{Binding Ascending, Source={x:Static ygo:Vocab.Current}}" IsChecked="{Binding IsAscending, Mode=TwoWay, RelativeSource={RelativeSource Mode=TemplatedParent}}"/>
+                            <ct:RadioButton Grid.Column="3" Icon="{x:Static md:Icons.ArrowDown}" ToolTip="{Binding Descending, Source={x:Static ygo:Vocab.Current}}" IsChecked="{Binding IsDescending, Mode=TwoWay, RelativeSource={RelativeSource Mode=TemplatedParent}}"/>
+                            <ct:Button Grid.Column="4" Margin="0" Icon="{x:Static md:Icons.Delete}" ToolTip="{Binding Clear, Source={x:Static ygo:Vocab.Current}}" Command="input:Commands.TextSearchClear"/>
+                        </Grid>
+                    </Border>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="Header" Value="{x:Null}">
+                            <Setter TargetName="header" Property="Visibility" Value="Collapsed"/>
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <Style TargetType="local:DeckRecipeView">
+        <Setter Property="Background" Value="White"/>
+        <Setter Property="HeaderHeight" Value="24"/>
+        <Setter Property="ContentHeight" Value="36"/>
+        <Setter Property="NameWidth1" Value="185"/>
+        <Setter Property="NameWidth2" Value="185"/>
+        <Setter Property="NameWidth3" Value="185"/>
+        <Setter Property="NameWidth4" Value="185"/>
+        <Setter Property="HorizontalAlignment" Value="Left"/>
+        <Setter Property="VerticalAlignment" Value="Top"/>
+        <Setter Property="UseLayoutRounding" Value="False"/>
+        <Setter Property="NumberFontWeight" Value="Bold"/>
+        <Setter Property="FontSize" Value="16"/>
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="local:DeckRecipeView">
+                    <Grid ColumnDefinitions="Auto, Auto, Auto, Auto">
+                        <Grid.Resources>
+                            <Style TargetType="TextBlock">
+                                <Setter Property="Margin" Value="2,0"/>
+                                <Setter Property="VerticalAlignment" Value="Center"/>
+                                <Setter Property="HorizontalAlignment" Value="Center"/>
+                            </Style>
+                            <Style TargetType="TextBox">
+                                <Setter Property="Margin" Value="0"/>
+                                <Setter Property="Padding" Value="0"/>
+                                <Setter Property="BorderBrush" Value="Transparent"/>
+                                <Setter Property="Background" Value="Transparent"/>
+                                <Setter Property="AcceptsReturn" Value="True"/>
+                                <Setter Property="ToolTip" Value="{Binding Deck_LineBreak, Source={x:Static ygo:Vocab.Current}}"/>
+                                <Style.Triggers>
+                                    <Trigger Property="IsMouseOver" Value="True">
+                                        <Setter Property="Background" Value="{Binding SelectedBackground, RelativeSource={RelativeSource AncestorType=local:DeckRecipeView}}"/>
+                                    </Trigger>
+                                </Style.Triggers>
+                            </Style>
+                            <Style TargetType="ct:VerticalTextBlock">
+                                <Setter Property="CharMargin" Value="2,-2"/>
+                            </Style>
+                        </Grid.Resources>
+                        <Grid Grid.Column="0" Grid.IsSharedSizeScope="True">
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="1"/>
+                                <RowDefinition Height="{TemplateBinding HeaderHeight}"/>
+                                <RowDefinition Height="1"/>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="1"/>
+                            </Grid.RowDefinitions>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="1"/>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="1"/>
+                                <ColumnDefinition Width="Auto" SharedSizeGroup="Label"/>
+                                <ColumnDefinition Width="1"/>
+                                <ColumnDefinition Width="{TemplateBinding NameWidth1}"/>
+                                <ColumnDefinition Width="1"/>
+                            </Grid.ColumnDefinitions>
+                            <StackPanel x:Name="MainDeck1" Grid.Row="3" Grid.Column="3" Grid.ColumnSpan="3"/>
+                            <!-- header -->
+                            <Border Grid.Column="1" Grid.Row="3" Background="{TemplateBinding Background}">
+                                <ct:VerticalTextBlock Text="{Binding Deck_Main.Value, Source={x:Static ygo:Vocab.Current}}"/>
+                            </Border>
+                            <Border Grid.Column="3" Grid.Row="1" Background="{TemplateBinding Background}">
+                                <TextBlock Text="{Binding Deck_Count.Value, Source={x:Static ygo:Vocab.Current}}"/>
+                            </Border>
+                            <Border Grid.Column="5" Grid.Row="1" Background="{TemplateBinding Background}">
+                                <TextBlock Text="{Binding CInfo.Name.Value, Source={x:Static ygo:Vocab.Current}}"/>
+                            </Border>
+                            <!-- vertical border -->
+                            <Border Grid.Row="2" Grid.RowSpan="3" Background="{TemplateBinding MainBorderBrush}"/>
+                            <Border Grid.Column="2" Grid.RowSpan="5" Background="{TemplateBinding MainBorderBrush}"/>
+                            <Border Grid.Column="4" Grid.RowSpan="5" Background="{TemplateBinding VerticalDashBrush}"/>
+                            <Border Grid.Column="6" Grid.RowSpan="5" Background="{TemplateBinding MainBorderBrush}"/>
+                            <!-- horizontal border -->
+                            <Border Grid.Column="2" Grid.ColumnSpan="5" Background="{TemplateBinding MainBorderBrush}"/>
+                            <Border Grid.ColumnSpan="7" Grid.Row="2" Background="{TemplateBinding MainBorderBrush}"/>
+                            <Border Grid.ColumnSpan="7" Grid.Row="4" Background="{TemplateBinding MainBorderBrush}"/>
+                        </Grid>
+                        <Grid Grid.Column="1" Grid.IsSharedSizeScope="True">
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="1"/>
+                                <RowDefinition Height="{TemplateBinding HeaderHeight}"/>
+                                <RowDefinition Height="1"/>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="1"/>
+                            </Grid.RowDefinitions>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto" SharedSizeGroup="Label"/>
+                                <ColumnDefinition Width="1"/>
+                                <ColumnDefinition Width="{TemplateBinding NameWidth2}"/>
+                                <ColumnDefinition Width="1"/>
+                            </Grid.ColumnDefinitions>
+                            <StackPanel x:Name="MainDeck2" Grid.Row="3" Grid.Column="0" Grid.ColumnSpan="3"/>
+                            <!-- header -->
+                            <Border Grid.Column="0" Grid.Row="1" Background="{TemplateBinding Background}">
+                                <TextBlock Text="{Binding Deck_Count.Value, Source={x:Static ygo:Vocab.Current}}"/>
+                            </Border>
+                            <Border Grid.Column="2" Grid.Row="1" Background="{TemplateBinding Background}">
+                                <TextBlock Text="{Binding CInfo.Name.Value, Source={x:Static ygo:Vocab.Current}}"/>
+                            </Border>
+                            <!-- vertical border -->
+                            <Border Grid.Column="1" Grid.RowSpan="5" Background="{TemplateBinding VerticalDashBrush}"/>
+                            <Border Grid.Column="3" Grid.RowSpan="5" Background="{TemplateBinding MainBorderBrush}"/>
+                            <!-- horizontal border -->
+                            <Border Grid.ColumnSpan="4" Grid.Row="0" Background="{TemplateBinding MainBorderBrush}"/>
+                            <Border Grid.ColumnSpan="4" Grid.Row="2" Background="{TemplateBinding MainBorderBrush}"/>
+                            <Border Grid.ColumnSpan="4" Grid.Row="4" Background="{TemplateBinding MainBorderBrush}"/>
+                        </Grid>
+                        <Grid Grid.Column="2" Margin="-1,0,0,0" Visibility="{TemplateBinding IsExtraDeckVisible, Converter={StaticResource BVConv}}" Grid.IsSharedSizeScope="True">
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="1"/>
+                                <RowDefinition Height="{TemplateBinding HeaderHeight}"/>
+                                <RowDefinition Height="1"/>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="1"/>
+                            </Grid.RowDefinitions>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="1"/>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="1"/>
+                                <ColumnDefinition Width="Auto" SharedSizeGroup="Label"/>
+                                <ColumnDefinition Width="1"/>
+                                <ColumnDefinition Width="{TemplateBinding NameWidth3}"/>
+                                <ColumnDefinition Width="1"/>
+                            </Grid.ColumnDefinitions>
+                            <StackPanel x:Name="ExtraDeck" Grid.Row="3" Grid.Column="3" Grid.ColumnSpan="3"/>
+                            <!-- header -->
+                            <Border Grid.Column="1" Grid.Row="3" Background="{TemplateBinding Background}">
+                                <ct:VerticalTextBlock Text="{Binding Deck_Extra.Value, Source={x:Static ygo:Vocab.Current}}"/>
+                            </Border>
+                            <Border Grid.Column="3" Grid.Row="1" Background="{TemplateBinding Background}">
+                                <TextBlock Text="{Binding Deck_Count.Value, Source={x:Static ygo:Vocab.Current}}"/>
+                            </Border>
+                            <Border Grid.Column="5" Grid.Row="1" Background="{TemplateBinding Background}">
+                                <TextBlock Text="{Binding CInfo.Name.Value, Source={x:Static ygo:Vocab.Current}}"/>
+                            </Border>
+                            <!-- vertical border -->
+                            <Border Grid.Row="2" Grid.RowSpan="3" Background="{TemplateBinding MainBorderBrush}"/>
+                            <Border Grid.Column="2" Grid.RowSpan="5" Background="{TemplateBinding MainBorderBrush}"/>
+                            <Border Grid.Column="4" Grid.RowSpan="5" Background="{TemplateBinding VerticalDashBrush}"/>
+                            <Border Grid.Column="6" Grid.RowSpan="5" Background="{TemplateBinding MainBorderBrush}"/>
+                            <!-- horizontal border -->
+                            <Border Grid.Column="2" Grid.ColumnSpan="5" Background="{TemplateBinding MainBorderBrush}"/>
+                            <Border Grid.ColumnSpan="7" Grid.Row="2" Background="{TemplateBinding MainBorderBrush}"/>
+                            <Border Grid.ColumnSpan="7" Grid.Row="4" Background="{TemplateBinding MainBorderBrush}"/>
+                        </Grid>
+                        <Grid Grid.Column="3" Margin="-1,0,0,0" Visibility="{TemplateBinding IsSideDeckVisible, Converter={StaticResource BVConv}}" Grid.IsSharedSizeScope="True">
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="1"/>
+                                <RowDefinition Height="{TemplateBinding HeaderHeight}"/>
+                                <RowDefinition Height="1"/>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="1"/>
+                            </Grid.RowDefinitions>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="1"/>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="1"/>
+                                <ColumnDefinition Width="Auto" SharedSizeGroup="Label"/>
+                                <ColumnDefinition Width="1"/>
+                                <ColumnDefinition Width="{TemplateBinding NameWidth4}"/>
+                                <ColumnDefinition Width="1"/>
+                            </Grid.ColumnDefinitions>
+                            <StackPanel x:Name="SideDeck" Grid.Row="3" Grid.Column="3" Grid.ColumnSpan="3"/>
+                            <!-- header -->
+                            <Border Grid.Column="1" Grid.Row="3" Background="{TemplateBinding Background}">
+                                <ct:VerticalTextBlock Text="{Binding Deck_Side.Value, Source={x:Static ygo:Vocab.Current}}"/>
+                            </Border>
+                            <Border Grid.Column="3" Grid.Row="1" Background="{TemplateBinding Background}">
+                                <TextBlock Text="{Binding Deck_Count.Value, Source={x:Static ygo:Vocab.Current}}"/>
+                            </Border>
+                            <Border Grid.Column="5" Grid.Row="1" Background="{TemplateBinding Background}">
+                                <TextBlock Text="{Binding CInfo.Name.Value, Source={x:Static ygo:Vocab.Current}}"/>
+                            </Border>
+                            <!-- vertical border -->
+                            <Border Grid.Row="2" Grid.RowSpan="3" Background="{TemplateBinding MainBorderBrush}"/>
+                            <Border Grid.Column="2" Grid.RowSpan="5" Background="{TemplateBinding MainBorderBrush}"/>
+                            <Border Grid.Column="4" Grid.RowSpan="5" Background="{TemplateBinding VerticalDashBrush}"/>
+                            <Border Grid.Column="6" Grid.RowSpan="5" Background="{TemplateBinding MainBorderBrush}"/>
+                            <!-- horizontal border -->
+                            <Border Grid.Column="2" Grid.ColumnSpan="5" Background="{TemplateBinding MainBorderBrush}"/>
+                            <Border Grid.ColumnSpan="7" Grid.Row="2" Background="{TemplateBinding MainBorderBrush}"/>
+                            <Border Grid.ColumnSpan="7" Grid.Row="4" Background="{TemplateBinding MainBorderBrush}"/>
+                        </Grid>
+                    </Grid>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <Style TargetType="local:MatchTypeSelector" BasedOn="{StaticResource ComboBoxBase}">
+        <Setter Property="ItemsSource" Value="{x:Static local:MatchTypeItem.Items}"/>
+        <Setter Property="BorderBrush" Value="Transparent"/>
+        <Setter Property="SelectedItem" Value="{Binding MatchType, Mode=TwoWay, RelativeSource={RelativeSource Mode=Self}, Converter={StaticResource CIConv}}"/>
+        <Setter Property="ItemTemplate">
+            <Setter.Value>
+                <DataTemplate>
+                    <TextBlock Text="{Binding Name.Value}"/>
+                </DataTemplate>
+            </Setter.Value>
+        </Setter>
     </Style>
 </ResourceDictionary>

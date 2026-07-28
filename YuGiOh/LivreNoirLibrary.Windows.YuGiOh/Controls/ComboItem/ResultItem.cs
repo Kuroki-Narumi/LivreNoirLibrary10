@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace LivreNoirLibrary.Windows.YuGiOh.Controls
 {
-    public class ResultItem : ComboItemBase<Result>
+    public sealed class ResultItem : AltBackgroundComboItem<Result>
     {
         public static ResultItem[] Items { get; }
         public static ResultItem? GetItem(Result value) => _items.GetValueOrDefault(value);

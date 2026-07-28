@@ -77,9 +77,9 @@ namespace LivreNoirLibrary.YuGiOh.Data
             }
         }
 
-        public void RemoveWithoutNotify(Card card, bool max = false, bool toSideDeck = false)
+        public void RemoveWithoutNotify(Card card, bool max = false, bool fromSideDeck = false)
         {
-            DeckCardList target = toSideDeck ? SideDeck : (card.IsMainDeck() ? MainDeck : ExtraDeck);
+            DeckCardList target = fromSideDeck ? SideDeck : (card.IsMainDeck() ? MainDeck : ExtraDeck);
             if (max)
             {
                 target.SetWithoutNotify(card, 0, out _, out _);
@@ -88,6 +88,18 @@ namespace LivreNoirLibrary.YuGiOh.Data
             {
                 target.RemoveWithoutNotify(card, out _, out _);
             }
+        }
+
+        public void Set(Card card, int count, bool toSideDeck = false)
+        {
+            DeckCardList target = toSideDeck ? SideDeck : (card.IsMainDeck() ? MainDeck : ExtraDeck);
+            target.Set(card, count);
+        }
+
+        public void SetWithoutNotify(Card card, int count, bool toSideDeck = false)
+        {
+            DeckCardList target = toSideDeck ? SideDeck : (card.IsMainDeck() ? MainDeck : ExtraDeck);
+            target.SetWithoutNotify(card, count, out _, out _);
         }
 
         public void NotifyCollectionReset()
@@ -160,7 +172,7 @@ namespace LivreNoirLibrary.YuGiOh.Data
             {
                 return false;
             }
-            if (Json.TryParse<Serializable.Deck>(path, out var deck) && !deck.IsEmpty())
+            if (Json.TryOpen<Serializable.Deck>(path, out var deck) && !deck.IsEmpty())
             {
                 Load(deck, provider);
             }
@@ -184,8 +196,7 @@ namespace LivreNoirLibrary.YuGiOh.Data
             writer.WriteEndObject();
         }
 
-        public IEnumerable<int> EnumerateIds() => ConcutnateEnumerator.Create(MainDeck.EnumerateIds(), ExtraDeck.EnumerateIds(), SideDeck.EnumerateIds());
-
-        public IEnumerable<ICard> EnumerateCards() => ConcutnateEnumerator.Create(MainDeck.EnumerateCards(), ExtraDeck.EnumerateCards(), SideDeck.EnumerateCards());
+        public IEnumerable<Card> CardEnumerable => ConcutnateEnumerator.Create(MainDeck.CardEnumerable, ExtraDeck.CardEnumerable, SideDeck.CardEnumerable);
+        public IEnumerable<int> IdEnumerable => ConcutnateEnumerator.Create(MainDeck.IdEnumerable, ExtraDeck.IdEnumerable, SideDeck.IdEnumerable);
     }
 }

@@ -185,5 +185,20 @@ namespace LivreNoirLibrary.Windows.Controls
             ProcessSelect(selector, index + 1);
             e.Handled = true;
         }
+
+        public static void ScrollSelectedItemIntoView(this ListBox selector)
+        {
+            if (selector.SelectionMode is SelectionMode.Single)
+            {
+                if (selector.SelectedItem is { } item)
+                {
+                    selector.ScrollIntoView(item);
+                }
+            }
+            else if (selector.SelectedItems.Count > 0)
+            {
+                selector.ScrollIntoView(selector.SelectedItems[0]);
+            }
+        }
     }
 }

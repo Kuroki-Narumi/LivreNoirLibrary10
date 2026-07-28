@@ -17,7 +17,7 @@ namespace LivreNoirLibrary.YuGiOh
         public static Order[] Orders { get; } = [Order.First, Order.Second, Order.CFirst, Order.CSecond];
         public static Result[] Results { get; } = Enum.GetValues<Result>();
 
-        public static bool IsMonster(this CardType type) => type is not 0 && (type & CardType.Type_Filter) is 0;
+        public static bool IsMonster(this CardType type) => type is not 0 && ((type & CardType.Type_Filter) is 0 || (type & CardType.MonsterLike) is not 0);
         public static bool IsSpell(this CardType type) => (type & CardType.Type_Filter) is CardType.Normal_Spell;
         public static bool IsTrap(this CardType type) => (type & CardType.Type_Filter) is CardType.Normal_Trap;
         public static bool IsMainDeckMonster(this CardType type) => type is CardType.Main_Monster or CardType.Ritual_Monster;
@@ -31,8 +31,8 @@ namespace LivreNoirLibrary.YuGiOh
         public static bool IsXyz(this CardType type) => type is CardType.Xyz_Monster;
         public static bool IsLink(this CardType type) => type is CardType.Link_Monster;
         public static bool IsToken(this CardType type) => type is CardType.Token;
-        public static bool HasLevel(this CardType type) => type is (>= CardType.Main_Monster and <= CardType.Synchro_Monster) or CardType.Token;
-        public static bool HasDef(this CardType type) => type is >= CardType.Main_Monster and <= CardType.Xyz_Monster;
+        public static bool HasLevel(this CardType type) => type is not (CardType.Xyz_Monster or CardType.Link_Monster) && IsMonster(type);
+        public static bool HasDef(this CardType type) => type is not CardType.Link_Monster && IsMonster(type);
 
         public static bool IsPendulum(this Ability ability) => (ability & Ability.Pendulum) is not 0;
         public static bool IsTuner(this Ability ability) => (ability & Ability.Tuner) is not 0;

@@ -19,12 +19,9 @@ namespace LivreNoirLibrary.Windows.YuGiOh.Controls
     /// <summary>
     /// DeckEditor.xaml の相互作用ロジック
     /// </summary>
-    public partial class DeckEditor : DeckEditor_Base, ICardSearch, IGridViewSort, IDragDrop, IProgressReporter
+    public partial class DeckEditor : DeckEditor_Base, IDragDrop, IProgressReporter
     {
-        ListBox ICardListView.CardListBox => ListView_CardList;
-        ICardProvider? ICardSearch.CardProvider => CardProvider;
-        CardSearchConditions ICardSearch.CardSearchConditions { get; } = new();
-        CardSearchConditions ICardSearch.DefaultCardSearchConditions { get; } = new() { Limits = [LimitCount.Forbidden, LimitCount.Limit1, LimitCount.Limit2, LimitCount.Unlimited] };
+        public CardSearchConditions DefaultCardSearchConditions => CardSearchConditions.Usable;
 
         WeakReference<object> IDragDrop.DragSource { get; } = new(null!);
         Point IDragDrop.DragStartPoint { get; set; }
@@ -40,14 +37,11 @@ namespace LivreNoirLibrary.Windows.YuGiOh.Controls
 
         private readonly List<Card> _selected = [];
         private bool _selectionChanging;
-        private string? _currentSort;
-        private bool _currentAscending;
 
         public DeckEditor()
         {
             MainGrid.DataContext = this;
             ListViews = [ListView_CardList, ListView_MainDeck, ListView_ExtraDeck, ListView_SideDeck];
-            this.RegisterCardSearchCommands();
             CardClipboard.RegisterCopy(ListView_CardList);
             CardClipboard.RegisterCopy(ListView_MainDeck);
             CardClipboard.RegisterCopy(ListView_ExtraDeck);
@@ -57,14 +51,6 @@ namespace LivreNoirLibrary.Windows.YuGiOh.Controls
         protected override void Initialize()
         {
             InitializeComponent();
-        }
-
-        void ICardSearch.SetCardSearchText(string text) => SearchBar?.SearchText = text;
-        private void CardList_RequestSearch(object sender, RoutedEventArgs<string> e) => ICardSearchExtensions.CardList_RequestSearch(this, sender, e);
-
-        public void SortBy(ListBox control, string key)
-        {
-            ListView_CardList.UpdateSort(key, ref _currentSort, ref _currentAscending);
         }
 
         protected override void ApplyHistory(DeckHistoryData historyData)
@@ -334,23 +320,9 @@ namespace LivreNoirLibrary.Windows.YuGiOh.Controls
             }
         }
 
-        bool IDragDrop.HandleMouseButtonEvent(object sender, MouseButtonEventArgs e)
-        {
-            if (Keyboard.Modifiers is 0 && sender is ListViewItem { IsSelected: true } item && item.TryGetAncestor<IListView>(out var lv))
-            {
-                lv.Focus();
-                return true;
-            }
-            return false;
-        }
+        bool IDragDrop.HandleMouseButtonEvent(object sender, MouseButtonEventArgs e) => IDragDropExtensions.HandleMouseButton_ListViewItem(sender, e);
 
-        void IDragDrop.BuildDataObject(DataObject obj, object sender)
-        {
-            if ((sender as DependencyObject).TryGetAncestor<IListView>(out var lv))
-            {
-                obj.SetData(DataObjectTypes.DeckDragDrop, lv);
-            }
-        }
+        void IDragDrop.BuildDataObject(DataObject obj, object sender) => IDragDropExtensions.BuildDataObject_ListView(DataObjectTypes.DeckDragDrop, obj, sender);
 
         bool IDragDrop.CanDrop(IDataObject obj) => obj.GetDataPresent(DataObjectTypes.DeckDragDrop);
 
@@ -372,6 +344,31 @@ namespace LivreNoirLibrary.Windows.YuGiOh.Controls
                 return true;
             }
             return false;
+        }
+
+        private void OnClick_ClearButton(object sender, RoutedEventArgs e)
+        {
+            e.Handled = true;
+            if (sender is FrameworkElement { Tag: DeckCardList list })
+            {
+                BeforeEdit();
+                list.Clear();
+                this.OnEdit();
+            }
+        }
+
+        public void AddCard(Card card, bool max = false, bool toSideDeck = false)
+        {
+            BeforeEdit();
+            Deck?.Add(card, max, toSideDeck);
+            this.OnEdit();
+        }
+
+        public void RemoveCard(Card card, bool max = false, bool fromSideDeck = false)
+        {
+            BeforeEdit();
+            Deck?.Remove(card, max, fromSideDeck);
+            this.OnEdit();
         }
     }
 }

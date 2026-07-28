@@ -7,6 +7,7 @@ using System.Windows.Data;
 
 namespace LivreNoirLibrary.Windows.YuGiOh.Converters
 {
+    using LivreNoirLibrary.Windows.Controls;
     using LivreNoirLibrary.YuGiOh;
 
     public class ComboItemConverter : IValueConverter
@@ -20,6 +21,8 @@ namespace LivreNoirLibrary.Windows.YuGiOh.Converters
             Order v => OrderItem.GetItem(v),
             Result v => ResultItem.GetItem(v),
             MatchType v => MatchTypeItem.GetItem(v),
+            TableViewValueStyle v => TableValueStyleItem.GetItem(v),
+            TableViewDigitMode v => TableDigitModeItem.GetItem(v),
             _ => value
         };
 
@@ -32,6 +35,8 @@ namespace LivreNoirLibrary.Windows.YuGiOh.Converters
             OrderItem item => item.Value,
             ResultItem item => item.Value,
             MatchTypeItem item => item.Value,
+            TableValueStyleItem item => item.Value,
+            TableDigitModeItem item => item.Value,
             _ => value
         };
     }

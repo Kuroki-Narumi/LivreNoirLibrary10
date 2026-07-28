@@ -1,23 +1,30 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Text.Json.Serialization;
+using LivreNoirLibrary.YuGiOh.Converters;
 using LivreNoirLibrary.YuGiOh.Data;
 
 namespace LivreNoirLibrary.YuGiOh.Search
 {
+    [JsonConverter(typeof(CardSortOptionJsonConverter))]
     public readonly struct CardSortOption(SortKey key, ListSortDirection direction)
     {
         public SortKey Key { get; } = key;
         public ListSortDirection Direction { get; } = direction;
+
+        [JsonIgnore]
         public bool IsAscending => Direction is ListSortDirection.Ascending;
+        [JsonIgnore]
         public bool IsDescending => Direction is ListSortDirection.Descending;
+        [JsonIgnore]
+        public string PropertyName => GetPropertyName(Key, IsDescending);
 
         public CardSortOption(SortKey key, bool isDescending) : this(key, isDescending ? ListSortDirection.Descending : ListSortDirection.Ascending) { }
 
         public int GetIntValue() => (int)Key * (IsDescending ? -1 : 1);
         public static CardSortOption FromIntValue(int value) => value >= 0 ? new((SortKey)value, ListSortDirection.Ascending) : new((SortKey)(-value), ListSortDirection.Descending);
 
-        public string PropertyName => GetPropertyName(Key, IsDescending);
 
         private static HashSet<string> AppendD { get; } = new(StringComparer.OrdinalIgnoreCase)
         {
@@ -84,7 +91,7 @@ namespace LivreNoirLibrary.YuGiOh.Search
             {
                 return GetPropertyName(value, isDescending);
             }
-            return AppendD.Contains(key) ? $"ThisCard.{key}" : $"ThisCard.{key}D";
+            return key;
         }
 
         public static string GetPropertyName(SortKey key, bool isDescending)

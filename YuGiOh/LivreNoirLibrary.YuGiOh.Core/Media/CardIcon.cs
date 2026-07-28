@@ -11,6 +11,7 @@ namespace LivreNoirLibrary.YuGiOh.Media
         public static CardIconType GetIconType(CardType type, bool effect = true, bool pendulum = false)
         {
             CardIconType result;
+            type &= CardType.MonsterLike_Filter;
             switch (type)
             {
                 case CardType.Main_Monster:
@@ -24,12 +25,6 @@ namespace LivreNoirLibrary.YuGiOh.Media
                 case CardType.Token:
                     result = (CardIconType)type;
                     break;
-                case CardType.Spell_Monster:
-                    return CardIconType.Spell;
-                case CardType.Trap_Monster:
-                    return CardIconType.Trap;
-                case CardType.CTrap_Monster:
-                    return CardIconType.Continuous_Trap;
                 default:
                     return (CardIconType)type;
             }

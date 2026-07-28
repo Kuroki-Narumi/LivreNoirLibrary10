@@ -26,20 +26,14 @@ namespace LivreNoirLibrary.Windows.YuGiOh.Controls
             MainGrid.DataContext = _viewModel;
         }
 
-        private void OnSourceChanged(Card? value)
-        {
-            if (value is not null)
-            {
-                _viewModel.CopyFrom(value);
-            }
-        }
+        private void OnSourceChanged(Card? value) => _viewModel.Source = value;
 
         private void OnClick_DB1(object sender, RoutedEventArgs e)
         {
             if (_source is { } card)
             {
                 e.Handled = true;
-                this.RaiseCardLinkClicked(card.Id, false);
+                this.RaiseRequestOpenCardUrl(card.Id, false);
             }
         }
 
@@ -48,24 +42,7 @@ namespace LivreNoirLibrary.Windows.YuGiOh.Controls
             if (_source is { } card)
             {
                 e.Handled = true;
-                this.RaiseCardLinkClicked(card.Id, true);
-            }
-        }
-
-        private void OnClick_Pack(object sender, RoutedEventArgs e)
-        {
-            if (sender is FrameworkContentElement { DataContext: PackInfo info })
-            {
-                e.Handled = true;
-                this.RaisePackLinkClicked(info.ProductId);
-            }
-        }
-
-        private void OnClick_RelatedText(object sender, RoutedEventArgs e)
-        {
-            if (sender is FrameworkContentElement { DataContext: string text })
-            {
-                this.RaiseRelatedTextClicked(text);
+                this.RaiseRequestOpenCardUrl(card.Id, true);
             }
         }
 
@@ -77,51 +54,16 @@ namespace LivreNoirLibrary.Windows.YuGiOh.Controls
 
         public static void SetTextBoxToClipboard(object sender)
         {
-            if (sender is FrameworkElement { Tag: TextBox { Text: string text } })
+            if (sender is FrameworkElement { Tag: TextBox { Text: string text } } && !string.IsNullOrEmpty(text))
             {
-                if (!string.IsNullOrEmpty(text))
+                try
                 {
-                    try
-                    {
-                        Clipboard.SetText(text);
-                    }
-                    catch
-                    {
-
-                    }
+                    Clipboard.SetText(text);
                 }
-            }
-        }
-
-        private int _detachListenerCount;
-
-        public static readonly RoutedEvent DetachEvent = Events.Register<CardInfoView, RoutedEventHandler<Card>>();
-
-        public event RoutedEventHandler<Card>? Detach
-        {
-            add
-            {
-                AddHandler(DetachEvent, value);
-                if (++_detachListenerCount > 0)
+                catch
                 {
-                    _viewModel.CanDetach = true;
-                }
-            }
-            remove
-            {
-                RemoveHandler(DetachEvent, value);
-                if (--_detachListenerCount <= 0)
-                {
-                    _viewModel.CanDetach = false;
-                }
-            }
-        }
 
-        private void OnClick_Detach(object sender, RoutedEventArgs e)
-        {
-            if (Source is { } card)
-            {
-                RaiseEvent(new RoutedEventArgs<Card>(card, DetachEvent, this));
+                }
             }
         }
     }

@@ -1,9 +1,10 @@
-﻿using System;
+﻿using LivreNoirLibrary.ObjectModel;
+using System;
 using System.Text.Json.Serialization;
 
 namespace LivreNoirLibrary.YuGiOh.Serializable
 {
-    public class Card
+    public class Card : IId
     {
         [JsonPropertyName(JsonPropertyNames.Id)]
         public int Id { get; set; }

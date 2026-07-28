@@ -1,5 +1,6 @@
 ﻿using LivreNoirLibrary.Debug;
 using LivreNoirLibrary.Windows.Controls;
+using LivreNoirLibrary.Windows.Input;
 using System;
 using System.Windows;
 using System.Windows.Controls;
@@ -27,7 +28,7 @@ namespace LivreNoirLibrary.Windows.YuGiOh.Controls
 
         public SortOptionView()
         {
-            this.RegisterCommand(YgoCommands.SearchClear, Executed_Clear);
+            this.RegisterCommand(Commands.TextSearchClear, Executed_Clear);
         }
 
         public override void OnApplyTemplate()

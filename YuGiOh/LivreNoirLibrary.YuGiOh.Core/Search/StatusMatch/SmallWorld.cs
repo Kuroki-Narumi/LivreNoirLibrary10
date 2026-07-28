@@ -1,15 +1,13 @@
 ﻿using LivreNoirLibrary.Collections;
-using LivreNoirLibrary.ObjectModel;
 using LivreNoirLibrary.YuGiOh.Data;
-using System;
 using System.Collections.Generic;
-using System.Text;
+using System.Linq;
 
 namespace LivreNoirLibrary.YuGiOh.Search
 {
     public static class SmallWorld
     {
-        public static bool IsMatch(Card a, Card b, int requiredCount = 1)
+        public static bool IsMatch(Card a, Card b, int requiredCount = 1, bool allowsGreater = false)
         {
             var match = 0;
             if (a.MonsterType == b.MonsterType) match++;
@@ -17,115 +15,102 @@ namespace LivreNoirLibrary.YuGiOh.Search
             if (a.Level == b.Level) match++;
             if (a.Atk == b.Atk) match++;
             if (a.Def == b.Def) match++;
-            return match == requiredCount;
+            return allowsGreater ? match >= requiredCount : match == requiredCount;
         }
 
-        public static bool IsMatch(Card a, Card b, out string matchText, int requiredCount = 1)
+        public static NeighborEnumerator EnumerateNeighbor(ICard a, ICardEnumerable source) => new(a.ThisCard, source);
+        public static NeighborEnumerator EnumerateNeighbor(ICard a, IEnumerable<Card> source) => new(a.ThisCard, source);
+
+        public static HashSet<Card> CreateCardSet() => new(CardIdEqualityComparer.Default);
+        public static HashSet<Card> CreateCardSet(ICardProvider provider) => new(new CardIdEqualityComparer() { Provider = provider });
+
+        public static ArrayPoolDisposable<int> RentFlagsArray()
         {
-            using var o = ObjectPool.RentStringBuilder(out var sb);
-            var match = 0;
-
-            void Append(string text)
-            {
-                if (match is > 0)
-                {
-                    sb.Append('/');
-                }
-                sb.Append(text);
-                match++;
-            }
-
-            if (a.MonsterType == b.MonsterType)
-            {
-                Append(Vocab.GetName(a.MonsterType));
-            }
-            if (a.Attribute == b.Attribute)
-            {
-                Append(Vocab.GetName(a.Attribute));
-            }
-            if (a.Level == b.Level)
-            {
-                Append($"★{a.Level}");
-            }
-            if (a.Atk == b.Atk)
-            {
-                Append($"ATK{Vocab.GetStatusText(a.Atk)}");
-            }
-            if (a.Def == b.Def)
-            {
-                Append($"DEF{Vocab.GetStatusText(a.Def)}");
-            }
-            matchText = sb.ToString();
-            return match == requiredCount;
+            var o = ArrayPool.Rent<int>(BitFlags.GetArrayLength(CardDataCollection.Capacity));
+            o.Array.Clear();
+            return o;
         }
 
-        public static IEnumerable<Card> EnumerateNeighbor(ICard a, ICardEnumerable source)
+        public static void FindRelay(ICardCollection target, IEnumerable<Card> cards, IEnumerable<Card> compareSource)
         {
-            if (a.IsMonster())
+            var enumer = cards.GetEnumerator();
+            target.Clear();
+            if (!enumer.MoveNext())
             {
-                foreach (var b in source.EnumerateCards())
-                {
-                    var bCard = b.ThisCard;
-                    if (b.IsMainMonster() && IsMatch(a.ThisCard, bCard))
-                    {
-                        yield return bCard;
-                    }
-                }
+                return;
             }
+            target.AddRange(EnumerateNeighbor(enumer.Current, compareSource));
+
+            using var o = RentFlagsArray();
+            var array = o.Array;
+            var span = o.Span;
+
+            while (enumer.MoveNext())
+            {
+                var card = enumer.Current;
+                array.Clear();
+                foreach (var c in EnumerateNeighbor(card, compareSource))
+                {
+                    BitFlags.Set(span, c.Id);
+                }
+                target.RemoveAll(Predicate);
+            }
+
+            bool Predicate(Card card) => !BitFlags.IsSet(array, card.Id);
         }
 
-        public static HashSet<Card> FindRelay(ICardEnumerable cards, ICardEnumerable source, HashSet<Card>? result = null)
-        {
-            result ??= [];
-            var first = true;
-            foreach (var a in cards.EnumerateCards())
-            {
-                if (a.IsMainMonster())
-                {
-                    if (first)
-                    {
-                        result.UnionWith(EnumerateNeighbor(a, source));
-                    }
-                    else
-                    {
-                        result.IntersectWith(EnumerateNeighbor(a, source));
-                    }
-                }
-            }
-            return result;
-        }
+        public static void FindRelay(ICardCollection target, ICardEnumerable cards, ICardEnumerable compareSource) => FindRelay(target, cards.CardEnumerable, compareSource.CardEnumerable);
 
-        public static Graph CreateGraph(ICardEnumerable cards, Graph? result = null, List<Card>? buffer = null)
+        public struct NeighborEnumerator : ISafeEnumerator<Card>
         {
-            result ??= [];
-            result.Clear();
-            buffer ??= [];
-            buffer.Clear();
-            foreach (var card in cards.EnumerateCards())
+            private readonly Card _card;
+            private readonly IEnumerator<Card> _enumerator;
+            private Card? _current;
+
+            public readonly Card Current => _current!;
+
+            public NeighborEnumerator(Card card, ICardEnumerable source)
             {
-                if (card.IsMainMonster())
+                _card = card;
+                if (card.IsMainDeckMonster())
                 {
-                    buffer.Add(card.ThisCard);
-                    result.Add(card.ThisCard.Name);
+                    _enumerator = source.CardEnumerable.GetEnumerator();
+                }
+                else
+                {
+                    _enumerator = Enumerable.Empty<Card>().GetEnumerator();
                 }
             }
-            var count = buffer.Count;
-            for (var i = 0; i < count; i++)
+
+            public NeighborEnumerator(Card card, IEnumerable<Card> source)
             {
-                var a = buffer[i];
-                var aName = a.Name;
-                for (var j = i + 1; j < count; j++)
+                _card = card;
+                if (card.IsMainDeckMonster())
                 {
-                    var b = buffer[j];
-                    var bName = b.Name;
-                    if (IsMatch(a, b, out var matchText))
+                    _enumerator = source.GetEnumerator();
+                }
+                else
+                {
+                    _enumerator = Enumerable.Empty<Card>().GetEnumerator();
+                }
+            }
+
+            public bool MoveNext()
+            {
+                var e = _enumerator;
+                var card = _card;
+                while (e.MoveNext())
+                {
+                    var target = e.Current;
+                    if (target.IsMainDeckMonster() && IsMatch(target, card, 1))
                     {
-                        result.AddEdge(aName, bName, matchText);
+                        _current = target;
+                        return true;
                     }
                 }
+                _current = null;
+                return false;
             }
-            buffer.Clear();
-            return result;
         }
     }
 }

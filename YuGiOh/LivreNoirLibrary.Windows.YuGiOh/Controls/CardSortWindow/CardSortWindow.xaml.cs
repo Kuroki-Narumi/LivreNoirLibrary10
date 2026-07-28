@@ -18,23 +18,13 @@ namespace LivreNoirLibrary.Windows.YuGiOh.Controls
     /// </summary>
     public partial class CardSortWindow : Window
     {
-        public static ObservableList<CardSortOptionsPreset> Presets { get; } = [new() { Name = "TestPreset" }];
-        public static CardSortOptionsPreset? DefaultPreset { get; private set; }
+        public static ObservableList<CardSortOptionsPreset> Presets { get; } = [];
+        public static event EventHandler<CardSortOptionsPreset?>? DefaultPresetChanged;
 
         public static void LoadPreset(IEnumerable<CardSortOptionsPreset> presets)
         {
-            var list = Presets;
-            list.ClearWithoutNotify();
-            CardSortOptionsPreset? @default = null;
-            foreach (var preset in presets)
-            {
-                list.AddWithoutNotify(preset);
-                if (preset.IsDefault)
-                {
-                    @default = preset;
-                }
-            }
-            DefaultPreset = @default;
+            Presets.Clear();
+            Presets.AddRange(presets);
         }
 
         public static void SavePreset(List<CardSortOptionsPreset> target)
@@ -45,11 +35,11 @@ namespace LivreNoirLibrary.Windows.YuGiOh.Controls
 
         public event EventHandler? Sort;
 
-        private CardSortOptionCollection? _options;
+        private ICardSort? _target;
 
         public SortOptionViewModel[] ViewModels { get; }
 
-        public CardSortWindow()
+        public CardSortWindow(ICardSort target)
         {
             ViewModels = [new("Sort1"), new("Sort2"), new("Sort3"), new("Sort4")];
             DataContext = this;
@@ -60,12 +50,16 @@ namespace LivreNoirLibrary.Windows.YuGiOh.Controls
             this.RegisterCommand(Commands.MoveDown, Executed_PresetMoveDown, ListView_Preset.CanExecute_MoveDown);
             this.RegisterCommand(Commands.Delete, Executed_PresetDelete, ListView_Preset.CanExecute_Item);
             this.RegisterCommand(Commands.Save, Executed_PresetOverwrite, ListView_Preset.CanExecute_Item);
+
+            this.RegisterCommand(PresetPresenterBase.DefaultChangedCommand, Executed_DefaultChanged);
+
+            Setup(target);
         }
 
-        public void Setup(CardSortOptionCollection options)
+        public void Setup(ICardSort target)
         {
-            _options = options;
-            CopyFrom(options);
+            _target = target;
+            CopyFrom(target.CardSortOptions);
         }
 
         protected override void OnMouseLeftButtonDown(MouseButtonEventArgs e)
@@ -94,7 +88,7 @@ namespace LivreNoirLibrary.Windows.YuGiOh.Controls
 
         private void OnClick_Exec(object sender, RoutedEventArgs e)
         {
-            if (_options is { } options)
+            if (_target is { CardSortOptions: { } options })
             {
                 CopyTo(options);
                 Sort?.Invoke(this, EventArgs.Empty);
@@ -118,16 +112,23 @@ namespace LivreNoirLibrary.Windows.YuGiOh.Controls
 
         private void OnClick_Clear(object sender, RoutedEventArgs e)
         {
-            foreach (var vm in ViewModels)
+            if (_target is { DefaultCardSortOptions: { } options })
             {
-                vm.Clear();
+                CopyFrom(options);
+            }
+            else
+            {
+                foreach (var vm in ViewModels)
+                {
+                    vm.Clear();
+                }
             }
             e.Handled = true;
         }
 
         private void OnClick_Close(object sender, RoutedEventArgs e)
         {
-            _options = null;
+            _target = null;
             Close();
             e.Handled = true;
         }
@@ -184,6 +185,14 @@ namespace LivreNoirLibrary.Windows.YuGiOh.Controls
         {
             CopyFrom(e.Value.Conditions);
             e.Handled = true;
+        }
+
+        private void Executed_DefaultChanged(object sender, ExecutedRoutedEventArgs e)
+        {
+            if (e.Parameter is CardSortOptionsPreset preset)
+            {
+                DefaultPresetChanged?.Invoke(this, preset.IsDefault ? preset : null);
+            }
         }
     }
 }

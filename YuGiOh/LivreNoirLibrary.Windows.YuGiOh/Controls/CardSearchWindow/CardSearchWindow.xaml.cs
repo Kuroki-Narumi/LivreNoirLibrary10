@@ -13,23 +13,13 @@ namespace LivreNoirLibrary.Windows.YuGiOh.Controls
 {
     public partial class CardSearchWindow : Window, IToggleButtonContainer
     {
-        public static ObservableList<CardSearchConditionsPreset> Presets { get; } = [new() { Name = "TestPreset" }];
-        public static CardSearchConditionsPreset? DefaultPreset { get; private set; }
+        public static ObservableList<CardSearchConditionsPreset> Presets { get; } = [];
+        public static event EventHandler<CardSearchConditionsPreset?>? DefaultPresetChanged;
 
         public static void LoadPreset(IEnumerable<CardSearchConditionsPreset> presets)
         {
-            var list = Presets;
-            list.ClearWithoutNotify();
-            CardSearchConditionsPreset? @default = null;
-            foreach (var preset in presets)
-            {
-                list.AddWithoutNotify(preset);
-                if (preset.IsDefault)
-                {
-                    @default = preset;
-                }
-            }
-            DefaultPreset = @default;
+            Presets.Clear();
+            Presets.AddRange(presets);
         }
 
         public static void SavePreset(List<CardSearchConditionsPreset> target)
@@ -40,15 +30,14 @@ namespace LivreNoirLibrary.Windows.YuGiOh.Controls
 
         public event EventHandler? Search;
 
-        private CardSearchConditions? _conditions;
-        private CardSearchConditions? _defaultConditions;
+        private ICardSearch? _target;
 
         public CardSearchConditionsViewModel ViewModel { get; } = new();
 
         bool IToggleButtonContainer.MousePressed { get; set; }
         bool IToggleButtonContainer.MouseToggleState { get; set; }
 
-        public CardSearchWindow()
+        public CardSearchWindow(ICardSearch target)
         {
             DataContext = ViewModel;
             InitializeComponent();
@@ -63,13 +52,16 @@ namespace LivreNoirLibrary.Windows.YuGiOh.Controls
             this.RegisterCommand(Commands.MoveDown, Executed_PresetMoveDown, ListView_Preset.CanExecute_MoveDown);
             this.RegisterCommand(Commands.Delete, Executed_PresetDelete, ListView_Preset.CanExecute_Item);
             this.RegisterCommand(Commands.Save, Executed_PresetOverwrite, ListView_Preset.CanExecute_Item);
+
+            this.RegisterCommand(PresetPresenterBase.DefaultChangedCommand, Executed_DefaultChanged);
+
+            Setup(target);
         }
 
-        public void Setup(CardSearchConditions conditions, CardSearchConditions defaultConditions)
+        public void Setup(ICardSearch target)
         {
-            _conditions = conditions;
-            _defaultConditions = defaultConditions;
-            ViewModel.CopyFrom(conditions);
+            _target = target;
+            ViewModel.CopyFrom(target.CardSearchConditions);
             TextBox_Expression.Text = ViewModel.StatusExpression.Expression;
             TextBox_Search.Text = ViewModel.SearchText;
         }
@@ -87,7 +79,7 @@ namespace LivreNoirLibrary.Windows.YuGiOh.Controls
 
         private void OnClick_Search(object sender, RoutedEventArgs e)
         {
-            if (_conditions is { } cond)
+            if (_target is { CardSearchConditions: { } cond })
             {
                 ViewModel.CopyTo(cond);
                 Search?.Invoke(this, EventArgs.Empty);
@@ -98,13 +90,13 @@ namespace LivreNoirLibrary.Windows.YuGiOh.Controls
 
         private void OnClick_Clear(object sender, RoutedEventArgs e)
         {
-            ViewModel.CopyFrom(_defaultConditions ?? CardSearchConditions.Default);
+            ViewModel.CopyFrom(_target?.DefaultCardSearchConditions ?? CardSearchConditions.Default);
             e.Handled = true;
         }
 
         private void OnClick_Close(object sender, RoutedEventArgs e)
         {
-            _conditions = null;
+            _target = null;
             Close();
             e.Handled = true;
         }
@@ -216,6 +208,14 @@ namespace LivreNoirLibrary.Windows.YuGiOh.Controls
         {
             ViewModel.CopyFrom(e.Value.Conditions);
             e.Handled = true;
+        }
+
+        private void Executed_DefaultChanged(object sender, ExecutedRoutedEventArgs e)
+        {
+            if (e.Parameter is CardSearchConditionsPreset preset)
+            {
+                DefaultPresetChanged?.Invoke(this, preset.IsDefault ? preset : null);
+            }
         }
     }
 }

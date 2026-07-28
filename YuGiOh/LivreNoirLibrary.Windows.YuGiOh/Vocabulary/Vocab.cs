@@ -66,7 +66,11 @@ namespace LivreNoirLibrary.Windows.YuGiOh
         public VocabData Sort { get => GetData(); set => SetData(value); }
         public VocabData Search { get => GetData(); set => SetData(value); }
         public VocabData Preset { get => GetData(); set => SetData(value); }
+        public VocabData DefaultPreset { get => GetData(); set => SetData(value); }
+        public VocabData Desc_DefaultPreset { get => GetData(); set => SetData(value); }
         public VocabData SetToDefault { get => GetData(); set => SetData(value); }
+        public VocabData SaveAsImage { get => GetData(); set => SetData(value); }
+        public VocabData CopyImage { get => GetData(); set => SetData(value); }
 
         public VocabData Search_CardType { get => GetData(); set => SetData(value); }
         public VocabData Search_Status { get => GetData(); set => SetData(value); }
@@ -149,11 +153,53 @@ namespace LivreNoirLibrary.Windows.YuGiOh
         public VocabData MatchType_Perfect { get => GetData(); set => SetData(value); }
         public VocabData MatchType_Perfect_Desc { get => GetData(); set => SetData(value); }
 
+        public VocabData Table_Vertical { get => GetData(); set => SetData(value); }
+        public VocabData Table_Horizontal { get => GetData(); set => SetData(value); }
+        public VocabData Table_Total { get => GetData(); set => SetData(value); }
+        public VocabData Table_Zero { get => GetData(); set => SetData(value); }
+        public VocabData Table_Style { get => GetData(); set => SetData(value); }
+        public VocabData Table_Style_Count { get => GetData(); set => SetData(value); }
+        public VocabData Table_Style_RatioV { get => GetData(); set => SetData(value); }
+        public VocabData Table_Style_RatioH { get => GetData(); set => SetData(value); }
+        public VocabData Table_Digits { get => GetData(); set => SetData(value); }
+        public VocabData Table_Decimal { get => GetData(); set => SetData(value); }
+        public VocabData Table_Entire { get => GetData(); set => SetData(value); }
+        public VocabData Table_Detail { get => GetData(); set => SetData(value); }
+
+        public VocabData Token_Referer { get => GetData(); set => SetData(value); }
+        public VocabData Token_NegativeReferer { get => GetData(); set => SetData(value); }
+        public VocabData Token_Generator { get => GetData(); set => SetData(value); }
+        public VocabData Token_Unselect { get => GetData(); set => SetData(value); }
+        public VocabData Token_Header_Generator { get => GetData(); set => SetData(value); }
+        public VocabData Token_Header_Referer { get => GetData(); set => SetData(value); }
+        public VocabData Token_Text { get => GetData(); set => SetData(value); }
+
+        public VocabData Matched { get => GetData(); set => SetData(value); }
+        public VocabData Settings { get => GetData(); set => SetData(value); }
+        public VocabData Match_Flags { get => GetData(); set => SetData(value); }
+        public VocabData Match_Count { get => GetData(); set => SetData(value); }
+        public VocabData Match_Equal { get => GetData(); set => SetData(value); }
+        public VocabData Match_Greater { get => GetData(); set => SetData(value); }
+        public VocabData Match_ExceptSelf { get => GetData(); set => SetData(value); }
+        public VocabData Match_Candidate { get => GetData(); set => SetData(value); }
+        public VocabData Match_Target { get => GetData(); set => SetData(value); }
+        public VocabData Match_All { get => GetData(); set => SetData(value); }
+        public VocabData Match_MainDeck { get => GetData(); set => SetData(value); }
+        public VocabData Match_Sculptor { get => GetData(); set => SetData(value); }
+        public VocabData Match_SmallWorld { get => GetData(); set => SetData(value); }
+        public VocabData Match_Nightmell { get => GetData(); set => SetData(value); }
+        public VocabData Match_Hedgehog { get => GetData(); set => SetData(value); }
+
+        public VocabData LessOrEqual { get => GetData(); set => SetData(value); }
+
+        public VocabData Numbers_Material { get => GetData(); set => SetData(value); }
+        public VocabData Numbers_Filter { get => GetData(); set => SetData(value); }
+
         public VocabData Deck_Main { get => GetData(); set => SetData(value); }
         public VocabData Deck_Extra { get => GetData(); set => SetData(value); }
         public VocabData Deck_Side { get => GetData(); set => SetData(value); }
         public VocabData Deck_Unique { get => GetData(); set => SetData(value); }
-        public VocabData Deck_Count { get => GetData(); set => SetData(value); }
+        public VocabData Deck_TotalCount { get => GetData(); set => SetData(value); }
         public VocabData Deck_Import { get => GetData(); set => SetData(value); }
         public VocabData Deck_ImportJS { get => GetData(); set => SetData(value); }
         public VocabData Deck_Export { get => GetData(); set => SetData(value); }
@@ -164,6 +210,46 @@ namespace LivreNoirLibrary.Windows.YuGiOh
         public VocabData Deck_AddMax { get => GetData(); set => SetData(value); }
         public VocabData Deck_RemoveOne { get => GetData(); set => SetData(value); }
         public VocabData Deck_RemoveAll { get => GetData(); set => SetData(value); }
+        public VocabData Deck_Count { get => GetData(); set => SetData(value); }
+        public VocabData Deck_LineBreak { get => GetData(); set => SetData(value); }
+        public VocabData Deck_Order { get => GetData(); set => SetData(value); }
+        public VocabData Deck_NumberFirst { get => GetData(); set => SetData(value); }
+        public VocabData Deck_NameFirst { get => GetData(); set => SetData(value); }
+        public VocabData Deck_Separator { get => GetData(); set => SetData(value); }
+        public VocabData Deck_WithBracket { get => GetData(); set => SetData(value); }
+        public VocabData Deck_ContentHeight { get => GetData(); set => SetData(value); }
+        public VocabData Deck_NameWidth { get => GetData(); set => SetData(value); }
+
+        public VocabData Graph_Directed { get => GetData(); set => SetData(value); }
+        public VocabData Graph_EdgeName { get => GetData(); set => SetData(value); }
+        public VocabData Graph_Radius { get => GetData(); set => SetData(value); }
+        public VocabData Graph_FontSize { get => GetData(); set => SetData(value); }
+        public VocabData Graph_EdgeFontSize { get => GetData(); set => SetData(value); }
+        public VocabData Graph_TextOutline { get => GetData(); set => SetData(value); }
+        public VocabData Graph_HorizontalGrid { get => GetData(); set => SetData(value); }
+        public VocabData Graph_VerticalGrid { get => GetData(); set => SetData(value); }
+
+        public VocabData AddToDeck { get => GetData(); set => SetData(value); }
+        public VocabData RemoveFromDeck { get => GetData(); set => SetData(value); }
+
+        public VocabData Inspect_Name { get => GetData(); set => SetData(value); }
+        public VocabData Inspect_GroupId { get => GetData(); set => SetData(value); }
+        public VocabData Inspect_Value1 { get => GetData(); set => SetData(value); }
+        public VocabData Inspect_Value2 { get => GetData(); set => SetData(value); }
+        public VocabData Inspect_Deck { get => GetData(); set => SetData(value); }
+        public VocabData Inspect_Hand { get => GetData(); set => SetData(value); }
+        public VocabData Inspect_And { get => GetData(); set => SetData(value); }
+        public VocabData Inspect_Or { get => GetData(); set => SetData(value); }
+        public VocabData InspectTest_Count { get => GetData(); set => SetData(value); }
+        public VocabData InspectTest_Hand { get => GetData(); set => SetData(value); }
+        public VocabData InspectTest_Priority { get => GetData(); set => SetData(value); }
+        public VocabData InspectTest_Other { get => GetData(); set => SetData(value); }
+        public VocabData InspectTest_Start { get => GetData(); set => SetData(value); }
+        public VocabData InspectTest_Result { get => GetData(); set => SetData(value); }
+        public VocabData InspectTest_Header_Name { get => GetData(); set => SetData(value); }
+        public VocabData InspectTest_Header_Group { get => GetData(); set => SetData(value); }
+        public VocabData InspectTest_Header_Count { get => GetData(); set => SetData(value); }
+        public VocabData InspectTest_Header_Probability { get => GetData(); set => SetData(value); }
 
         [JsonIgnore]
         public SortKeyVocab SortKey { get; }
@@ -214,7 +300,11 @@ namespace LivreNoirLibrary.Windows.YuGiOh
             SetData(nameof(TcgDatabase), "TCG DB");
             SetData(nameof(Detach), "別窓");
             SetData(nameof(Preset), "プリセ");
+            SetData(nameof(DefaultPreset), "デフォ");
+            SetData(nameof(Desc_DefaultPreset), "各設定項目をデフォルトの状態にします。");
             SetData(nameof(SetToDefault), "デフォルトにする");
+            SetData(nameof(SaveAsImage), "画像として保存");
+            SetData(nameof(CopyImage), "クリップボードにコピー");
 
             SetData(nameof(Search_CardType), "カードタイプ");
             SetData(nameof(Search_Status), "ステータス");
@@ -295,11 +385,53 @@ namespace LivreNoirLibrary.Windows.YuGiOh
             SetData(nameof(MatchType_Perfect), "完全一致");
             SetData(nameof(MatchType_Perfect_Desc), "選択された項目を全て含み、選択されていない項目を含まない");
 
+            SetData(nameof(Table_Vertical), "縦");
+            SetData(nameof(Table_Horizontal), "横");
+            SetData(nameof(Table_Total), "Total列");
+            SetData(nameof(Table_Zero), "ゼロ");
+            SetData(nameof(Table_Style), "スタイル");
+            SetData(nameof(Table_Style_Count), "枚数");
+            SetData(nameof(Table_Style_RatioV), "%(縦)");
+            SetData(nameof(Table_Style_RatioH), "%(横)");
+            SetData(nameof(Table_Digits), "桁数");
+            SetData(nameof(Table_Decimal), "小数点以下");
+            SetData(nameof(Table_Entire), "全体幅");
+            SetData(nameof(Table_Detail), "クリックで詳細");
+
+            SetData(nameof(Token_Referer), "参照するカード");
+            SetData(nameof(Token_NegativeReferer), "除外するカード");
+            SetData(nameof(Token_Generator), "生成するカード");
+            SetData(nameof(Token_Unselect), "選択解除");
+            SetData(nameof(Token_Header_Referer), "参照");
+            SetData(nameof(Token_Header_Generator), "生成");
+            SetData(nameof(Token_Text), "参考テキスト");
+
+            SetData(nameof(Matched), "マッチ");
+            SetData(nameof(Settings), "設定");
+            SetData(nameof(Match_Flags), "比較項目");
+            SetData(nameof(Match_Count), "一致数");
+            SetData(nameof(Match_Equal), "のみ");
+            SetData(nameof(Match_Greater), "以上");
+            SetData(nameof(Match_ExceptSelf), "自身を除外");
+            SetData(nameof(Match_Candidate), "リスト候補");
+            SetData(nameof(Match_Target), "検索候補");
+            SetData(nameof(Match_All), "全て");
+            SetData(nameof(Match_MainDeck), "メインデッキ");
+            SetData(nameof(Match_Sculptor), "造形家");
+            SetData(nameof(Match_SmallWorld), "スモワ");
+            SetData(nameof(Match_Nightmell), "悪醒師");
+            SetData(nameof(Match_Hedgehog), "針鼠");
+
+            SetData(nameof(LessOrEqual), "以下");
+
+            SetData(nameof(Numbers_Material), "素材候補");
+            SetData(nameof(Numbers_Filter), "絞り込み");
+
             SetData(nameof(Deck_Main), "メインデッキ");
             SetData(nameof(Deck_Extra), "EXデッキ");
             SetData(nameof(Deck_Side), "サイドデッキ");
             SetData(nameof(Deck_Unique), "種");
-            SetData(nameof(Deck_Count), "枚");
+            SetData(nameof(Deck_TotalCount), "枚");
             SetData(nameof(Deck_Import), "URLから読み込む");
             SetData(nameof(Deck_ImportJS), "JavaScriptで読み込む");
             SetData(nameof(Deck_Export), "デッキ編集用JavaScriptをコピー");
@@ -310,6 +442,46 @@ namespace LivreNoirLibrary.Windows.YuGiOh
             SetData(nameof(Deck_AddMax), "最大まで追加");
             SetData(nameof(Deck_RemoveOne), "1枚削除");
             SetData(nameof(Deck_RemoveAll), "全て削除");
+            SetData(nameof(Deck_Count), "数");
+            SetData(nameof(Deck_LineBreak), "クリックで改行を調整");
+            SetData(nameof(Deck_Order), "順序");
+            SetData(nameof(Deck_NameFirst), "名前→数");
+            SetData(nameof(Deck_NumberFirst), "数→名前");
+            SetData(nameof(Deck_Separator), "区切り");
+            SetData(nameof(Deck_WithBracket), "《》で囲む");
+            SetData(nameof(Deck_ContentHeight), "項目高さ");
+            SetData(nameof(Deck_NameWidth), "項目幅");
+
+            SetData(nameof(Graph_Directed), "接続先も表示");
+            SetData(nameof(Graph_EdgeName), "辺の名前を表示");
+            SetData(nameof(Graph_Radius), "半径");
+            SetData(nameof(Graph_FontSize), "名前");
+            SetData(nameof(Graph_EdgeFontSize), "辺名前");
+            SetData(nameof(Graph_TextOutline), "文字枠");
+            SetData(nameof(Graph_HorizontalGrid), "横グリッド");
+            SetData(nameof(Graph_VerticalGrid), "縦グリッド");
+
+            SetData(nameof(AddToDeck), "デッキに追加");
+            SetData(nameof(RemoveFromDeck), "デッキから削除");
+
+            SetData(nameof(Inspect_Name), "表示名");
+            SetData(nameof(Inspect_GroupId), "グループ");
+            SetData(nameof(Inspect_Value1), "価値1");
+            SetData(nameof(Inspect_Value2), "価値2");
+            SetData(nameof(Inspect_Deck), "デッキ");
+            SetData(nameof(Inspect_Hand), "手札");
+            SetData(nameof(Inspect_And), "AND");
+            SetData(nameof(Inspect_Or), "OR");
+            SetData(nameof(InspectTest_Count), "試行回数");
+            SetData(nameof(InspectTest_Hand), "初期手札");
+            SetData(nameof(InspectTest_Priority), "初期手札");
+            SetData(nameof(InspectTest_Priority), "優先度");
+            SetData(nameof(InspectTest_Start), "検証開始");
+            SetData(nameof(InspectTest_Result), "結果");
+            SetData(nameof(InspectTest_Header_Name), "名前");
+            SetData(nameof(InspectTest_Header_Group), "G");
+            SetData(nameof(InspectTest_Header_Count), "回数");
+            SetData(nameof(InspectTest_Header_Probability), "確率");
         }
 
         public override void UpdateVocabData<T>(T? source) where T : class

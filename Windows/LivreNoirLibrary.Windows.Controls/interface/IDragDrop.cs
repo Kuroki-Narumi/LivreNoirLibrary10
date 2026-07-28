@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 using System.Windows;
+using System.Windows.Controls;
 using System.Windows.Input;
 
 namespace LivreNoirLibrary.Windows.Controls
@@ -12,9 +13,9 @@ namespace LivreNoirLibrary.Windows.Controls
         Point DragStartPoint { get; set; }
 
         bool HandleMouseButtonEvent(object sender, MouseButtonEventArgs e) => false;
-        void BuildDataObject(DataObject obj, object sender) { }
+        void BuildDataObject(DataObject obj, object sender);
         bool CanDrop(IDataObject obj) => true;
-        bool HandleDrop(IDataObject obj, object sender) => true;
+        bool HandleDrop(IDataObject obj, object sender);
     }
 
     public static class IDragDropExtensions
@@ -31,6 +32,24 @@ namespace LivreNoirLibrary.Windows.Controls
             if (owner.HandleMouseButtonEvent(sender, e))
             {
                 e.Handled = true;
+            }
+        }
+
+        public static bool HandleMouseButton_ListViewItem(object sender, MouseEventArgs e)
+        {
+            if (Keyboard.Modifiers is 0 && sender is ListViewItem { IsSelected: true } item && item.TryGetAncestor<IListView>(out var lv))
+            {
+                lv.Focus();
+                return true;
+            }
+            return false;
+        }
+
+        public static void BuildDataObject_ListView(string dataObjectType, DataObject obj, object sender)
+        {
+            if ((sender as DependencyObject).TryGetAncestor<IListView>(out var lv))
+            {
+                obj.SetData(dataObjectType, lv);
             }
         }
 
@@ -75,7 +94,7 @@ namespace LivreNoirLibrary.Windows.Controls
             }
         }
 
-        private static bool IsSameProcessGuid(IDataObject data)
+        public static bool IsSameProcessGuid(IDataObject data)
         {
             try
             {

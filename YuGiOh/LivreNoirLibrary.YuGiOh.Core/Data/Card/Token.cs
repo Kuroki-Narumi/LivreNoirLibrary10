@@ -5,36 +5,56 @@ namespace LivreNoirLibrary.YuGiOh.Data
 {
     public class Token : Card
     {
-        public string NameForSearch { get; internal set; }
-        public bool IsInitialized { get; internal set; }
-        public SortedCardIdList Generators { get; } = [];
-        public SortedCardIdList Referers { get; } = [];
+        public SortedCardList Generators { get; } = [];
+        public SortedCardList Referers { get; } = [];
 
         public Token(int id, string name)
         {
             Id = id;
             Name = name;
-            NameForSearch = name.ConvertForSearch(true, true);
+            CardType = CardType.Token;
         }
-    }
 
-    public class TokenCollection : List<Token>
-    {
-        public SortedCardIdList Generic { get; } = [];
-        public SortedCardIdList Except { get; } = [];
-
-        private readonly Dictionary<string, int> _indexes = [];
-
-        public Token GetByName(string name)
+        public void Clear()
         {
-            if (!_indexes.TryGetValue(name, out var index))
+            Generators.Clear();
+            Referers.Clear();
+            Ruby = "";
+            EnName = "";
+            Text = "";
+            PendulumText = "";
+        }
+
+        public void AddGenerator(Card card)
+        {
+            Generators.Add(card);
+            UpdateText(card);
+        }
+
+        public void AddReferer(Card card)
+        {
+            Referers.Add(card);
+            UpdateText(card);
+        }
+
+        private void UpdateText(Card card)
+        {
+            if (string.IsNullOrEmpty(Ruby))
             {
-                index = Count;
-                Token token = new(index + 1, name);
-                _indexes.Add(name, index);
-                Add(token);
+                Ruby = card.Ruby;
             }
-            return this[index];
+            if (string.IsNullOrEmpty(EnName))
+            {
+                EnName = card.EnName;
+            }
+            if (string.IsNullOrEmpty(Text))
+            {
+                Text = card.Text;
+            }
+            if (string.IsNullOrEmpty(PendulumText))
+            {
+                PendulumText = card.PendulumText;
+            }
         }
     }
 }

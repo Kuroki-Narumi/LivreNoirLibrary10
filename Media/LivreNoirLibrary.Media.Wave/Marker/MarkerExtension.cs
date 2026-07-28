@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using LivreNoirLibrary.Media.Wave.Chunks;
+using LivreNoirLibrary.ObjectModel;
 using LivreNoirLibrary.Text;
 
 namespace LivreNoirLibrary.Media.Wave
@@ -33,47 +35,57 @@ namespace LivreNoirLibrary.Media.Wave
             }
         }
 
+        private static readonly ThreadLocal<HashSet<int>> _buffers = new(() => []);
+
         public static void SetCueMarkers<T>(this T meta, IMarkerCollection source, long totalSamples)
             where T : IWaveMetaData
         {
             var cues = meta.GetOrCreateChunk<Cue>(() => []);
             var adtl = meta.GetOrCreateAdtlList();
             // clearnup
-            HashSet<int> ids = [.. cues.Select(c => c.Id)];
-            cues.Clear();
-            var adList = adtl.SubChunks;
-            for (var i = 0; i < adList.Count;)
+            var ids = _buffers.Value!;
+            try
             {
-                var item = adList[i];
-                if (item.Chid is ChunkIds.Label or ChunkIds.LTxt &&
-                    item is IIdChunk idc && ids.Contains(idc.Id))
+                ids.UnionWith(cues.Select(IId.GetId));
+                cues.Clear();
+                var adList = adtl.SubChunks;
+                for (var i = 0; i < adList.Count;)
                 {
-                    adList.RemoveAt(i);
+                    var item = adList[i];
+                    if (item.Chid is ChunkIds.Label or ChunkIds.LTxt &&
+                        item is IIdChunk idc && ids.Contains(idc.Id))
+                    {
+                        adList.RemoveAt(i);
+                    }
+                    else
+                    {
+                        i++;
+                    }
                 }
-                else
+                // apply
+                var purpose = "beat";
+                foreach (var (i, name, pos, length) in source.EnumerateWithLength(totalSamples, false))
                 {
-                    i++;
+                    CueData data = new(pos) { Id = i };
+                    cues.Add(data);
+                    if (!string.IsNullOrEmpty(name))
+                    {
+                        adtl.Add(ChunkIds.Label, i, name);
+                    }
+                    adList.Add(new LTxt() { Purpose = purpose, SampleLength = (uint)length });
+                }
+                if (cues.Count is 0)
+                {
+                    meta.RemoveChunk<Cue>();
+                }
+                if (adtl.Count is 0)
+                {
+                    meta.RemoveAdtlList();
                 }
             }
-            // apply
-            var purpose = "beat";
-            foreach (var (i, name, pos, length) in source.EnumerateWithLength(totalSamples, false))
+            finally
             {
-                CueData data = new(pos) { Id = i };
-                cues.Add(data);
-                if (!string.IsNullOrEmpty(name))
-                {
-                    adtl.Add(ChunkIds.Label, i, name);
-                }
-                adList.Add(new LTxt() { Purpose = purpose, SampleLength = (uint)length });
-            }
-            if (cues.Count is 0)
-            {
-                meta.RemoveChunk<Cue>();
-            }
-            if (adtl.Count is 0)
-            {
-                meta.RemoveAdtlList();
+                ids.Clear();
             }
         }
     }

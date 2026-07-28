@@ -8,7 +8,7 @@ namespace LivreNoirLibrary.ObjectModel
         public static PooledObject<T> Create<T>(Func<T> getMethod, Action<T> returnMethod) where T : class => new(getMethod, returnMethod);
     }
 
-    public readonly struct PooledObject<T> : IDisposable
+    public readonly ref struct PooledObject<T> : IDisposable
         where T : class
     {
         public readonly T Value;

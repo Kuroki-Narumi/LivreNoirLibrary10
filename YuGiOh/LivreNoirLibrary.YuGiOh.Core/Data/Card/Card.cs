@@ -5,7 +5,7 @@ using LivreNoirLibrary.YuGiOh.Converters;
 
 namespace LivreNoirLibrary.YuGiOh.Data
 {
-    public partial class Card() : ObservableObjectBase, ICard
+    public partial class Card() : ObservableObjectBase, ICard, IId, INamedObject
     {
         public static Card Dummy(int id) => new() { Id = id, Name = $"Card#{id}" };
 

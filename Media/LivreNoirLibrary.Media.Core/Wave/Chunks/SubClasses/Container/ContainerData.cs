@@ -1,10 +1,11 @@
 ﻿using System.Text.Json;
 using System.Collections.Generic;
 using System.IO;
+using LivreNoirLibrary.ObjectModel;
 
 namespace LivreNoirLibrary.Media.Wave.Chunks
 {
-    public abstract class ContainerData
+    public abstract class ContainerData : IId
     {
         public int Id { get; set; }
 

@@ -23,7 +23,7 @@ namespace LivreNoirLibrary.ObjectModel
             using MemoryStream ms = new();
             if (obj is IWriteJson w)
             {
-                w.WriteJson(ms);
+                Json.Dump(ms, w, false);
             }
             else
             {

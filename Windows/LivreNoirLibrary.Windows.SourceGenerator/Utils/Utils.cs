@@ -6,10 +6,21 @@ using System.Xml.Linq;
 
 namespace LivreNoirLibrary.Windows.SourceGenerator
 {
-    public static class Utils
+    public static partial class Utils
     {
         public static bool IsDerivedFrom(ITypeSymbol? classSymbol, string fullName)
         {
+            if (classSymbol is null)
+            {
+                return false;
+            }
+            foreach (var @if in classSymbol.AllInterfaces)
+            {
+                if (@if.ToDisplayString() == fullName)
+                {
+                    return true;
+                }
+            }
             while (classSymbol is not null && classSymbol.SpecialType is not SpecialType.System_Object)
             {
                 if (classSymbol.ToDisplayString() == fullName)

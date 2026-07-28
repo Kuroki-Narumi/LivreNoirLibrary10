@@ -1,0 +1,64 @@
+﻿<local:SaveImageBase x:Class="LivreNoirLibrary.Windows.YuGiOh.Controls.SmallWorldGraphControl"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:LivreNoirLibrary.Windows.YuGiOh.Controls"
+             xmlns:ct="clr-namespace:LivreNoirLibrary.Windows.Controls;assembly=LivreNoirLibrary.Windows.Controls"
+             xmlns:media="clr-namespace:LivreNoirLibrary.Windows.Media;assembly=LivreNoirLibrary.Windows.Media"
+             xmlns:yw="clr-namespace:LivreNoirLibrary.Windows.YuGiOh;assembly=LivreNoirLibrary.Windows.YuGiOh"
+             xmlns:ygo="clr-namespace:LivreNoirLibrary.YuGiOh.Data;assembly=LivreNoirLibrary.YuGiOh.Core"
+             xmlns:yg="clr-namespace:LivreNoirLibrary.YuGiOh;assembly=LivreNoirLibrary.YuGiOh.Core"
+             xmlns:input="clr-namespace:LivreNoirLibrary.Windows.Input;assembly=LivreNoirLibrary.Windows.Core"
+             xmlns:conv="clr-namespace:LivreNoirLibrary.Windows.Converters;assembly=LivreNoirLibrary.Windows.Controls"
+             mc:Ignorable="d" Background="White"
+             d:DesignHeight="450" d:DesignWidth="800">
+    <UserControl.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="/LivreNoirLibrary.Windows.YuGiOh;component/Themes/Generic.xaml"/>
+            </ResourceDictionary.MergedDictionaries>
+            <conv:DoubleLinearConverter x:Key="HalfConv" Slope="0.5"/>
+        </ResourceDictionary>
+    </UserControl.Resources>
+    <Grid x:Name="MainGrid" RowDefinitions="Auto, 4, Auto, 4, *" d:DataContext="{d:DesignInstance Type=local:SmallWorldGraphControl}">
+        <Grid.Resources>
+            <Style TargetType="TextBlock">
+                <Setter Property="VerticalAlignment" Value="Center"/>
+                <Setter Property="Margin" Value="4,0,2,0"/>
+            </Style>
+            <Style TargetType="ct:Button">
+                <Setter Property="Margin" Value="4,0"/>
+                <Setter Property="VerticalAlignment" Value="Center"/>
+            </Style>
+            <Style TargetType="ct:ToggleButton">
+                <Setter Property="Margin" Value="4,0"/>
+                <Setter Property="VerticalAlignment" Value="Center"/>
+            </Style>
+            <Style TargetType="ct:LabeledSlider">
+                <Setter Property="Margin" Value="4"/>
+                <Setter Property="SliderWidth" Value="60"/>
+                <Setter Property="TickFrequency" Value="5"/>
+                <Setter Property="IsSnapToTickEnabled" Value="True"/>
+            </Style>
+        </Grid.Resources>
+        <local:SmallWorldGraphView x:Name="GraphView" Grid.Row="4" 
+                                   OffsetX="{Binding ActualWidth, RelativeSource={RelativeSource Mode=Self}, Converter={StaticResource HalfConv}}"
+                                   OffsetY="{Binding ActualHeight, RelativeSource={RelativeSource Mode=Self}, Converter={StaticResource HalfConv}}"/>
+        <StackPanel Orientation="Horizontal">
+            <ct:Button Icon="{x:Static media:Icons.Update}" Content="{Binding Reload.Value, Source={x:Static yw:Vocab.Current}}" Click="OnClick_Refresh"/>
+            <ct:ToggleButton Content="{Binding Graph_Directed.Value, Source={x:Static yw:Vocab.Current}}" IsChecked="{Binding DisplaysConnected, ElementName=GraphView}"/>
+            <ct:ToggleButton Content="{Binding Graph_EdgeName.Value, Source={x:Static yw:Vocab.Current}}" IsChecked="{Binding DisplaysEdgeName, ElementName=GraphView}"/>
+            <ct:Button Icon="{x:Static media:Icons.Picture}" Content="{Binding SaveAsImage, Source={x:Static yw:Vocab.Current}}" Click="OnClick_SaveAsImage"/>
+            <ct:Button Icon="{x:Static media:Icons.Picture}" Content="{Binding CopyImage, Source={x:Static yw:Vocab.Current}}" Click="OnClick_CopyImage"/>
+        </StackPanel>
+        <StackPanel Grid.Row="2" Orientation="Horizontal">
+            <ct:LabeledSlider Header="{Binding Graph_Radius.Value, Source={x:Static yw:Vocab.Current}}" Minimum="5" Maximum="50" Value="{Binding NodeRadius, ElementName=GraphView}"/>
+            <ct:LabeledSlider Header="{Binding Graph_FontSize.Value, Source={x:Static yw:Vocab.Current}}" Minimum="8" Maximum="30" TickFrequency="1" Value="{Binding FontSize, ElementName=GraphView}"/>
+            <ct:LabeledSlider Header="{Binding Graph_EdgeFontSize.Value, Source={x:Static yw:Vocab.Current}}" Minimum="8" Maximum="30" TickFrequency="1" Value="{Binding EdgeNameFontSize, ElementName=GraphView}"/>
+            <ct:LabeledSlider Header="{Binding Graph_TextOutline.Value, Source={x:Static yw:Vocab.Current}}" Minimum="0" Maximum="10" TickFrequency="1" Value="{Binding TextOutlineThickness, ElementName=GraphView}"/>
+            <ct:LabeledSlider Header="{Binding Graph_HorizontalGrid.Value, Source={x:Static yw:Vocab.Current}}" Minimum="5" Maximum="100" Value="{Binding HorizontalGrid, ElementName=GraphView}"/>
+            <ct:LabeledSlider Header="{Binding Graph_VerticalGrid.Value, Source={x:Static yw:Vocab.Current}}" Minimum="5" Maximum="100" Value="{Binding VerticalGrid, ElementName=GraphView}"/>
+        </StackPanel>
+    </Grid>
+</local:SaveImageBase>

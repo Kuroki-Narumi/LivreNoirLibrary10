@@ -13,6 +13,7 @@
 	  </AllowedReferenceRelatedFileExtensions>
     <UseWPF>true</UseWPF>
     <ApplicationIcon>icon.ico</ApplicationIcon>
+    <Version>2.0.0</Version>
   </PropertyGroup>
 
 	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
@@ -34,7 +35,9 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="src\BaseClass\" />
+    <Compile Update="src\Unit_DuelLog.xaml.cs">
+      <SubType>Code</SubType>
+    </Compile>
   </ItemGroup>
 
 </Project>
