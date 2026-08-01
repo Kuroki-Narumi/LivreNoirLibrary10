@@ -3,6 +3,7 @@ using LivreNoirLibrary.Windows.Controls;
 using LivreNoirLibrary.YuGiOh.Data;
 using System;
 using System.Collections.Generic;
+using System.Windows.Controls;
 using SReg = LivreNoirLibrary.YuGiOh.Serializable.Regulation;
 
 namespace LivreNoirLibrary.Windows.YuGiOh.Controls
@@ -42,7 +43,7 @@ namespace LivreNoirLibrary.Windows.YuGiOh.Controls
             }
         }
 
-        public void ConvertBack(Regulation? target, ReadOnlySpan<IListView> listViews, ICardProvider provider)
+        public void ConvertBack(Regulation? target, ReadOnlySpan<ListBox> listViews, ICardProvider? provider)
         {
             if (target is not null && _data is { } data)
             {

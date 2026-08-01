@@ -11,6 +11,7 @@ namespace LivreNoirLibrary.Windows
         private string? _value;
 
         public string Value => _value ??= EnsureValue();
+        string? IVocabData.KeyTip => null;
         public string WithLeader => $"{Value}{VocabData.Leader}";
 
         public MergedVocabData(IVocabData[] sources, IVocabData? separator = null)

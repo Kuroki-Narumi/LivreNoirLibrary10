@@ -1,4 +1,5 @@
-﻿using LivreNoirLibrary.ObjectModel;
+﻿using LivreNoirLibrary.Debug;
+using LivreNoirLibrary.ObjectModel;
 using LivreNoirLibrary.Text;
 using LivreNoirLibrary.Windows;
 using LivreNoirLibrary.Windows.Controls;
@@ -26,8 +27,11 @@ namespace LivreNoir.YuGiOhDatabase
     {
         public static MainViewModel ViewModel => MainViewModel.Instance;
 
+        public const string ManualUrl = "https://livrenoir.web.fc2.com/apps/yugioh/";
+        public const string HistoryUrl = $"{ManualUrl}history.html";
+
         bool IUpdateCheck.CheckUpdate { get => ViewModel.CheckUpdate; set => ViewModel.CheckUpdate = value; }
-        string IUpdateCheck.VersionUrl => "";
+        string IUpdateCheck.VersionUrl => "https://dl.dropboxusercontent.com/scl/fi/nek8vhpd6gi9pohgetu6r/version.json?rlkey=truzpczvnqniqgwx3rvc5cuaq";
         string IUpdateCheck.UpdaterLocation => MainViewModel.AppName;
 
         UIElement IProgressReporter.MainElement => Grid_Main;
@@ -35,11 +39,16 @@ namespace LivreNoir.YuGiOhDatabase
         Task? IProgressReporter.WorkingTask { get; set; }
         Dispatcher IProgressReporter.Dispatcher => Dispatcher;
 
+        private long _t0;
+
         public MainWindow()
         {
+            _t0 = Stopwatch.GetTimestamp();
             DataContext = ViewModel;
             InitializeResources();
+            var t0 = Stopwatch.GetTimestamp();
             InitializeComponent();
+            Console.WriteLine($"MainWindow: InitializeComponent in {Stopwatch.GetElapsedTime(t0).TotalMilliseconds}ms");
             this.SetDispatcher(CheckUpdate_Auto);
 
             YgoEvents.AddRequestOpenCardUrlHandler(this, OnRequestOpenCardUrl);
@@ -72,11 +81,20 @@ namespace LivreNoir.YuGiOhDatabase
         {
             ViewModel.WindowLeft = Left;
             ViewModel.WindowTop = Top;
+            ViewModel.EditingDuelLog = Unit_DuelLog.DuelLogEditor.EditingLog;
             MainViewModel.Save();
             base.OnClosing(e);
         }
 
-        private void CheckUpdate_Auto() => CheckUpdate(false);
+        private void CheckUpdate_Auto()
+        {
+            if (ViewModel.EditingDuelLog is { } log)
+            {
+                Unit_DuelLog.DuelLogEditor.UpdateEditingLog(log);
+            }
+            CheckUpdate(false);
+            Console.WriteLine($"MainWindow: Initialized in {Stopwatch.GetElapsedTime(_t0).TotalMilliseconds}ms");
+        }
 
         private void CheckUpdate(bool force)
         {
@@ -117,7 +135,8 @@ namespace LivreNoir.YuGiOhDatabase
 
         private void OnClick_Help_Manual(object sender, RoutedEventArgs e)
         {
-
+            e.Handled = true;
+            this.ShellOpen(ManualUrl);
         }
 
         private void OnClick_Help_Update(object sender, RoutedEventArgs e)
@@ -135,7 +154,10 @@ namespace LivreNoir.YuGiOhDatabase
         private void Executed_UpdateDatabase(object sender, ExecutedRoutedEventArgs e)
         {
             e.Handled = true;
-            this.StartTask(asyncProcess: UpdateDatabase, isAbortable: false);
+            if (ViewModel.CardPool.LastUpdate + TimeSpan.FromHours(1) < DateTime.Now)
+            {
+                this.StartTask(asyncProcess: UpdateDatabase, isAbortable: false);
+            }
         }
 
         private async Task UpdateDatabase(ProgressReporter p, CancellationToken c)

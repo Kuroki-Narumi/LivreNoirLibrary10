@@ -73,14 +73,18 @@ namespace LivreNoirLibrary.Text
             return GetValueOrThrow(obj);
         }
 
-        public static T Open<T>(string path, bool ignorePropertyCase = false)
+        public static T Open<T>(string path) where T : class => Open<T>(path, false);
+
+        public static T Open<T>(string path, bool ignorePropertyCase)
             where T : class
         {
             using var file = File.OpenRead(path);
             return Load<T>(file, ignorePropertyCase);
         }
 
-        public static T Load<T>(Stream utf8json, bool ignorePropertyCase = false)
+        public static T Load<T>(Stream utf8Json) where T : class => Load<T>(utf8Json, false);
+
+        public static T Load<T>(Stream utf8json, bool ignorePropertyCase)
             where T : class
         {
             var obj = JsonSerializer.Deserialize<T>(utf8json, GetReadOptions(ignorePropertyCase));

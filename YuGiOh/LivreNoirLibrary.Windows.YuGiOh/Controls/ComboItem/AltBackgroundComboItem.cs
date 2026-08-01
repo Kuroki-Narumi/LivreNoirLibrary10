@@ -1,6 +1,7 @@
 ﻿using LivreNoirLibrary.Windows.Media;
 using System;
 using System.Windows.Media;
+using LivreNoirLibrary.Windows.Controls;
 
 namespace LivreNoirLibrary.Windows.YuGiOh.Controls
 {
@@ -8,11 +9,5 @@ namespace LivreNoirLibrary.Windows.YuGiOh.Controls
         where T : struct, Enum
     {
         protected override Brush? GetBackground(int row, int column) => AltBackgroundComboItem.GetBackground(row, column);
-    }
-
-    public static class AltBackgroundComboItem
-    {
-        private static SolidColorBrush AltBackground { get; } = MediaUtils.GetBrush("#08000080");
-        internal static SolidColorBrush? GetBackground(int row, int column) => ((row + column) % 2) is 1 ? AltBackground : Brushes.Transparent;
     }
 }

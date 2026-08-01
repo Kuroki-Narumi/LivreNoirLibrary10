@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Windows;
 using System.Windows.Input;
-using LivreNoirLibrary.Windows.NativeMethods;
+using LivreNoirLibrary.Win32Api;
 
 namespace LivreNoirLibrary.Windows.Input
 {
@@ -29,7 +29,7 @@ namespace LivreNoirLibrary.Windows.Input
             {
                 foreach (var (id, _) in _key_binds)
                 {
-                    _ = Win32Api.UnregisterHotKey(0, id);
+                    _ = NativeMethods.UnregisterHotKey(0, id);
                 }
                 _stopped = true;
             }
@@ -81,10 +81,10 @@ namespace LivreNoirLibrary.Windows.Input
                 m |= 0x4000;
             }
             var vk = KeyInterop.VirtualKeyFromKey(key);
-            var result = Win32Api.RegisterHotKey(0, id, m, vk) != 0;
+            var result = NativeMethods.RegisterHotKey(0, id, m, vk);
             if (unregister)
             {
-                _ = Win32Api.UnregisterHotKey(0, id);
+                _ = NativeMethods.UnregisterHotKey(0, id);
             }
             return result;
         }
@@ -92,7 +92,7 @@ namespace LivreNoirLibrary.Windows.Input
         public static bool Remove(int id)
         {
             _key_binds.Remove(id);
-            return Win32Api.UnregisterHotKey(0, id) is not 0;
+            return NativeMethods.UnregisterHotKey(0, id);
         }
 
         private record KeyBindInfo(int Id, Key Key, ModifierKeys Modifier, bool NoRepeat, Action Handler);

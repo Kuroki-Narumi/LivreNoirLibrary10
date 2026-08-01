@@ -27,11 +27,11 @@ namespace LivreNoirLibrary.Windows.YuGiOh.Controls
 
         WeakReference<object> IDragDrop.DragSource { get; } = new(null!);
         Point IDragDrop.DragStartPoint { get; set; }
-        protected override IListView[] ListViews { get; }
+        protected override ListBox[] ListViews { get; }
 
         private readonly List<Card> _mainSelectedItems = [];
-        private readonly Dictionary<int, (IListView, List<Card>)> _listMap;
-        private IListView? _currentListView;
+        private readonly Dictionary<int, (ListBox, List<Card>)> _listMap;
+        private ListBox? _currentListView;
         private bool _selectionChanging;
 
         public RegulationEditor()
@@ -56,6 +56,8 @@ namespace LivreNoirLibrary.Windows.YuGiOh.Controls
         {
             InitializeComponent();
         }
+
+        protected override void OnCardProviderChanged(ICardProvider? value) => ListView_CardList.SetCloningSource(value);
 
         private void OnCardSortExecuted(object sender, RoutedEventArgs<SortDescriptionCollection> e)
         {
@@ -94,15 +96,15 @@ namespace LivreNoirLibrary.Windows.YuGiOh.Controls
             }
         }
 
-        private void ListView_OnSelectionChanged(object sender, SelectionChangedEventArgs e) => UpdateSelection(sender as IListView);
+        private void ListView_OnSelectionChanged(object sender, SelectionChangedEventArgs e) => UpdateSelection(sender as ListBox);
         private void ListView_OnGotFocus(object sender, RoutedEventArgs e)
         {
-            var lv = sender as IListView;
+            var lv = sender as ListBox;
             _currentListView = lv;
             UpdateSelection(lv);
         }
 
-        private static void ApplySelection(IListView lv, System.Collections.IList list)
+        private static void ApplySelection(ListBox lv, System.Collections.IList list)
         {
             lv.SetSelectedItems(list);
             if (list.Count > 0)
@@ -112,7 +114,7 @@ namespace LivreNoirLibrary.Windows.YuGiOh.Controls
             list.Clear();
         }
 
-        private void UpdateSelection(IListView? control)
+        private void UpdateSelection(ListBox? control)
         {
             if (_selectionChanging || control is null)
             {
@@ -158,13 +160,13 @@ namespace LivreNoirLibrary.Windows.YuGiOh.Controls
 
         bool IDragDrop.HandleMouseButtonEvent(object sender, MouseButtonEventArgs e) => IDragDropExtensions.HandleMouseButton_ListViewItem(sender, e);
 
-        void IDragDrop.BuildDataObject(DataObject obj, object sender) => IDragDropExtensions.BuildDataObject_ListView(DataObjectTypes.RegulationDragDrop, obj, sender);
+        void IDragDrop.BuildDataObject(DataObject obj, object sender) => IDragDropExtensions.BuildDataObject_ListView(DataObjectTypes.CardDragDrop, obj, sender);
 
-        bool IDragDrop.CanDrop(IDataObject obj) => obj.GetDataPresent(DataObjectTypes.RegulationDragDrop);
+        bool IDragDrop.CanDrop(IDataObject obj) => obj.GetDataPresent(DataObjectTypes.CardDragDrop);
 
         bool IDragDrop.HandleDrop(IDataObject obj, object sender)
         {
-            if (sender is IListView to && obj.GetData(DataObjectTypes.RegulationDragDrop) is IListView from)
+            if (sender is ListBox to && obj.GetData(DataObjectTypes.CardDragDrop) is ListBox from)
             {
                 MoveItems(from, to);
                 return true;
@@ -178,7 +180,7 @@ namespace LivreNoirLibrary.Windows.YuGiOh.Controls
         private void ContextMenu_OnClick_Unlimited(object sender, RoutedEventArgs e) => MoveItems(_currentListView, null, e);
         private void ContextMenu_OnClick_Specified(object sender, RoutedEventArgs e) => MoveItems(_currentListView, ListView_Specified, e);
 
-        private void MoveItems(IListView? from, IListView? to, RoutedEventArgs? e = null)
+        private void MoveItems(ListBox? from, ListBox? to, RoutedEventArgs? e = null)
         {
             e?.Handled = true;
             if (from is null || from == to)

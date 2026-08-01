@@ -8,7 +8,10 @@ namespace LivreNoirLibrary.Windows.Converters
 {
     public class StarGridLengthConverter : IValueConverter
     {
-        private static object Convert(object value)
+        public double MinValue { get; set; } = 0;
+        public double MaxValue { get; set; } = double.PositiveInfinity;
+
+        private static object Convert(object value, double min, double max)
         {
             if (value is GridLength g)
             {
@@ -27,18 +30,18 @@ namespace LivreNoirLibrary.Windows.Converters
                 }
                 else if (v is >= 0)
                 {
-                    return new GridLength(v, GridUnitType.Pixel);
+                    return new GridLength(Math.Clamp(v, min, max), GridUnitType.Pixel);
                 }
                 else
                 {
-                    return new GridLength(-v, GridUnitType.Star);
+                    return new GridLength(Math.Clamp(-v, min, max), GridUnitType.Star);
                 }
             }
             return value;
         }
 
-        public object Convert(object value, Type targetType, object parameter, CultureInfo culture) => Convert(value);
+        public object Convert(object value, Type targetType, object parameter, CultureInfo culture) => Convert(value, MinValue, MaxValue);
 
-        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture) => Convert(value);
+        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture) => Convert(value, MinValue, MaxValue);
     }
 }

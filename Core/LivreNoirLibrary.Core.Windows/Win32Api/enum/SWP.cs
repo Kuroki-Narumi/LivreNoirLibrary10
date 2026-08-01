@@ -1,0 +1,23 @@
+﻿using System;
+
+namespace LivreNoirLibrary.Win32Api
+{
+    public enum SWP
+    {
+        ASYNCWINDOWPOS = 0x00004000,
+        DEFERERASE = 0x00002000,
+        DRAWFRAME = 0x00000020,
+        FRAMECHANGED = DRAWFRAME,
+        HIDEWINDOW = 0x00000080,
+        NOACTIVATE = 0x00000010,
+        NOCOPYBITS = 0x00000100,
+        NOMOVE = 0x00000002,
+        NOOWNERZORDER = 0x00000200,
+        NOREDRAW = 0x00000008,
+        NOREPOSITION = NOOWNERZORDER,
+        NOSENDCHANGING = 0x00000400,
+        NOSIZE = 0x00000001,
+        NOZORDER = 0x00000004,
+        SHOWWINDOW = 0x00000040,
+    }
+}

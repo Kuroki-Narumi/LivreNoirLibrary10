@@ -12,6 +12,8 @@
     xmlns:input="clr-namespace:LivreNoirLibrary.Windows.Input;assembly=LivreNoirLibrary.Windows.Core"
     xmlns:data="clr-namespace:LivreNoirLibrary.YuGiOh.Data;assembly=LivreNoirLibrary.YuGiOh.Core"
     xmlns:ym="clr-namespace:LivreNoirLibrary.YuGiOh.Media;assembly=LivreNoirLibrary.YuGiOh.Core"
+    xmlns:wconv="clr-namespace:LivreNoirLibrary.Windows.Converters;assembly=LivreNoirLibrary.Windows.Controls"
+    xmlns:ymd="clr-namespace:LivreNoirLibrary.YuGiOh.MasterDuel;assembly=LivreNoirLibrary.YuGiOh.Core"
     >
     <ResourceDictionary.MergedDictionaries>
         <ResourceDictionary Source="/LivreNoirLibrary.Windows.Controls;component/Themes/Generic.xaml" />
@@ -179,11 +181,13 @@
     <Style x:Key="IconButton_Duplicate" TargetType="ct:Button" BasedOn="{StaticResource IconButtonBase_Duplicate}">
         <Setter Property="ToolTip" Value="{Binding Duplicate.Value, Source={x:Static ygo:Vocab.Current}}"/>
     </Style>
+    <Style x:Key="IconButton_Sort" TargetType="ct:Button" BasedOn="{StaticResource IconButtonBase_Sort}">
+        <Setter Property="ToolTip" Value="{Binding Sort.Value, Source={x:Static ygo:Vocab.Current}}"/>
+    </Style>
     
     <Style x:Key="IconButton_ListClear" TargetType="ct:Button" BasedOn="{StaticResource IconButtonBase}">
         <Setter Property="Icon" Value="{x:Static md:Icons.Cross}"/>
         <Setter Property="ToolTip" Value="{Binding Clear.Value, Source={x:Static ygo:Vocab.Current}}"/>
-        <Setter Property="Margin" Value="4,0,0,0"/>
     </Style>
 
     <Style x:Key="MenuItem_Add" TargetType="MenuItem" BasedOn="{StaticResource MenuItemBase_Add}">
@@ -495,6 +499,257 @@
         </DataTemplate.Triggers>
     </DataTemplate>
 
+    <DataTemplate x:Key="GridViewHeader_DateTime">
+        <TextBlock Text="{Binding DLog.DateTime.Value, Source={x:Static ygo:Vocab.Current}}" Tag="DateTime"/>
+    </DataTemplate>
+    <DataTemplate x:Key="GridViewHeader_Rank">
+        <TextBlock Text="{Binding DLog.Rank.Value, Source={x:Static ygo:Vocab.Current}}" Tag="Rank"/>
+    </DataTemplate>
+    <DataTemplate x:Key="GridViewHeader_Order">
+        <TextBlock Text="{Binding DLog.Order.Value, Source={x:Static ygo:Vocab.Current}}" Tag="Order"/>
+    </DataTemplate>
+    <DataTemplate x:Key="GridViewHeader_Turn">
+        <TextBlock Text="{Binding DLog.Turn_S.Value, Source={x:Static ygo:Vocab.Current}}" Tag="Turn"/>
+    </DataTemplate>
+    <DataTemplate x:Key="GridViewHeader_Result">
+        <TextBlock Text="{Binding DLog.Result.Value, Source={x:Static ygo:Vocab.Current}}" Tag="Result"/>
+    </DataTemplate>
+    <DataTemplate x:Key="GridViewHeader_User">
+        <TextBlock Text="{Binding DLog.User.Value, Source={x:Static ygo:Vocab.Current}}" Tag="UserTagText"/>
+    </DataTemplate>
+    <DataTemplate x:Key="GridViewHeader_Opponent">
+        <TextBlock Text="{Binding DLog.Opponent.Value, Source={x:Static ygo:Vocab.Current}}" Tag="OpponentTagText"/>
+    </DataTemplate>
+    <DataTemplate x:Key="GridViewHeader_Note">
+        <TextBlock Text="{Binding DLog.Note.Value, Source={x:Static ygo:Vocab.Current}}" Tag="Note"/>
+    </DataTemplate>
+    <DataTemplate x:Key="GridViewHeader_TagName">
+        <TextBlock Text="{Binding DLog.Name.Value, Source={x:Static ygo:Vocab.Current}}" Tag="Name"/>
+    </DataTemplate>
+    <DataTemplate x:Key="GridViewHeader_TagHint">
+        <TextBlock Text="{Binding DLog.SearchHint.Value, Source={x:Static ygo:Vocab.Current}}" Tag="SearchHint"/>
+    </DataTemplate>
+    <DataTemplate x:Key="ItemTemplate_DateTime">
+        <TextBlock Text="{Binding DateTime, StringFormat={}{0:yy/MM/dd HH:mm}}"/>
+    </DataTemplate>
+    <DataTemplate x:Key="ItemTemplate_Rank">
+        <TextBlock Text="{Binding Rank}" HorizontalAlignment="Center"/>
+    </DataTemplate>
+    <DataTemplate x:Key="ItemTemplate_Order">
+        <TextBlock Text="{Binding OrderText}" HorizontalAlignment="Center"/>
+    </DataTemplate>
+    <DataTemplate x:Key="ItemTemplate_Turn">
+        <TextBlock Text="{Binding Turn}" HorizontalAlignment="Center"/>
+    </DataTemplate>
+    <DataTemplate x:Key="ItemTemplate_Result">
+        <TextBlock Text="{Binding ResultText}" HorizontalAlignment="Center"/>
+    </DataTemplate>
+    <DataTemplate x:Key="ItemTemplate_User">
+        <TextBlock Text="{Binding UserTagText}"/>
+    </DataTemplate>
+    <DataTemplate x:Key="ItemTemplate_Opponent">
+        <TextBlock Text="{Binding OpponentTagText}"/>
+    </DataTemplate>
+    <DataTemplate x:Key="ItemTemplate_Note">
+        <TextBlock Text="{Binding Note}"/>
+    </DataTemplate>
+    <DataTemplate x:Key="ItemTemplate_TagName">
+        <TextBlock Text="{Binding Name}"/>
+    </DataTemplate>
+    <DataTemplate x:Key="ItemTemplate_TagHint">
+        <TextBlock Text="{Binding SearchHint}"/>
+    </DataTemplate>
+
+    <DataTemplate x:Key="GridViewHeader_DS_Tag">
+        <TextBlock Text="{Binding DLog.Header_Tag.Value, Source={x:Static ygo:Vocab.Current}}" Tag="Tag"/>
+    </DataTemplate>
+    <DataTemplate x:Key="GridViewHeader_DS_Card">
+        <TextBlock Text="{Binding DLog.Header_Card.Value, Source={x:Static ygo:Vocab.Current}}" Tag="TypeIdIndex"/>
+    </DataTemplate>
+    <DataTemplate x:Key="GridViewHeader_DS_Count">
+        <TextBlock Text="{Binding DLog.Header_Total.Value, Source={x:Static ygo:Vocab.Current}}" Tag="Count"/>
+    </DataTemplate>
+    <DataTemplate x:Key="GridViewHeader_DS_CountRatio">
+        <TextBlock Text="{Binding DLog.Header_Percent.Value, Source={x:Static ygo:Vocab.Current}}" Tag="CountRatio"/>
+    </DataTemplate>
+    <DataTemplate x:Key="GridViewHeader_DS_Win">
+        <TextBlock Text="{Binding DLog.Header_Win.Value, Source={x:Static ygo:Vocab.Current}}" Tag="Win"/>
+    </DataTemplate>
+    <DataTemplate x:Key="GridViewHeader_DS_WinRatio">
+        <TextBlock Text="{Binding DLog.Header_Percent.Value, Source={x:Static ygo:Vocab.Current}}" Tag="WinRatio"/>
+    </DataTemplate>
+    <DataTemplate x:Key="GridViewHeader_DS_Lose">
+        <TextBlock Text="{Binding DLog.Header_Lose.Value, Source={x:Static ygo:Vocab.Current}}" Tag="Lose"/>
+    </DataTemplate>
+    <DataTemplate x:Key="GridViewHeader_DS_LoseRatio">
+        <TextBlock Text="{Binding DLog.Header_Percent.Value, Source={x:Static ygo:Vocab.Current}}" Tag="LoseRatio"/>
+    </DataTemplate>
+    <DataTemplate x:Key="GridViewHeader_DS_Draw">
+        <TextBlock Text="{Binding DLog.Header_Draw.Value, Source={x:Static ygo:Vocab.Current}}" Tag="Draw"/>
+    </DataTemplate>
+    <DataTemplate x:Key="GridViewHeader_DS_DrawRatio">
+        <TextBlock Text="{Binding DLog.Header_Percent.Value, Source={x:Static ygo:Vocab.Current}}" Tag="DrawRatio"/>
+    </DataTemplate>
+    <DataTemplate x:Key="GridViewHeader_DS_DiscWin">
+        <TextBlock Text="{Binding DLog.Header_DiscWin.Value, Source={x:Static ygo:Vocab.Current}}" Tag="DiscWin"/>
+    </DataTemplate>
+    <DataTemplate x:Key="GridViewHeader_DS_DiscWinRatio">
+        <TextBlock Text="{Binding DLog.Header_Percent.Value, Source={x:Static ygo:Vocab.Current}}" Tag="DiscWinRatio"/>
+    </DataTemplate>
+    <DataTemplate x:Key="GridViewHeader_DS_DiscLose">
+        <TextBlock Text="{Binding DLog.Header_DiscLose.Value, Source={x:Static ygo:Vocab.Current}}" Tag="DiscLose"/>
+    </DataTemplate>
+    <DataTemplate x:Key="GridViewHeader_DS_DiscLoseRatio">
+        <TextBlock Text="{Binding DLog.Header_Percent.Value, Source={x:Static ygo:Vocab.Current}}" Tag="DiscLoseRatio"/>
+    </DataTemplate>
+    <DataTemplate x:Key="GridViewHeader_DS_WinLike">
+        <TextBlock Text="{Binding DLog.Header_WinLike.Value, Source={x:Static ygo:Vocab.Current}}" Tag="WinLike"/>
+    </DataTemplate>
+    <DataTemplate x:Key="GridViewHeader_DS_WinLikeRatio">
+        <TextBlock Text="{Binding DLog.Header_Percent.Value, Source={x:Static ygo:Vocab.Current}}" Tag="WinLikeRatio"/>
+    </DataTemplate>
+    <DataTemplate x:Key="GridViewHeader_DS_First">
+        <TextBlock Text="{Binding DLog.Header_First.Value, Source={x:Static ygo:Vocab.Current}}" Tag="First"/>
+    </DataTemplate>
+    <DataTemplate x:Key="GridViewHeader_DS_FirstRatio">
+        <TextBlock Text="{Binding DLog.Header_Percent.Value, Source={x:Static ygo:Vocab.Current}}" Tag="FirstRatio"/>
+    </DataTemplate>
+    <DataTemplate x:Key="GridViewHeader_DS_Second">
+        <TextBlock Text="{Binding DLog.Header_Second.Value, Source={x:Static ygo:Vocab.Current}}" Tag="Second"/>
+    </DataTemplate>
+    <DataTemplate x:Key="GridViewHeader_DS_SecondRatio">
+        <TextBlock Text="{Binding DLog.Header_Percent.Value, Source={x:Static ygo:Vocab.Current}}" Tag="SecondRatio"/>
+    </DataTemplate>
+    <DataTemplate x:Key="GridViewHeader_DS_CFirst">
+        <TextBlock Text="{Binding DLog.Header_CFirst.Value, Source={x:Static ygo:Vocab.Current}}" Tag="CFirst"/>
+    </DataTemplate>
+    <DataTemplate x:Key="GridViewHeader_DS_CFirstRatio">
+        <TextBlock Text="{Binding DLog.Header_Percent.Value, Source={x:Static ygo:Vocab.Current}}" Tag="CFirstRatio"/>
+    </DataTemplate>
+    <DataTemplate x:Key="GridViewHeader_DS_CSecond">
+        <TextBlock Text="{Binding DLog.Header_CSecond.Value, Source={x:Static ygo:Vocab.Current}}" Tag="CSecond"/>
+    </DataTemplate>
+    <DataTemplate x:Key="GridViewHeader_DS_CSecondRatio">
+        <TextBlock Text="{Binding DLog.Header_Percent.Value, Source={x:Static ygo:Vocab.Current}}" Tag="CSecondRatio"/>
+    </DataTemplate>
+    <DataTemplate x:Key="GridViewHeader_DS_FirstWin">
+        <TextBlock Text="{Binding DLog.Header_FirstWin.Value, Source={x:Static ygo:Vocab.Current}}" Tag="FirstWin"/>
+    </DataTemplate>
+    <DataTemplate x:Key="GridViewHeader_DS_FirstWinRatio">
+        <TextBlock Text="{Binding DLog.Header_Percent.Value, Source={x:Static ygo:Vocab.Current}}" Tag="FirstWinRatio"/>
+    </DataTemplate>
+    <DataTemplate x:Key="GridViewHeader_DS_SecondWin">
+        <TextBlock Text="{Binding DLog.Header_SecondWin.Value, Source={x:Static ygo:Vocab.Current}}" Tag="SecondWin"/>
+    </DataTemplate>
+    <DataTemplate x:Key="GridViewHeader_DS_SecondWinRatio">
+        <TextBlock Text="{Binding DLog.Header_Percent.Value, Source={x:Static ygo:Vocab.Current}}" Tag="SecondWinRatio"/>
+    </DataTemplate>
+    <DataTemplate x:Key="GridViewHeader_DS_CFirstWin">
+        <TextBlock Text="{Binding DLog.Header_CFirstWin.Value, Source={x:Static ygo:Vocab.Current}}" Tag="CFirstWin"/>
+    </DataTemplate>
+    <DataTemplate x:Key="GridViewHeader_DS_CFirstWinRatio">
+        <TextBlock Text="{Binding DLog.Header_Percent.Value, Source={x:Static ygo:Vocab.Current}}" Tag="CFirstWinRatio"/>
+    </DataTemplate>
+    <DataTemplate x:Key="GridViewHeader_DS_CSecondWin">
+        <TextBlock Text="{Binding DLog.Header_CSecondWin.Value, Source={x:Static ygo:Vocab.Current}}" Tag="CSecondWin"/>
+    </DataTemplate>
+    <DataTemplate x:Key="GridViewHeader_DS_CSecondWinRatio">
+        <TextBlock Text="{Binding DLog.Header_Percent.Value, Source={x:Static ygo:Vocab.Current}}" Tag="CSecondWinRatio"/>
+    </DataTemplate>
+    <DataTemplate x:Key="ItemTemplate_DS_Tag">
+        <TextBlock Text="{Binding Tag}"/>
+    </DataTemplate>
+    <DataTemplate x:Key="ItemTemplate_DS_Count">
+        <TextBlock Text="{Binding Count}" HorizontalAlignment="Right"/>
+    </DataTemplate>
+    <DataTemplate x:Key="ItemTemplate_DS_CountRatio">
+        <TextBlock Text="{Binding CountRatioText}" HorizontalAlignment="Right"/>
+    </DataTemplate>
+    <DataTemplate x:Key="ItemTemplate_DS_Win">
+        <TextBlock Text="{Binding Win}" HorizontalAlignment="Right"/>
+    </DataTemplate>
+    <DataTemplate x:Key="ItemTemplate_DS_WinRatio">
+        <TextBlock Text="{Binding WinRatioText}" HorizontalAlignment="Right"/>
+    </DataTemplate>
+    <DataTemplate x:Key="ItemTemplate_DS_Lose">
+        <TextBlock Text="{Binding Lose}" HorizontalAlignment="Right"/>
+    </DataTemplate>
+    <DataTemplate x:Key="ItemTemplate_DS_LoseRatio">
+        <TextBlock Text="{Binding LoseRatioText}" HorizontalAlignment="Right"/>
+    </DataTemplate>
+    <DataTemplate x:Key="ItemTemplate_DS_Draw">
+        <TextBlock Text="{Binding Draw}" HorizontalAlignment="Right"/>
+    </DataTemplate>
+    <DataTemplate x:Key="ItemTemplate_DS_DrawRatio">
+        <TextBlock Text="{Binding DrawRatioText}" HorizontalAlignment="Right"/>
+    </DataTemplate>
+    <DataTemplate x:Key="ItemTemplate_DS_DiscWin">
+        <TextBlock Text="{Binding DiscWin}" HorizontalAlignment="Right"/>
+    </DataTemplate>
+    <DataTemplate x:Key="ItemTemplate_DS_DiscWinRatio">
+        <TextBlock Text="{Binding DiscWinRatioText}" HorizontalAlignment="Right"/>
+    </DataTemplate>
+    <DataTemplate x:Key="ItemTemplate_DS_DiscLose">
+        <TextBlock Text="{Binding DiscLose}" HorizontalAlignment="Right"/>
+    </DataTemplate>
+    <DataTemplate x:Key="ItemTemplate_DS_DiscLoseRatio">
+        <TextBlock Text="{Binding DiscLoseRatioText}" HorizontalAlignment="Right"/>
+    </DataTemplate>
+    <DataTemplate x:Key="ItemTemplate_DS_WinLike">
+        <TextBlock Text="{Binding WinLike}" HorizontalAlignment="Right"/>
+    </DataTemplate>
+    <DataTemplate x:Key="ItemTemplate_DS_WinLikeRatio">
+        <TextBlock Text="{Binding WinLikeRatioText}" HorizontalAlignment="Right"/>
+    </DataTemplate>
+    <DataTemplate x:Key="ItemTemplate_DS_First">
+        <TextBlock Text="{Binding First}" HorizontalAlignment="Right"/>
+    </DataTemplate>
+    <DataTemplate x:Key="ItemTemplate_DS_FirstRatio">
+        <TextBlock Text="{Binding FirstRatioText}" HorizontalAlignment="Right"/>
+    </DataTemplate>
+    <DataTemplate x:Key="ItemTemplate_DS_Second">
+        <TextBlock Text="{Binding Second}" HorizontalAlignment="Right"/>
+    </DataTemplate>
+    <DataTemplate x:Key="ItemTemplate_DS_SecondRatio">
+        <TextBlock Text="{Binding SecondRatioText}" HorizontalAlignment="Right"/>
+    </DataTemplate>
+    <DataTemplate x:Key="ItemTemplate_DS_CFirst">
+        <TextBlock Text="{Binding CFirst}" HorizontalAlignment="Right"/>
+    </DataTemplate>
+    <DataTemplate x:Key="ItemTemplate_DS_CFirstRatio">
+        <TextBlock Text="{Binding CFirstRatioText}" HorizontalAlignment="Right"/>
+    </DataTemplate>
+    <DataTemplate x:Key="ItemTemplate_DS_CSecond">
+        <TextBlock Text="{Binding CSecond}" HorizontalAlignment="Right"/>
+    </DataTemplate>
+    <DataTemplate x:Key="ItemTemplate_DS_CSecondRatio">
+        <TextBlock Text="{Binding CSecondRatioText}" HorizontalAlignment="Right"/>
+    </DataTemplate>
+    <DataTemplate x:Key="ItemTemplate_DS_FirstWin">
+        <TextBlock Text="{Binding FirstWin}" HorizontalAlignment="Right"/>
+    </DataTemplate>
+    <DataTemplate x:Key="ItemTemplate_DS_FirstWinRatio">
+        <TextBlock Text="{Binding FirstWinRatioText}" HorizontalAlignment="Right"/>
+    </DataTemplate>
+    <DataTemplate x:Key="ItemTemplate_DS_SecondWin">
+        <TextBlock Text="{Binding SecondWin}" HorizontalAlignment="Right"/>
+    </DataTemplate>
+    <DataTemplate x:Key="ItemTemplate_DS_SecondWinRatio">
+        <TextBlock Text="{Binding SecondWinRatioText}" HorizontalAlignment="Right"/>
+    </DataTemplate>
+    <DataTemplate x:Key="ItemTemplate_DS_CFirstWin">
+        <TextBlock Text="{Binding CFirstWin}" HorizontalAlignment="Right"/>
+    </DataTemplate>
+    <DataTemplate x:Key="ItemTemplate_DS_CFirstWinRatio">
+        <TextBlock Text="{Binding CFirstWinRatioText}" HorizontalAlignment="Right"/>
+    </DataTemplate>
+    <DataTemplate x:Key="ItemTemplate_DS_CSecondWin">
+        <TextBlock Text="{Binding CSecondWin}" HorizontalAlignment="Right"/>
+    </DataTemplate>
+    <DataTemplate x:Key="ItemTemplate_DS_CSecondWinRatio">
+        <TextBlock Text="{Binding CSecondWinRatioText}" HorizontalAlignment="Right"/>
+    </DataTemplate>
+
     <Style TargetType="ListBox" x:Key="CardListView" BasedOn="{StaticResource Alt2ListBoxStyle}">
         <Setter Property="SelectionMode" Value="Single"/>
         <Setter Property="ItemTemplate" Value="{StaticResource ItemTemplate_FullText}"/>
@@ -519,6 +774,11 @@
         <Setter Property="OpenSortText" Value="{Binding Sort.Value, Source={x:Static ygo:Vocab.Current}}"/>
         <Setter Property="OpenSearchText" Value="{Binding Search.Value, Source={x:Static ygo:Vocab.Current}}"/>
         <Setter Property="ClearText" Value="{Binding Clear.Value, Source={x:Static ygo:Vocab.Current}}"/>
+    </Style>
+
+    <Style TargetType="ct:DateTimePicker">
+        <Setter Property="DisplayDateStart" Value="{x:Static ymd:DuelLogSearchConditions.DefaultDateStart}"/>
+        <Setter Property="DisplayDateEnd" Value="{x:Static ymd:DuelLogSearchConditions.DefaultDateEnd}"/>
     </Style>
 
     <Style x:Key="Button_PresetApply" TargetType="ct:Button" BasedOn="{StaticResource IconButtonBase}">
@@ -803,12 +1063,52 @@
     <Style TargetType="local:MatchTypeSelector" BasedOn="{StaticResource ComboBoxBase}">
         <Setter Property="ItemsSource" Value="{x:Static local:MatchTypeItem.Items}"/>
         <Setter Property="BorderBrush" Value="Transparent"/>
+        <Setter Property="BorderThickness" Value="1"/>
+        <Setter Property="ScrollViewer.VerticalScrollBarVisibility" Value="Disabled"/>
         <Setter Property="SelectedItem" Value="{Binding MatchType, Mode=TwoWay, RelativeSource={RelativeSource Mode=Self}, Converter={StaticResource CIConv}}"/>
         <Setter Property="ItemTemplate">
             <Setter.Value>
                 <DataTemplate>
                     <TextBlock Text="{Binding Name.Value}"/>
                 </DataTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <wconv:DoubleLimitConverter x:Key="Min280" Minimum="280"/>
+    <Style x:Key="DeckTagSelector_ToggleButton" TargetType="ct:ToggleButton">
+        <Setter Property="Margin" Value="0"/>
+        <Setter Property="Padding" Value="4,2,6,2"/>
+        <Setter Property="BorderThickness" Value="0"/>
+        <Setter Property="Focusable" Value="False"/>
+    </Style>
+    <Style TargetType="local:DeckTagSelector">
+        <Setter Property="Background" Value="{DynamicResource {x:Static SystemColors.WindowBrushKey}}"/>
+        <Setter Property="BorderBrush" Value="Transparent"/>
+        <Setter Property="BorderThickness" Value="1"/>
+        <Setter Property="Focusable" Value="False"/>
+        <Setter Property="ToggleButtonStyle" Value="{StaticResource DeckTagSelector_ToggleButton}"/>
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="local:DeckTagSelector">
+                    <Grid ColumnDefinitions="*, Auto">
+                        <ct:DropDownMenuButton x:Name="PART_DropDown" Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" Content="{TemplateBinding ValueText}">
+                            <ct:DropDownMenuButton.DropDownContent>
+                                <Grid RowDefinitions="Auto, Auto" MaxWidth="{Binding ActualWidth, RelativeSource={RelativeSource Mode=TemplatedParent}, Converter={StaticResource Min280}}">
+                                    <Grid ColumnDefinitions="*, Auto, Auto">
+                                        <ct:DefaultTextBox x:Name="PART_Search_TextBox" Style="{StaticResource DefaultTextBox_SearchBar}" InputMethod.IsInputMethodEnabled="False"/>
+                                        <ct:Button Grid.Column="1" Style="{StaticResource IconButtonBase}" Icon="{x:Static md:Icons.Check}" ToolTip="{Binding DLog.Filter.Value, Source={x:Static ygo:Vocab.Current}}" Command="input:Commands.ItemsFilter"/>
+                                        <ct:Button Grid.Column="2" Style="{StaticResource IconButtonBase}" Icon="{x:Static md:Icons.Delete_Mono}" ToolTip="{Binding DLog.FilterClear.Value, Source={x:Static ygo:Vocab.Current}}" Command="input:Commands.ItemsFilterClear"/>
+                                    </Grid>
+                                    <ScrollViewer Grid.Row="1" HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto" MaxHeight="240" Focusable="False">
+                                        <WrapPanel RenderOptions.ClearTypeHint="Enabled" x:Name="PART_Search_Container" Orientation="Horizontal"/>
+                                    </ScrollViewer>
+                                </Grid>
+                            </ct:DropDownMenuButton.DropDownContent>
+                        </ct:DropDownMenuButton>
+                        <ct:Button Grid.Column="1" Style="{StaticResource IconButton_ListClear}" Command="input:Commands.Clear"/>
+                    </Grid>
+                </ControlTemplate>
             </Setter.Value>
         </Setter>
     </Style>

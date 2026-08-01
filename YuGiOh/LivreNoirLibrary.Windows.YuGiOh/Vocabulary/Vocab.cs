@@ -71,6 +71,8 @@ namespace LivreNoirLibrary.Windows.YuGiOh
         public VocabData SetToDefault { get => GetData(); set => SetData(value); }
         public VocabData SaveAsImage { get => GetData(); set => SetData(value); }
         public VocabData CopyImage { get => GetData(); set => SetData(value); }
+        public VocabData All { get => GetData(); set => SetData(value); }
+        public VocabData Others { get => GetData(); set => SetData(value); }
 
         public VocabData Search_CardType { get => GetData(); set => SetData(value); }
         public VocabData Search_Status { get => GetData(); set => SetData(value); }
@@ -305,6 +307,8 @@ namespace LivreNoirLibrary.Windows.YuGiOh
             SetData(nameof(SetToDefault), "デフォルトにする");
             SetData(nameof(SaveAsImage), "画像として保存");
             SetData(nameof(CopyImage), "クリップボードにコピー");
+            SetData(nameof(All), "全て");
+            SetData(nameof(Others), "その他");
 
             SetData(nameof(Search_CardType), "カードタイプ");
             SetData(nameof(Search_Status), "ステータス");

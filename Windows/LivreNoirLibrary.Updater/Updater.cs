@@ -67,7 +67,7 @@ namespace LivreNoirLibrary.Updater
             }
             if (File.Exists(exePath))
             {
-                Windows.WindowsExtensions.RunAsInvoker(exePath);
+                Win32Api.NativeMethods.RunAsInvoker(exePath);
             }
         }
 

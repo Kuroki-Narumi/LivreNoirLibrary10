@@ -30,8 +30,8 @@
                 <ct:Button Style="{StaticResource IconButtonBase}" Icon="{x:Static media:Icons.Merge}" ToolTip="{Binding Merge.Value, Source={x:Static yw:Vocab.Current}}" Click="OnClick_Merge"/>
                 <ct:Button Style="{StaticResource IconButton_Save}"/>
             </StackPanel>
-            <ct:CtListView x:Name="ListView_CardList" Grid.Row="2" Style="{StaticResource CardListView}">
-                <ct:CtListView.ItemContainerStyle>
+            <ListView x:Name="ListView_CardList" Grid.Row="2" Style="{StaticResource CardListView}">
+                <ListView.ItemContainerStyle>
                     <Style TargetType="ListViewItem" BasedOn="{StaticResource Alt2ListBoxItemContainerStyle}">
                         <Setter Property="ContextMenu">
                             <Setter.Value>
@@ -50,14 +50,14 @@
                         </Setter>
                         <EventSetter Event="PreviewMouseLeftButtonDown" Handler="CardListView_PreviewMouseLeftButtonDown"/>
                     </Style>
-                </ct:CtListView.ItemContainerStyle>
-                <ct:CtListView.ContextMenu>
+                </ListView.ItemContainerStyle>
+                <ListView.ContextMenu>
                     <ContextMenu>
                         <MenuItem Style="{StaticResource MenuItem_Add}" CommandTarget="{Binding PlacementTarget, RelativeSource={RelativeSource AncestorType=ContextMenu}}"/>
                         <MenuItem Style="{StaticResource MenuItem_Paste}" CommandTarget="{Binding PlacementTarget, RelativeSource={RelativeSource AncestorType=ContextMenu}}"/>
                     </ContextMenu>
-                </ct:CtListView.ContextMenu>
-            </ct:CtListView>
+                </ListView.ContextMenu>
+            </ListView>
             <Grid Grid.Row="4" Style="{StaticResource EditBarPanel}">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="*" MaxWidth="8"/>

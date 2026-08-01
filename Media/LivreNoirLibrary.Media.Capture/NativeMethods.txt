@@ -1,0 +1,7 @@
+﻿D3D11CreateDevice
+D3D11_SDK_VERSION
+ID3D11Texture2D
+IDirect3DDxgiInterfaceAccess
+IDXGIDevice
+IUnknown
+CreateDirect3D11DeviceFromDXGIDevice

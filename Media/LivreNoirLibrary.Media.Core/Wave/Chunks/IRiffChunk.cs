@@ -36,6 +36,7 @@ namespace LivreNoirLibrary.Media.Wave
 
     public interface IIdChunk : IRiffChunk, IId
     {
+        void SetId(int id);
     }
 
     public interface IRiffChunk<TSelf> : IRiffChunk
@@ -113,7 +114,7 @@ namespace LivreNoirLibrary.Media.Wave
             destination.Data = newData;
             if (source is IIdChunk i1 && destination is IIdChunk i2)
             {
-                i2.Id = i1.Id;
+                i2.SetId(i1.Id);
             }
         }
 

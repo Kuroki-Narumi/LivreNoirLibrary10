@@ -22,7 +22,7 @@ namespace LivreNoirLibrary.Windows.YuGiOh.Controls
         static OrderItem()
         {
             var v = Vocab.Current.DLog;
-            Items = [new(Order.First, v.First), new(Order.Second, v.Second), new(Order.CFirst, v.CFirst), new(Order.CSecond, v.CSecond)];
+            Items = [new(Order.First, v.WinFirst), new(Order.Second, v.LoseSecond), new(Order.CFirst, v.LoseFirst), new(Order.CSecond, v.WinSecond)];
             _items = CreateMap(Items);
         }
     }

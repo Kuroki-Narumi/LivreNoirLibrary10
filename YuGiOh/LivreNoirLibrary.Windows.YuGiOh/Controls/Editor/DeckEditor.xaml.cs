@@ -30,7 +30,7 @@ namespace LivreNoirLibrary.Windows.YuGiOh.Controls
         TaskProgressBar IProgressReporter.ProgressBar => TaskProgressBar;
         Task? IProgressReporter.WorkingTask { get; set; }
 
-        protected override IListView[] ListViews { get; }
+        protected override ListBox[] ListViews { get; }
 
         [DependencyProperty]
         private bool _isSideDeckVisible;
@@ -53,6 +53,8 @@ namespace LivreNoirLibrary.Windows.YuGiOh.Controls
             InitializeComponent();
         }
 
+        protected override void OnCardProviderChanged(ICardProvider? value) => ListView_CardList.SetCloningSource(value);
+
         protected override void ApplyHistory(DeckHistoryData historyData)
         {
             _selectionChanging = true;
@@ -66,14 +68,14 @@ namespace LivreNoirLibrary.Windows.YuGiOh.Controls
             this.IDragDrop_PreviewMouseLeftButtonDown(sender, e);
         }
 
-        private void ListView_OnSelectionChanged(object sender, SelectionChangedEventArgs e) => UpdateSelection(sender as IListView);
+        private void ListView_OnSelectionChanged(object sender, SelectionChangedEventArgs e) => UpdateSelection(sender as ListBox);
         private void ListView_OnGotFocus(object sender, RoutedEventArgs e)
         {
-            var lv = sender as IListView;
+            var lv = sender as ListBox;
             UpdateSelection(lv);
         }
 
-        private List<Card> BuildSelectedItem(IListView lv)
+        private List<Card> BuildSelectedItem(ListBox lv)
         {
             var list = _selected;
             list.Clear();
@@ -88,7 +90,7 @@ namespace LivreNoirLibrary.Windows.YuGiOh.Controls
             return list;
         }
 
-        private void UpdateSelection(IListView? lv)
+        private void UpdateSelection(ListBox? lv)
         {
             if (lv is null || _selectionChanging)
             {
@@ -112,7 +114,7 @@ namespace LivreNoirLibrary.Windows.YuGiOh.Controls
             _selectionChanging = false;
         }
 
-        private static void SetSelectedItems(IListView lv, System.Collections.IEnumerable enumer)
+        private static void SetSelectedItems(ListView lv, System.Collections.IEnumerable enumer)
         {
             lv.SetSelectedItems(enumer);
             if (lv.SelectedItems.Count > 0)
@@ -259,7 +261,7 @@ namespace LivreNoirLibrary.Windows.YuGiOh.Controls
         private void OnMouseRightButtonDown(object sender, MouseButtonEventArgs e)
         {
             _rightClickObject = sender;
-            if (sender is ListViewItem { DataContext: ICard card, IsSelected: false} f && f.TryGetAncestor<IListView>(out var lv))
+            if (sender is ListViewItem { DataContext: ICard card, IsSelected: false} f && f.TryGetAncestor<ListBox>(out var lv))
             {
                 lv.SelectedItems.Clear();
                 lv.SelectedItems.Add(card);
@@ -268,7 +270,7 @@ namespace LivreNoirLibrary.Windows.YuGiOh.Controls
 
         private void OnMouseRightButtonUp(object sender, MouseButtonEventArgs e)
         {
-            if (_rightClickObject == sender && (sender as DependencyObject).TryGetAncestor<IListView>(out var lv))
+            if (_rightClickObject == sender && (sender as DependencyObject).TryGetAncestor<ListBox>(out var lv))
             {
                 if (lv == ListView_CardList)
                 {
@@ -282,7 +284,7 @@ namespace LivreNoirLibrary.Windows.YuGiOh.Controls
             _rightClickObject = null;
         }
 
-        private void ProcessImpl(IListView lv, Deck deck, Action<Card, bool, bool> action)
+        private void ProcessImpl(ListBox lv, Deck deck, Action<Card, bool, bool> action)
         {
             _selectionChanging = true;
             var list = BuildSelectedItem(lv);
@@ -304,7 +306,7 @@ namespace LivreNoirLibrary.Windows.YuGiOh.Controls
             UpdateSelection(ListView_CardList);
         }
 
-        private void ProcessAdd(IListView lv)
+        private void ProcessAdd(ListBox lv)
         {
             if (Deck is { } deck)
             {
@@ -312,7 +314,7 @@ namespace LivreNoirLibrary.Windows.YuGiOh.Controls
             }
         }
 
-        private void ProcessRemove(IListView lv)
+        private void ProcessRemove(ListBox lv)
         {
             if (Deck is { } deck)
             {
@@ -322,13 +324,13 @@ namespace LivreNoirLibrary.Windows.YuGiOh.Controls
 
         bool IDragDrop.HandleMouseButtonEvent(object sender, MouseButtonEventArgs e) => IDragDropExtensions.HandleMouseButton_ListViewItem(sender, e);
 
-        void IDragDrop.BuildDataObject(DataObject obj, object sender) => IDragDropExtensions.BuildDataObject_ListView(DataObjectTypes.DeckDragDrop, obj, sender);
+        void IDragDrop.BuildDataObject(DataObject obj, object sender) => IDragDropExtensions.BuildDataObject_ListView(DataObjectTypes.CardDragDrop, obj, sender);
 
-        bool IDragDrop.CanDrop(IDataObject obj) => obj.GetDataPresent(DataObjectTypes.DeckDragDrop);
+        bool IDragDrop.CanDrop(IDataObject obj) => obj.GetDataPresent(DataObjectTypes.CardDragDrop);
 
         bool IDragDrop.HandleDrop(IDataObject obj, object sender)
         {
-            if (sender is IListView to && obj.GetData(DataObjectTypes.DeckDragDrop) is IListView from)
+            if (sender is ListBox to && obj.GetData(DataObjectTypes.CardDragDrop) is ListBox from)
             {
                 if (from == ListView_CardList)
                 {

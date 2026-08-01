@@ -75,7 +75,7 @@ namespace LivreNoirLibrary.Windows.Media
             var bitmap = Bitmap.Create(source);
             using (var p = bitmap.BeginWrite())
             {
-                p.Blend(BlendMode.Multiply, key.Color);
+                p.Blend(BlendMode.Multiply, new LnColor(key.Color));
             }
             bitmap.Freeze();
             return bitmap;

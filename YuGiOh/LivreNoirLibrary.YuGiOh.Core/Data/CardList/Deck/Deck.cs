@@ -109,14 +109,14 @@ namespace LivreNoirLibrary.YuGiOh.Data
             SideDeck.NotifyCollectionReset();
         }
 
-        public void Load(Serializable.Deck source, ICardProvider provider)
+        public void Load(Serializable.Deck source, ICardProvider? provider)
         {
             ProcessLoad(MainDeck, source.MainDeck.AsSpan(), provider);
             ProcessLoad(ExtraDeck, source.ExtraDeck.AsSpan(), provider);
             ProcessLoad(SideDeck, source.SideDeck.AsSpan(), provider);
         }
 
-        private static void ProcessLoad(DeckCardList list, ReadOnlySpan<int> ids, ICardProvider provider)
+        private static void ProcessLoad(DeckCardList list, ReadOnlySpan<int> ids, ICardProvider? provider)
         {
             list.ClearWithoutNotify();
             foreach (var id in ids)
@@ -129,16 +129,20 @@ namespace LivreNoirLibrary.YuGiOh.Data
             list.NotifyCollectionReset();
         }
 
-        public void Load(DeckForHistoryData source, ICardProvider provider)
+        public void Load(DeckForHistoryData source, ICardProvider? provider)
         {
             ProcessLoad(MainDeck, source.MainDeck.AsSpan(), provider);
             ProcessLoad(ExtraDeck, source.ExtraDeck.AsSpan(), provider);
             ProcessLoad(SideDeck, source.SideDeck.AsSpan(), provider);
         }
 
-        private static void ProcessLoad(DeckCardList list, ReadOnlySpan<(int, int)> values, ICardProvider provider)
+        private static void ProcessLoad(DeckCardList list, ReadOnlySpan<(int, int)> values, ICardProvider? provider)
         {
             list.ClearWithoutNotify();
+            if (provider is null)
+            {
+                return;
+            }
             foreach (var (id, count) in values)
             {
                 if (provider.TryGet(id, out var card))
@@ -149,9 +153,13 @@ namespace LivreNoirLibrary.YuGiOh.Data
             list.NotifyCollectionReset();
         }
 
-        public void Load(IEnumerable<string> source, ICardProvider provider)
+        public void Load(IEnumerable<string> source, ICardProvider? provider)
         {
             Clear();
+            if (provider is null)
+            {
+                return;
+            }
             var main = MainDeck;
             var extra = ExtraDeck;
             foreach (var name in source)
@@ -166,7 +174,7 @@ namespace LivreNoirLibrary.YuGiOh.Data
             extra.NotifyCollectionReset();
         }
 
-        public bool LoadFile(string path, ICardProvider provider)
+        public bool LoadFile(string path, ICardProvider? provider)
         {
             if (!File.Exists(path))
             {

@@ -22,7 +22,6 @@ namespace LivreNoir.YuGiOhDatabase
         public Unit_Deck()
         {
             InitializeComponent();
-            DeckEditor.CardProvider = new CloningCardList(MainViewModel.Instance.CardPool.Cards);
 
             this.RegisterCommand(YgoCommands.AddToDeck, OnExecuted_AddToDeck, CanExecute_AddToDeck);
             this.RegisterCommand(YgoCommands.RemoveFromDeck, OnExecuted_RemoveFromDeck, CanExecute_RemoveFromDeck);

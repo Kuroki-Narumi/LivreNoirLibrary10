@@ -11,40 +11,40 @@ using LivreNoirLibrary.Text;
 
 namespace LivreNoirLibrary.Media
 {
-    [StructLayout(LayoutKind.Sequential)]
+    [StructLayout(LayoutKind.Explicit)]
     [JsonConverter(typeof(FloatColorJsonConverter))]
     [TypeConverter(typeof(FloatColorTypeConverter))]
-    public readonly unsafe struct FloatColor : IEquatable<FloatColor>, IEqualityOperators<FloatColor, FloatColor, bool>, ISpanParsable<FloatColor>
+    public readonly struct FloatColor : IEquatable<FloatColor>, IEqualityOperators<FloatColor, FloatColor, bool>, ISpanParsable<FloatColor>
     {
         public static FloatColor White { get; } = new(1, 1, 1, 1);
         public static FloatColor Black { get; } = new(1, 0, 0, 0);
 
-        private readonly Vector<float> _vector;
-        public float B => _vector[0];
-        public float G => _vector[1];
-        public float R => _vector[2];
-        public float A => _vector[3];
+        [FieldOffset(0)]
+        public readonly Vector<float> Vector;
+        [FieldOffset(0)]
+        public readonly float B;
+        [FieldOffset(1)]
+        public readonly float G;
+        [FieldOffset(2)]
+        public readonly float R;
+        [FieldOffset(3)]
+        public readonly float A;
 
         private FloatColor(Vector<float> vector)
         {
-            _vector = vector;
+            Vector = vector;
         }
 
         public FloatColor(float a, float r, float g, float b) : this(VectorUtils.CreateRepeating([b, g, r, a])) { }
 
-        public override int GetHashCode() => _vector.GetHashCode();
+        public override int GetHashCode() => Vector.GetHashCode();
         public override bool Equals(object? obj) => obj is FloatColor c && Equals(c);
-        public bool Equals(FloatColor other) => _vector == other._vector;
-        public static bool operator ==(FloatColor left, FloatColor right) => left._vector == right._vector;
-        public static bool operator !=(FloatColor left, FloatColor right) => left._vector != right._vector;
+        public bool Equals(FloatColor other) => Vector == other.Vector;
+        public static bool operator ==(FloatColor left, FloatColor right) => left.Vector == right.Vector;
+        public static bool operator !=(FloatColor left, FloatColor right) => left.Vector != right.Vector;
         public override string ToString() => ColorUtils.GetColorCode(A, R, G, B);
 
-        public static implicit operator Vector<float>(FloatColor value) => value._vector;
         public static explicit operator FloatColor(Vector<float> value) => new(value);
-
-        public Vector<float> AsVector() => _vector;
-        public Vector<float> Rgb => _vector * GetMask(ColorFlags.RGB);
-        public Vector<float> Alpha => _vector * GetMask(ColorFlags.A);
 
         public static FloatColor FromRgb(float r, float g, float b) => new(1, r, g, b);
         public static FloatColor FromByte(byte a, byte r, byte g, byte b) => new(ColorUtils.GetFloat(a), ColorUtils.RgbToScRgb(r), ColorUtils.RgbToScRgb(g), ColorUtils.RgbToScRgb(b));
@@ -61,10 +61,10 @@ namespace LivreNoirLibrary.Media
             b = B;
         }
 
-        public static FloatColor operator +(FloatColor left, FloatColor right) => new(left._vector + right._vector);
-        public static FloatColor operator -(FloatColor left, FloatColor right) => new(left._vector - right._vector);
-        public static FloatColor operator *(FloatColor left, FloatColor right) => new(left._vector * right._vector);
-        public static FloatColor operator /(FloatColor left, FloatColor right) => new(left._vector / right._vector);
+        public static FloatColor operator +(FloatColor left, FloatColor right) => new(left.Vector + right.Vector);
+        public static FloatColor operator -(FloatColor left, FloatColor right) => new(left.Vector - right.Vector);
+        public static FloatColor operator *(FloatColor left, FloatColor right) => new(left.Vector * right.Vector);
+        public static FloatColor operator /(FloatColor left, FloatColor right) => new(left.Vector / right.Vector);
 
         public static bool TryParse([NotNullWhen(true)] string? s, [MaybeNullWhen(false)] out FloatColor result) => TryParse(s.AsSpan(), null, out result);
         public static bool TryParse([NotNullWhen(true)] string? s, IFormatProvider? provider, [MaybeNullWhen(false)] out FloatColor result) => TryParse(s.AsSpan(), provider, out result);
@@ -104,12 +104,12 @@ namespace LivreNoirLibrary.Media
         {
             if (!_masks.TryGetValue(flags, out var value))
             {
-                var vector = Vector.Create(0f);
+                var vector = System.Numerics.Vector.Create(0f);
                 void Update(ColorFlags reference)
                 {
                     if ((flags & reference) is not 0)
                     {
-                        vector += _masks[reference];
+                        vector += _masks[reference].Vector;
                     }
                 }
                 Update(ColorFlags.A);

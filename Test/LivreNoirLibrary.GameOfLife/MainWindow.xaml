@@ -5,6 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:LivreNoirLibrary.GameOfLife"
         xmlns:ct="clr-namespace:LivreNoirLibrary.Windows.Controls;assembly=LivreNoirLibrary.Windows.Controls"
+        xmlns:md="clr-namespace:LivreNoirLibrary.Windows.Media;assembly=LivreNoirLibrary.Windows.Media"
         mc:Ignorable="d"
         Title="MainWindow" Height="450" Width="800">
     <DockPanel>
@@ -14,9 +15,9 @@
                     <Setter Property="Margin" Value="2"/>
                 </Style>
             </WrapPanel.Resources>
-            <ct:Button Icon="{x:Static ct:Icons.Play}" Content="Start" Click="OnClick_Start"/>
-            <ct:Button Icon="{x:Static ct:Icons.Stop}" Content="Stop" Click="OnClick_Stop"/>
-            <ct:Button Icon="{x:Static ct:Icons.Cross_Red}" Content="Clear" Click="OnClick_Clear"/>
+            <ct:Button Icon="{x:Static md:Icons.Play}" Content="Start" Click="OnClick_Start"/>
+            <ct:Button Icon="{x:Static md:Icons.Stop}" Content="Stop" Click="OnClick_Stop"/>
+            <ct:Button Icon="{x:Static md:Icons.Cross_Red}" Content="Clear" Click="OnClick_Clear"/>
         </WrapPanel>
         <Image x:Name="MainImage" DockPanel.Dock="Bottom" Stretch="None" MouseDown="OnMouseDown_MainImage"/>
     </DockPanel>

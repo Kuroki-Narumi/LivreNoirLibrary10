@@ -13,7 +13,7 @@ namespace LivreNoirLibrary.Windows.Controls
 
         IHistory IHistoryOwner.History => _history;
 
-        protected abstract IListView[] ListViews { get; }
+        protected abstract ListBox[] ListViews { get; }
 
         public virtual string OpenFilter => Filters.Json;
         public virtual string SaveFilter => Filters.Json;

@@ -16,7 +16,7 @@ namespace LivreNoirLibrary.Windows.YuGiOh.Controls
     /// </summary>
     public partial class HandInspectEditor : HandInspectEditor_Base, IDragDrop
     {
-        protected override IListView[] ListViews { get; }
+        protected override ListBox[] ListViews { get; }
         WeakReference<object> IDragDrop.DragSource { get; } = new(null!);
         Point IDragDrop.DragStartPoint { get; set; }
 
@@ -27,7 +27,7 @@ namespace LivreNoirLibrary.Windows.YuGiOh.Controls
         [DependencyProperty(SetterScope = Scope.Private)]
         private HandConditions? _editingItem;
         [DependencyProperty(SetterScope = Scope.Private)]
-        private IListView? _lastFocusedListView;
+        private ListView? _lastFocusedListView;
 
         private readonly List<Card> _selection = [];
 
@@ -245,14 +245,14 @@ namespace LivreNoirLibrary.Windows.YuGiOh.Controls
 
         bool IDragDrop.HandleMouseButtonEvent(object sender, MouseButtonEventArgs e) => IDragDropExtensions.HandleMouseButton_ListViewItem(sender, e);
 
-        void IDragDrop.BuildDataObject(DataObject obj, object sender) => IDragDropExtensions.BuildDataObject_ListView(DataObjectTypes.HandInspectDragDrop, obj, sender);
+        void IDragDrop.BuildDataObject(DataObject obj, object sender) => IDragDropExtensions.BuildDataObject_ListView(DataObjectTypes.CardDragDrop, obj, sender);
 
         bool IDragDrop.HandleDrop(IDataObject obj, object sender)
         {
-            if (obj.GetData(DataObjectTypes.HandInspectDragDrop) is IListView from)
+            if (obj.GetData(DataObjectTypes.CardDragDrop) is ListView from)
             {
                 var list = BuildSelection(from);
-                if (sender is IListView to && from != to)
+                if (sender is ListView to && from != to)
                 {
                     if (to != ListView_Deck)
                     {
@@ -281,7 +281,7 @@ namespace LivreNoirLibrary.Windows.YuGiOh.Controls
         private void ListView_PreviewMouseRightButtonDown(object sender, MouseButtonEventArgs e)
         {
             _rightClickObject = sender;
-            if (sender is ListViewItem { DataContext: ICard card, IsSelected: false } f && f.TryGetAncestor<IListView>(out var lv))
+            if (sender is ListViewItem { DataContext: ICard card, IsSelected: false } f && f.TryGetAncestor<ListBox>(out var lv))
             {
                 lv.SelectedItems.Clear();
                 lv.SelectedItems.Add(card);
@@ -290,7 +290,7 @@ namespace LivreNoirLibrary.Windows.YuGiOh.Controls
 
         private void ListView_PreviewMouseRightButtonUp(object sender, MouseButtonEventArgs e)
         {
-            if (_rightClickObject == sender && (sender as DependencyObject).TryGetAncestor<IListView>(out var lv))
+            if (_rightClickObject == sender && (sender as DependencyObject).TryGetAncestor<ListView>(out var lv))
             {
                 if (lv == ListView_Deck)
                 {
@@ -307,7 +307,7 @@ namespace LivreNoirLibrary.Windows.YuGiOh.Controls
 
         private void ListView_OnGotFocus(object sender, RoutedEventArgs e)
         {
-            if (sender is CtListView lv && lv != ListView_Deck)
+            if (sender is ListView lv && lv != ListView_Deck)
             {
                 LastFocusedListView = lv;
             }
@@ -316,7 +316,7 @@ namespace LivreNoirLibrary.Windows.YuGiOh.Controls
         private void Item_OnClick_Or(object sender, RoutedEventArgs e)
         {
             e.Handled = true;
-            ItemsControl_Hand.TryGetFirstDescendant<IListView>(out var lv);
+            ItemsControl_Hand.TryGetFirstDescendant<ListView>(out var lv);
             ProcessAdd(BuildSelection(ListView_Deck), LastFocusedListView ?? lv);
         }
 
@@ -341,7 +341,7 @@ namespace LivreNoirLibrary.Windows.YuGiOh.Controls
             }
         }
 
-        private List<Card> BuildSelection(IListView source)
+        private List<Card> BuildSelection(ListView source)
         {
             var list = _selection;
             list.Clear();
@@ -356,7 +356,7 @@ namespace LivreNoirLibrary.Windows.YuGiOh.Controls
             return list;
         }
 
-        private void ProcessAdd(List<Card> source, IListView? to)
+        private void ProcessAdd(List<Card> source, ListView? to)
         {
             if (source.Count is 0)
             {
@@ -374,7 +374,7 @@ namespace LivreNoirLibrary.Windows.YuGiOh.Controls
                 var newItem = EditingItem!.AddNewItem(source);
                 this.SetDispatcher(() =>
                 {
-                    if (ItemsControl_Hand.TryGetFirstDescendant<IListView>(lv => lv.DataContext == newItem, out var lv))
+                    if (ItemsControl_Hand.TryGetFirstDescendant<ListBox>(lv => lv.DataContext == newItem, out var lv))
                     {
                         lv.Focus();
                         lv.SetSelectedItems(newItem.Cards);
@@ -384,7 +384,7 @@ namespace LivreNoirLibrary.Windows.YuGiOh.Controls
             }
         }
 
-        private void ProcessRemove(IListView? from)
+        private void ProcessRemove(ListView? from)
         {
             if (from?.DataContext is HandConditionItem item)
             {

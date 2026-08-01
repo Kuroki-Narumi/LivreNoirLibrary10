@@ -1,3 +1,4 @@
+using LivreNoirLibrary.Win32Api;
 using System;
 using System.Collections.Generic;
 using System.Windows.Input;
@@ -71,18 +72,18 @@ namespace LivreNoirLibrary.Windows.Input
 
         private static void OnUpdate(object? sender, EventArgs e)
         {
-            fixed (sbyte* ptr = _buffer)
-            fixed (KeyMap* keys = _available_keys)
-            fixed (byte* states = _press_states)
+            var buffer = _buffer;
+            if (NativeMethods.GetKeyboardState(buffer))
             {
                 var max = _available_keys.Length;
-                if (NativeMethods.Win32Api.GetKeyboardState((nint)ptr) is not 0)
+                fixed (KeyMap* keys = _available_keys)
+                fixed (byte* states = _press_states)
                 {
                     var modifier = Keyboard.Modifiers;
                     for (var i = 0; i < max; i++)
                     {
                         var (vk, key) = _available_keys[i];
-                        if (ptr[vk] is < 0)
+                        if (buffer[vk] is < 0)
                         {
                             if (states[i] is 0)
                             {

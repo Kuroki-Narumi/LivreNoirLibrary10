@@ -13,7 +13,7 @@ namespace LivreNoirLibrary.Windows.YuGiOh.Controls
     public partial class CardInfoView : UserControl
     {
         public const double DefaultPackListHeight = 104;
-        public const double ExpandedPackListHeight = 224;
+        public const double ExpandedPackListHeight = 304;
 
         private readonly CardInfoViewModel _viewModel = new(true);
 

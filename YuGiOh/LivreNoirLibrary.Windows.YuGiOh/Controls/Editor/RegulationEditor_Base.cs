@@ -7,12 +7,11 @@ namespace LivreNoirLibrary.Windows.YuGiOh.Controls
     public abstract partial class RegulationEditor_Base : FileEditorBase<RegulationHistoryData>
     {
         [DependencyProperty]
-        private ICardProvider _cardProvider = EmptyCardProvider.Instance;
+        private ICardProvider? _cardProvider;
         [DependencyProperty]
         private Regulation? _regulation;
 
-        private static ICardProvider CoerceCardProvider(ICardProvider value) => value ?? EmptyCardProvider.Instance;
-        protected virtual void OnCardProviderChanged(ICardProvider value) { }
+        protected virtual void OnCardProviderChanged(ICardProvider? value) { }
 
         protected virtual void OnRegulationChanged(Regulation? value)
         {

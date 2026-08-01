@@ -32,7 +32,7 @@ namespace LivreNoirLibrary.YuGiOh.Data
             };
         }
 
-        public bool LoadFile(string path, ICardProvider provider)
+        public bool LoadFile(string path, ICardProvider? provider)
         {
             if (Json.TryOpen<Serializable.Regulation>(path, out var data) && !data.IsEmpty())
             {
@@ -56,9 +56,13 @@ namespace LivreNoirLibrary.YuGiOh.Data
             Set(source.Specified, LimitCount.Specified);
         }
 
-        public void Load(Serializable.Regulation source, ICardProvider provider)
+        public void Load(Serializable.Regulation source, ICardProvider? provider)
         {
             Clear();
+            if (provider is null)
+            {
+                return;
+            }
             void SetInternal(List<int>? list, int num)
             {
                 if (list is not null)
@@ -72,9 +76,13 @@ namespace LivreNoirLibrary.YuGiOh.Data
             SetInternal(source.Specified, LimitCount.Specified);
         }
 
-        public void Load(Serializable.StringRegulation source, ICardProvider provider)
+        public void Load(Serializable.StringRegulation source, ICardProvider? provider)
         {
             Clear();
+            if (provider is null)
+            {
+                return;
+            }
             void SetInternal(List<string>? list, int num)
             {
                 if (list is not null)
@@ -209,7 +217,7 @@ namespace LivreNoirLibrary.YuGiOh.Data
             }
         }
 
-        public void Set(ReadOnlySpan<int> ids, int value, ICardProvider provider)
+        public void Set(ReadOnlySpan<int> ids, int value, ICardProvider? provider)
         {
             SortedCardList? list;
             foreach (var id in ids)

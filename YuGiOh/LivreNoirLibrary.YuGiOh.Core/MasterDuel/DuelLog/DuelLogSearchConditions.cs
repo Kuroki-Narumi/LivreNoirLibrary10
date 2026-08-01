@@ -3,30 +3,57 @@ using System;
 using System.Collections.Generic;
 using System.Text.Json.Serialization;
 using LivreNoirLibrary.YuGiOh.Search;
+using LivreNoirLibrary.ObjectModel;
 
 namespace LivreNoirLibrary.YuGiOh.MasterDuel
 {
-    public class DuelLogSearchConditions
+    public class DuelLogSearchConditions : ObservableObjectBase
     {
         public static DateTime DefaultDateStart { get; } = new(2022, 1, 18);
         public static DateTime DefaultDateEnd { get; } = new(DateTime.Now.Year + 1, 12, 31, 23, 59, 59);
-        public static NumberRange DefaultTurn { get; } = new(0, 99, false, false);
+        public static NumberRange DefaultTurn { get; } = new(0, 99, true, false);
 
         [JsonConverter(typeof(NoSecondsDateJsonConverter))]
-        public DateTime DateStart { get; set; } = DefaultDateStart;
-        [JsonConverter(typeof(NoSecondsDateJsonConverter))]
-        public DateTime DateEnd { get; set; } = DefaultDateEnd;
+        public DateTime DateStart { get; set => SetValue(ref field, value); } = DefaultDateStart;
+        [JsonIgnore]
+        public DateTime DateEnd { get; set => SetValue(ref field, value); } = DefaultDateEnd;
 
         public SortedSet<string> UserTags { get; set; } = [];
-        public MatchType UserTagMatchType { get; set; }
+        public MatchType UserTagMatchType { get; set => SetValue(ref field, value); }
 
         public SortedSet<string> OpponentTags { get; set; } = [];
-        public MatchType OpponentTagMatchType { get; set; }
+        public MatchType OpponentTagMatchType { get; set => SetValue(ref field, value); }
 
         public HashSet<Rank> Ranks { get; set; } = [];
         public HashSet<Order> Orders { get; set; } = [];
         public HashSet<Result> Results { get; set; } = [];
         public NumberRange Turn { get; set; } = new(DefaultTurn);
+
+        public void Clear()
+        {
+            DateStart = DefaultDateStart;
+            DateEnd = DefaultDateEnd;
+            UserTags.Clear();
+            UserTagMatchType = 0;
+            OpponentTags.Clear();
+            OpponentTagMatchType = 0;
+            Ranks.Clear();
+            Orders.Clear();
+            Results.Clear();
+            Turn.CopyFrom(DefaultTurn);
+        }
+
+        public void SetUserTags(IEnumerable<string> value)
+        {
+            UserTags.Clear();
+            UserTags.UnionWith(value);
+        }
+
+        public void SetOpponentTags(IEnumerable<string> value)
+        {
+            OpponentTags.Clear();
+            OpponentTags.UnionWith(value);
+        }
 
         public bool IsMatch(DuelLog log)
         {

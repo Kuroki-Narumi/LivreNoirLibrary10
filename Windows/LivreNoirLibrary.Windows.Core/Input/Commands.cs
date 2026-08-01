@@ -83,6 +83,8 @@ namespace LivreNoirLibrary.Windows.Input
         public static RoutedUICommand TextSearchClear { get; } = Create();
         public static RoutedUICommand OpenSearchDialog { get; } = Create();
         public static RoutedUICommand OpenSortDialog { get; } = Create();
+        public static RoutedUICommand ItemsFilter { get; } = Create();
+        public static RoutedUICommand ItemsFilterClear { get; } = Create();
 
         // dialog
         public static RoutedUICommand Decide { get; } = Create(Key.Enter);

@@ -33,6 +33,19 @@ namespace LivreNoirLibrary.Windows.Media
             PixelsPerDip = 1;
         }
 
+        public FormattedTextOptions(TextBlock textBlock)
+        {
+            CultureInfo = CultureInfo.CurrentCulture;
+            FlowDirection = textBlock.FlowDirection;
+            FontFamily = textBlock.FontFamily;
+            FontStyle = textBlock.FontStyle;
+            FontWeight = textBlock.FontWeight;
+            FontStretch = textBlock.FontStretch;
+            FontSize = textBlock.FontSize;
+            Foreground = textBlock.Foreground;
+            PixelsPerDip = VisualTreeHelper.GetDpi(textBlock).PixelsPerDip;
+        }
+
         public FormattedTextOptions(Control control)
         {
             CultureInfo = CultureInfo.CurrentCulture;

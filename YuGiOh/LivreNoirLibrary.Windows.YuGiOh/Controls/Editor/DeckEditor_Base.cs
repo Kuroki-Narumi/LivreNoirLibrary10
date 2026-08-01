@@ -9,12 +9,11 @@ namespace LivreNoirLibrary.Windows.YuGiOh.Controls
     public abstract partial class DeckEditor_Base : FileEditorBase<DeckHistoryData>
     {
         [DependencyProperty]
-        private ICardProvider _cardProvider = EmptyCardProvider.Instance;
+        private ICardProvider? _cardProvider;
         [DependencyProperty]
         private Deck? _deck;
 
-        private static ICardProvider CoerceCardProvider(ICardProvider value) => value ?? EmptyCardProvider.Instance;
-        protected virtual void OnCardProviderChanged(ICardProvider value) { }
+        protected virtual void OnCardProviderChanged(ICardProvider? value) { }
 
         protected virtual void OnDeckChanged(Deck? value)
         {

@@ -66,7 +66,7 @@ namespace LivreNoirLibrary.Windows.Controls
                     }
                 }
                 Console.WriteLine(string.Join(", ", values));
-                throw new NotImplementedException();
+                return Binding.DoNothing;
             }
 
             public object[] ConvertBack(object value, Type[] targetTypes, object parameter, CultureInfo culture)

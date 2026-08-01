@@ -8,7 +8,12 @@ namespace LivreNoirLibrary.ObjectModel
         bool IsChecked { get; set; }
     }
 
-    public partial class CheckableObject : ObservableObjectBase, ICheckableObject
+    public interface INotifyIsCheckedChanged : ICheckableObject
+    {
+        event EventHandler<bool>? IsCheckedChanged;
+    }
+
+    public partial class CheckableObject : ObservableObjectBase, INotifyIsCheckedChanged
     {
         public event EventHandler<bool>? IsCheckedChanged;
 
@@ -17,11 +22,13 @@ namespace LivreNoirLibrary.ObjectModel
             get;
             set
             {
-                if (SetValue(ref field, value))
+                if (SetValue(ref field, value, OnIsCheckedChanged))
                 {
                     IsCheckedChanged?.Invoke(this, value);
                 }
             }
         }
+
+        protected virtual void OnIsCheckedChanged(bool oldValue, bool newValue) { }
     }
 }

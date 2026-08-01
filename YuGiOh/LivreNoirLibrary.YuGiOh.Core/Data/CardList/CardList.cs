@@ -19,6 +19,22 @@ namespace LivreNoirLibrary.YuGiOh.Data
             return false;
         }
 
+        public void Load(IEnumerable<int> ids, ICardProvider? provider)
+        {
+            Clear();
+            if (provider is not null)
+            {
+                foreach (var id in ids)
+                {
+                    if (provider.TryGet(id, out var card))
+                    {
+                        AddWithoutNotify(card);
+                    }
+                }
+                this.NotifyCollectionReset();
+            }
+        }
+
         IEnumerable<Card> ICardEnumerable.CardEnumerable => this;
     }
 }

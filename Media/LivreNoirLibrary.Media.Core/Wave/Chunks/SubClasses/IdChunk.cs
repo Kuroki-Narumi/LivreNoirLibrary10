@@ -19,6 +19,8 @@ namespace LivreNoirLibrary.Media.Wave.Chunks
             Data = data;
         }
 
+        void IIdChunk.SetId(int id) => Id = id;
+
         internal static IdChunk Load(string chid, BinaryReader reader)
         {
             var size = reader.ReadUInt32();

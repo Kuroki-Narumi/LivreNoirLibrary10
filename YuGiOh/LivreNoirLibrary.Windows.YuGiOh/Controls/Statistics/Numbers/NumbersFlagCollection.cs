@@ -1,85 +1,17 @@
 ﻿using LivreNoirLibrary.Collections;
-using LivreNoirLibrary.ObjectModel;
 using LivreNoirLibrary.YuGiOh.Search;
-using System;
 using System.Collections.Generic;
-using System.Collections.Specialized;
-using System.ComponentModel;
-using System.Text;
 
 namespace LivreNoirLibrary.Windows.YuGiOh.Controls
 {
-    public class NumbersFlagCollection : ISafeEnumerable<NumbersFlag>, IObservableCollection
+    public class NumbersFlagCollection : CheckableItemCollection<int, NumbersFlag>
     {
-        public event PropertyChangedEventHandler? PropertyChanged;
-        public event NotifyCollectionChangedEventHandler? CollectionChanged;
+        protected override NumbersFlag CreateItem() => new();
+        protected override int GetKey(NumbersFlag item) => item.Number;
 
-        private readonly ObjectCache<NumbersFlag> _cache;
-        private readonly List<NumbersFlag> _items = [];
-        private readonly HashSet<int> _checkedItems = [];
+        public void RefreshItems(IEnumerable<int> numbers) => RefreshItems(numbers, InitializeFlag);
 
-        public int Count => _items.Count;
-        public int CheckedCount
-        {
-            get;
-            private set
-            {
-                field = value;
-                this.NotifyPropertyChanged(nameof(CheckedCount));
-            }
-        }
-
-        public NumbersFlagCollection()
-        {
-            _cache = new(CreateNumberFlag);
-        }
-
-        public void Clear()
-        {
-            foreach( var item in _items)
-            {
-                item.IsChecked = false;
-            }
-            CheckedCount = 0;
-        }
-
-        private NumbersFlag CreateNumberFlag()
-        {
-            NumbersFlag item = new();
-            item.IsCheckedChanged += Item_IsCheckedChanged;
-            return item;
-        }
-
-        private void Item_IsCheckedChanged(object? sender, bool e)
-        {
-            var item = (sender as NumbersFlag)!;
-            if (item.IsChecked)
-            {
-                _checkedItems.Add(item.Number);
-                CheckedCount++;
-            }
-            else
-            {
-                _checkedItems.Remove(item.Number);
-                CheckedCount--;
-            }
-        }
-
-        public void UpdateItems(IEnumerable<int> numbers)
-        {
-            var cache = _cache;
-            var items = _items;
-            _checkedItems.Clear();
-            cache.Clear();
-            items.Clear();
-            foreach (var number in numbers)
-            {
-                var item = cache.GetNext();
-                item.Number = number;
-                items.Add(item);
-            }
-            this.NotifyCollectionReset();
-        }
+        private static void InitializeFlag(NumbersFlag item, int number) => item.Number = number;
 
         public bool Contains(NumbersKey obj)
         {
@@ -108,10 +40,5 @@ namespace LivreNoirLibrary.Windows.YuGiOh.Controls
                 _ => matchCount is > 0,
             };
         }
-
-        public IEnumerator<NumbersFlag> GetEnumerator() => _items.GetEnumerator();
-
-        void IObservableCollection.RaiseCollectionChanged(object sender, NotifyCollectionChangedEventArgs e) => CollectionChanged?.Invoke(sender, e);
-        void IObservableObject.RaisePropertyChanged(object sender, PropertyChangedEventArgs e) => PropertyChanged?.Invoke(sender, e);
     }
 }

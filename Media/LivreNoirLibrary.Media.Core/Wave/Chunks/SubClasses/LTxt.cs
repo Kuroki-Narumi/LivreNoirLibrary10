@@ -21,6 +21,8 @@ namespace LivreNoirLibrary.Media.Wave.Chunks
         public short Dialect { get; set; }
         public short CodePage { get; set; }
 
+        void IIdChunk.SetId(int id) => Id = id;
+
         public override string GetText() => this.GetText(Encodings.Get(CodePage));
         public override void SetText(string text) => this.SetText(text, Encodings.Get(CodePage));
 

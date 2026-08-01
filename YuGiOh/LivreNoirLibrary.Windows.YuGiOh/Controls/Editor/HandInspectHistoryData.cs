@@ -8,6 +8,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
+using System.Windows.Controls;
 
 namespace LivreNoirLibrary.Windows.YuGiOh.Controls
 {
@@ -19,13 +20,13 @@ namespace LivreNoirLibrary.Windows.YuGiOh.Controls
 
         public bool EqualsAll(HandInspectHistoryData other) => base.EqualsAll(other);
 
-        public void StoreSelection(ReadOnlySpan<IListView> listViews)
+        public void StoreSelection(ReadOnlySpan<ListBox> listViews)
         {
             SelectedIndex = listViews[0].SelectedIndex;
             IsSelectionStored = true;
         }
 
-        public void RestoreSelection(ReadOnlySpan<IListView> listViews)
+        public void RestoreSelection(ReadOnlySpan<ListBox> listViews)
         {
             listViews[0].SelectedIndex = SelectedIndex;
         }

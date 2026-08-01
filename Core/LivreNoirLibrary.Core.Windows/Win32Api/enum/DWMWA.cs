@@ -1,0 +1,37 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Text;
+
+namespace LivreNoirLibrary.Win32Api
+{
+    public enum DWMWA : int
+    {
+        NCRENDERING_ENABLED = 1,
+        NCRENDERING_POLICY,
+        TRANSITIONS_FORCEDISABLED,
+        ALLOW_NCPAINT,
+        CAPTION_BUTTON_BOUNDS,
+        NONCLIENT_RTL_LAYOUT,
+        FORCE_ICONIC_REPRESENTATION,
+        FLIP3D_POLICY,
+        EXTENDED_FRAME_BOUNDS,
+        HAS_ICONIC_BITMAP,
+        DISALLOW_PEEK,
+        EXCLUDED_FROM_PEEK,
+        CLOAK,
+        CLOAKED,
+        FREEZE_REPRESENTATION,
+        PASSIVE_UPDATE_MODE,
+        USE_HOSTBACKDROPBRUSH,
+        USE_IMMERSIVE_DARK_MODE = 20,
+        WINDOW_CORNER_PREFERENCE = 33,
+        BORDER_COLOR,
+        CAPTION_COLOR,
+        TEXT_COLOR,
+        VISIBLE_FRAME_BORDER_THICKNESS,
+        SYSTEMBACKDROP_TYPE,
+        REDIRECTIONBITMAP_ALPHA,
+        BORDER_MARGINS,
+        LAST
+    }
+}

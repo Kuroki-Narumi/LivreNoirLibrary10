@@ -21,7 +21,7 @@ namespace LivreNoirLibrary.Media
                 {
                     return;
                 }
-                BlendCore(bitmap.Offset(rect), bitmap.Stride, bitmap.IsFloat, rect.Width, rect.Height, func, color);
+                BlendCore(bitmap.Offset(rect), bitmap.Stride, bitmap.IsFloat, rect.Width, rect.Height, func, color.Vector);
             }
         }
 
@@ -142,7 +142,7 @@ namespace LivreNoirLibrary.Media
             // 横方向の拡縮
             StretchCopy_Horizontal(source, srcX, srcY, srcW, srcH, buffer, destW);
             // 縦方向の拡縮&ブレンド
-            StretchCopy_Vertical(buffer, srcH, destination, destX, destY, destW, destH, blend, colorCorrection);
+            StretchCopy_Vertical(buffer, srcH, destination, destX, destY, destW, destH, blend, colorCorrection.Vector);
 
             if (needDispose)
             {
@@ -168,7 +168,7 @@ namespace LivreNoirLibrary.Media
                 BlendToWithoutScaleCore(
                     source.Offset(sourceX, sourceY), source.Stride, source.IsFloat,
                     destination.Offset(destX, destY), destination.Stride, destination.IsFloat,
-                    width, height, func, colorCorrection
+                    width, height, func, colorCorrection.Vector
                     );
             }
             // 見つからなかった場合は全ピクセルを上書きする
@@ -177,7 +177,7 @@ namespace LivreNoirLibrary.Media
                 CopyToCore(
                     source.Offset(sourceX, sourceY), source.Stride, source.IsFloat,
                     destination.Offset(destX, destY), destination.Stride, destination.IsFloat,
-                    width, height, colorCorrection
+                    width, height, colorCorrection.Vector
                     );
             }
         }

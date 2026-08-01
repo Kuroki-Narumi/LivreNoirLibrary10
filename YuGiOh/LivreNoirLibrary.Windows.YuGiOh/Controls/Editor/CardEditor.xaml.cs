@@ -6,6 +6,7 @@ using LivreNoirLibrary.YuGiOh.Data;
 using System;
 using System.Windows;
 using System.Windows.Input;
+using System.Windows.Controls;
 
 namespace LivreNoirLibrary.Windows.YuGiOh.Controls
 {
@@ -14,7 +15,7 @@ namespace LivreNoirLibrary.Windows.YuGiOh.Controls
     /// </summary>
     public partial class CardEditor : CardEditor_Base
     {
-        protected override IListView[] ListViews { get; }
+        protected override ListBox[] ListViews { get; }
 
         public CardEditor()
         {
@@ -45,11 +46,7 @@ namespace LivreNoirLibrary.Windows.YuGiOh.Controls
         protected override void ApplyHistory(CardEditorHistoryData historyData)
         {
             historyData.ConvertBack(ItemsSource);
-            if (ListView_CardList.SelectedIndex == historyData.SelectedIndex)
-            {
-                ListView_CardList.SelectedIndex = -1;
-            }
-            ListView_CardList.SelectedIndex = historyData.SelectedIndex;
+            historyData.RestoreSelection(ListViews);
         }
 
         private void OnClick_Merge(object sender, RoutedEventArgs e)

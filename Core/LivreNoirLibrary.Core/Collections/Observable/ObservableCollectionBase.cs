@@ -70,18 +70,36 @@ namespace LivreNoirLibrary.Collections
 
         /// <inheritdoc cref="List{T}.ConvertAll{TOutput}(Converter{T, TOutput})"/>
         public List<TOutput> ConvertAll<TOutput>(Converter<T, TOutput> converter) => _list.ConvertAll(converter);
+
         /// <inheritdoc cref="List{T}.Exists(Predicate{T})"/>
         public bool Exists(Predicate<T> predicate) => _list.Exists(predicate);
+
         /// <inheritdoc cref="List{T}.Find(Predicate{T})"/>
         public T? Find(Predicate<T> predicate) => _list.Find(predicate);
+
         /// <inheritdoc cref="List{T}.FindAll(Predicate{T})"/>
         public List<T> FindAll(Predicate<T> predicate) => _list.FindAll(predicate);
+
         /// <inheritdoc cref="List{T}.FindIndex(Predicate{T})"/>
         public int FindIndex(Predicate<T> predicate) => _list.FindIndex(predicate);
+
+        /// <inheritdoc cref="List{T}.FindIndex(int, Predicate{T})"/>
+        public int FindIndex(int startIndex, Predicate<T> predicate) => _list.FindIndex(startIndex, predicate);
+
+        /// <inheritdoc cref="List{T}.FindIndex(int, int, Predicate{T})"/>
+        public int FindIndex(int startIndex, int count, Predicate<T> predicate) => _list.FindIndex(startIndex, count, predicate);
+
         /// <inheritdoc cref="List{T}.FindLast(Predicate{T})"/>
         public T? FindLast(Predicate<T> predicate) => _list.FindLast(predicate);
+
         /// <inheritdoc cref="List{T}.FindLastIndex(Predicate{T})"/>
         public int FindLastIndex(Predicate<T> predicate) => _list.FindLastIndex(predicate);
+
+        /// <inheritdoc cref="List{T}.FindLastIndex(int, Predicate{T})"/>
+        public int FindLastIndex(int startIndex, Predicate<T> predicate) => _list.FindLastIndex(startIndex, predicate);
+
+        /// <inheritdoc cref="List{T}.FindLastIndex(int, int, Predicate{T})"/>
+        public int FindLastIndex(int startIndex, int count, Predicate<T> predicate) => _list.FindLastIndex(startIndex, count, predicate);
 
         public List<T>.Enumerator GetEnumerator() => _list.GetEnumerator();
         public void CopyTo(T[] array, int arrayIndex) => _list.CopyTo(array, arrayIndex);

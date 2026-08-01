@@ -39,7 +39,7 @@
                     </MenuItem.Icon>
                 </MenuItem>
             </ContextMenu>
-            <Style TargetType="ct:CtListView" x:Key="ListViewStyle" BasedOn="{StaticResource CardListView_MultiSelect}">
+            <Style TargetType="ListView" x:Key="ListViewStyle" BasedOn="{StaticResource CardListView_MultiSelect}">
                 <Setter Property="Grid.Row" Value="2"/>
                 <Setter Property="AllowDrop" Value="True"/>
                 <Setter Property="ContextMenu" Value="{StaticResource ContextMenu_Regulation}"/>
@@ -60,7 +60,7 @@
     </UserControl.Resources>
     <Grid x:Name="MainGrid" d:DataContext="{d:DesignInstance Type=local:RegulationEditor}" ColumnDefinitions="1.5*, 4, 4*" RowDefinitions="Auto, 4, *">
         <local:CardSearchBar ListBox="{Binding ElementName=ListView_CardList}" DefaultSearchConditions="{Binding DefaultCardSearchConditions}" SortExecuted="OnCardSortExecuted"/>
-        <ct:CtListView x:Name="ListView_CardList" Style="{StaticResource ListViewStyle}" ItemsSource="{Binding CardProvider}" ItemTemplate="{StaticResource ItemTemplate_FullTextWithLimit}"/>
+        <ListView x:Name="ListView_CardList" Style="{StaticResource ListViewStyle}" ItemTemplate="{StaticResource ItemTemplate_FullTextWithLimit}"/>
         <Grid Grid.Column="2" ColumnDefinitions="*, Auto, Auto">
             <Grid.Resources>
                 <Style x:Key="UpdateButton" TargetType="ct:Button">
@@ -101,6 +101,7 @@
                         <Setter Property="HorizontalAlignment" Value="Right"/>
                     </Style>
                     <Style TargetType="ct:Button" BasedOn="{StaticResource IconButton_ListClear}">
+                        <Setter Property="Margin" Value="4,0,0,0"/>
                         <EventSetter Event="Click" Handler="OnClick_ClearButton"/>
                     </Style>
                 </Grid.Resources>
@@ -123,14 +124,14 @@
             </Grid>
             <Grid Grid.Row="2" ColumnDefinitions="*, 4, *, 4, *, 4, *">
                 <Grid.Resources>
-                    <Style TargetType="ct:CtListView" BasedOn="{StaticResource ListViewStyle}">
+                    <Style TargetType="ListView" BasedOn="{StaticResource ListViewStyle}">
 
                     </Style>
                 </Grid.Resources>
-                <ct:CtListView Grid.Column="0" x:Name="ListView_Forbidden" ItemsSource="{Binding Regulation.Forbidden}" Tag="{x:Static yg:LimitCount.Forbidden}"/>
-                <ct:CtListView Grid.Column="2" x:Name="ListView_Limit1" ItemsSource="{Binding Regulation.Limit1}" Tag="{x:Static yg:LimitCount.Limit1}"/>
-                <ct:CtListView Grid.Column="4" x:Name="ListView_Limit2" ItemsSource="{Binding Regulation.Limit2}" Tag="{x:Static yg:LimitCount.Limit2}"/>
-                <ct:CtListView Grid.Column="6" x:Name="ListView_Specified" ItemsSource="{Binding Regulation.Specified}" Tag="{x:Static yg:LimitCount.Specified}"/>
+                <ListView Grid.Column="0" x:Name="ListView_Forbidden" ItemsSource="{Binding Regulation.Forbidden}" Tag="{x:Static yg:LimitCount.Forbidden}"/>
+                <ListView Grid.Column="2" x:Name="ListView_Limit1" ItemsSource="{Binding Regulation.Limit1}" Tag="{x:Static yg:LimitCount.Limit1}"/>
+                <ListView Grid.Column="4" x:Name="ListView_Limit2" ItemsSource="{Binding Regulation.Limit2}" Tag="{x:Static yg:LimitCount.Limit2}"/>
+                <ListView Grid.Column="6" x:Name="ListView_Specified" ItemsSource="{Binding Regulation.Specified}" Tag="{x:Static yg:LimitCount.Specified}"/>
             </Grid>
         </Grid>
     </Grid>

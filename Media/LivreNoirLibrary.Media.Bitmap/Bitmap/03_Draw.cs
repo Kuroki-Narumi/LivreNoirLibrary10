@@ -91,11 +91,11 @@ namespace LivreNoirLibrary.Media
             {
                 if (bitmap.IsFloat)
                 {
-                    Fill(bitmap, color.ToFloatColor().AsVector());
+                    Fill(bitmap, color.ToFloatColor().Vector);
                 }
                 else
                 {
-                    Fill(bitmap, (uint)color);
+                    Fill(bitmap, color.UintValue);
                 }
             }
 
@@ -103,11 +103,11 @@ namespace LivreNoirLibrary.Media
             {
                 if (bitmap.IsFloat)
                 {
-                    Fill(bitmap, rect, color.ToFloatColor().AsVector());
+                    Fill(bitmap, rect, color.ToFloatColor().Vector);
                 }
                 else
                 {
-                    Fill(bitmap, rect, (uint)color);
+                    Fill(bitmap, rect, color.UintValue);
                 }
             }
 
@@ -115,11 +115,11 @@ namespace LivreNoirLibrary.Media
             {
                 if (bitmap.IsFloat)
                 {
-                    Fill(bitmap, color.AsVector());
+                    Fill(bitmap, color.Vector);
                 }
                 else
                 {
-                    Fill(bitmap, (uint)color.ToByteColor());
+                    Fill(bitmap, color.ToByteColor().UintValue);
                 }
             }
 
@@ -127,11 +127,11 @@ namespace LivreNoirLibrary.Media
             {
                 if (bitmap.IsFloat)
                 {
-                    Fill(bitmap, rect, color.AsVector());
+                    Fill(bitmap, rect, color.Vector);
                 }
                 else
                 {
-                    Fill(bitmap, rect, (uint)color.ToByteColor());
+                    Fill(bitmap, rect, color.ToByteColor().UintValue);
                 }
             }
 
@@ -153,7 +153,7 @@ namespace LivreNoirLibrary.Media
                         GradientColorProvider g = new(color1, color2, rect.Height);
                         foreach (var (p, _) in bitmap.EnumerateLines(rect))
                         {
-                            SimdOperations.CopyFrom((uint*)p, g.Get(y), s);
+                            SimdOperations.CopyFrom((uint*)p, g.Get(y).UintValue, s);
                             y++;
                         }
                     }
@@ -164,7 +164,7 @@ namespace LivreNoirLibrary.Media
                         var colors = stackalloc uint[stride];
                         for (var x = 0; x < stride; x++)
                         {
-                            colors[x] = g.Get(x);
+                            colors[x] = g.Get(x).UintValue;
                         }
                         var xMin = rect.X;
                         var yMax = rect.Y + rect.Height;
@@ -188,7 +188,7 @@ namespace LivreNoirLibrary.Media
                     var pointer = (uint*)bitmap.Pointer;
                     var width = bitmap.Width;
                     var height = bitmap.Height;
-                    var c = (uint)color;
+                    var c = color.UintValue;
                     foreach (var (left, right, y) in triangle)
                     {
                         if ((uint)y < (uint)height)
@@ -234,7 +234,7 @@ namespace LivreNoirLibrary.Media
                                     if ((uint)x < (uint)w)
                                     {
                                         var d = den - Math.Abs(dy * x + dx * y + cross) * den2;
-                                        pointer[x + y * w] = (uint)g.Get(d.RoundToInt());
+                                        pointer[x + y * w] = g.Get(d.RoundToInt()).UintValue;
                                     }
                                 }
                             }
@@ -277,7 +277,7 @@ namespace LivreNoirLibrary.Media
                                         {
                                             dif = (xx - x1).RoundToInt();
                                         }
-                                        pointer[x + y * w] = (uint)g.Get(dif);
+                                        pointer[x + y * w] = g.Get(dif).UintValue;
                                     }
                                 }
                             }
@@ -297,7 +297,7 @@ namespace LivreNoirLibrary.Media
                 var width = bitmap.Width;
                 var height = bitmap.Height;
                 // アルファは無視
-                var c = (uint)color & ColorUtils.GetMask(ColorFlags.RGB);
+                var c = color.UintValue & ColorUtils.GetMask(ColorFlags.RGB);
 
                 // 透明判定の一時保存用バッファ
                 var needDispose = buffer is null;
@@ -359,7 +359,7 @@ namespace LivreNoirLibrary.Media
                 var height = (nuint)bitmap.Height;
                 var size = width * height;
                 // アルファは無視
-                var c = (uint)color & ColorUtils.GetMask(ColorFlags.RGB);
+                var c = color.UintValue & ColorUtils.GetMask(ColorFlags.RGB);
 
                 // 透明判定の一時保存用バッファ
                 var needDispose = buffer is null;

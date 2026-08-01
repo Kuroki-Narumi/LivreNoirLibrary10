@@ -49,6 +49,20 @@ namespace LivreNoirLibrary.ObjectModel
             return true;
         }
 
+        protected bool SetValue(T value, ReadOnlySpan<string> relatedProperties = default, Action<T>? callback = null, [CallerMemberName] string key = "")
+        {
+            var result = SetValue(value, key);
+            if (result)
+            {
+                callback?.Invoke(value);
+                foreach (var prop in relatedProperties)
+                {
+                    this.NotifyPropertyChanged(prop);
+                }
+            }
+            return true;
+        }
+
         public void ClearValues()
         {
             _values.Clear();

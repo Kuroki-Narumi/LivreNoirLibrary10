@@ -71,7 +71,7 @@ namespace LivreNoirLibrary.Windows.YuGiOh.Controls
             {
                 return;
             }
-            var o = SmallWorld.RentFlagsArray();
+            using var o = SmallWorld.RentFlagsArray();
             var array = o.Array;
             var list = CheckableList;
             foreach (var card in source.CardEnumerable.Where(card => card.IsMainDeckMonster()))

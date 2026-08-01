@@ -13,6 +13,8 @@ namespace LivreNoirLibrary.Media.Wave.Chunks
         public int Id { get; set; }
         public uint MediaType { get; set; }
 
+        void IIdChunk.SetId(int id) => Id = id;
+
         public override void CopyTo<T>(T target)
         {
             base.CopyTo(target);

@@ -56,7 +56,7 @@
                 </Grid>
             </TabItem>
             <TabItem Header="{Binding Tab_Regulation.Value, Source={x:Static yw:Vocab.Current}}">
-                <yc:RegulationEditor x:Name="RegulationEditor" Regulation="{Binding Regulation}"/>
+                <yc:RegulationEditor x:Name="RegulationEditor" CardProvider="{Binding CardPool.Cards}" Regulation="{Binding Regulation}"/>
             </TabItem>
             <TabItem Header="{Binding Tab_OriginalCards.Value, Source={x:Static yw:Vocab.Current}}">
                 <yc:CardEditor ItemsSource="{Binding OriginalCards}"/>

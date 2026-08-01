@@ -4,10 +4,11 @@ using System.Linq;
 using System.Windows.Media;
 using LivreNoirLibrary.YuGiOh;
 using LivreNoirLibrary.YuGiOh.MasterDuel;
+using LivreNoirLibrary.Windows.Controls;
 
 namespace LivreNoirLibrary.Windows.YuGiOh.Controls
 {
-    public sealed class RankItem(Rank value) : Windows.ComboItemBase<Rank>(value)
+    public sealed class RankItem(Rank value) : ComboItemBase<Rank>(value)
     {
         public string Name { get; } = value.GetName();
         protected override int GetRow(Rank value) => (int)value % 5;

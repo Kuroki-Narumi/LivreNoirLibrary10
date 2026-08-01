@@ -14,7 +14,7 @@
     <Grid>
         <TabControl x:Name="MainUI">
             <TabItem Header="{Binding Tab_DeckEdit.Value, Source={x:Static yw:Vocab.Current}}">
-                <yc:DeckEditor x:Name="DeckEditor" Deck="{Binding Deck}"/>
+                <yc:DeckEditor x:Name="DeckEditor" CardProvider="{Binding CardPool.Cards}" Deck="{Binding Deck}"/>
             </TabItem>
             <TabItem Header="{Binding Tab_CardTable.Value, Source={x:Static yw:Vocab.Current}}">
                 <yc:DeckRecipeControl Deck="{Binding Deck}" LineBreaks="{Binding CardNameLBPositions}"/>

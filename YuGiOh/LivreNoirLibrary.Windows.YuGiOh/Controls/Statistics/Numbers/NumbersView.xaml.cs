@@ -60,7 +60,7 @@ namespace LivreNoirLibrary.Windows.YuGiOh.Controls
             if (ItemsSource is { } source)
             {
                 numbers.RefreshCandidates(source);
-                Flags.UpdateItems(numbers.Numbers);
+                Flags.RefreshItems(numbers.Numbers);
             }
         }
 
@@ -94,7 +94,7 @@ namespace LivreNoirLibrary.Windows.YuGiOh.Controls
         private void Keys_Click_Clear(object sender, RoutedEventArgs e)
         {
             e.Handled = true;
-            Flags.Clear();
+            Flags.ClearFlags();
             UpdateKeyFilter();
         }
 

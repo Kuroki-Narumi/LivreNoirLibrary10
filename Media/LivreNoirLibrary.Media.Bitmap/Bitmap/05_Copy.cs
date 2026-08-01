@@ -45,7 +45,7 @@ namespace LivreNoirLibrary.Media
             public void CopyTo<TDest>(TDest destination, Rectangle sourceRect, Point destLocation, FloatColor colorCorrection)
                 where TDest : IBitmap
             {
-                if (colorCorrection == Vector<float>.One)
+                if (colorCorrection.Vector == Vector<float>.One)
                 {
                     CopyTo(bitmap, destination, sourceRect, destLocation);
                     return;
@@ -57,7 +57,7 @@ namespace LivreNoirLibrary.Media
                 CopyToCore(
                     bitmap.Offset(sourceRect), bitmap.Stride, bitmap.IsFloat,
                     destination.Offset(destLocation), destination.Stride, destination.IsFloat,
-                    sourceRect.Width, sourceRect.Height, colorCorrection
+                    sourceRect.Width, sourceRect.Height, colorCorrection.Vector
                     );
             }
 

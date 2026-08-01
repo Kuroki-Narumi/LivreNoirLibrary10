@@ -1,9 +1,10 @@
 ﻿using LivreNoirLibrary.ObjectModel;
 using System.Windows.Media;
+using LivreNoirLibrary.Windows.Controls;
 
 namespace LivreNoirLibrary.Windows.YuGiOh.Controls
 {
-    public class NumbersFlag : CheckableObject, IClear
+    public class NumbersFlag : CheckableObject, IClear, IGridComboItem
     {
         public const int ColumnCount = 10;
 
@@ -17,6 +18,6 @@ namespace LivreNoirLibrary.Windows.YuGiOh.Controls
 
         public int Column => Number % ColumnCount;
         public int Row => Number / ColumnCount;
-        public SolidColorBrush? Background => AltBackgroundComboItem.GetBackground(Row, Column);
+        public Brush? Background => AltBackgroundComboItem.GetBackground(Row, Column);
     }
 }

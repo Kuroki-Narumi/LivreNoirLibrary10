@@ -18,7 +18,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Include="..\LivreNoirLibrary.Windows.Extensions\RunAsInvoker.cs" Link="RunAsInvoker.cs" />
+    <Compile Include="..\..\Core\LivreNoirLibrary.Core.Windows\NativeMethods\RunAsInvoker.cs" Link="RunAsInvoker.cs" />
   </ItemGroup>
 
 </Project>

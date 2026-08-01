@@ -1,8 +1,7 @@
 ﻿using System;
 using System.Windows.Input;
 using System.Windows.Interop;
-using System.Windows.Media;
-using LivreNoirLibrary.Windows.NativeMethods;
+using LivreNoirLibrary.Win32Api;
 
 namespace LivreNoirLibrary.Windows.Input
 {

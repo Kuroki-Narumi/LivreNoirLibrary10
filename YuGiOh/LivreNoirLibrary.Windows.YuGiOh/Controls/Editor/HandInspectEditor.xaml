@@ -29,9 +29,9 @@
                     <ct:Button Style="{StaticResource IconButton_Open}"/>
                     <ct:Button Style="{StaticResource IconButton_Save}"/>
                 </StackPanel>
-                <ct:Button Grid.Column="1" Style="{StaticResource IconButtonBase_Sort}" ToolTip="{Binding Sort.Value, Source={x:Static yw:Vocab.Current}}"/>
+                <ct:Button Grid.Column="1" Style="{StaticResource IconButton_Sort}"/>
             </Grid>
-            <ct:CtListView x:Name="ListView_Main" Grid.Row="2" Style="{StaticResource Alt2ListBoxStyle}" SelectionMode="Single" ItemsSource="{Binding Conditions}" SelectedItem="{Binding SelectedItem, Mode=TwoWay}">
+            <ListView x:Name="ListView_Main" Grid.Row="2" Style="{StaticResource Alt2ListBoxStyle}" SelectionMode="Single" ItemsSource="{Binding Conditions}" SelectedItem="{Binding SelectedItem, Mode=TwoWay}">
                 <ListView.ItemContainerStyle>
                     <Style TargetType="ListViewItem" BasedOn="{StaticResource Alt2ListBoxItemContainerStyle}">
                         <Setter Property="ContextMenu">
@@ -62,7 +62,7 @@
                         <MenuItem Style="{StaticResource MenuItem_Paste}" CommandTarget="{Binding PlacementTarget, RelativeSource={RelativeSource AncestorType=ContextMenu}}"/>
                     </ContextMenu>
                 </ListView.ContextMenu>
-            </ct:CtListView>
+            </ListView>
             <Grid Grid.Row="4" Style="{StaticResource EditBarPanel}">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="*" MaxWidth="8"/>
@@ -122,6 +122,7 @@
                 <Style TargetType="Label" BasedOn="{StaticResource Label_Header}"/>
                 <Style x:Key="ClearButton" TargetType="ct:Button" BasedOn="{StaticResource IconButton_ListClear}">
                     <Setter Property="Grid.Column" Value="2"/>
+                    <Setter Property="Margin" Value="4,0,0,0"/>
                     <Setter Property="HorizontalAlignment" Value="Right"/>
                     <EventSetter Event="Click" Handler="Item_OnClick_ClearButton"/>
                 </Style>
@@ -131,7 +132,7 @@
                     <EventSetter Event="PreviewMouseRightButtonUp" Handler="ListView_PreviewMouseRightButtonUp"/>
                     <EventSetter Event="PreviewMouseMove" Handler="IDragDrop_PreviewMouseMove"/>
                 </Style>
-                <Style TargetType="ct:CtListView" BasedOn="{StaticResource CardListView_MultiSelect}">
+                <Style TargetType="ListView" BasedOn="{StaticResource CardListView_MultiSelect}">
                     <Setter Property="ItemTemplate" Value="{StaticResource ItemTemplate_FullText}"/>
                     <Setter Property="AllowDrop" Value="True"/>
                     <Setter Property="ItemContainerStyle" Value="{StaticResource ListViewItemStyle}"/>
@@ -180,7 +181,7 @@
                         </ct:Button.Content>
                     </ct:Button>
                 </Grid>
-                <ct:CtListView x:Name="ListView_Deck" Grid.Row="1" ItemsSource="{Binding CardSource, RelativeSource={RelativeSource AncestorType=local:HandInspectEditor}}"/>
+                <ListView x:Name="ListView_Deck" Grid.Row="1" ItemsSource="{Binding CardSource, RelativeSource={RelativeSource AncestorType=local:HandInspectEditor}}"/>
                 <ItemsControl x:Name="ItemsControl_Hand" Grid.Row="1" Grid.Column="2" ItemsSource="{Binding EditingItem.Items}" AllowDrop="True" DragOver="IDragDrop_DragOver" Drop="IDragDrop_Drop">
                     <ItemsControl.Template>
                         <ControlTemplate TargetType="ItemsControl">
@@ -200,11 +201,11 @@
                         <DataTemplate>
                             <StackPanel>
                                 <TextBlock Text="&amp;" Foreground="Red" Visibility="{Binding IsFirst, Converter={StaticResource TVConvI}}" HorizontalAlignment="Center"/>
-                                <ct:CtListView ItemsSource="{Binding Cards}" Margin="4">
+                                <ListView ItemsSource="{Binding Cards}" Margin="4">
                                     <ListView.CommandBindings>
                                         <CommandBinding Command="ApplicationCommands.Delete" Executed="Hand_OnExecuted_Delete" CanExecute="CanExecute_Always"/>
                                     </ListView.CommandBindings>
-                                </ct:CtListView>
+                                </ListView>
                             </StackPanel>
                         </DataTemplate>
                     </ItemsControl.ItemTemplate>

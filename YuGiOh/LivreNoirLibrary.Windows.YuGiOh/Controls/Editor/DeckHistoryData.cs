@@ -1,6 +1,7 @@
 ﻿using LivreNoirLibrary.Windows.Controls;
 using LivreNoirLibrary.YuGiOh.Data;
 using System;
+using System.Windows.Controls;
 
 namespace LivreNoirLibrary.Windows.YuGiOh.Controls
 {
@@ -25,7 +26,7 @@ namespace LivreNoirLibrary.Windows.YuGiOh.Controls
                    left.SideDeck.SequenceEqual(right.SideDeck);
         }
 
-        public void ConvertBack(Deck? target, ReadOnlySpan<IListView> listViews, ICardProvider provider)
+        public void ConvertBack(Deck? target, ReadOnlySpan<ListBox> listViews, ICardProvider? provider)
         {
             if (target is not null && _data is { } data)
             {

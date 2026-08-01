@@ -38,12 +38,6 @@ namespace LivreNoirLibrary.Windows.YuGiOh.Controls
             MainGrid.DataContext = value;
         }
 
-        private void OnSearchExecuted(object sender, RoutedEventArgs<string?> e)
-        {
-            ListView_Main.Items.Filter = item => item is Card card && _conds.IsTextMatch(card);
-            ListView_Main.ScrollSelectedItemIntoView();
-        }
-
         private void OnClick_Unselect(object sender, RoutedEventArgs e)
         {
             e.Handled = true;

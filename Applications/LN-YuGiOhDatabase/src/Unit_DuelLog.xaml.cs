@@ -1,4 +1,5 @@
-﻿using System;
+﻿using LivreNoirLibrary.YuGiOh.MasterDuel;
+using System;
 using System.Collections.Generic;
 using System.Text;
 using System.Windows;
@@ -20,7 +21,13 @@ namespace LivreNoir.YuGiOhDatabase
     {
         public Unit_DuelLog()
         {
+            DataContext = MainViewModel.Instance;
             InitializeComponent();
+        }
+
+        private void OnTagNameChanged(object sender, LivreNoirLibrary.Windows.YuGiOh.Controls.TagNameChangedEventArgs e)
+        {
+            MainViewModel.Instance.DuelLogs.RenameTag(e.OldName, e.NewName);
         }
     }
 }

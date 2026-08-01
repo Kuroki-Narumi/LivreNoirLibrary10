@@ -31,7 +31,7 @@ namespace LivreNoirLibrary.Media
                 {
                     if (bitmap.IsFloat)
                     {
-                        var mask = FloatColor.GetMask(flags).AsVector(); ;
+                        var mask = FloatColor.GetMask(flags).Vector;
                         InvertColorCore((float*)bitmap.Pointer, bitmap.Width * bitmap.Height * 4, mask);
                     }
                     else
@@ -48,7 +48,7 @@ namespace LivreNoirLibrary.Media
                 {
                     if (bitmap.IsFloat)
                     {
-                        var mask = FloatColor.GetMask(flags).AsVector();
+                        var mask = FloatColor.GetMask(flags).Vector;
                         var stride = rect.Width * 4;
                         foreach (var (p, _) in bitmap.EnumerateLines(rect))
                         {
@@ -145,7 +145,7 @@ namespace LivreNoirLibrary.Media
                 if (bitmap.IsValid)
                 {
                     AssertType(bitmap, false);
-                    var uintColor = (uint)color;
+                    var uintColor = color.UintValue;
                     var compareMask = ColorUtils.GetMask(compareFlags);
                     SetTransparentCore((uint*)bitmap.Pointer, bitmap.Width * bitmap.Height, uintColor, compareMask);
                 }
@@ -156,7 +156,7 @@ namespace LivreNoirLibrary.Media
                 AssertType(bitmap, false);
                 if (bitmap.Adjust(ref rect))
                 {
-                    var uintColor = (uint)color;
+                    var uintColor = color.UintValue;
                     var compareMask = ColorUtils.GetMask(compareFlags);
                     var stride = rect.Width;
                     foreach (var (p, _) in bitmap.EnumerateLines(rect))
@@ -349,8 +349,8 @@ namespace LivreNoirLibrary.Media
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private static (Vector<float>, Vector<float>) GetClearSetMask(ColorFlags flags, float value)
         {
-            var clearMask = FloatColor.GetMask(~flags).AsVector();
-            var setMask = FloatColor.GetMask(flags).AsVector();
+            var clearMask = FloatColor.GetMask(~flags).Vector;
+            var setMask = FloatColor.GetMask(flags).Vector;
             return (clearMask, setMask * value);
         }
 

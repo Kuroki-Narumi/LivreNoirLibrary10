@@ -14,10 +14,13 @@
     <Grid>
         <TabControl>
             <TabItem Header="{Binding Tab_LogManage.Value, Source={x:Static yw:Vocab.Current}}">
+                <yc:DuelLogEditor x:Name="DuelLogEditor" ItemsSource="{Binding DuelLogs}" CardProvider="{Binding CardPool.Cards}" DeckTagSource="{Binding DeckTags}" DeckCards="{Binding Deck.MainDeck}"/>
             </TabItem>
             <TabItem Header="{Binding Tab_TagManage.Value, Source={x:Static yw:Vocab.Current}}">
+                <yc:DeckTagEditor ItemsSource="{Binding DeckTags}" TagNameChanged="OnTagNameChanged"/>
             </TabItem>
             <TabItem Header="{Binding Tab_Statistics.Value, Source={x:Static yw:Vocab.Current}}">
+                <yc:DuelLogStatisticsView CardProvider="{Binding CardPool.Cards}" ItemsSource="{Binding DuelLogs}" SearchConditions="{Binding DuelLogSearchConditions}" DeckTagSource="{Binding DeckTags}"/>
             </TabItem>
         </TabControl>
     </Grid>

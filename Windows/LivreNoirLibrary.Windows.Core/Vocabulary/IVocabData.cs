@@ -6,5 +6,6 @@ namespace LivreNoirLibrary.Windows
     public interface IVocabData : INotifyPropertyChanged
     {
         public string? Value { get; }
+        public string? KeyTip { get; }
     }
 }

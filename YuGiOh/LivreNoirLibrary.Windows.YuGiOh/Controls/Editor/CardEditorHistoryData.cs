@@ -5,26 +5,38 @@ using LivreNoirLibrary.Windows.Controls;
 using LivreNoirLibrary.YuGiOh.Data;
 using System;
 using System.IO;
+using System.Windows.Controls;
 
 namespace LivreNoirLibrary.Windows.YuGiOh.Controls
 {
     public class CardEditorHistoryData(ICardCollection? data) : CompressionHistoryData<ICardCollection>(data), IHistoryData<CardEditorHistoryData>
     {
-        public int SelectedIndex { get; set; } = -1;
+        private int _selectedIndex = -1;
 
         public bool IsSelectionStored { get; private set; }
 
         public bool EqualsAll(CardEditorHistoryData other) => base.EqualsAll(other);
 
-        public void StoreSelection(ReadOnlySpan<IListView> listViews)
+        public void StoreSelection(ReadOnlySpan<ListBox> listViews)
         {
-            SelectedIndex = listViews[0].SelectedIndex;
-            IsSelectionStored = true;
+            if (listViews.Length > 0)
+            {
+                _selectedIndex = listViews[0].SelectedIndex;
+                IsSelectionStored = true;
+            }
         }
 
-        public void RestoreSelection(ReadOnlySpan<IListView> listViews)
+        public void RestoreSelection(ReadOnlySpan<ListBox> listViews)
         {
-            listViews[0].SelectedIndex = SelectedIndex;
+            if (listViews.Length > 0)
+            {
+                var lv = listViews[0];
+                if (lv.SelectedIndex == _selectedIndex)
+                {
+                    lv.SelectedIndex = -1;
+                }
+                lv.SelectedIndex = _selectedIndex;
+            }
         }
 
         protected override void Dump(Stream stream, ICardCollection source)

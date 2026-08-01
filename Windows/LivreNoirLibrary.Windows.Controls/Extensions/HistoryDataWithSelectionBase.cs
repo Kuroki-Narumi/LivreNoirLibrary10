@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Windows.Controls;
 
 namespace LivreNoirLibrary.Windows.Controls
 {
@@ -19,7 +20,7 @@ namespace LivreNoirLibrary.Windows.Controls
             _selectedItems = ary;
         }
 
-        public void StoreSelection(ReadOnlySpan<IListView> listViews)
+        public void StoreSelection(ReadOnlySpan<ListBox> listViews)
         {
             var selected = _selectedItems.AsSpan();
             var max = Math.Min(selected.Length, listViews.Length);
@@ -37,7 +38,7 @@ namespace LivreNoirLibrary.Windows.Controls
             IsSelectionStored = true;
         }
 
-        public void RestoreSelection(ReadOnlySpan<IListView> listViews)
+        public void RestoreSelection(ReadOnlySpan<ListBox> listViews)
         {
             var selected = _selectedItems.AsSpan();
             var max = Math.Min(selected.Length, listViews.Length);

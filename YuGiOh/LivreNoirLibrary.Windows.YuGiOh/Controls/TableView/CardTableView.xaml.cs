@@ -47,11 +47,15 @@ namespace LivreNoirLibrary.Windows.YuGiOh.Controls
         {
             InitializeComponent();
             MainGrid.DataContext = this;
-            CardProvider ??= EmptyCardProvider.Instance;
             this.RegisterCardSearchCommands();
             VerticalSelector = Selectors[0];
             HorizontalSelector = Selectors[1];
             this.RegisterCommand(YgoCommands.RefreshItems, Executed_Refresh);
+        }
+
+        private void OnCardProviderChanged()
+        {
+            TableView.ItemsSource = null;
         }
 
         private void Executed_Refresh(object sender, ExecutedRoutedEventArgs e)

@@ -1,0 +1,51 @@
+﻿<UserControl x:Class="LivreNoirLibrary.SandBox.Unit_Capture"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:LivreNoirLibrary.SandBox"
+             xmlns:ct="clr-namespace:LivreNoirLibrary.Windows.Controls;assembly=LivreNoirLibrary.Windows.Controls"
+             xmlns:media="clr-namespace:LivreNoirLibrary.Windows.Media;assembly=LivreNoirLibrary.Windows.Media"
+             xmlns:conv="clr-namespace:LivreNoirLibrary.Windows.Converters;assembly=LivreNoirLibrary.Windows.Controls"
+             xmlns:cptr="clr-namespace:LivreNoirLibrary.Windows.Controls;assembly=LivreNoirLibrary.Windows.Capture"
+             mc:Ignorable="d" d:DataContext="{d:DesignInstance Type=local:Unit_Capture}"
+             d:DesignHeight="450" d:DesignWidth="800">
+    <Grid RowDefinitions="Auto, *">
+        <Grid ColumnDefinitions="*, Auto">
+            <WrapPanel Orientation="Horizontal">
+                <ct:Button Icon="{x:Static media:Icons.Update}" Content="リスト更新" Click="OnClick_UpdateList"/>
+                <ct:ToggleButton Margin="4" Content="カーソル" IsChecked="{Binding IsCursorCaptureEnabled, ElementName=Capturer}"/>
+                <ct:ToggleButton Margin="4" Content="クライアント領域" IsChecked="{Binding CaptureClientArea, ElementName=Capturer}"/>
+                <ct:Button Icon="{x:Static media:Icons.Camera}" Content="コピー" Click="OnClick_Capture"/>
+            </WrapPanel>
+            <TextBlock Grid.Column="1">
+                (<Run Text="{Binding SourceRect.Width, ElementName=Capturer}"/>x<Run Text="{Binding SourceRect.Height, ElementName=Capturer}"/>)
+            </TextBlock>
+        </Grid>
+        <Grid Grid.Row="1" ColumnDefinitions="*, 3*">
+            <Grid RowDefinitions="Auto, *, 2*">
+                <ListView Grid.Row="1" Style="{StaticResource Alt2ListBoxStyle}" ItemsSource="{Binding MonitorInfos}" SelectionMode="Single" SelectionChanged="OnSelectionChanged_Window">
+                    <ListView.ItemTemplate>
+                        <DataTemplate>
+                            <TextBlock>
+                            <Run Text="{Binding FriendlyName, Mode=OneWay}"/> (<Run Text="{Binding Rect.Width}"/>x<Run Text="{Binding Rect.Height}"/>)
+                            </TextBlock>
+                        </DataTemplate>
+                    </ListView.ItemTemplate>
+                </ListView>
+                <ListView Grid.Row="2" Style="{StaticResource Alt2ListBoxStyle}" ItemsSource="{Binding WindowInfos}" SelectionMode="Single" SelectionChanged="OnSelectionChanged_Window">
+                    <ListView.ItemTemplate>
+                        <DataTemplate>
+                            <TextBlock>
+                            <Run Text="{Binding Title, Mode=OneWay}"/> (<Run Text="{Binding ExeFileName, Mode=OneWay}"/>)
+                            </TextBlock>
+                        </DataTemplate>
+                    </ListView.ItemTemplate>
+                </ListView>
+            </Grid>
+            <Border Grid.Column="1" Background="{x:Static media:MediaUtils.TransparentCheckerBrush}">
+                <cptr:CaptureControl x:Name="Capturer"/>
+            </Border>
+        </Grid>
+    </Grid>
+</UserControl>

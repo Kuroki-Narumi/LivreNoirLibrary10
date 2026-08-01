@@ -8,31 +8,46 @@ using LivreNoirLibrary.Text;
 
 namespace LivreNoirLibrary.Media
 {
-    [StructLayout(LayoutKind.Sequential)]
+    [StructLayout(LayoutKind.Explicit)]
     [JsonConverter(typeof(LnColorJsonConverter))]
     [TypeConverter(typeof(LnColorTypeConverter))]
-    public readonly unsafe struct LnColor(byte a, byte r, byte g, byte b) : IEquatable<LnColor>, IEqualityOperators<LnColor, LnColor, bool>, ISpanParsable<LnColor>
+    public readonly struct LnColor : IEquatable<LnColor>, IEqualityOperators<LnColor, LnColor, bool>, ISpanParsable<LnColor>
     {
-        public readonly byte B = b;
-        public readonly byte G = g;
-        public readonly byte R = r;
-        public readonly byte A = a;
+        [FieldOffset(0)]
+        public readonly byte B;
+        [FieldOffset(1)]
+        public readonly byte G;
+        [FieldOffset(2)]
+        public readonly byte R;
+        [FieldOffset(3)]
+        public readonly byte A;
 
-        public override int GetHashCode()
+        [FieldOffset(0)]
+        public readonly uint UintValue;
+        [FieldOffset(0)]
+        public readonly int IntValue;
+
+        public LnColor(byte a, byte r, byte g, byte b)
         {
-            var c = this;
-            return *(int*)&c;
+            B = b;
+            G = g;
+            R = r;
+            A = a;
         }
 
+        public LnColor(uint value)
+        {
+            UintValue = value;
+        }
+
+        public override int GetHashCode() => IntValue;
+
         public override bool Equals(object? obj) => obj is LnColor c && Equals(c);
-        public bool Equals(LnColor other) => this == other;
-        public static bool operator ==(LnColor left, LnColor right) => *(uint*)&left == *(uint*)&right;
-        public static bool operator !=(LnColor left, LnColor right) => *(uint*)&left != *(uint*)&right;
+        public bool Equals(LnColor other) => UintValue == other.UintValue;
+        public static bool operator ==(LnColor left, LnColor right) => left.UintValue == right.UintValue;
+        public static bool operator !=(LnColor left, LnColor right) => left.UintValue != right.UintValue;
 
         public override string ToString() => ColorUtils.GetColorCode(A, R, G, B);
-
-        public static implicit operator LnColor(uint value) => *(LnColor*)&value;
-        public static implicit operator uint(LnColor value) => *(uint*)&value;
 
         public static LnColor FromRgb(byte r, byte g, byte b) => new(255, r, g, b);
         public static LnColor FromFloat(float a, float r, float g, float b) => new(ColorUtils.GetByte(a), ColorUtils.GetByte(r), ColorUtils.GetByte(g), ColorUtils.GetByte(b));

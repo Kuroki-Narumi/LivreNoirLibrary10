@@ -20,6 +20,7 @@
     <conv:ComboItemConverter x:Key="ComboItemConverter"/>
     <conv:StarGridLengthConverter x:Key="SGLConv"/>
     <conv:DateTimeToStringConverter x:Key="DTPicker_C_Date" Format="yyyy/MM/dd"/>
+    <conv:SelectedItemTextConverter x:Key="SelectedTextConv"/>
 
     <SolidColorBrush x:Key="Brush_Background" po:Freeze="True" Color="White"/>
     <SolidColorBrush x:Key="Brush_Border" po:Freeze="True" Color="#808080"/>

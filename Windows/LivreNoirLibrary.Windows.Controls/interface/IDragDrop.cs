@@ -37,7 +37,7 @@ namespace LivreNoirLibrary.Windows.Controls
 
         public static bool HandleMouseButton_ListViewItem(object sender, MouseEventArgs e)
         {
-            if (Keyboard.Modifiers is 0 && sender is ListViewItem { IsSelected: true } item && item.TryGetAncestor<IListView>(out var lv))
+            if (Keyboard.Modifiers is 0 && sender is ListViewItem { IsSelected: true } item && item.TryGetAncestor<ListBox>(out var lv))
             {
                 lv.Focus();
                 return true;
@@ -47,7 +47,7 @@ namespace LivreNoirLibrary.Windows.Controls
 
         public static void BuildDataObject_ListView(string dataObjectType, DataObject obj, object sender)
         {
-            if ((sender as DependencyObject).TryGetAncestor<IListView>(out var lv))
+            if ((sender as DependencyObject).TryGetAncestor<ListBox>(out var lv))
             {
                 obj.SetData(dataObjectType, lv);
             }

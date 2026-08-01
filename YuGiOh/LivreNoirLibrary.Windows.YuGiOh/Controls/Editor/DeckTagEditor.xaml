@@ -1,0 +1,98 @@
+﻿<local:DeckTagEditor_Base x:Class="LivreNoirLibrary.Windows.YuGiOh.Controls.DeckTagEditor"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:LivreNoirLibrary.Windows.YuGiOh.Controls"
+             xmlns:ct="clr-namespace:LivreNoirLibrary.Windows.Controls;assembly=LivreNoirLibrary.Windows.Controls"
+             xmlns:media="clr-namespace:LivreNoirLibrary.Windows.Media;assembly=LivreNoirLibrary.Windows.Media"
+             xmlns:yw="clr-namespace:LivreNoirLibrary.Windows.YuGiOh;assembly=LivreNoirLibrary.Windows.YuGiOh"
+             xmlns:ygo="clr-namespace:LivreNoirLibrary.YuGiOh.Data;assembly=LivreNoirLibrary.YuGiOh.Core"
+             xmlns:ys="clr-namespace:LivreNoirLibrary.YuGiOh.Search;assembly=LivreNoirLibrary.YuGiOh.Core"
+             xmlns:ymd="clr-namespace:LivreNoirLibrary.YuGiOh.MasterDuel;assembly=LivreNoirLibrary.YuGiOh.Core"
+             mc:Ignorable="d" 
+             d:DesignHeight="450" d:DesignWidth="800">
+    <UserControl.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="/LivreNoirLibrary.Windows.YuGiOh;component/Themes/Generic.xaml"/>
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </UserControl.Resources>
+    <Grid x:Name="MainGrid" d:DataContext="{d:DesignInstance Type=local:DeckTagEditor}" ColumnDefinitions="*, *">
+        <Grid RowDefinitions="Auto, 4, *, 4, Auto" ColumnDefinitions="*, Auto">
+            <Grid ColumnDefinitions="*, Auto">
+                <local:TextSearchBar ItemsCount="{Binding Items.Count, ElementName=ListView_Main}" SearchExecuted="OnSearchExecuted"/>
+                <StackPanel Grid.Column="1" Style="{StaticResource EditBarStackPanel}">
+                    <ct:Button Style="{StaticResource IconButton_Undo}"/>
+                    <ct:Button Style="{StaticResource IconButton_Redo}"/>
+                    <Rectangle Width="8"/>
+                    <ct:Button Style="{StaticResource IconButton_AllClear}"/>
+                    <ct:Button Style="{StaticResource IconButton_Open}"/>
+                    <ct:Button Style="{StaticResource IconButton_Save}"/>
+                </StackPanel>
+            </Grid>
+            <ListView x:Name="ListView_Main" Style="{StaticResource Alt2ListBoxStyle}" Grid.Row="2" ItemsSource="{Binding ItemsSource}" SelectionMode="Single" SelectionChanged="ListView_SelectionChanged">
+                <ListView.View>
+                    <GridView>
+                        <GridViewColumn HeaderTemplate="{StaticResource GridViewHeader_TagName}" CellTemplate="{StaticResource ItemTemplate_TagName}"/>
+                        <GridViewColumn HeaderTemplate="{StaticResource GridViewHeader_TagHint}" CellTemplate="{StaticResource ItemTemplate_TagHint}"/>
+                    </GridView>
+                </ListView.View>
+                <ListView.ItemContainerStyle>
+                    <Style TargetType="ListViewItem" BasedOn="{StaticResource Alt2ListBoxItemContainerStyle}">
+                        <Setter Property="ContextMenu">
+                            <Setter.Value>
+                                <ContextMenu>
+                                    <MenuItem Style="{StaticResource MenuItem_MoveUp}"/>
+                                    <MenuItem Style="{StaticResource MenuItem_MoveDown}"/>
+                                    <MenuItem Style="{StaticResource MenuItem_Delete}"/>
+                                </ContextMenu>
+                            </Setter.Value>
+                        </Setter>
+                    </Style>
+                </ListView.ItemContainerStyle>
+            </ListView>
+            <Grid Grid.Row="4" Style="{StaticResource EditBarPanel}">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" MaxWidth="8"/>
+                    <ColumnDefinition Width="*" MinWidth="22"/>
+                    <ColumnDefinition Width="*" MinWidth="22"/>
+                    <ColumnDefinition Width="*" MinWidth="22"/>
+                    <ColumnDefinition Width="*" MaxWidth="8"/>
+                    <ColumnDefinition Width="*" MinWidth="22"/>
+                </Grid.ColumnDefinitions>
+                <ct:Button Grid.Column="1" Style="{StaticResource IconButton_MoveUp}" CommandTarget="{Binding ElementName=ListView_Main}"/>
+                <ct:Button Grid.Column="2" Style="{StaticResource IconButton_MoveDown}" CommandTarget="{Binding ElementName=ListView_Main}"/>
+                <ct:Button Grid.Column="3" Style="{StaticResource IconButton_Delete}" CommandTarget="{Binding ElementName=ListView_Main}"/>
+                <ct:Button Grid.Column="5" Style="{StaticResource IconButton_Sort}"/>
+            </Grid>
+            <Grid Grid.Row="2" Grid.Column="1" RowDefinitions="*, *, *">
+                <ct:Button Style="{StaticResource LargeButton_Blue}" Click="OnClick_Add" IsEnabled="{Binding CanAdd}">
+                    <StackPanel Style="{StaticResource LargeButtonStackPanel}">
+                        <ct:IconPresenter Style="{StaticResource LargeButtonIcon}" Source="{x:Static media:Icons.ArrowLeft}"/>
+                        <ct:VerticalTextBlock Text="{Binding Add.Value, Source={x:Static yw:Vocab.Current}}"/>
+                    </StackPanel>
+                </ct:Button>
+                <ct:Button Style="{StaticResource LargeButton_Green}" Click="OnClick_Save" IsEnabled="{Binding CanSave}">
+                    <StackPanel Style="{StaticResource LargeButtonStackPanel}">
+                        <ct:IconPresenter Style="{StaticResource LargeButtonIcon}" Source="{x:Static media:Icons.ArrowLeft}"/>
+                        <ct:VerticalTextBlock Text="{Binding Save.Value, Source={x:Static yw:Vocab.Current}}"/>
+                    </StackPanel>
+                </ct:Button>
+                <ct:Button Style="{StaticResource LargeButton_Red}" Click="OnClick_Load" IsEnabled="{Binding SelectedItem, ElementName=ListView_Main, Converter={StaticResource BooleanConverter}}">
+                    <StackPanel Style="{StaticResource LargeButtonStackPanel}">
+                        <ct:IconPresenter Style="{StaticResource LargeButtonIcon}" Source="{x:Static media:Icons.ArrowRight}"/>
+                        <ct:VerticalTextBlock Text="{Binding Reload.Value, Source={x:Static yw:Vocab.Current}}"/>
+                    </StackPanel>
+                </ct:Button>
+            </Grid>
+        </Grid>
+        <Grid Grid.Column="1" ColumnDefinitions="Auto, *" RowDefinitions="Auto, Auto, *">
+            <Label Grid.Row="0" Style="{StaticResource Label_Header}" Content="{Binding DLog.Name.Value, Source={x:Static yw:Vocab.Current}}" />
+            <Label Grid.Row="1" Style="{StaticResource Label_Header}" Content="{Binding DLog.SearchHint.Value, Source={x:Static yw:Vocab.Current}}" />
+            <TextBox Grid.Row="0" Grid.Column="1" x:Name="TextBox_Name" Margin="2" TextChanged="OnTextChanged_Name" />
+            <TextBox Grid.Row="1" Grid.Column="1" x:Name="TextBox_SearchHint" Margin="2" InputMethod.IsInputMethodEnabled="False"/>
+        </Grid>
+    </Grid>
+</local:DeckTagEditor_Base>

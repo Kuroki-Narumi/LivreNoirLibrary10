@@ -3,7 +3,7 @@ using System.Windows;
 using System.Windows.Media.Imaging;
 using System.Windows.Interop;
 using System.Diagnostics;
-using LivreNoirLibrary.Windows.NativeMethods;
+using LivreNoirLibrary.Win32Api;
 
 namespace LivreNoirLibrary.Windows
 {
@@ -23,15 +23,15 @@ namespace LivreNoirLibrary.Windows
         }
 
         public static (int Width, int Height) GetSystemIconSize(bool small = false) => 
-            small ? (Win32Api.GetSystemMetrics(SM.CXSMICON), Win32Api.GetSystemMetrics(SM.CYSMICON))
-                  : (Win32Api.GetSystemMetrics(SM.CXICON), Win32Api.GetSystemMetrics(SM.CYICON));
+            small ? (NativeMethods.GetSystemMetrics(SM.CXSMICON), NativeMethods.GetSystemMetrics(SM.CYSMICON))
+                  : (NativeMethods.GetSystemMetrics(SM.CXICON), NativeMethods.GetSystemMetrics(SM.CYICON));
 
         public static BitmapSource? GetIcon(nint handle, bool small = false)
         {
-            var ptr = Win32Api.SendMessage(handle, WM.GetIcon, small ? 2 : 1, 0);
+            var ptr = NativeMethods.SendMessage(handle, WM.GetIcon, small ? 2 : 1, 0);
             if (ptr is 0)
             {
-                ptr = Win32Api.GetClassLong(handle, small ? GCL.Handle_IconSmall : GCL.Handle_Icon);
+                ptr = (nint)NativeMethods.GetClassLong(handle, small ? GCL.Handle_IconSmall : GCL.Handle_Icon);
             }
             if (ptr is not 0)
             {
@@ -43,26 +43,26 @@ namespace LivreNoirLibrary.Windows
 
         public static BitmapSource? GetApplicationIcon(bool small = false) => GetIcon(GetCurrentHandle(), small);
 
-        public static int SetSlipThrough(this Window window, bool through)
+        public static nint SetSlipThrough(this Window window, bool through)
         {
             var handle = GetHandle(window);
-            var style = Win32Api.GetWindowLong(handle, (int)GWL.ExStyle);
+            var style = NativeMethods.GetWindowLong(handle, GWL.ExStyle);
             var nStyle = through
                 ? style | (int)WS_EX.Transparent
                 : style & ~(int)WS_EX.Transparent;
-            return Win32Api.SetWindowLong(handle, (int)GWL.ExStyle, nStyle);
+            return NativeMethods.SetWindowLong(handle, GWL.ExStyle, nStyle);
         }
 
         public static bool SetRect(this Window window, double x, double y, double width, double height)
         {
-            return Win32Api.SetWindowPos(GetHandle(window), nint.Zero, (int)x, (int)y, (int)Math.Ceiling(width), (int)Math.Ceiling(height), 0);
+            return NativeMethods.SetWindowPos(GetHandle(window), nint.Zero, (int)x, (int)y, (int)Math.Ceiling(width), (int)Math.Ceiling(height), 0);
         }
 
         public static bool SetRect(this Window window, in Rect rect) => SetRect(window, rect.X, rect.Y, rect.Width, rect.Height);
 
         public static void ShellExecute(this Window window, string? operation = null, string? file = null, string? parameters = null, string? directory = null, SW showCmd = SW.ShowNormal)
         {
-            Win32Api.ShellExecute(GetHandle(window), operation, file, parameters, directory, showCmd);
+            NativeMethods.ShellExecute(GetHandle(window), operation, file, parameters, directory, showCmd);
         }
 
         public static void ShellOpen(this Window window, string path) => ShellExecute(window, "open", path, null, null, SW.ShowNormal);

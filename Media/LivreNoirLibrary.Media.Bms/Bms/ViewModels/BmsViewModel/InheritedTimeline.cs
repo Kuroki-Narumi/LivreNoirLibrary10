@@ -51,10 +51,12 @@ namespace LivreNoirLibrary.Media.Bms.ViewModels
         IEnumerable<(BarPosition, List<Note>)> IListEnumerable<BarPosition, Note>.ReverseEnumerateList() => EnumerateCore(GetReverseEnumerator());
         IEnumerable<(BarPosition, List<Note>)> IListEnumerable<BarPosition, Note>.ReverseEnumerateList(Range<BarPosition> range) => EnumerateCore(GetReverseEnumerator(range));
 
+        private static readonly List<Note> _noteBuffer = [];
+
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private static IEnumerable<(BarPosition, List<Note>)> EnumerateCore(TwoMergedEnumerator<BarPosition, List<Note>> enumer)
         {
-            using var o = ObjectPool.RentList<Note>(out var buffer);
+            var buffer = _noteBuffer;
             foreach (var (pos, list1, list2) in enumer)
             {
                 if (list1 is not null && list2 is not null)
@@ -69,6 +71,7 @@ namespace LivreNoirLibrary.Media.Bms.ViewModels
                     yield return (pos, (list1 ?? list2)!);
                 }
             }
+            buffer.Clear();
         }
 
         public void RefreshTimeline(IBarPositionProvider provider, ITimelineViewModel target, double initialTempo, bool abortIfInvalidTempo)

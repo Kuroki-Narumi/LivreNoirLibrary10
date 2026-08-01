@@ -1,4 +1,4 @@
-﻿using LivreNoirLibrary.Windows.Controls;
+﻿using System.Windows.Controls;
 using System;
 
 namespace LivreNoirLibrary.Windows.Controls
@@ -7,10 +7,10 @@ namespace LivreNoirLibrary.Windows.Controls
     {
         bool IsSelectionStored { get; }
 
-        void StoreSelection(ReadOnlySpan<IListView> listViews);
+        void StoreSelection(ReadOnlySpan<ListBox> listViews);
 
         bool EqualsAll(TSelf other);
 
-        void RestoreSelection(ReadOnlySpan<IListView> listViews);
+        void RestoreSelection(ReadOnlySpan<ListBox> listViews);
     }
 }

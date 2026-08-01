@@ -11,8 +11,8 @@ namespace LivreNoirLibrary.Windows.YuGiOh.Controls
         protected override int GetRow(Result value) => value switch
         {
             Result.Win => 1,
-            Result.DiscWin => 2,
-            Result.DiscLose => 3,
+            Result.DiscLose => 2,
+            Result.DiscWin => 3,
             Result.Draw => 4,
             _ => 0,
         };
@@ -23,7 +23,7 @@ namespace LivreNoirLibrary.Windows.YuGiOh.Controls
         static ResultItem()
         {
             var v = Vocab.Current.DLog;
-            Items = [new(Result.Lose, v.Lose), new(Result.Win, v.Win), new(Result.DiscWin, v.DiscWin), new(Result.DiscLose, v.DiscLose), new(Result.Draw, v.Draw)];
+            Items = [new(Result.Lose, v.Lose), new(Result.Win, v.Win), new(Result.DiscLose, v.DiscLose), new(Result.DiscWin, v.DiscWin), new(Result.Draw, v.Draw)];
             _items = CreateMap(Items);
         }
     }

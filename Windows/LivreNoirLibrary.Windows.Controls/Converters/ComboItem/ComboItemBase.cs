@@ -4,7 +4,7 @@ using System.Windows.Media;
 
 namespace LivreNoirLibrary.Windows
 {
-    public abstract class ComboItemBase<T>
+    public abstract class ComboItemBase<T> : IGridComboItem
         where T : struct, Enum
     {
         public T Value { get; }

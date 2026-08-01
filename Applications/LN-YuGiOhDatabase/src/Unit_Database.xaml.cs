@@ -50,8 +50,6 @@ namespace LivreNoir.YuGiOhDatabase
             }
             UpdateDefaultSortOptions(op);
             CardSortWindow.DefaultPresetChanged += CardSortWindow_DefaultPresetChanged;
-
-            RegulationEditor.CardProvider = new CloningCardList(ViewModel.CardPool.Cards);
         }
 
         private void CardSearchWindow_DefaultPresetChanged(object? sender, CardSearchConditionsPreset? e) => UpdateDefaultSearchConditions(e?.Conditions);
