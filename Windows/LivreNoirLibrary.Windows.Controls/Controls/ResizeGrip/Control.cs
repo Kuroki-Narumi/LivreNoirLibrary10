@@ -3,35 +3,39 @@ using System.Windows;
 using System.Windows.Shapes;
 using System.Windows.Input;
 using LivreNoirLibrary.Windows.Input;
+using LivreNoirLibrary.Win32Api;
+using LivreNoirLibrary.Debug;
 
 namespace LivreNoirLibrary.Windows.Controls
 {
     public partial class ResizeGrip
     {
-        private static double Validate(double value, double @default = 0) => double.IsNormal(value) ? Math.Max(value, @default) : @default;
+        private static double Validate(double value, double @default = 0) => double.IsFinite(value) ? Math.Max(value, @default) : @default;
 
         private void OnMouseLeftButtonDown_Grip(object sender, MouseButtonEventArgs e)
         {
             if (sender is not Shape s) return;
-            _root ??= Window.GetWindow(this);
+            var window = _root ??= Window.GetWindow(this);
             if (_root is null) return;
 
+            var handle = window.GetHandle();
             var dir = (int)s.Tag;
             var moveRight = dir is 3 or 6 or 9;
             var moveLeft = dir is 1 or 4 or 7;
             var moveBottom = dir is 1 or 2 or 3;
             var moveTop = dir is 7 or 8 or 9;
 
-            var pos = PointToScreen(e.GetPosition(this));
-            var initCursorX = pos.X;
-            var initCursorY = pos.Y;
-            var screen = pos.GetScreenBounds();
-            var initRect = _root.GetRect();
-
-            var limitLeft = moveRight ? initRect.Left + Validate(_root.MinWidth) : screen.Left;
-            var limitRight = moveLeft ? initRect.Right - Validate(_root.MinWidth) : screen.Right;
-            var limitTop = moveBottom ? initRect.Top + Validate(_root.MinHeight) : screen.Top;
-            var limitBottom = moveTop ? initRect.Bottom - Validate(_root.MinHeight) : screen.Bottom;
+            var absPoint = NativeMethods.GetCursorPos();
+            var initCursorX = absPoint.X;
+            var initCursorY = absPoint.Y;
+            var absScreen = NativeMethods.GetScreenBounds(absPoint);
+            var (sx, sy) = window.GetDisplayScale();
+            var initRect = window.GetRect();
+            
+            var limitLeft = moveRight ? initRect.Left + Validate(window.MinWidth) : absScreen.Left / sx;
+            var limitRight = moveLeft ? initRect.Right - Validate(window.MinWidth) : absScreen.Right / sx;
+            var limitTop = moveBottom ? initRect.Top + Validate(window.MinHeight) : absScreen.Top / sy;
+            var limitBottom = moveTop ? initRect.Bottom - Validate(window.MinHeight) : absScreen.Bottom / sy;
 
             double initLeft, initRight, initTop, initBottom, newLeft, newRight, newTop, newBottom;
             initLeft = newLeft = initRect.Left;
@@ -88,13 +92,14 @@ namespace LivreNoirLibrary.Windows.Controls
 
             void MouseMove(object sender, MouseEventArgs e)
             {
-                var pos = PointToScreen(e.GetPosition(this));
-                var dx = pos.X - initCursorX;
-                var dy = pos.Y - initCursorY;
-                newLeft = initLeft + (moveLeft ? dx : 0);
-                newRight = initRight + (moveRight ? dx : 0);
-                newTop = initTop + (moveTop ? dy : 0);
-                newBottom = initBottom + (moveBottom ? dy : 0);
+                var absPos = NativeMethods.GetCursorPos();
+                var absDx = absPos.X - initCursorX;
+                var absDy = absPos.Y - initCursorY;
+                var (sx, sy) = window.GetDisplayScale();
+                newLeft = initLeft + (moveLeft ? absDx / sx : 0);
+                newRight = initRight + (moveRight ? absDx / sx : 0);
+                newTop = initTop + (moveTop ? absDy / sy : 0);
+                newBottom = initBottom + (moveBottom ? absDy / sy : 0);
                 Adjust();
                 // 縦横比の維持
                 var refWidth = Validate(_baseWidth);
@@ -148,7 +153,7 @@ namespace LivreNoirLibrary.Windows.Controls
                 }
                 else
                 {
-                    _root.SetRect(NewRect());
+                    window.SetRect(NewRect());
                 }
             }
 

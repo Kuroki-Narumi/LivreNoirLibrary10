@@ -27,5 +27,10 @@ namespace LivreNoirLibrary.Windows
 
         public static PropertyChangedCallback OnMeasurePropertyChanged { get; } = new(default(object).EX_OnMeasurePropertyChanged);
         public static PropertyChangedCallback OnVisualPropertyChanged { get; } = new(default(object).EX_OnVisualPropertyChanged);
+
+        public static object? GetDefaultValue(this DependencyObject o, DependencyProperty property) => property.GetMetadata(o).DefaultValue;
+        public static T GetDefaultValue<T>(this DependencyObject o, DependencyProperty property) => (T)property.GetMetadata(o).DefaultValue;
+        public static void SetDefaultValue<T>(this DependencyObject o, DependencyProperty property, ref T field) => field = (T)property.GetMetadata(o).DefaultValue;
+        public static void SetDefaultValue(this DependencyObject o, DependencyProperty property) => o.SetValue(property, property.GetMetadata(o).DefaultValue);
     }
 }

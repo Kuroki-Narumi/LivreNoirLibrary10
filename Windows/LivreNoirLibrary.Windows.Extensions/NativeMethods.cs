@@ -53,12 +53,15 @@ namespace LivreNoirLibrary.Windows
             return NativeMethods.SetWindowLong(handle, GWL.ExStyle, nStyle);
         }
 
-        public static bool SetRect(this Window window, double x, double y, double width, double height)
+        public static void SetRect(this Window window, double x, double y, double width, double height)
         {
-            return NativeMethods.SetWindowPos(GetHandle(window), nint.Zero, (int)x, (int)y, (int)Math.Ceiling(width), (int)Math.Ceiling(height), 0);
+            window.Left = x;
+            window.Top = y;
+            window.Width = width;
+            window.Height = height;
         }
 
-        public static bool SetRect(this Window window, in Rect rect) => SetRect(window, rect.X, rect.Y, rect.Width, rect.Height);
+        public static void SetRect(this Window window, in Rect rect) => SetRect(window, rect.X, rect.Y, rect.Width, rect.Height);
 
         public static void ShellExecute(this Window window, string? operation = null, string? file = null, string? parameters = null, string? directory = null, SW showCmd = SW.ShowNormal)
         {

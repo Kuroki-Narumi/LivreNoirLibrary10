@@ -13,10 +13,10 @@ namespace LivreNoirLibrary.Windows.Controls
 
         protected override void InitializeFields()
         {
-            _default = (long)DefaultValueProperty.GetMetadata(this).DefaultValue;
-            _minimum = (long)MinimumProperty.GetMetadata(this).DefaultValue;
-            _maximum = (long)MaximumProperty.GetMetadata(this).DefaultValue;
-            _wheel_step = (long)WheelStepProperty.GetMetadata(this).DefaultValue;
+            this.SetDefaultValue(DefaultValueProperty, ref _default);
+            this.SetDefaultValue(MinimumProperty, ref _minimum);
+            this.SetDefaultValue(MaximumProperty, ref _maximum);
+            this.SetDefaultValue(WheelStepProperty, ref _wheel_step);
         }
 
         public sealed override long DefaultValue { get => _default; set => SetValue(DefaultValueProperty, value); }
@@ -36,10 +36,10 @@ namespace LivreNoirLibrary.Windows.Controls
 
         protected override void InitializeFields()
         {
-            _default = (long)DefaultValueProperty.GetMetadata(this).DefaultValue;
-            _minimum = (long)MinimumProperty.GetMetadata(this).DefaultValue;
-            _maximum = (long)MaximumProperty.GetMetadata(this).DefaultValue;
-            _wheel_step = (long)WheelStepProperty.GetMetadata(this).DefaultValue;
+            this.SetDefaultValue(DefaultValueProperty, ref _default);
+            this.SetDefaultValue(MinimumProperty, ref _minimum);
+            this.SetDefaultValue(MaximumProperty, ref _maximum);
+            this.SetDefaultValue(WheelStepProperty, ref _wheel_step);
         }
 
         public sealed override long DefaultValue { get => _default; set => SetValue(DefaultValueProperty, value); }

@@ -77,18 +77,23 @@ namespace LivreNoirLibrary.Windows.Media
             }
         }
 
+        public static BitmapImage? GetSourceFromStream(Stream stream)
+        {
+            BitmapImage src = new();
+            src.BeginInit();
+            src.CacheOption = BitmapCacheOption.OnLoad;
+            src.CreateOptions = BitmapCreateOptions.None;
+            src.StreamSource = stream;
+            src.EndInit();
+            return src;
+        }
+
         public static BitmapImage? GetSourceFromFile(string path)
         {
             if (File.Exists(path))
             {
                 using var fs = File.OpenRead(path);
-                BitmapImage src = new();
-                src.BeginInit();
-                src.CacheOption = BitmapCacheOption.OnLoad;
-                src.CreateOptions = BitmapCreateOptions.None;
-                src.StreamSource = fs;
-                src.EndInit();
-                return src;
+                return GetSourceFromStream(fs);
             }
             return null;
         }
@@ -107,6 +112,15 @@ namespace LivreNoirLibrary.Windows.Media
             }
             bounds.X = 0;
             bounds.Y = 0;
+            var (sx, sy) = options.Scale;
+            if (sx > 0)
+            {
+                bounds.Width *= sx;
+            }
+            if (sy > 0)
+            {
+                bounds.Height *= sy;
+            }
             VisualBrush brush = new(visual);
             using var dc = dv.RenderOpen();
             if (options.Background is not null)

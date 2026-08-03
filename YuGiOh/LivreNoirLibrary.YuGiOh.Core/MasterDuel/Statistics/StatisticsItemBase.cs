@@ -73,11 +73,12 @@ namespace LivreNoirLibrary.YuGiOh.MasterDuel
         public virtual void Clear()
         {
             Count = 0;
-            CountRatio = 0;
+            ValidCount = 0;
             _order.Clear();
             _result.Clear();
             _win.Clear();
             _win_den.Clear();
+            CountRatio = 0;
         }
 
         public void Append(DuelLog item)

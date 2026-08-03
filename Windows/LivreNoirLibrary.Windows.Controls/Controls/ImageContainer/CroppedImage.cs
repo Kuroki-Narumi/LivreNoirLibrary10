@@ -54,10 +54,28 @@ namespace LivreNoirLibrary.Windows.Controls
                 return false;
             }
             var (cx, cy, cw, ch) = rect;
+            var sw = source.PixelWidth;
+            var sh = source.PixelHeight;
+            if (cx is < 0)
+            {
+                cx += sw;
+            }
+            if (cy is < 0)
+            {
+                cy += sh;
+            }
+            if (cw is <= 0)
+            {
+                cw = sw;
+            }
+            if (ch is <= 0)
+            {
+                ch = sh;
+            }
             var left = Math.Max(cx, 0);
-            var right = Math.Min(cx + cw, source.PixelWidth);
+            var right = Math.Min(cx + cw, sw);
             var top = Math.Max(cy, 0);
-            var bottom = Math.Min(cy + ch, source.PixelHeight);
+            var bottom = Math.Min(cy + ch, sh);
             cx = left;
             cy = top;
             cw = right - left;

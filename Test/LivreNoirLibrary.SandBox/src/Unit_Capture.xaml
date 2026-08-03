@@ -24,11 +24,11 @@
         </Grid>
         <Grid Grid.Row="1" ColumnDefinitions="*, 3*">
             <Grid RowDefinitions="Auto, *, 2*">
-                <ListView Grid.Row="1" Style="{StaticResource Alt2ListBoxStyle}" ItemsSource="{Binding MonitorInfos}" SelectionMode="Single" SelectionChanged="OnSelectionChanged_Window">
+                <ListView Grid.Row="1" Style="{StaticResource Alt2ListBoxStyle}" ItemsSource="{Binding MonitorInfos}" SelectionMode="Single" SelectionChanged="OnSelectionChanged_Monitor">
                     <ListView.ItemTemplate>
                         <DataTemplate>
                             <TextBlock>
-                            <Run Text="{Binding FriendlyName, Mode=OneWay}"/> (<Run Text="{Binding Rect.Width}"/>x<Run Text="{Binding Rect.Height}"/>)
+                            <Run Text="{Binding FriendlyName, Mode=OneWay}"/> (<Run Text="{Binding Rect}"/>)
                             </TextBlock>
                         </DataTemplate>
                     </ListView.ItemTemplate>
@@ -36,15 +36,25 @@
                 <ListView Grid.Row="2" Style="{StaticResource Alt2ListBoxStyle}" ItemsSource="{Binding WindowInfos}" SelectionMode="Single" SelectionChanged="OnSelectionChanged_Window">
                     <ListView.ItemTemplate>
                         <DataTemplate>
-                            <TextBlock>
-                            <Run Text="{Binding Title, Mode=OneWay}"/> (<Run Text="{Binding ExeFileName, Mode=OneWay}"/>)
-                            </TextBlock>
+                            <Grid>
+                                <TextBlock Text="{Binding TitleAndExeName}"/>
+                                <Popup x:Name="popup">
+                                    <Border Style="{StaticResource HelpPopupContent}">
+                                        <TextBlock Text="{Binding TitleAndExeName}"/>
+                                    </Border>
+                                </Popup>
+                            </Grid>
+                            <DataTemplate.Triggers>
+                                <Trigger Property="IsMouseOver" Value="True">
+                                    <Setter TargetName="popup" Property="IsOpen" Value="True"/>
+                                </Trigger>
+                            </DataTemplate.Triggers>
                         </DataTemplate>
                     </ListView.ItemTemplate>
                 </ListView>
             </Grid>
             <Border Grid.Column="1" Background="{x:Static media:MediaUtils.TransparentCheckerBrush}">
-                <cptr:CaptureControl x:Name="Capturer"/>
+                <cptr:WindowCaptureControl x:Name="Capturer"/>
             </Border>
         </Grid>
     </Grid>

@@ -595,6 +595,7 @@
         <Setter Property="Background" Value="{StaticResource Brush_Popup_Background}"/>
         <Setter Property="Control.Foreground" Value="{StaticResource Brush_Popup_Foreground}"/>
         <Setter Property="Padding" Value="4"/>
+        <Setter Property="IsHitTestVisible" Value="False"/>
         <Setter Property="TextBlock.FontSize" Value="12"/>
     </Style>
 

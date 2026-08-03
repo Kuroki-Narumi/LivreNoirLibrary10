@@ -1,20 +1,22 @@
-﻿using LivreNoirLibrary.ObjectModel;
+﻿using LivreNoirLibrary.Collections;
+using LivreNoirLibrary.IO;
+using LivreNoirLibrary.ObjectModel;
+using LivreNoirLibrary.Text;
 using LivreNoirLibrary.Windows;
-using LivreNoirLibrary.YuGiOh.MasterDuel;
 using LivreNoirLibrary.Windows.YuGiOh.Controls;
-using LivreNoirLibrary.YuGiOh.Search;
+using LivreNoirLibrary.Windows.YuGiOh.Converters;
+using LivreNoirLibrary.YuGiOh.Converters;
 using LivreNoirLibrary.YuGiOh.Data;
+using LivreNoirLibrary.YuGiOh.Inspect;
+using LivreNoirLibrary.YuGiOh.MasterDuel;
+using LivreNoirLibrary.YuGiOh.Search;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
+using System.IO;
 using System.Text;
 using System.Text.Json.Serialization;
-using LivreNoirLibrary.Collections;
-using LivreNoirLibrary.Text;
 using System.Windows;
-using System.IO;
-using LivreNoirLibrary.YuGiOh.Inspect;
-using System.Diagnostics;
-using LivreNoirLibrary.YuGiOh.Converters;
 
 namespace LivreNoir.YuGiOhDatabase
 {
@@ -121,6 +123,9 @@ namespace LivreNoir.YuGiOhDatabase
             CardSearchWindow.LoadPreset(CardSearchPresets);
             CardSortWindow.LoadPreset(CardSortPresets);
             Console.WriteLine($"  MainViewModel: Presets in {Stopwatch.GetElapsedTime(t0).TotalMilliseconds}ms");
+
+            IdToCardImageConverter.ResourceDirectory = General.GetAppDataPath(AppName);
+
             Console.WriteLine($"MainViewModel: total load time {Stopwatch.GetElapsedTime(t).TotalMilliseconds}ms");
         }
 

@@ -119,7 +119,7 @@ namespace LivreNoir.Clock
                 horz *= 10;
                 vert *= 10;
             }
-            var bounds = this.GetScreenBounds();
+            var bounds = this.GetScaledScreenBounds();
             double newLeft, newTop;
             if (KeyInput.IsCtrlDown())
             {

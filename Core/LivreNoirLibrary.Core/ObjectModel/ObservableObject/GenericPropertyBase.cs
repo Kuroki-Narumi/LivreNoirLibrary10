@@ -36,6 +36,16 @@ namespace LivreNoirLibrary.ObjectModel
             return true;
         }
 
+        protected bool SetValue(T value, Action<T>? callback, [CallerMemberName] string key = "")
+        {
+            var result = SetValue(value, key);
+            if (result)
+            {
+                callback?.Invoke(value);
+            }
+            return true;
+        }
+
         protected bool SetValue(T value, ReadOnlySpan<string> relatedProperties, [CallerMemberName] string key = "")
         {
             var result = SetValue(value, key);
@@ -49,7 +59,7 @@ namespace LivreNoirLibrary.ObjectModel
             return true;
         }
 
-        protected bool SetValue(T value, ReadOnlySpan<string> relatedProperties = default, Action<T>? callback = null, [CallerMemberName] string key = "")
+        protected bool SetValue(T value, ReadOnlySpan<string> relatedProperties, Action<T>? callback, [CallerMemberName] string key = "")
         {
             var result = SetValue(value, key);
             if (result)

@@ -1,7 +1,9 @@
-﻿using LivreNoirLibrary.ObjectModel;
+﻿using LivreNoirLibrary.Collections;
+using LivreNoirLibrary.ObjectModel;
 using LivreNoirLibrary.Win32Api;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading;
@@ -22,12 +24,16 @@ namespace LivreNoirLibrary.Media.Capture
     /// Windows Graphics Capture を使用したウィンドウキャプチャクラス。<br/>
     /// reference: https://github.com/radian-jp/WindowCaptureDemo/blob/main/WindowCapturer.cs
     /// </summary>
-    /// <typeparam name="T">生成される画像オブジェクトの型。</typeparam>
-    /// <param name="adapter">画像データの変換に使用するアダプター。</param>
-    public class Capturer<T> : DisposableBase
+    public class Capturer : DisposableBase, ICapturer
     {
+        public event EventHandler? CaptureTargetClosed;
+
         private readonly Lock _lock = new();
-        private readonly IImageAdapter<T> _adapter;
+
+        private SynchronizationContext? _syncContext;
+        private readonly UnmanagedArray<byte> _pendingBuffer;
+        private int _pendingWidth, _pendingHeight, _pendingStride;
+        private bool _hasPendingFrame;
 
         // Direct3D11のオブジェクト
         private unsafe ID3D11Device* _d3dDevice;
@@ -41,20 +47,46 @@ namespace LivreNoirLibrary.Media.Capture
         private GraphicsCaptureSession? _session;
         private Direct3D11CaptureFrame? _latestFrame;
 
-        public bool IsActive => _session is not null;
+        public IImageAdapter Adapter 
+        {
+            get;
+            set
+            {
+                ArgumentNullException.ThrowIfNull(value);
+                lock (_lock)
+                {
+                    field = value;
+                }
+            }
+        }
+
         public bool IsCursorCaptureEnabled
         {
             get;
             set
             {
-                field = value;
-                _session?.IsCursorCaptureEnabled = value;
+                lock (_lock)
+                {
+                    field = value;
+                    _session?.IsCursorCaptureEnabled = value;
+                }
             }
         }
 
-        public Capturer(IImageAdapter<T> adapter)
+        public bool IsActive => _session is not null;
+
+        public nint CapturingWindowHandle { get; private set; }
+        public nint CapturingMonitorHandle { get; private set; }
+
+        /// <summary>
+        /// 指定された<see cref="IImageAdapter"/>を通じてキャプチャを行う<see cref="Capturer"/>インスタンスを作成します。
+        /// </summary>
+        /// <param name="adapter">画像データの変換に使用するアダプター。</param>
+        public Capturer(IImageAdapter adapter)
         {
-            _adapter = adapter;
+            ArgumentNullException.ThrowIfNull(adapter);
+            Adapter = adapter;
+            _pendingBuffer = new();
             CreateD3DDevice();
         }
 
@@ -63,49 +95,88 @@ namespace LivreNoirLibrary.Media.Capture
             base.DisposeUnmanaged();
             lock (_lock)
             {
-                _item = null;
-                DisposeHelper.NullDispose(ref _winrtD3DDevice);
                 DisposeSession();
+                DisposeHelper.NullDispose(ref _winrtD3DDevice);
                 unsafe
                 {
                     DisposeHelper.NullRelease(ref _textureDst);
                     DisposeHelper.NullRelease(ref _d3dContext);
                     DisposeHelper.NullRelease(ref _d3dDevice);
                 }
+                _pendingBuffer.Free();
             }
         }
 
-        public void StartWindowCapture(nint handle)
-        {
-            Stop();
-            if (NativeMethods.IsWindow(handle))
-            {
-                _item = GraphicsCaptureItem.TryCreateFromWindowId(new Windows.UI.WindowId((ulong)handle));
-                StartImpl(_item);
-            }
-        }
-
-        public void StartMonitorCapture(nint handle)
-        {
-            Stop();
-            try
-            {
-                _item = GraphicsCaptureItem.TryCreateFromDisplayId(new Windows.Graphics.DisplayId((ulong)handle));
-                StartImpl(_item);
-            }
-            catch
-            {
-                Stop();
-            }
-        }
-
+        /// <summary>
+        /// 実行中のキャプチャセッションを終了します。キャプチャ中でない場合は何も起こりません。
+        /// </summary>
         public void Stop()
         {
-            DisposeSession();
+            lock (_lock)
+            {
+                DisposeSession();
+            }
+        }
+
+        private void DisposeSession()
+        {
+            _framePool?.FrameArrived -= OnFrameArrived;
+            _item?.Closed -= OnCaptureItemClosed;
+            DisposeHelper.NullDispose(ref _latestFrame);
+            DisposeHelper.NullDispose(ref _session);
+            DisposeHelper.NullDispose(ref _framePool);
+            _item = null;
+            _hasPendingFrame = false;
+            CapturingWindowHandle = 0;
+            CapturingMonitorHandle = 0;
+        }
+
+        /// <summary>
+        /// ウィンドウハンドルを指定してキャプチャセッションを開始します。
+        /// </summary>
+        /// <param name="handle">キャプチャ対象ウィンドウのハンドル。</param>
+        public void StartWindowCapture(nint handle)
+        {
+            lock (_lock)
+            {
+                DisposeSession();
+                if (NativeMethods.IsWindow(handle))
+                {
+                    var item = GraphicsCaptureItem.TryCreateFromWindowId(new Windows.UI.WindowId((ulong)handle));
+                    StartImpl(item);
+                    CapturingWindowHandle = handle;
+                }
+            }
+        }
+
+        /// <summary>
+        /// モニターハンドルを指定してキャプチャセッションを開始します。
+        /// </summary>
+        /// <param name="handle">キャプチャ対象モニターのハンドル。</param>
+        public void StartMonitorCapture(nint handle)
+        {
+            lock (_lock)
+            {
+                DisposeSession();
+                try
+                {
+                    var item = GraphicsCaptureItem.TryCreateFromDisplayId(new Windows.Graphics.DisplayId((ulong)handle));
+                    StartImpl(item);
+                    CapturingMonitorHandle = handle;
+                }
+                catch
+                {
+                    DisposeSession();
+                }
+            }
         }
 
         private void StartImpl(GraphicsCaptureItem item)
         {
+            _syncContext = SynchronizationContext.Current;
+            item.Closed += OnCaptureItemClosed;
+            _item = item;
+
             _framePool = Direct3D11CaptureFramePool.CreateFreeThreaded(
                 _winrtD3DDevice,
                 DirectXPixelFormat.B8G8R8A8UIntNormalized,
@@ -113,81 +184,24 @@ namespace LivreNoirLibrary.Media.Capture
                 item.Size);
             _framePool.FrameArrived += OnFrameArrived;
 
-            _session = _framePool.CreateCaptureSession(_item);
+            _session = _framePool.CreateCaptureSession(item);
             _session.IsBorderRequired = false;
             _session.IsCursorCaptureEnabled = IsCursorCaptureEnabled;
             _session.StartCapture();
         }
 
-        private void DisposeSession()
+        private void OnCaptureItemClosed(GraphicsCaptureItem sender, object args)
         {
-            DisposeHelper.NullDispose(ref _latestFrame);
-            DisposeHelper.NullDispose(ref _session);
-            DisposeHelper.NullDispose(ref _framePool);
-        }
-
-        /// <inheritdoc cref="GetFrame(T?, out int, out int)"/>
-        public T? GetFrame(T? image) => GetFrame(image, out _, out _);
-
-        /// <summary>
-        /// 最新のキャプチャフレームを取得し、指定された画像オブジェクトにコピーします。
-        /// </summary>
-        /// <param name="image">再利用する画像オブジェクト。null の場合は新しく作成されます。</param>
-        /// <param name="width">キャプチャされた画像の幅。</param>
-        /// <param name="height">キャプチャされた画像の高さ。</param>
-        /// <returns>画像データが書き込まれた画像オブジェクト。※フレームがまだ取得できていない場合、書き込まれない事もあります。</returns>
-        public T? GetFrame(T? image, out int width, out int height)
-        {
+            Console.WriteLine("CaptureTargetClosed");
             lock (_lock)
             {
-                if (IsDisposed || _latestFrame is null)
+                if (!ReferenceEquals(sender, _item))
                 {
-                    width = height = 0;
-                    return image;
+                    return;
                 }
-
-                unsafe
-                {
-                    // WinRTのIDirect3DSurfaceから
-                    // IDirect3DDxgiInterfaceAccess経由で
-                    // ID3D11Texture2Dを取り出す
-                    var surfacePtr = MarshalInterface<IDirect3DSurface>.FromManaged(_latestFrame.Surface);
-                    ((IUnknown*)surfacePtr)->QueryInterface<Windows.Win32.System.WinRT.Direct3D11.IDirect3DDxgiInterfaceAccess>(out var access);
-                    var iid = ID3D11Texture2D.IID_Guid;
-                    void* pTextureSrc;
-                    access->GetInterface(&iid, &pTextureSrc);
-                    access->Release();
-                    var textureSrc = (ID3D11Texture2D*)pTextureSrc;
-                    textureSrc->GetDesc(out var desc);
-
-                    // 転送先画像の準備
-                    image = _adapter.Prepare(image, (int)desc.Width, (int)desc.Height);
-
-                    // 同サイズのコピー先テクスチャが既にある場合は再利用される
-                    CreateBufferTexture(desc);
-
-                    _d3dContext->CopyResource(
-                        (ID3D11Resource*)_textureDst,
-                        (ID3D11Resource*)textureSrc);
-
-                    textureSrc->Release();
-
-                    _d3dContext->Map(
-                        (ID3D11Resource*)_textureDst,
-                        0,
-                        D3D11_MAP.D3D11_MAP_READ,
-                        0,
-                        out var mapped);
-
-                    width = (int)desc.Width;
-                    height = (int)desc.Height;
-                    // 画像データ転送
-                    _adapter.Copy(image, (byte*)mapped.pData, width, height, (int)mapped.RowPitch);
-
-                    _d3dContext->Unmap((ID3D11Resource*)_textureDst, 0);
-                    return image;
-                }
+                DisposeSession();
             }
+            CaptureTargetClosed?.Invoke(this, EventArgs.Empty);
         }
 
         /// <summary>
@@ -246,45 +260,6 @@ namespace LivreNoirLibrary.Media.Capture
         }
 
         /// <summary>
-        /// 新しいフレームが到着したときに呼び出されます。
-        /// </summary>
-        private void OnFrameArrived(Direct3D11CaptureFramePool sender, object args)
-        {
-            lock (_lock)
-            {
-                if (IsDisposed || _framePool is null)
-                    return;
-
-                var frame = sender.TryGetNextFrame();
-                if (frame is null)
-                    return;
-
-                // サイズ変更があった場合、
-                // フレームプールを新しいサイズで再作成
-                if (_latestFrame is not null && frame.ContentSize != _latestFrame.ContentSize)
-                {
-                    var size = frame.ContentSize;
-
-                    frame.Dispose();
-                    _latestFrame?.Dispose();
-                    _latestFrame = null;
-
-                    _framePool.Recreate(
-                        _winrtD3DDevice,
-                        DirectXPixelFormat.B8G8R8A8UIntNormalized,
-                        2,
-                        size);
-
-                    return;
-                }
-
-                // 新しいフレームと入れ替え
-                _latestFrame?.Dispose();
-                _latestFrame = frame;
-            }
-        }
-
-        /// <summary>
         /// CPUから読み取り可能なコピー先グテクスチャを作成または再作成します。
         /// </summary>
         /// <param name="src">コピー元テクスチャから取得したD3D11_TEXTURE2D_DESC構造体</param>
@@ -317,6 +292,130 @@ namespace LivreNoirLibrary.Media.Capture
                 &texture);
 
             _textureDst = texture;
+        }
+
+        /// <summary>
+        /// 新しいフレームが到着したときに呼び出されます。
+        /// </summary>
+        private void OnFrameArrived(Direct3D11CaptureFramePool sender, object args)
+        {
+            var ctx = _syncContext;
+            lock (_lock)
+            {
+                var t0 = Stopwatch.GetTimestamp();
+                if (IsDisposed || _framePool is null)
+                {
+                    return;
+                }
+                var frame = sender.TryGetNextFrame();
+                if (frame is null)
+                {
+                    return;
+                }
+
+                // サイズ変更があった場合、
+                // フレームプールを新しいサイズで再作成
+                if (_latestFrame is not null && frame.ContentSize != _latestFrame.ContentSize)
+                {
+                    var size = frame.ContentSize;
+
+                    frame.Dispose();
+                    _latestFrame?.Dispose();
+                    _latestFrame = null;
+
+                    _framePool.Recreate(
+                        _winrtD3DDevice,
+                        DirectXPixelFormat.B8G8R8A8UIntNormalized,
+                        2,
+                        size);
+
+                    return;
+                }
+                // 新しいフレームと入れ替え
+                _latestFrame?.Dispose();
+                _latestFrame = frame;
+
+                unsafe
+                {
+                    // WinRTのIDirect3DSurfaceから
+                    // IDirect3DDxgiInterfaceAccess経由で
+                    // ID3D11Texture2Dを取り出す
+                    var surfacePtr = MarshalInterface<IDirect3DSurface>.FromManaged(_latestFrame.Surface);
+                    ((IUnknown*)surfacePtr)->QueryInterface<Windows.Win32.System.WinRT.Direct3D11.IDirect3DDxgiInterfaceAccess>(out var access);
+                    var iid = ID3D11Texture2D.IID_Guid;
+                    void* pTextureSrc;
+                    access->GetInterface(&iid, &pTextureSrc);
+                    access->Release();
+                    var textureSrc = (ID3D11Texture2D*)pTextureSrc;
+                    textureSrc->GetDesc(out var desc);
+
+                    // 同サイズのコピー先テクスチャが既にある場合は再利用される
+                    CreateBufferTexture(desc);
+
+                    _d3dContext->CopyResource((ID3D11Resource*)_textureDst, (ID3D11Resource*)textureSrc);
+
+                    textureSrc->Release();
+
+                    _d3dContext->Map(
+                        (ID3D11Resource*)_textureDst,
+                        0,
+                        D3D11_MAP.D3D11_MAP_READ,
+                        0,
+                        out var mapped);
+
+                    var srcPtr = (byte*)(mapped.pData);
+                    var width = (int)desc.Width;
+                    var height = (int)desc.Height;
+                    var pitch = (int)mapped.RowPitch;
+
+                    // 同期コンテキストが存在しない場合は直接IImageAdapter.WritePixelsを呼ぶ
+                    if (ctx is null)
+                    {
+                        Adapter?.WritePixels(srcPtr, width, height, pitch);
+                    }
+                    // 同期コンテキストが存在する場合は一度内部バッファに書き込む
+                    else
+                    {
+                        var buffer = _pendingBuffer;
+                        var bufferSize = (nuint)(height * pitch);
+                        buffer.EnsureSize(bufferSize, false);
+                        SimdOperations.CopyFrom(buffer.Pointer, srcPtr, bufferSize);
+                        _pendingWidth = width;
+                        _pendingHeight = height;
+                        _pendingStride = pitch;
+                        _hasPendingFrame = true;
+                    }
+
+                    _d3dContext->Unmap((ID3D11Resource*)_textureDst, 0);
+                }
+                // Console.WriteLine($"Capturer: frame processed in {Stopwatch.GetElapsedTime(t0).TotalMilliseconds}ms");
+            }
+            // 同期コンテキストでフレーム更新
+            ctx?.Post(ProcessPendingFrame, null);
+        }
+
+        private void ProcessPendingFrame(object? state)
+        {
+            UnmanagedArray<byte> buffer;
+            int width, height, stride;
+            lock (_lock)
+            {
+                if (IsDisposed || !_hasPendingFrame)
+                {
+                    return;
+                }
+                buffer = _pendingBuffer;
+                width = _pendingWidth;
+                height = _pendingHeight;
+                stride = _pendingStride;
+            }
+            if (width > 0 && height > 0)
+            {
+                unsafe
+                {
+                    Adapter?.WritePixels(buffer.Pointer, width, height, stride);
+                }
+            }
         }
     }
 }

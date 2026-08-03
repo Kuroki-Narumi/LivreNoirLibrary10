@@ -1,6 +1,9 @@
-﻿using LivreNoirLibrary.Windows.Controls;
+﻿using LivreNoirLibrary.IO;
+using LivreNoirLibrary.ObjectModel;
+using LivreNoirLibrary.Windows.Controls;
 using LivreNoirLibrary.Windows.YuGiOh.Converters;
 using LivreNoirLibrary.YuGiOh.Data;
+using System.IO;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
@@ -26,7 +29,11 @@ namespace LivreNoirLibrary.Windows.YuGiOh.Controls
             MainGrid.DataContext = _viewModel;
         }
 
-        private void OnSourceChanged(Card? value) => _viewModel.Source = value;
+        private void OnSourceChanged(Card? value)
+        {
+            CardImage_Large.Close();
+            _viewModel.Source = value;
+        }
 
         private void OnClick_DB1(object sender, RoutedEventArgs e)
         {
@@ -65,6 +72,56 @@ namespace LivreNoirLibrary.Windows.YuGiOh.Controls
 
                 }
             }
+        }
+
+        private void OnMouseDown_CardImage(object sender, System.Windows.Input.MouseButtonEventArgs e)
+        {
+            if (Source is { } card)
+            {
+                if (IdToCardImageConverter.ImageExists(card.Id))
+                {
+                    CardImage_Large.Open();
+                }
+                else
+                {
+                    OnClick_CardImage(sender, e);
+                }
+            }
+        }
+
+        private void CardImage_DragOver(object sender, DragEventArgs e)
+        {
+            if (Source is not null)
+            {
+                e.ApplyEffect(acceptExts: ExtRegs.Image);
+            }
+        }
+
+        private void CardImage_Drop(object sender, DragEventArgs e)
+        {
+            if (Source is { } card && e.TryGetAvailable(out var path, ExtRegs.Image))
+            {
+                e.Handled = true;
+                OverrideCardImage(card, path);
+            }
+        }
+
+        private void OnClick_CardImage(object sender, System.Windows.Input.MouseButtonEventArgs e)
+        {
+            e.Handled = true;
+            if (Source is { } card && this.OpenFileDialog(null, Filters.Image) is { } path)
+            {
+                OverrideCardImage(card, path);
+            }
+        }
+
+        private void OverrideCardImage(Card card, string path)
+        {
+            var targetPath = IdToCardImageConverter.GetImagePath(card.Id);
+            targetPath = Path.ChangeExtension(targetPath, Path.GetExtension(path));
+            General.EnsureDirectory(targetPath);
+            File.Copy(path, targetPath, true);
+            Source?.NotifyPropertyChanged(nameof(Card.Id));
         }
     }
 }

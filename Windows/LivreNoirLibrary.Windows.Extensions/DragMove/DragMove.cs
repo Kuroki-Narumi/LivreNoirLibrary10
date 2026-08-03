@@ -1,10 +1,11 @@
+using LivreNoirLibrary.Debug;
 using LivreNoirLibrary.Media;
+using LivreNoirLibrary.Win32Api;
 using LivreNoirLibrary.Windows.Input;
 using System;
 using System.Windows;
 using System.Windows.Input;
 using System.Windows.Media;
-using Forms = System.Windows.Forms;
 
 namespace LivreNoirLibrary.Windows
 {
@@ -12,48 +13,51 @@ namespace LivreNoirLibrary.Windows
     {
         public static (double ScaleX, double ScaleY) GetDisplayScale(this Visual visual)
         {
-            var matrix = PresentationSource.FromVisual(visual).CompositionTarget.TransformToDevice;
-            return (matrix.M11, matrix.M22);
+            var scale = VisualTreeHelper.GetDpi(visual);
+            return (scale.DpiScaleX, scale.DpiScaleY);
         }
 
         public static Rect GetRect(this Window window) => new(window.Left, window.Top, window.ActualWidth, window.ActualHeight);
-        public static Rect GetDisplayRect(this Window window)
+        public static Rect GetWindowRect(this Visual visual) => Window.GetWindow(visual).GetRect();
+
+        public static Int32Rect GetScreenBounds(this Point point)
         {
-            var x = window.Left;
-            var y = window.Top;
+            Int32Rect result = default;
+            System.Drawing.Point p = new((int)point.X, (int)point.Y);
+            NativeMethods.EnumerateMonitorInfo(info =>
+            {
+                if (info.Rect.Contains(p))
+                {
+                    result = info.Rect.ToInt32Rect();
+                    return false;
+                }
+                return true;
+            });
+            return result;
+        }
+
+        public static Int32Rect GetScreenBounds(this Window window) => NativeMethods.MonitorFromWindow(window.GetHandle()).Rect.ToInt32Rect();
+        public static Int32Rect GetScreenBounds(this Visual visual) => Window.GetWindow(visual).GetScreenBounds();
+
+        public static Rect GetScaledScreenBounds(this Window window)
+        {
+            var (x, y, w, h) = GetScreenBounds(window);
             var (sx, sy) = GetDisplayScale(window);
-            return new(x * sx, y * sy, window.ActualWidth * sx, window.ActualHeight * sy);
-        }
-
-        public static Rect GetScreenBounds(this Point point)
-        {
-            if (Forms.Screen.FromPoint(point.ToDrawingPoint()) is { } screen)
-            {
-                return screen.Bounds.ToRect();
-            }
-            return default;
-        }
-
-        public static Rect GetScreenBounds(this Window window)
-        {
-            var screen = Forms.Screen.FromRectangle(GetDisplayRect(window).ToDrawingRect()) ?? Forms.Screen.PrimaryScreen;
-            if (screen is not null)
-            {
-                return screen.Bounds.ToRect();
-            }
-            return default;
+            return new(x / sx, y / sy, w / sx, h / sy);
         }
 
         public static void CorrectPosition(this Window target, Window? boundsSource = null)
         {
             boundsSource ??= target;
-            var bounds = GetScreenBounds(boundsSource);
-            var (x, y, w, h) = GetDisplayRect(target);
-            var (sx, sy) = GetDisplayScale(boundsSource);
-            x = Math.Clamp(x, bounds.X, Math.Max(bounds.Right - w, bounds.X));
-            y = Math.Clamp(y, bounds.Y, Math.Max(bounds.Bottom - h, bounds.Y));
-            target.Left = x / sx;
-            target.Top = y / sy;
+            var bounds = GetScreenBounds(boundsSource); 
+            NativeMethods.TryGetWindowRect(target.GetHandle(), out var windowRect);
+            NativeMethods.TryGetActualWindowRect(target.GetHandle(), out var r2);
+            var (x, y, w, h) = windowRect;
+            var (sx, sy) = GetDisplayScale(target);
+            var newX = Math.Clamp(x, bounds.X, Math.Max(bounds.Right - w, bounds.X)) / sx;
+            var newY = Math.Clamp(y, bounds.Y, Math.Max(bounds.Bottom - h, bounds.Y)) / sy;
+            target.Left = newX;
+            target.Top = newY;
         }
 
         public static void PlaceToCenter(this Window window, double offsetX = 0, double offsetY = 0, Visual? scaleSource = null)
@@ -69,26 +73,28 @@ namespace LivreNoirLibrary.Windows
         public static void PlaceToCursor(this Window window, double offsetX = 0, double offsetY = 0, Window? placementTarget = null)
         {
             placementTarget ??= window;
-            var (x, y) = placementTarget.PointToScreen(Mouse.GetPosition(placementTarget));
+            var (x, y) = NativeMethods.GetCursorPos();
             PlaceToPoint(window, new(x + offsetX, y + offsetY), placementTarget);
         }
 
-        public static void PlaceToPoint(this Window window, Point point, Visual? scaleSource = null)
+        public static void PlaceToPoint(this Window window, Point pixelPoint, Visual? scaleSource = null)
         {
-            var bounds = GetScreenBounds(point);
+            var bounds = GetScreenBounds(pixelPoint);
             var (sx, sy) = GetDisplayScale(scaleSource ?? window);
-            var x = Math.Min(point.X, bounds.X + Math.Max(bounds.Width - window.ActualWidth * sx, 0));
-            var y = Math.Min(point.Y, bounds.Y + Math.Max(bounds.Height - window.ActualHeight * sy, 0));
+            var x = Math.Min(pixelPoint.X, bounds.X + Math.Max(bounds.Width - window.ActualWidth * sx, 0));
+            var y = Math.Min(pixelPoint.Y, bounds.Y + Math.Max(bounds.Height - window.ActualHeight * sy, 0));
             window.Left = x / sx;
             window.Top = y / sy;
         }
 
         public static void DragMoveWithSnap(this Window window, DragMoveOptions options = default)
         {
+            var handle = window.GetHandle();
             var initialRect = window.GetRect();
             var (limitLeft, limitTop, limitWidth, limitHeight) = GetScreenBounds(window);
-            var (initLeft, initTop, initWidth, initHeight) = window.GetDisplayRect();
-            var (initCursorX, initCursorY) = window.PointToScreen(Mouse.GetPosition(window));
+            NativeMethods.TryGetWindowRect(handle, out var r);
+            var (initLeft, initTop, initWidth, initHeight) = r;
+            var (initCursorX, initCursorY) = NativeMethods.GetCursorPos();
             var minX = limitLeft - initLeft;
             var maxX = minX + limitWidth - initWidth;
             var minY = limitTop - initTop;
@@ -99,10 +105,9 @@ namespace LivreNoirLibrary.Windows
 
             void MouseMove(object sender, MouseEventArgs e)
             {
-                var (sx, sy) = GetDisplayScale(window);
-                var pos = window.PointToScreen(e.GetPosition(window));
-                var dX = pos.X - initCursorX;
-                var dY = pos.Y - initCursorY;
+                var pos = NativeMethods.GetCursorPos();
+                double dX = pos.X - initCursorX;
+                double dY = pos.Y - initCursorY;
                 // スナップ
                 if (KeyInput.IsCtrlDown())
                 {
@@ -145,6 +150,7 @@ namespace LivreNoirLibrary.Windows
                     }
                 }
                 // 移動先の計算
+                var (sx, sy) = window.GetDisplayScale();
                 window.Left = (initLeft + dX) / sx;
                 window.Top = (initTop + dY) / sy;
                 changing?.Invoke(window, new(initialRect, window.GetRect()));

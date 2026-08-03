@@ -101,11 +101,8 @@ namespace LivreNoirLibrary.IO
 
         public static string GetAppDataPath(string appName, string @namespace="LivreNoir")
         {
-            string path = Path.Join(
-                Environment.GetFolderPath(
-                    Environment.SpecialFolder.LocalApplicationData
-                    ),
-                @namespace, appName);
+            var root = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
+            var path = Path.Join(root, @namespace, appName);
             Directory.CreateDirectory(path);
             return path;
         }

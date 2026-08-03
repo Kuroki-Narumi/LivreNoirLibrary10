@@ -16,7 +16,7 @@ namespace LivreNoirLibrary.Windows.Controls
         {
             PropertyUtils.OverrideDefaultStyleKey<CenteringPanel>();
             VisibilityProperty.OverrideMetadata(typeof(CenteringPanel), PropertyUtils.GetMetaTwoWay(Visibility.Collapsed, OnVisibilityChanged));
-            FocusableProperty.OverrideMetadata(typeof(CenteringPanel), PropertyUtils.GetMetaTwoWay(true));
+            FocusableProperty.OverrideMetadata(typeof(CenteringPanel), new FrameworkPropertyMetadata(true));
             BackgroundProperty.OverrideMetadata(typeof(CenteringPanel), PropertyUtils.GetMeta(DefaultBackground));
         }
 
@@ -42,11 +42,10 @@ namespace LivreNoirLibrary.Windows.Controls
 
         public CenteringPanel()
         {
-            var type = GetType();
-            _visibleIndex = (int)VisibleIndexProperty.GetMetadata(type).DefaultValue;
-            _closeByClick = (bool)CloseByClickProperty.GetMetadata(type).DefaultValue;
-            _closeByKey = (bool)CloseByKeyProperty.GetMetadata(type).DefaultValue;
-            _mode = (ClickMode)ClickModeProperty.GetMetadata(type).DefaultValue;
+            this.SetDefaultValue(VisibleIndexProperty, ref _visibleIndex);
+            this.SetDefaultValue(CloseByClickProperty, ref _closeByClick);
+            this.SetDefaultValue(CloseByKeyProperty, ref _closeByKey);
+            this.SetDefaultValue(ClickModeProperty, ref _mode);
         }
 
         protected override void OnVisualChildrenChanged(DependencyObject visualAdded, DependencyObject visualRemoved)

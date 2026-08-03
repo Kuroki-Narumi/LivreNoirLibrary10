@@ -23,13 +23,7 @@ namespace LivreNoirLibrary.YuGiOh.Converters
             writer.WriteStartObject();
             writer.WritePropertyName(JsonPropertyNames.Log_User);
             JsonSerializer.Serialize(writer, value.UserTags, options);
-            writer.WritePropertyName(JsonPropertyNames.Log_Opponent);
-            JsonSerializer.Serialize(writer, value.OpponentTags, options);
             writer.WriteString(JsonPropertyNames.Log_Rank, value.Rank.ToString());
-            writer.WriteNumber(JsonPropertyNames.Log_Order, (int)value.Order);
-            writer.WriteString(JsonPropertyNames.Log_Result, value.Result.ToString());
-            writer.WriteNumber(JsonPropertyNames.Log_Turn, value.Turn);
-            writer.WriteString(JsonPropertyNames.Note, value.Note);
             writer.WriteEndObject();
         }
     }

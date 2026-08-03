@@ -17,11 +17,11 @@ namespace LivreNoirLibrary.Windows.Controls
 
         protected override void InitializeFields()
         {
-            _default = (double)DefaultValueProperty.GetMetadata(this).DefaultValue;
-            _minimum = (double)MinimumProperty.GetMetadata(this).DefaultValue;
-            _maximum = (double)MaximumProperty.GetMetadata(this).DefaultValue;
-            _wheel_step = (double)WheelStepProperty.GetMetadata(this).DefaultValue;
-            _stringFormat = StringFormatProperty.GetMetadata(this).DefaultValue as string;
+            this.SetDefaultValue(DefaultValueProperty, ref _default);
+            this.SetDefaultValue(MinimumProperty, ref _minimum);
+            this.SetDefaultValue(MaximumProperty, ref _maximum);
+            this.SetDefaultValue(WheelStepProperty, ref _wheel_step);
+            this.SetDefaultValue(StringFormatProperty, ref _stringFormat);
         }
 
         public sealed override double DefaultValue { get => _default; set => SetValue(DefaultValueProperty, value); }
@@ -52,11 +52,11 @@ namespace LivreNoirLibrary.Windows.Controls
 
         protected override void InitializeFields()
         {
-            _default = (double)DefaultValueProperty.GetMetadata(this).DefaultValue;
-            _minimum = (double)MinimumProperty.GetMetadata(this).DefaultValue;
-            _maximum = (double)MaximumProperty.GetMetadata(this).DefaultValue;
-            _wheel_step = (double)WheelStepProperty.GetMetadata(this).DefaultValue;
-            _stringFormat = StringFormatProperty.GetMetadata(this).DefaultValue as string;
+            this.SetDefaultValue(DefaultValueProperty, ref _default);
+            this.SetDefaultValue(MinimumProperty, ref _minimum);
+            this.SetDefaultValue(MaximumProperty, ref _maximum);
+            this.SetDefaultValue(WheelStepProperty, ref _wheel_step);
+            this.SetDefaultValue(StringFormatProperty, ref _stringFormat);
         }
 
         public sealed override double DefaultValue { get => _default; set => SetValue(DefaultValueProperty, value); }

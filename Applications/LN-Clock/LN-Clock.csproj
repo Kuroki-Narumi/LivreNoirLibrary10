@@ -14,6 +14,7 @@
 		  *.xml;
 		  *.pdb
 	  </AllowedReferenceRelatedFileExtensions>
+	  <ApplicationManifest>app.manifest</ApplicationManifest>
 	  <ApplicationIcon>icon.ico</ApplicationIcon>
 	  <RootNamespace>LivreNoir.Clock</RootNamespace>
   </PropertyGroup>

@@ -1,28 +1,31 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Drawing;
-using System.Text;
 using Windows.Win32;
+using Windows.Win32.System.Threading;
 using Windows.Win32.Foundation;
 using Windows.Win32.UI.WindowsAndMessaging;
-using Windows.Win32.Graphics.Dwm;
-using System.Runtime.InteropServices;
 using System.IO;
+using System.Diagnostics.CodeAnalysis;
+using System.Runtime.InteropServices;
+using System.Buffers;
 
 namespace LivreNoirLibrary.Win32Api
 {
     public record WindowInfo(nint Handle, string Title, string ExePath, Rectangle Rect)
     {
         public string ExeFileName => Path.GetFileName(ExePath);
+        public string TitleAndExeName => $"{Title} ({ExeFileName})";
     }
 
     partial class NativeMethods
     {
-        public static ICollection<WindowInfo> GetWindowInfo(ICollection<WindowInfo>? results = null)
+        /// <summary>
+        /// 現在のデスクトップに存在する全ての表示済みのウィンドウを列挙します。
+        /// </summary>
+        /// <param name="enumFunc">列挙されたウィンドウ情報を処理するデリゲート。列挙を継続する場合は<see langword="true"/>、終了する場合は<see langword="false"/>を返す。</param>
+        public static void EnumerateWindowInfo(Func<WindowInfo, bool> enumFunc)
         {
-            results ??= [];
-            results.Clear();
-
             PInvoke.EnumWindows((hWnd, _) =>
             {
                 try
@@ -40,7 +43,7 @@ namespace LivreNoirLibrary.Win32Api
                     }
 
                     var exePath = GetExePath(hWnd) ?? "";
-                    results.Add(new WindowInfo(hWnd, title, exePath, rect));
+                    return enumFunc(new WindowInfo(hWnd, title, exePath, rect));
                 }
                 catch
                 {
@@ -48,20 +51,46 @@ namespace LivreNoirLibrary.Win32Api
                 }
                 return true;
             }, 0);
+        }
 
+        public static bool TryGetWindowInfo(Predicate<WindowInfo> predicate, [NotNullWhen(true)]out WindowInfo? info)
+        {
+            WindowInfo? result = null;
+            EnumerateWindowInfo(info =>
+            {
+                if (predicate(info))
+                {
+                    result = info;
+                    return false;
+                }
+                return true;
+            });
+            info = result;
+            return result is not null;
+        }
+
+        public static ICollection<WindowInfo> GetWindowInfo(ICollection<WindowInfo>? results = null)
+        {
+            results ??= [];
+            results.Clear();
+            EnumerateWindowInfo(info =>
+            {
+                results.Add(info);
+                return true;
+            });
             return results;
         }
 
-        private static bool IsCandidateWindow(HWND hWnd, out string title)
+        private static bool IsCandidateWindow(HWND hWnd, [NotNullWhen(true)] out string? title)
         {
-            title = string.Empty;
+            title = null;
 
             if (!PInvoke.IsWindowVisible(hWnd))
             {
                 return false;
             }
 
-            //*
+            /*
             // トップレベル(祖先が自分自身)のみ対象
             if (PInvoke.GetAncestor(hWnd, GET_ANCESTOR_FLAGS.GA_ROOT) != hWnd)
             {
@@ -92,7 +121,7 @@ namespace LivreNoirLibrary.Win32Api
                 return false;
             }
 
-            title = GetWindowText(hWnd) ?? "";
+            title = GetWindowText(hWnd);
             return !string.IsNullOrWhiteSpace(title);
         }
 
@@ -100,15 +129,49 @@ namespace LivreNoirLibrary.Win32Api
         {
             PInvoke.GetWindowThreadProcessId(hWnd, out uint pid);
             if (pid == 0) return null;
-            try
+            using var hProcess = PInvoke.OpenProcess_SafeHandle(PROCESS_ACCESS_RIGHTS.PROCESS_QUERY_LIMITED_INFORMATION, false, pid);
+            if (hProcess is { IsInvalid: false })
             {
-                using var process = System.Diagnostics.Process.GetProcessById((int)pid);
-                return process.MainModule?.FileName;
+                unsafe
+                {
+                    var buffer = (stackalloc char[1024]);
+                    var len = (uint)buffer.Length;
+                    if (PInvoke.QueryFullProcessImageName(hProcess, PROCESS_NAME_FORMAT.PROCESS_NAME_WIN32, buffer, ref len))
+                    {
+                        return buffer[..(int)len].ToString();
+                    }
+                    if ((WIN32_ERROR)Marshal.GetLastPInvokeError() is WIN32_ERROR.ERROR_HV_INSUFFICIENT_BUFFER)
+                    {
+                        var ary = ArrayPool<char>.Shared.Rent(32768);
+                        len = (uint)ary.Length;
+                        PInvoke.QueryFullProcessImageName(hProcess, PROCESS_NAME_FORMAT.PROCESS_NAME_WIN32, ary, ref len);
+                        return buffer[..(int)len].ToString();
+                    }
+                }
             }
-            catch
+            return null;
+        }
+
+        public static bool TryGetWindowHandleByTitle(Predicate<string?> predicate, out nint handle) => TryGetWindowHandle(GetWindowText, predicate, out handle);
+
+        public static bool TryGetWindowHandleByExePath(Predicate<string?> predicate, out nint handle) => TryGetWindowHandle(GetExePath, predicate, out handle);
+
+        private static bool TryGetWindowHandle(Func<HWND, string?> getter, Predicate<string?> predicate, out nint handle)
+        {
+            nint h = 0;
+            PInvoke.EnumWindows((hWnd, _) =>
             {
-                return null;
-            }
+                var path = getter(hWnd);
+                if (predicate(path))
+                {
+                    h = (nint)hWnd;
+                    return false;
+                }
+                return true;
+            }, 0);
+
+            handle = h;
+            return handle is not 0;
         }
     }
 }

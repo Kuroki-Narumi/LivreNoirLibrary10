@@ -3,6 +3,7 @@ using LivreNoirLibrary.Media.Capture;
 using LivreNoirLibrary.Win32Api;
 using LivreNoirLibrary.Windows;
 using LivreNoirLibrary.Windows.Media;
+using LivreNoirLibrary.Media;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -17,6 +18,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 using System.Windows.Threading;
+using LivreNoirLibrary.IO;
 
 namespace LivreNoirLibrary.SandBox
 {
@@ -38,19 +40,31 @@ namespace LivreNoirLibrary.SandBox
         {
             e.Handled = true;
             CaptureService.RefreshInfo();
+            Console.WriteLine(General.GetAssemblyDir());
+        }
+
+        private void OnSelectionChanged_Monitor(object sender, SelectionChangedEventArgs e)
+        {
+
         }
 
         private void OnSelectionChanged_Window(object sender, SelectionChangedEventArgs e)
         {
-            Capturer.CaptureTarget = (sender as ListView)?.SelectedItem;
+            //Capturer.CaptureTarget = (sender as ListView)?.SelectedItem;
+            if (sender is ListView { SelectedItem: WindowInfo info })
+            {
+                var title = info.Title;
+                var filename = info.ExePath;
+                Capturer.WindowSelector = i => i.Title == title && i.ExePath == filename;
+            }
         }
 
         private void OnClick_Capture(object sender, RoutedEventArgs e)
         {
-            var handle = Capturer.CapturingHandle;
+            var handle = Capturer.CapturingWindowHandle;
             if (Capturer.CreateCroppedBitmap() is { } bitmap)
             {
-                Console.WriteLine($"rect={Capturer.SourceRect} cropped=({bitmap.PixelWidth},{bitmap.PixelHeight})");
+                Console.WriteLine($"sourceHandle={handle:X16}, rect={Capturer.SourceRect} cropped=({bitmap.PixelWidth},{bitmap.PixelHeight})");
                 Bitmap.ToClipboard(bitmap);
             }
         }

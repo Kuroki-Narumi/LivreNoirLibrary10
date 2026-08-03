@@ -45,11 +45,14 @@ namespace LivreNoirLibrary.Win32Api
         public static nint GetWindowLong(nint hWnd, GWL nIndex) => PInvoke.GetWindowLongPtr((HWND)hWnd, (WINDOW_LONG_PTR_INDEX)nIndex);
         public static nint SetWindowLong(nint hWnd, GWL nIndex, nint newLong) => PInvoke.SetWindowLongPtr((HWND)hWnd, (WINDOW_LONG_PTR_INDEX)nIndex, newLong);
 
+        public static bool SetWindowPos(nint nWnd, int x, int y, int width, int height) => PInvoke.SetWindowPos((HWND)nWnd, HWND.Null, x, y, width, height, 0);
         public static bool SetWindowPos(nint hWnd, nint hWndInsertAfter, int x, int y, int width, int height, SWP uFlags) 
             => PInvoke.SetWindowPos((HWND)hWnd, (HWND)hWndInsertAfter, x, y, width, height, (SET_WINDOW_POS_FLAGS)uFlags);
 
         public static void ShellExecute(nint hWnd, string? operation, string? file, string? parameters, string? directory, SW showCommand) 
             => PInvoke.ShellExecute((HWND)hWnd, operation, file, parameters, directory, (SHOW_WINDOW_CMD)showCommand);
+
+        private static string? GetWindowText(HWND hWnd) => GetWindowText((nint)hWnd);
 
         public static string? GetWindowText(nint hWnd)
         {
@@ -58,13 +61,31 @@ namespace LivreNoirLibrary.Win32Api
             {
                 return null;
             }
-            var buffer = length < 512 ? (stackalloc char[length + 1]) : new char[length + 1];
-            var written = PInvoke.GetWindowText((HWND)hWnd, buffer);
-            if (written <= 0)
+#pragma warning disable CS9081
+            Span<char> buffer;
+            char[]? array = null;
+            if (length >= 512)
             {
-                return null;
+                buffer = stackalloc char[length + 1];
             }
-            return buffer[..written].ToString();
+            else
+            {
+                array = ArrayPool<char>.Shared.Rent(length);
+                buffer = array.AsSpan();
+            }
+#pragma warning restore
+            try
+            {
+                var written = PInvoke.GetWindowText((HWND)hWnd, buffer);
+                return buffer[..written].ToString();
+            }
+            finally
+            {
+                if (array is not null)
+                {
+                    ArrayPool<char>.Shared.Return(array);
+                }
+            }
         }
 
         public static bool IsWindow(nint hWnd) => PInvoke.IsWindow((HWND)hWnd);
@@ -88,13 +109,22 @@ namespace LivreNoirLibrary.Win32Api
             return false;
         }
 
-        public static unsafe bool TryGetWindowRect(nint hWnd, out Rectangle rect)
+        public static Point GetCursorPos() => PInvoke.GetCursorPos(out var point) ? point : default;
+
+        public static bool TryGetWindowRect(nint hWnd, out Rectangle rect)
+        {
+            var ret = PInvoke.GetWindowRect((HWND)hWnd, out var r);
+            rect = r.ToRectangle();
+            return ret;
+        }
+
+        public static unsafe bool TryGetActualWindowRect(nint hWnd, out Rectangle rect)
         {
             RECT r;
             var ret = PInvoke.DwmGetWindowAttribute((HWND)hWnd, DWMWINDOWATTRIBUTE.DWMWA_EXTENDED_FRAME_BOUNDS, &r, (uint)sizeof(RECT));
             if (ret.Succeeded)
             {
-                rect = new(r.left, r.top, r.Width, r.Height);
+                rect = r.ToRectangle();
                 return true;
             }
             rect = default;
@@ -105,7 +135,7 @@ namespace LivreNoirLibrary.Win32Api
         {
             Point point;
             var h = (HWND)hWnd;
-            if (TryGetWindowRect(hWnd, out windowRect) && PInvoke.GetClientRect(h, out var cr) && PInvoke.ClientToScreen(h, &point))
+            if (TryGetActualWindowRect(hWnd, out windowRect) && PInvoke.GetClientRect(h, out var cr) && PInvoke.ClientToScreen(h, &point))
             {
                 clientRect = new(point.X - windowRect.X, point.Y - windowRect.Y, cr.Width, cr.Height);
                 return true;
@@ -119,6 +149,22 @@ namespace LivreNoirLibrary.Win32Api
         {
             point = default;
             return PInvoke.ClientToScreen((HWND)hWnd, ref point);
+        }
+
+        public static Rectangle GetScreenBounds(this Point point)
+        {
+            Rectangle result = default;
+            Point p = new(point.X, point.Y);
+            EnumerateMonitorInfo(info =>
+            {
+                if (info.Rect.Contains(p))
+                {
+                    result = info.Rect;
+                    return false;
+                }
+                return true;
+            });
+            return result;
         }
     }
 }

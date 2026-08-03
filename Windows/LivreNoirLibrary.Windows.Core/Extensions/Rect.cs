@@ -60,5 +60,13 @@ namespace LivreNoirLibrary.Windows
             width = rect.Width;
             height = rect.Height;
         }
+
+        extension(Int32Rect rect)
+        {
+            public int Left => rect.X;
+            public int Right => rect.X + rect.Width;
+            public int Top => rect.Y;
+            public int Bottom => rect.Y + rect.Height;
+        }
     }
 }

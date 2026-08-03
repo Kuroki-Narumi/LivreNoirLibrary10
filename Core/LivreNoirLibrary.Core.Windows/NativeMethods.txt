@@ -8,6 +8,7 @@ GetWindowLongPtrW
 SetWindowLongPtrW
 SetWindowPos
 ShellExecute
+GetCursorPos
 EnumWindows
 IsWindow
 IsWindowVisible
@@ -17,9 +18,12 @@ GetWindow
 GetAncestor
 DwmGetWindowAttribute
 GetWindowThreadProcessId
+OpenProcess
+QueryFullProcessImageName
 GetWindowRect
 GetClientRect
 ClientToScreen
+SetWindowRect
 EnumDisplayMonitors
 GetMonitorInfo
 MONITORINFOEXW
@@ -29,3 +33,4 @@ GetDisplayConfigBufferSizes
 DisplayConfigGetDeviceInfo
 DISPLAYCONFIG_SOURCE_DEVICE_NAME
 DISPLAYCONFIG_TARGET_DEVICE_NAME
+MonitorFromWindow

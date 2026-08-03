@@ -5,3 +5,4 @@ IDirect3DDxgiInterfaceAccess
 IDXGIDevice
 IUnknown
 CreateDirect3D11DeviceFromDXGIDevice
+GetDpiForWindow

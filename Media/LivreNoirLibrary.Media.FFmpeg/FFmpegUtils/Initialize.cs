@@ -17,7 +17,7 @@ namespace LivreNoirLibrary.Media.FFmpeg
         {
             if (!_initialized)
             {
-                var rootPath = Path.Combine(IO.General.GetAssemblyDir(), "DLL");
+                var rootPath = Path.Join(IO.General.GetAssemblyDir(), "DLL");
                 ffmpeg.RootPath = rootPath;
                 _initialized = true;
             }

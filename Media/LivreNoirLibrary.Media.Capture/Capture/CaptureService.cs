@@ -1,7 +1,9 @@
-﻿using LivreNoirLibrary.Win32Api;
-using LivreNoirLibrary.Collections;
+﻿using LivreNoirLibrary.Collections;
+using LivreNoirLibrary.Win32Api;
+using Windows.Win32;
+using Windows.Win32.Foundation;
 
-namespace LivreNoirLibrary.Windows
+namespace LivreNoirLibrary.Media
 {
     public static class CaptureService
     {
@@ -12,7 +14,8 @@ namespace LivreNoirLibrary.Windows
         {
             NativeMethods.GetWindowInfo(WindowInfos);
             NativeMethods.GetMonitorInfo(MonitorInfos);
-            MonitorInfos.NotifyCollectionReset();
         }
+
+        public static double GetDpiForWindow(nint handle) => PInvoke.GetDpiForWindow((HWND)handle);
     }
 }

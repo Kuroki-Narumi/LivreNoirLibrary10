@@ -49,8 +49,8 @@ namespace LivreNoirLibrary.Windows.Controls
         protected override void InitializeFields()
         {
             base.InitializeFields();
-            _radix = (int)RadixProperty.GetMetadata(this).DefaultValue;
-            _digits = (int)DigitsProperty.GetMetadata(this).DefaultValue;
+            this.SetDefaultValue(RadixProperty, ref _radix);
+            this.SetDefaultValue(DigitsProperty, ref _digits);
         }
 
         public int Radix { get => _radix; set => SetValue(RadixProperty, value); }
@@ -93,8 +93,8 @@ namespace LivreNoirLibrary.Windows.Controls
         protected override void InitializeFields()
         {
             base.InitializeFields();
-            _radix = (int)RadixProperty.GetMetadata(this).DefaultValue;
-            _digits = (int)DigitsProperty.GetMetadata(this).DefaultValue;
+            this.SetDefaultValue(RadixProperty, ref _radix);
+            this.SetDefaultValue(DigitsProperty, ref _digits);
         }
 
         public int Radix { get => _radix; set => SetValue(RadixProperty, value); }

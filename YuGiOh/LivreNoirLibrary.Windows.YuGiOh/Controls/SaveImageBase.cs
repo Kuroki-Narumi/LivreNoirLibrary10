@@ -8,11 +8,25 @@ using System.Windows.Media;
 
 namespace LivreNoirLibrary.Windows.YuGiOh.Controls
 {
-    public abstract class SaveImageBase : UserControl
+    public abstract partial class SaveImageBase : UserControl
     {
         protected abstract Visual SavingVisual { get; }
 
         private readonly FileDialogOptions _dialogOptions = new() { FileName = "image.png" };
+
+        [DependencyProperty]
+        private Color _saveBackgroundColor;
+        [DependencyProperty]
+        private double _saveScaleX;
+        [DependencyProperty]
+        private double _saveScaleY;
+
+        public RenderVisualOptions GetRenderOptinos()
+        {
+            var color = SaveBackgroundColor;
+            var brush = color.A > 0 ? MediaUtils.GetBrush(color) : null;
+            return new RenderVisualOptions(background: brush, scale: new(SaveScaleX, SaveScaleY), sizeUnit: 2);
+        }
 
         protected void OnClick_SaveAsImage(object sender, RoutedEventArgs e)
         {
@@ -20,7 +34,7 @@ namespace LivreNoirLibrary.Windows.YuGiOh.Controls
             if (this.SaveFileDialog(_dialogOptions, Filters.Image_Save) is { } path)
             {
                 _dialogOptions.FileName = System.IO.Path.GetFileNameWithoutExtension(path);
-                Bitmap.SaveImage(SavingVisual, path, new(sizeUnit: 2), BitmapEncodeType.Auto);
+                Bitmap.SaveImage(SavingVisual, path, GetRenderOptinos(), BitmapEncodeType.Auto);
             }
         }
 
@@ -28,7 +42,7 @@ namespace LivreNoirLibrary.Windows.YuGiOh.Controls
         {
             try
             {
-                var obj = Bitmap.CreateDataObject(SavingVisual, new(sizeUnit: 2));
+                var obj = Bitmap.CreateDataObject(SavingVisual, GetRenderOptinos());
                 SetExtraData(obj);
                 Clipboard.SetDataObject(obj);
                 e.Handled = true;

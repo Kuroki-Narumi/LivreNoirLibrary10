@@ -1,13 +1,22 @@
-﻿using System;
+﻿using LivreNoirLibrary.Windows.Input;
+using System;
+using System.Data;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
-using LivreNoirLibrary.Windows.Input;
+using System.Windows.Shapes;
 
 namespace LivreNoirLibrary.Windows.Controls
 {
     public abstract partial class CenteringPanelChildBase : ContentControl, ICenteringPanelChild
     {
+        static CenteringPanelChildBase()
+        {
+            HorizontalContentAlignmentProperty.OverrideMetadata(typeof(CenteringPanelChildBase), new FrameworkPropertyMetadata(HorizontalAlignment.Stretch));
+            VerticalContentAlignmentProperty.OverrideMetadata(typeof(CenteringPanelChildBase), new FrameworkPropertyMetadata(VerticalAlignment.Stretch));
+            FocusableProperty.OverrideMetadata(typeof(CenteringPanelChildBase), new FrameworkPropertyMetadata(false));
+        }
+
         public event DecidedEventHandler? Decided;
         public event EventHandler? Closed;
 
@@ -20,7 +29,7 @@ namespace LivreNoirLibrary.Windows.Controls
 
         public CenteringPanelChildBase()
         {
-            _canDecide = (bool)CanDecideProperty.GetMetadata(GetType()).DefaultValue;
+            this.SetDefaultValue(CanDecideProperty, ref _canDecide);
             this.RegisterCommand(Commands.Decide, OnExecuted_Decide, CanExecute_Decide);
             this.RegisterCommand(Commands.AltDecide, OnExecuted_AltDecide, CanExecute_Decide);
             this.RegisterCommand(Commands.Cancel, OnExecuted_Cancel);
