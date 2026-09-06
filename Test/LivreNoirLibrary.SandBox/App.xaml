@@ -15,7 +15,13 @@
             </Style>
 
             <Style TargetType="TabControl">
+                <Setter Property="ItemContainerStyle" Value="{StaticResource TabItem_Cornered}"/>
                 <EventSetter Event="MouseWheel" Handler="TabControl_PreviewMouseWheel"/>
+            </Style>
+
+            <Style x:Key="RadioContainerBase" TargetType="Panel">
+                <Setter Property="Background" Value="Transparent"/>
+                <EventSetter Event="PreviewMouseWheel" Handler="RadioContainer_MouseWheel"/>
             </Style>
 
             <Style x:Key="LabeledSliderStyle" TargetType="ct:LabeledSlider">
@@ -31,8 +37,6 @@
 
             <Style TargetType="ComboBox" BasedOn="{StaticResource ComboBoxBase}">
                 <Setter Property="Margin" Value="4"/>
-                <Setter Property="AlternationCount" Value="2"/>
-                <Setter Property="ItemContainerStyle" Value="{StaticResource Alt2ListBoxItemContainerStyle}"/>
                 <EventSetter Event="PreviewMouseWheel" Handler="ComboBox_PreviewMouseWheel"/>
             </Style>
             
@@ -59,17 +63,6 @@
                 <Setter Property="CornerRadius" Value="0"/>
                 <Setter Property="HorizontalContentAlignment" Value="Center"/>
                 <Setter Property="IsOptionMarkVisible" Value="False"/>
-            </Style>
-
-            <Style x:Key="RadioContainerBase" TargetType="Panel">
-                <Setter Property="Background" Value="Transparent"/>
-                <EventSetter Event="PreviewMouseWheel" Handler="RadioContainer_MouseWheel"/>
-            </Style>
-
-            <Style TargetType="Border" x:Key="Separator">
-                <Setter Property="Width" Value="1"/>
-                <Setter Property="Margin" Value="2,4"/>
-                <Setter Property="Background" Value="Gray"/>
             </Style>
         </ResourceDictionary>
     </Application.Resources>

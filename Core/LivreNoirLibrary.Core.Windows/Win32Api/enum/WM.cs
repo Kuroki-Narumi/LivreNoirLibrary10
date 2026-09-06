@@ -140,7 +140,7 @@ namespace LivreNoirLibrary.Win32Api
         QueryNewPalette = 0x030F,
         PaletteIsChanging = 0x0310,
         PaletteChanged = 0x0311,
-        Hotkey = 0x0312,
+        HotKey = 0x0312,
         Print = 0x0317,
         PrintClient = 0x0318,
         AppCommand = 0x0319,

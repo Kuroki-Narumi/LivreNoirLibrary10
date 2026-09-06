@@ -8,11 +8,11 @@ using LivreNoirLibrary.Numerics;
 
 namespace LivreNoirLibrary.Media
 {
-    public static unsafe partial class BitmapOperation
+    partial class BitmapOperation
     {
         extension<T> (T bitmap) where T : IBitmap
         {
-            public void SetPixel<TElement>(int x, int y, TElement value)
+            public unsafe void SetPixel<TElement>(int x, int y, TElement value)
                 where TElement : unmanaged
             {
                 if (bitmap.IsValid && (uint)x < (uint)bitmap.Width && (uint)y < (uint)bitmap.Height)
@@ -135,7 +135,7 @@ namespace LivreNoirLibrary.Media
                 }
             }
 
-            public void Fill(Rectangle rect, LnColor color1, LnColor color2, bool vertical = false)
+            public unsafe void Fill(Rectangle rect, LnColor color1, LnColor color2, bool vertical = false)
             {
                 // 同じ色が指定されている場合は単色用のメソッドを呼ぶ
                 if (color1 == color2)
@@ -180,7 +180,7 @@ namespace LivreNoirLibrary.Media
                 }
             }
 
-            public void FillTriangle(Triangle triangle, LnColor color)
+            public unsafe void FillTriangle(Triangle triangle, LnColor color)
             {
                 if (bitmap.IsValid)
                 {
@@ -201,7 +201,7 @@ namespace LivreNoirLibrary.Media
                 }
             }
 
-            public void FillTriangle(Triangle triangle, LnColor color1, LnColor color2, bool radial = false)
+            public unsafe void FillTriangle(Triangle triangle, LnColor color1, LnColor color2, bool radial = false)
             {
                 // 同じ色が指定されている場合は単色用のメソッドを呼ぶ
                 if (color1 == color2)
@@ -286,7 +286,7 @@ namespace LivreNoirLibrary.Media
                 }
             }
 
-            public void DrawBorder(int thickness, LnColor color, bool keepSource = false, UnmanagedArray<uint>? buffer = null)
+            public unsafe void DrawBorder(int thickness, LnColor color, bool keepSource = false, UnmanagedArray<uint>? buffer = null)
             {
                 if (!bitmap.IsValid)
                 {
@@ -351,7 +351,7 @@ namespace LivreNoirLibrary.Media
                 }
             }
 
-            public void DrawBorderSimple(int thickness, LnColor color, UnmanagedArray<uint>? buffer = null)
+            public unsafe void DrawBorderSimple(int thickness, LnColor color, UnmanagedArray<uint>? buffer = null)
             {
                 AssertType(bitmap, false);
                 var pointer = (uint*)bitmap.Pointer;
@@ -407,7 +407,7 @@ namespace LivreNoirLibrary.Media
             }
         }
 
-        private static void FillCore<TElement>(nint pointer, int byteCount, Vector<TElement> value)
+        private static unsafe void FillCore<TElement>(nint pointer, int byteCount, Vector<TElement> value)
             where TElement : unmanaged
         {
             var count = Vector<TElement>.Count;

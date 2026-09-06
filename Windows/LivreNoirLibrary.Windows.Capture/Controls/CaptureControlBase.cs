@@ -4,6 +4,7 @@ using LivreNoirLibrary.Win32Api;
 using LivreNoirLibrary.Windows.Media;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 
@@ -26,6 +27,7 @@ namespace LivreNoirLibrary.Windows.Controls
             {
                 bitmap = new(width, height, 96, 96, PixelFormats.Pbgra32, null);
                 Source = bitmap;
+                Console.WriteLine("Source Updated");
             }
             using var b = bitmap.BeginWrite();
             var dstPtr = (uint*)b.Pointer;

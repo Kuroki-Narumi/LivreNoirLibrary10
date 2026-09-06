@@ -43,12 +43,12 @@
             <Grid ColumnDefinitions="Auto, *, Auto, Auto">
                 <WrapPanel Orientation="Horizontal">
                     <ct:Button Icon="{x:Static media:Icons.Open}" Content="{Binding Player.FileName}" ToolTip="Open" Command="ApplicationCommands.Open"/>
-                    <Border Style="{StaticResource Separator}"/>
+                    <Border Style="{StaticResource VerticalSeparator}"/>
                     <TextBlock Style="{StaticResource Header}" Text="分割"/>
                     <ct:IntTextBox x:Name="TextBox_Split" Minimum="1" Maximum="600" WheelStep="1" Value="10"/>
                     <TextBlock Style="{StaticResource Footer}" Text="min"/>
                     <ct:Button Icon="{x:Static media:Icons.Save}" ToolTip="Save" Command="ApplicationCommands.Save"/>
-                    <Border Style="{StaticResource Separator}"/>
+                    <Border Style="{StaticResource VerticalSeparator}"/>
                     <ct:ToggleButton Style="{StaticResource PlayButton}" IsEnabled="{Binding Player.IsPlayable, Mode=OneWay}" IsChecked="{Binding Player.IsPlaying, Mode=TwoWay}"/>
                 </WrapPanel>
 

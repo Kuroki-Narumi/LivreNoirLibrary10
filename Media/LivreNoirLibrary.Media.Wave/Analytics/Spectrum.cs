@@ -49,13 +49,13 @@ namespace LivreNoirLibrary.Media.Wave
             {
                 range = 1;
             }
+            var levelDen = 1 / range;
             var ch = Channels;
             var ww = WindowWidth;
             var w2 = ww / 2;
-            var factor = Factor;
             var hamming = FFT.GetHammingComplex32(ww);
             var src = _source;
-            var levelFactor = factor / range;
+            var factor = Factor;
             var prevFactor = 1 - factor;
             using var o = ArrayPool.Rent<float>(ww * 2);
             var buffer = o.Span;
@@ -68,11 +68,12 @@ namespace LivreNoirLibrary.Media.Wave
                 {
                     FFT.FFTCore(true, bufferPtr, ww);
                     var ptr = bufferPtr;
-                    for (int i = 0; i < w2; i++)
+                    for (var i = 0; i < w2; i++)
                     {
                         var value = *ptr * *ptr++ + *ptr * *ptr++;
-                        var level = Math.Max(Math.Log10(value) / 2 - min, 0);
-                        resultPtr[i] = level * levelFactor + resultPtr[i] * prevFactor;
+                        var level = Math.Max(Math.Log10(value) / 2 - min, 0) * levelDen;
+                        var prev = resultPtr[i];
+                        resultPtr[i] = level > prev ? level : level * factor + resultPtr[i] * prevFactor;
                     }
                 }
             }

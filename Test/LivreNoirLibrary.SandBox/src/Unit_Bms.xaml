@@ -88,12 +88,12 @@
                 </ComboBox>
                 <ct:Button Icon="{x:Static media:Icons.Config}" ToolTip="Skin Optins" Click="OnClick_SkinOptions" IsEnabled="{Binding BmsScreen.HasSkinOptions}"/>
 
-                <Border Style="{StaticResource Separator}"/>
+                <Border Style="{StaticResource VerticalSeparator}"/>
                 <ct:Button Icon="{x:Static media:Icons.Open}" Content="{Binding BmsScreen.BmsBaseName}" ToolTip="Open" Command="ApplicationCommands.Open"/>
                 <ct:Button Icon="{x:Static media:Icons.Save}" ToolTip="Save" Command="ApplicationCommands.Save"/>
                 <ct:Button Icon="{x:Static media:Icons.Document}" ToolTip="Hash" Click="OnClick_Hash"/>
 
-                <Border Style="{StaticResource Separator}"/>
+                <Border Style="{StaticResource VerticalSeparator}"/>
                 <ct:DropDownMenuButton>
                     <ct:IconPresenter Height="16" Source="{x:Static media:Icons.Volume_3}"/>
                     <ct:DropDownMenuButton.DropDownContent>
@@ -124,10 +124,10 @@
                     </ct:DropDownMenuButton.DropDownContent>
                 </ct:DropDownMenuButton>
 
-                <Border Style="{StaticResource Separator}"/>
+                <Border Style="{StaticResource VerticalSeparator}"/>
                 <ct:Button Icon="{x:Static media:Icons.Wave}" ToolTip="Assemble" Click="OnClick_Assemble" IsEnabled="{Binding BmsScreen.IsBmsReady, Mode=OneWay}"/>
 
-                <Border Style="{StaticResource Separator}"/>
+                <Border Style="{StaticResource VerticalSeparator}"/>
 
                 <ct:DropDownMenuButton>
                     <ct:IconPresenter Source="{x:Static media:Icons.Config}" Height="16"/>
@@ -167,7 +167,7 @@
                 <ct:Button Icon="{x:Static media:Icons.Camera}" ToolTip="Save Video" Click="OnClick_Video" IsEnabled="{Binding BmsScreen.IsBmsReady, Mode=OneWay}"/>
                 <ct:Button Icon="{x:Static media:Icons.Play}" ToolTip="Play" Click="OnClick_Play" IsEnabled="{Binding BmsScreen.IsBmsReady, Mode=OneWay}"/>
 
-                <Border Style="{StaticResource Separator}"/>
+                <Border Style="{StaticResource VerticalSeparator}"/>
             </WrapPanel>
             <Rectangle Grid.Row="1">
                 <Rectangle.Fill>

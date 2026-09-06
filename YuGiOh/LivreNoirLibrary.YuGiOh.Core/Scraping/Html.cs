@@ -50,7 +50,7 @@ namespace LivreNoirLibrary.YuGiOh.Scraping
             return document;
         }
 
-        public static string ToHtmlDecoded(this string text) => HttpUtility.HtmlDecode(text.Trim());
+        public static string ToHtmlDecoded(this string? text) => string.IsNullOrEmpty(text) ? "" : HttpUtility.HtmlDecode(text.Trim());
 
         public static HtmlNode? SelectSingleNode(this HtmlNode? node, string? tag = null, string? klass = null, string? id = null)
         {

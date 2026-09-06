@@ -9,27 +9,26 @@ namespace LivreNoirLibrary.Windows.Input
     {
         static InputManager()
         {
-            ComponentDispatcher.ThreadPreprocessMessage += _message_receiver.ExecuteMessage;
+            ComponentDispatcher.ThreadPreprocessMessage += ExecuteMessage;
         }
 
         // スタティックコンストラクタ呼び出し用のダミー
         public static void Initialize() { }
 
-        private static readonly MessageReceiver _message_receiver = new();
-
-        private class MessageReceiver()
+        private static void ExecuteMessage(ref MSG msg, ref bool handled)
         {
-            public void ExecuteMessage(ref MSG msg, ref bool handled)
+            if (handled)
             {
-                switch ((WM)msg.message)
-                {
-                    case WM.MouseHorizontalWheel:
-                        HandleMouseHorizontalWheel(msg.wParam);
-                        break;
-                    case WM.Hotkey:
-                        Hotkey.HandleMessage(msg.wParam, ref handled);
-                        break;
-                }
+                return;
+            }
+            switch ((WM)msg.message)
+            {
+                case WM.MouseHorizontalWheel:
+                    HandleMouseHorizontalWheel(msg.wParam);
+                    break;
+                case WM.HotKey:
+                    HandleHotKeyMessage(msg.hwnd, msg.wParam, ref handled);
+                    break;
             }
         }
     }

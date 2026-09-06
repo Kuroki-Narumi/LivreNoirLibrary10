@@ -7,8 +7,8 @@ namespace LivreNoirLibrary.YuGiOh.MasterDuel
 {
     public class CheckableDeckTag : CheckableObject, IDeckTag, IClear
     {
-        public string Name { get; internal set => SetValue(ref field, value); } = "";
-        public string SearchHint { get; internal set => SetValue(ref field, value); } = "";
+        public string? Name { get; internal set => SetValue(ref field, value); }
+        public string? SearchHint { get; internal set => SetValue(ref field, value); }
 
         public void Clear()
         {

@@ -68,7 +68,7 @@ namespace LivreNoirLibrary.Media.Bms
             if (index is >= 0)
             {
                 // インデックスは「実際の小節番号 - 1」
-                return new(index + 1, true);
+                return new(index + 1, 0);
             }
             // 指定値より値の大きい最初の要素のインデックス(存在しない場合はリストの長さに等しい)
             // = 指定値の直後の小節番号 - 1 = 指定値の直前の小節番号
@@ -88,7 +88,7 @@ namespace LivreNoirLibrary.Media.Bms
                 length = provider.GetBarLength(number);
                 absolutePosition -= length;
             }
-            return new(number + absolutePosition / length, true);
+            return new(number, absolutePosition / length);
         }
     }
 }

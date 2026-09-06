@@ -50,12 +50,10 @@ namespace LivreNoirLibrary.SandBox
 
         private void OnSelectionChanged_Window(object sender, SelectionChangedEventArgs e)
         {
-            //Capturer.CaptureTarget = (sender as ListView)?.SelectedItem;
             if (sender is ListView { SelectedItem: WindowInfo info })
             {
-                var title = info.Title;
-                var filename = info.ExePath;
-                Capturer.WindowSelector = i => i.Title == title && i.ExePath == filename;
+                Capturer.SearchingTitle = info.Title;
+                Capturer.SearchingFile = info.ExeFileName;
             }
         }
 

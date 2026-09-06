@@ -33,6 +33,16 @@ namespace LivreNoirLibrary.Media
             back = Vector.ConditionalSelect(AlphaSelector, newAlpha, color);
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static void Mask(ref Vector<float> destination, in Vector<float> source, ColorIndex colorIndex, in Vector<float> clearMask, in Vector<float> setMask)
+        {
+            // 対象の該当成分をクリア
+            destination *= clearMask;
+            // コピー元をシャッフルして該当成分を抽出
+            var color = FloatColor.FillSingleElement(source, colorIndex) * setMask;
+            destination += color;
+        }
+
         public static bool TryGetBlendFunc(BlendMode mode, [MaybeNullWhen(false)] out BlendFunc blendFunc) => _funcs.TryGetValue(mode, out blendFunc);
 
         private static readonly Dictionary<BlendMode, BlendFunc> _funcs = new()

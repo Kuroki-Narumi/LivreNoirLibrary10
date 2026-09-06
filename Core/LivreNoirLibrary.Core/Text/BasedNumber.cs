@@ -93,13 +93,6 @@ namespace LivreNoirLibrary.Text
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static int ParseToInt(this ReadOnlySpan<char> span, int radix) => (int)ParseToLong(span, radix);
 
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static long ParseToLong(this string? text, int radix) => ParseToLong(text.AsSpan(), radix);
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static short ParseToShort(this string? text, int radix) => (short)ParseToLong(text, radix);
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static int ParseToInt(this string? text, int radix) => (int)ParseToLong(text, radix);
-
         public static bool TryParseToLong(this ReadOnlySpan<char> span, int radix, out long value)
         {
             value = default;
@@ -159,30 +152,6 @@ namespace LivreNoirLibrary.Text
                 return false;
             }
         }
-
-        private delegate bool TryParseStringDelegate<T>(ReadOnlySpan<char> index, int radix, out T value);
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private static bool TryParseStringCore<T>(this string? text, int radix, out T value, TryParseStringDelegate<T> del)
-            where T : struct
-        {
-            if (string.IsNullOrEmpty(text))
-            {
-                value = default;
-                return false;
-            }
-            else
-            {
-                return del(text.AsSpan(), radix, out value);
-            }
-        }
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static bool TryParseToLong(this string? text, int radix, out long value) => TryParseStringCore(text, radix, out value, TryParseToLong);
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static bool TryParseToShort(this string? text, int radix, out short value) => TryParseStringCore(text, radix, out value, TryParseToShort);
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static bool TryParseToInt(this string? text, int radix, out int value) => TryParseStringCore(text, radix, out value, TryParseToInt);
 
         public static string ToBased(this long value, int radix, int minDigits = 0, int maxDigits = 0)
         {

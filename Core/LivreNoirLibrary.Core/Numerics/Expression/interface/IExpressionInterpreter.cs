@@ -29,57 +29,9 @@ namespace LivreNoirLibrary.Numerics
         /// </summary>
         /// <param name="expression">Expression to parse as a <see cref="Span{T}"/>.</param>
         /// <param name="exception">Set an exception if parse failed.</param>
+        /// <param name="symbolTypeProvider"></param>
         /// <returns><see langword="true"/> if parse succeeded; otherwise, <see langword="false"/>.</returns>
-        bool TryParse(ReadOnlySpan<char> expression, [MaybeNullWhen(true)] out Exception exception);
-
-        /// <summary>
-        /// Determines whether the specified character is classified as a white space.
-        /// </summary>
-        /// <param name="c">The character to evaluate.</param>
-        /// <returns><see langword="true"/> if the specified character is a white-space character; otherwise, <see langword="false"/>.</returns>
-        bool IsWhiteSpace(char c) => char.IsWhiteSpace(c);
-
-        /// <summary>
-        /// Determines whether the specified character is classified as an open bracket.
-        /// </summary>
-        /// <param name="c">The character to evaluate.</param>
-        /// <returns><see langword="true"/> if the specified character is an open-bracket character; otherwise <see langword="false"/>.</returns>
-        bool IsOpenBracket(char c) => c is '(';
-
-        /// <summary>
-        /// Determines whether the specified character is classified as an close bracket.
-        /// </summary>
-        /// <param name="c">The character to evaluate.</param>
-        /// <returns><see langword="true"/> if the specified character is a close-bracket character; otherwise <see langword="false"/>.</returns>
-        bool IsCloseBracket(char c) => c is ')';
-
-        /// <summary>
-        /// Determines whether the specified character is classified as a delimiter for arguments.
-        /// </summary>
-        /// <param name="c">The character to evaluate.</param>
-        /// <returns><see langword="true"/> if the specified character is a delimiter; otherwise <see langword="false"/>.</returns>
-        bool IsArgumentDelimiter(char c) => c is ',';
-
-        /// <summary>
-        /// Determines whether the specified character is classified as a digit or a decimal point.
-        /// </summary>
-        /// <param name="c">The character to evaluate.</param>
-        /// <returns><see langword="true"/> if the specified character is a digit character or a decimal point character; otherwise <see langword="false"/>.</returns>
-        bool IsNumberCharacter(char c) => c is '.' or (>= '0' and <= '9');
-
-        /// <summary>
-        /// Determines whether the specified character can use as an identifier.
-        /// </summary>
-        /// <param name="c">The character to evaluate.</param>
-        /// <returns><see langword="true"/> if the specified character can use in an identifier; otherwise <see langword="false"/>.</returns>
-        bool IsIdentifierCharacter(char c) => c is '.' or (>= '0' and <= '9') or (>= 'A' and <= 'Z') or '_' or (>= 'a' and <= 'z');
-
-        /// <summary>
-        /// Determines whether the specified character can use as an operator.
-        /// </summary>
-        /// <param name="c">The character to evaluate.</param>
-        /// <returns><see langword="true"/> if the specified character can use in an operator; otherwise <see langword="false"/>.</returns>
-        bool IsOperatorCharacter(char c) => c is '!' or '"' or '#' or '$' or '%' or '&' or '\'' or '+' or '*' or '-' or '/' or ':' or ';' or '<' or '=' or '>' or '?' or '@' or '\\' or '^' or '`' or '|' or '~';
+        bool TryParse(ReadOnlySpan<char> expression, [MaybeNullWhen(true)] out Exception exception, ICharTypeProvider? symbolTypeProvider = null);
     }
 
     public static partial class IExpressionExtensions
@@ -99,7 +51,5 @@ namespace LivreNoirLibrary.Numerics
         }
 
         public static void Parse(this IExpressionInterpreter obj, string expression) => Parse(obj, expression.AsSpan());
-
-        public static SymbolEnumerator EnumSymbol(this IExpressionInterpreter obj, ReadOnlySpan<char> span) => new(span, obj);
     }
 }

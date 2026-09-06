@@ -222,30 +222,20 @@ namespace LivreNoirLibrary.Windows.YuGiOh.Controls
             where TKey : struct
             where TValue : CheckableItem
         {
-            var buffer = StringBuffer.Get();
-            var index = 0;
-            var count = 0;
+            return DuelLog.GetTagText(EnumerateChecked(items), anyText);
+        }
+
+        private static IEnumerable<string?> EnumerateChecked<TKey, TValue>(Dictionary<TKey, TValue> items)
+            where TKey : struct
+            where TValue : CheckableItem
+        {
             foreach (var (_, item) in items)
             {
                 if (item.IsChecked is true)
                 {
-                    if (count is > 0)
-                    {
-                        buffer[index] = ',';
-                        index++;
-                    }
-                    var name = item.Name.Value.AsSpan();
-                    name.CopyTo(buffer[index..]);
-                    index += name.Length;
-                    count++;
+                    yield return item.Name.Value;
                 }
             }
-            if (index is 0)
-            {
-                anyText.CopyTo(buffer);
-                index = anyText.Length;
-            }
-            return (new(buffer[..index]), count);
         }
     }
 }

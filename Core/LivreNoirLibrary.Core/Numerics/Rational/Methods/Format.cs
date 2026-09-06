@@ -63,6 +63,10 @@ namespace LivreNoirLibrary.Numerics
         public static bool TryParseCore(ReadOnlySpan<char> s, long denLimit, NumberStyles style, IFormatProvider? provider, out long numerator, out long denominator)
         {
             numerator = denominator = default;
+            if (s.Length is 0)
+            {
+                return false;
+            }
             // 分子と分母に分割するためのバッファ
             var dest = (stackalloc Range[3]);
             // 区切り文字 "/" で分割

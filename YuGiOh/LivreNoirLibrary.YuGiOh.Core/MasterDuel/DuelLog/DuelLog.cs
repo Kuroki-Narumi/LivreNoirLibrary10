@@ -57,9 +57,9 @@ namespace LivreNoirLibrary.YuGiOh.MasterDuel
         [JsonIgnore]
         public string ResultText => Vocab.GetName(Result);
         [JsonIgnore]
-        public string UserTagText => GetTagText(_userTags, TagNone);
+        public string UserTagText => GetTagText(_userTags, TagNone).Text;
         [JsonIgnore]
-        public string OpponentTagText => GetTagText(_opponentTags, TagNone);
+        public string OpponentTagText => GetTagText(_opponentTags, TagNone).Text;
 
         private void SetTags(SortedSet<string> field, IEnumerable<string> value, string tagTextPropName, [CallerMemberName]string propName = "")
         {
@@ -102,29 +102,20 @@ namespace LivreNoirLibrary.YuGiOh.MasterDuel
             }
         }
 
-        public static string GetTagText(IEnumerable<string> tags, string ifnone, string separator = ", ", int lengthLimit = 512)
+        public static (string Text, int Count) GetTagText(IEnumerable<string?> tags, string ifnone, string separator = ", ")
         {
-            ArgumentOutOfRangeException.ThrowIfLessThan(lengthLimit, 1);
-            var buffer = StringBuffer.Get();
+            using var o = ObjectPool.RentStringBuilder(out var sb);
             var count = 0;
-            var index = 0;
             foreach (var tag in tags)
             {
                 if (count is not 0)
                 {
-                    separator.CopyTo(buffer[index..]);
-                    index += separator.Length;
+                    sb.Append(separator);
                 }
-                tag.CopyTo(buffer[index..]);
-                index += tag.Length;
+                sb.Append(tag);
                 count++;
-                if (index >= lengthLimit)
-                {
-                    Trail.CopyTo(buffer[lengthLimit..]);
-                    return new(buffer[..(lengthLimit + Trail.Length)]);
-                }
             }
-            return count is 0 ? ifnone : new(buffer[..index]);
+            return (count is 0 ? ifnone : sb.ToString(), count);
         }
 
         public void CopyFrom(DuelLog source)

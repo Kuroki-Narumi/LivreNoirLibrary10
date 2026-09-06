@@ -49,7 +49,7 @@ namespace LivreNoirLibrary.Media.Bms
             return SortedList.AddOrReplace(_numbers, _values, ValidateNumber(number), value);
         }
 
-        public bool Remove(int number) => SortedList.Remove(_numbers, _values, ValidateNumber(number));
+        public bool Remove(int number) => (number is >= 0 and <= BmsConstants.MaxBarNumber) && SortedList.Remove(_numbers, _values, (short)number);
 
         protected int GetInsertIndex(short number)
         {

@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Numerics;
 using System.Runtime.CompilerServices;
+using System.Runtime.InteropServices;
 
 namespace LivreNoirLibrary.Media
 {
@@ -263,7 +264,12 @@ namespace LivreNoirLibrary.Media
             return table;
         }
 
-        public static float RgbToScRgb(byte value) => _scRgbTable[value];
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static float RgbToScRgb(byte value)
+        {
+            ref var first = ref MemoryMarshal.GetArrayDataReference(_scRgbTable);
+            return Unsafe.Add(ref first, value);
+        }
 
         const int RgbTableSize = 4096;
         const float RgbScale = 4095;
@@ -289,11 +295,12 @@ namespace LivreNoirLibrary.Media
 
         public static byte ScRgbToRgb(float value)
         {
+            if (value is not > 0)
+            {
+                return 0;
+            }
             var index = Math.Clamp((int)(value * RgbScale), 0, RgbTableSize - 1);
             return _rgbTable[index];
         }
-
-        public static float GetFloatAuto(byte value, int index) => (index & ColorIndex_A) is ColorIndex_A ? GetFloat(value) : RgbToScRgb(value);
-        public static byte GetByteAuto(float value, int index) => (index & ColorIndex_A) is ColorIndex_A ? GetByte(value) : ScRgbToRgb(value);
     }
 }

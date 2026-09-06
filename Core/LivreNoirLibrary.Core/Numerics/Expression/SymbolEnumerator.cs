@@ -10,17 +10,17 @@ namespace LivreNoirLibrary.Numerics
     public ref struct SymbolEnumerator
     {
         private readonly ReadOnlySpan<char> _expression;
-        private readonly IExpressionInterpreter _interpreter;
+        private readonly ICharTypeProvider _provider;
         private int _index;
         private SymbolInfo _current;
 
-        public SymbolEnumerator(ReadOnlySpan<char> expression, IExpressionInterpreter interpreter)
+        public SymbolEnumerator(ReadOnlySpan<char> expression, ICharTypeProvider provider)
         {
             _expression = expression;
-            _interpreter = interpreter;
+            _provider = provider;
             var index = 0;
             // 先頭の空白は飛ばす
-            SkipWhile(ref index, interpreter.IsWhiteSpace);
+            SkipWhile(expression, ref index, provider, CharType.WhiteSpace);
             _index = index;
         }
 
@@ -33,40 +33,42 @@ namespace LivreNoirLibrary.Numerics
             var length = span.Length;
             if (index < length)
             {
-                var interpreter = _interpreter;
+                var provider = _provider;
                 var i = index;
                 var c = span[index];
                 index++;
                 var type = SymbolType.Unknown;
                 string? symbol = null;
-                if (interpreter.IsOpenBracket(c))
+                switch (provider.GetCharType(c))
                 {
-                    type = SymbolType.OpenBracket;
-                }
-                else if (interpreter.IsCloseBracket(c))
-                {
-                    type = SymbolType.CloseBracket;
-                }
-                else if (interpreter.IsArgumentDelimiter(c))
-                {
-                    type = SymbolType.ArgumentDelimiter;
-                }
-                else if (interpreter.IsIdentifierCharacter(c))
-                {
-                    type = interpreter.IsNumberCharacter(c) ? SymbolType.Number : SymbolType.Variable;
-                    SkipWhile(ref index, interpreter.IsIdentifierCharacter);
-                    symbol = new(span[i..index]);
-                }
-                else if (interpreter.IsOperatorCharacter(c))
-                {
-                    type = SymbolType.Operator;
-                    SkipWhile(ref index, interpreter.IsOperatorCharacter);
-                    symbol = new(span[i..index]);
+                    case CharType.OpenBracket:
+                        type = SymbolType.OpenBracket;
+                        break;
+                    case CharType.CloseBracket:
+                        type = SymbolType.CloseBracket;
+                        break;
+                    case CharType.ArgumentDelimiter:
+                        type = SymbolType.ArgumentDelimiter;
+                        break;
+                    case CharType.Number:
+                        type = SymbolType.Number;
+                        symbol = GetIdentifier(span, i, ref index, provider);
+                        break;
+                    case CharType.StartVariable:
+                    case CharType.Identifier:
+                        type = SymbolType.Variable;
+                        symbol = GetIdentifier(span, i, ref index, provider);
+                        break;
+                    case CharType.Operator:
+                        type = SymbolType.Operator;
+                        SkipWhile(span, ref index, provider, CharType.Operator);
+                        symbol = new(span[i..index]);
+                        break;
                 }
                 symbol ??= c.ToString();
-                SkipWhile(ref index, interpreter.IsWhiteSpace);
+                SkipWhile(span, ref index, provider, CharType.WhiteSpace);
                 // 暫定が値シンボルで、次の文字が開き括弧なら、これは関数シンボル
-                if (type is SymbolType.Variable && index < length && interpreter.IsOpenBracket(span[index]))
+                if (type is SymbolType.Variable && index < length && provider.GetCharType(span[index]) is CharType.OpenBracket)
                 {
                     type = SymbolType.Function;
                 }
@@ -82,10 +84,16 @@ namespace LivreNoirLibrary.Numerics
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private readonly void SkipWhile(ref int index, Predicate<char> selector)
+        private static void SkipWhile(in ReadOnlySpan<char> span, ref int index, ICharTypeProvider provider, CharType type)
         {
-            var span = _expression;
-            for (; index < span.Length && selector(span[index]); index++) ;
+            for (; index < span.Length && provider.GetCharType(span[index]) == type; index++) ;
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        private static string GetIdentifier(in ReadOnlySpan<char> span, int start, ref int index, ICharTypeProvider provider)
+        {
+            for (; index < span.Length && provider.GetCharType(span[index]) is (CharType.Number or CharType.Identifier); index++) ;
+            return new(span[start..index]);
         }
 
         public readonly SymbolEnumerator GetEnumerator() => this;

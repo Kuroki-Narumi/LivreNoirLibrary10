@@ -118,6 +118,11 @@ namespace LivreNoirLibrary.YuGiOh.Scraping
             return cids;
         }
 
+        public static bool TryGetFallbackDate(string pid, out DateTime date)
+        {
+            return _dateFallback.TryGetValue(pid, out date);
+        }
+
         private static readonly DateTime _invalidDate = new(1990, 1, 1);
         private static readonly Dictionary<string, DateTime> _dateFallback = new()
         {

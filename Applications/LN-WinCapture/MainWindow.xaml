@@ -1,0 +1,48 @@
+﻿<Window x:Class="LivreNoir.WinCapture.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:LivreNoir.WinCapture"
+        xmlns:ct="clr-namespace:LivreNoirLibrary.Windows.Controls;assembly=LivreNoirLibrary.Windows.Controls"
+        xmlns:media="clr-namespace:LivreNoirLibrary.Windows.Media;assembly=LivreNoirLibrary.Windows.Media"
+        xmlns:conv="clr-namespace:LivreNoirLibrary.Windows.Converters;assembly=LivreNoirLibrary.Windows.Controls"
+        xmlns:cptr="clr-namespace:LivreNoirLibrary.Windows.Controls;assembly=LivreNoirLibrary.Windows.Capture"
+        mc:Ignorable="d" d:DataContext="{d:DesignInstance Type=local:AppSettings}"
+        Title="LN WinCapture" Height="450" Width="800">
+    <Window.Resources>
+        <Style TargetType="ct:Button">
+            <Setter Property="Margin" Value="4"/>
+        </Style>
+        <Style TargetType="TextBlock">
+            <Setter Property="VerticalAlignment" Value="Center"/>
+        </Style>
+    </Window.Resources>
+    <Grid ColumnDefinitions="*, Auto, 2*">
+        <Grid RowDefinitions="Auto, *">
+            <Grid ColumnDefinitions="Auto, Auto, *">
+                <ct:Button Grid.Column="0" Icon="{x:Static media:Icons.Picture}" Content="Capture" Click="OnClick_Capture"/>
+                <TextBlock Grid.Column="1" Text="HotKey:" Margin="4,0,-2,0"/>
+                <ct:Button Grid.Column="2" Content="{Binding HotKeyText}" Click="OnClick_HotKey"/>
+            </Grid>
+            <ListView Grid.Row="1" Style="{StaticResource Alt2ListBoxStyle}" ItemsSource="{Binding CapturedItems}" SelectedItem="{Binding SelectedItem}">
+                <ListView.ItemTemplate>
+                    <DataTemplate>
+                        <TextBlock Text="{Binding Name}"/>
+                    </DataTemplate>
+                </ListView.ItemTemplate>
+            </ListView>
+        </Grid>
+        <GridSplitter Grid.Column="1" Width="4" HorizontalAlignment="Center"/>
+        <Border Grid.Column="2" Background="{x:Static media:MediaUtils.TransparentCheckerBrush}">
+            <Grid>
+                <cptr:WindowCaptureControl x:Name="Capturer" Visibility="{Binding SelectedItem.Bitmap, Converter={StaticResource TVConvI}}"
+                    SearchingTitle="{Binding TargetTitle}" SearchingFile="{Binding TargetFileName}" SearchMode="{Binding TargetSearchMode}" 
+                    IsCursorCaptureEnabled="{Binding IsCursorCaptureEnabled}" CaptureClientArea="{Binding CaptureClientArea}"/>
+                <ct:ImageRectSelector Source="{Binding Source, ElementName=Capturer}" Visibility="{Binding Visibility, ElementName=Capturer}">
+                </ct:ImageRectSelector>
+                <Image Source="{Binding SelectedItem.Bitmap}"/>
+            </Grid>
+        </Border>
+    </Grid>
+</Window>

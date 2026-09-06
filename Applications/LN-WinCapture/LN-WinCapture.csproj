@@ -1,0 +1,38 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net10.0-windows10.0.22621.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <UseWPF>true</UseWPF>
+	  <AllowUnsafeBlocks>True</AllowUnsafeBlocks>
+	  <BaseOutputPath>..\..\bin</BaseOutputPath>
+	  <Authors>Kuroki-Narumi</Authors>
+	  <Company>LivreNoir</Company>
+	  <AllowedReferenceRelatedFileExtensions>
+		  *.xml;
+		  *.pdb
+	  </AllowedReferenceRelatedFileExtensions>
+	  <RootNamespace>LivreNoir.WinCapture</RootNamespace>
+	  <ApplicationManifest>app.manifest</ApplicationManifest>
+	  <ApplicationIcon>icon.ico</ApplicationIcon>
+  </PropertyGroup>
+
+	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+		<DebugType>none</DebugType>
+	</PropertyGroup>
+
+	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+		<DebugType>none</DebugType>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<Content Include="icon.ico" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<ProjectReference Include="..\..\Windows\LivreNoirLibrary.Windows.Capture\LivreNoirLibrary.Windows.Capture.csproj" />
+		<ProjectReference Include="..\..\Windows\LivreNoirLibrary.Windows.Controls\LivreNoirLibrary.Windows.Controls.csproj" />
+	</ItemGroup>
+
+</Project>

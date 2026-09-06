@@ -125,12 +125,14 @@ namespace LivreNoirLibrary.Windows.YuGiOh
         public VocabData Tab_StatusMatch { get => GetData(); set => SetData(value); }
         public VocabData Tab_Hedgehog { get => GetData(); set => SetData(value); }
         public VocabData Tab_Numbers { get => GetData(); set => SetData(value); }
+
         public VocabData Tab_DeckEdit { get => GetData(); set => SetData(value); }
         public VocabData Tab_CardTable { get => GetData(); set => SetData(value); }
         public VocabData Tab_SwSearch { get => GetData(); set => SetData(value); }
         public VocabData Tab_SwInDeck { get => GetData(); set => SetData(value); }
         public VocabData Tab_TestConds { get => GetData(); set => SetData(value); }
         public VocabData Tab_TestExec { get => GetData(); set => SetData(value); }
+
         public VocabData Tab_LogManage { get => GetData(); set => SetData(value); }
         public VocabData Tab_TagManage { get => GetData(); set => SetData(value); }
 

@@ -1,13 +1,16 @@
 ﻿using LivreNoirLibrary.Collections;
+using LivreNoirLibrary.Windows.Converters;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Text;
+using System.Text.Json.Serialization;
 using System.Windows.Input;
 
 namespace LivreNoirLibrary.Windows.Input
 {
-    public readonly struct KeyInput(Key key, ModifierKeys modifier) : IEquatable<KeyInput>
+    [JsonConverter(typeof(KeyInputJsonConverter))]
+    public readonly struct KeyInput(Key key, ModifierKeys modifier) : IEquatable<KeyInput>, IParsable<KeyInput>, ISpanParsable<KeyInput>
     {
         public readonly Key Key = key;
         public readonly ModifierKeys Modifier = modifier;
@@ -15,6 +18,7 @@ namespace LivreNoirLibrary.Windows.Input
         public KeyInput(Key key) : this(key, Keyboard.Modifiers) { }
         public KeyInput(KeyInput key) : this(key.Key, key.Modifier) { }
         public KeyInput(KeyEventArgs e) : this(e.Key is Key.System ? e.SystemKey : e.Key, Keyboard.Modifiers) { }
+        public KeyInput(int value) : this((Key)(value & 0xFF), (ModifierKeys)(value >> 8)) { }
 
         public bool Ctrl => ModGet(Modifier, ModifierKeys.Control);
         public bool Alt => ModGet(Modifier, ModifierKeys.Alt);
@@ -22,6 +26,7 @@ namespace LivreNoirLibrary.Windows.Input
         public bool Windows => ModGet(Modifier, ModifierKeys.Windows);
 
         public override string ToString() => ToString(Key, Modifier);
+        public int ToInt() => (int)Key | ((int)Modifier << 8);
 
         public override bool Equals([NotNullWhen(true)] object? obj) => obj is KeyInput input && Equals(input);
 
@@ -36,8 +41,10 @@ namespace LivreNoirLibrary.Windows.Input
             return $"{(ModGet(modifier, ModifierKeys.Windows) ? "Win+" : "")}{(ModGet(modifier, ModifierKeys.Control) ? "Ctrl+" : "")}{(ModGet(modifier, ModifierKeys.Alt) ? "Alt+" : "")}{(ModGet(modifier, ModifierKeys.Shift) ? "Shift+" : "")}{GetKeyName(key)}";
         }
 
-        public static string GetKeyName(Key key) => _key_names.TryGetValue(key, out var name) ? name : key.ToString();
-        public static Key GetKey(string text) => _key_names_invert.TryGetValue(text, out var key) || Enum.TryParse(text, out key) ? key : Key.None;
+        public static string GetKeyName(Key key) => _key2name.TryGetValue(key, out var name) ? name : key.ToString();
+        public static Key GetKey(ReadOnlySpan<char> text) => TryGetKey(text, out var key) ? key : Key.None;
+        public static bool TryGetKey(ReadOnlySpan<char> text, out Key key) => _name2key.TryGetValue(text, out key) || Enum.TryParse(text, out key);
+        public static bool TryGetModifier(ReadOnlySpan<char> text, out ModifierKeys modifierKeys) => _name2mod.TryGetValue(text, out modifierKeys);
 
         public static bool IsCtrlDown() => ModGet(Keyboard.Modifiers, ModifierKeys.Control);
         public static bool IsAltDown() => ModGet(Keyboard.Modifiers, ModifierKeys.Alt);
@@ -48,7 +55,7 @@ namespace LivreNoirLibrary.Windows.Input
 
         public static bool IsTextKey(Key key) => GetType(key) is KeyType.Number or KeyType.Letter;
 
-        public static KeyType GetType(Key key) => KeyTypes.TryGetValue(key, out KeyType value) ? value : KeyType.Other;
+        public static KeyType GetType(Key key) => _keyTypes.TryGetValue(key, out KeyType value) ? value : KeyType.Other;
 
         public static bool IsSystemKey(Key key)
         {
@@ -59,7 +66,46 @@ namespace LivreNoirLibrary.Windows.Input
             };
         }
 
-        private static readonly Dictionary<Key, string> _key_names = new()
+        public static KeyInput Parse(string? s) => Parse(s.AsSpan(), null);
+        public static KeyInput Parse(string? s, IFormatProvider? provider) => Parse(s.AsSpan(), provider);
+        public static bool TryParse([NotNullWhen(true)] string? s, out KeyInput result) => TryParse(s.AsSpan(), null, out result);
+        public static bool TryParse([NotNullWhen(true)] string? s, IFormatProvider? provider, out KeyInput result) => TryParse(s.AsSpan(), provider, out result);
+
+        public static KeyInput Parse(ReadOnlySpan<char> s) => Parse(s, null);
+        public static KeyInput Parse(ReadOnlySpan<char> s, IFormatProvider? provider)
+        {
+            if (TryParse(s, provider, out var value))
+            {
+                return value;
+            }
+            return ThrowFormatException();
+        }
+
+        private static KeyInput ThrowFormatException() => throw new FormatException();
+
+        public static bool TryParse(ReadOnlySpan<char> s, out KeyInput result) => TryParse(s, null, out result);
+        public static bool TryParse(ReadOnlySpan<char> s, IFormatProvider? provider, out KeyInput result)
+        {
+            Key key = 0;
+            ModifierKeys modifier = 0;
+            var modDic = _name2mod;
+            foreach (var range in s.Split('+'))
+            {
+                var value = s[range].Trim();
+                if (modDic.TryGetValue(value, out var mod))
+                {
+                    modifier |= mod;
+                }
+                else if (TryGetKey(value, out var k))
+                {
+                    key = k;
+                }
+            }
+            result = new KeyInput(key, modifier);
+            return true;
+        }
+
+        private static readonly Dictionary<Key, string> _key2name = new()
         {
             [Key.None] = "",
             [Key.Enter] = nameof(Key.Enter),
@@ -96,9 +142,19 @@ namespace LivreNoirLibrary.Windows.Input
             [Key.OemBackslash] = "_",
         };
 
-        private static readonly Dictionary<string, Key> _key_names_invert = _key_names.Invert();
+        private static readonly Dictionary<string, Key>.AlternateLookup<ReadOnlySpan<char>> _name2key = _key2name.Invert(StringComparer.OrdinalIgnoreCase).GetAlternateLookup<ReadOnlySpan<char>>();
 
-        private static Dictionary<Key, KeyType> KeyTypes { get; } = new()
+        private static readonly Dictionary<string, ModifierKeys>.AlternateLookup<ReadOnlySpan<char>> _name2mod = new Dictionary<string, ModifierKeys>(StringComparer.OrdinalIgnoreCase)
+        {
+            ["Ctrl"] = ModifierKeys.Control,
+            ["Control"] = ModifierKeys.Control,
+            ["Alt"] = ModifierKeys.Alt,
+            ["Shift"] = ModifierKeys.Shift,
+            ["Win"] = ModifierKeys.Windows,
+            ["Windows"] = ModifierKeys.Windows,
+        }.GetAlternateLookup<ReadOnlySpan<char>>();
+
+        private static readonly Dictionary<Key, KeyType> _keyTypes = new()
         {
             { Key.None, KeyType.None },
             { Key.Cancel, KeyType.System },

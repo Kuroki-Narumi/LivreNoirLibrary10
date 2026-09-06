@@ -18,7 +18,7 @@ namespace LivreNoirLibrary.YuGiOh.Data
         public CardType CardType { get;  set => SetValue(ref field, value, 
             [nameof(CardTypeText), nameof(CTypeText), nameof(AbilityTextWithType), nameof(DefText), nameof(FullText), nameof(Icon), nameof(LinkIcon), nameof(FrameBrush)]); }
         public string Text { get; set => SetValue(ref field, value.ReplaceLineEndings("\n"), [nameof(FullText)]); } = "";
-        public bool Unusable { get; set => SetValue(ref field, value, [nameof(LimitIcon)]); }
+        public bool Unusable { get; set => SetValue(ref field, value, [nameof(ActualLimitCount), nameof(LimitIcon), nameof(LimitText)]); }
 
         public Attribute Attribute { get; set => SetValue(ref field, value, [nameof(AttributeText), nameof(AttrText), nameof(MonsterInfoText), nameof(FullText), nameof(AttributeIcon)]); }
         public MonsterType MonsterType { get; set => SetValue(ref field, value, [nameof(MonsterTypeText), nameof(MTypeText), nameof(MonsterInfoText), nameof(FullText)]); }

@@ -11,6 +11,7 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
+using static System.Net.Mime.MediaTypeNames;
 
 namespace LivreNoirLibrary.YuGiOh.Scraping
 {
@@ -28,18 +29,26 @@ namespace LivreNoirLibrary.YuGiOh.Scraping
             {
                 i++;
                 c.ThrowIfCancellationRequested();
-                var card = await GetCardInfo(id, p, c);
-                if (card is not null)
+                try
                 {
-                    p?.Report($"{i}/{max}: {card.Name}", i, max);
-                    card = cards.Add(card);
-                    foreach (var info in card.PackInfo)
+                    var card = await GetCardInfo(id, p, c);
+                    if (card is not null)
                     {
-                        if (packs.TryGet(info.ProductId, out var pack))
+                        p?.Report($"{i}/{max}: {card.Name}", i, max);
+                        card = cards.Add(card);
+                        foreach (var info in card.PackInfo)
                         {
-                            pack.Add(new(card, info.Number));
+                            if (packs.TryGet(info.ProductId, out var pack))
+                            {
+                                pack.Add(new(card, info.Number));
+                            }
                         }
                     }
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine(ex);
+                    throw;
                 }
             }
         }
@@ -90,6 +99,9 @@ namespace LivreNoirLibrary.YuGiOh.Scraping
         const string Class_Ruby = "ruby";
         const string Class_CardText = "CardText";
         const string Class_CardText_Pen = "CardText pen";
+        const string Class_CardText_Note = "CardText note";
+
+        const string Class_Text_LineBreak = "text_linebreak";
 
         const string Class_ItemBox = "item_box";
         const string Class_ItemBoxText = "item_box_text";
@@ -107,9 +119,6 @@ namespace LivreNoirLibrary.YuGiOh.Scraping
 
         [GeneratedRegex("カードテキスト|Card Text")]
         private static partial Regex Regex_CardText { get; }
-
-        [GeneratedRegex("備考|Note")]
-        private static partial Regex Regex_Note { get; }
 
         [GeneratedRegex("公式のデュエルでは使用できません|Cannot be used in official Duels")]
         private static partial Regex Regex_Unusable { get; }
@@ -173,21 +182,11 @@ namespace LivreNoirLibrary.YuGiOh.Scraping
                 // カードテキスト
                 if (node.SelectSingleNode(Tags.Div, klass: Class_ItemBoxText) is { } textNode)
                 {
-                    if (textNode.SelectSingleNode(Tags.Div, klass: Class_TextTitle) is { } titleNode)
+                    if (textNode.SelectSingleNode(Tags.Div, klass: Class_TextTitle) is { } titleNode &&
+                        Regex_CardText.IsMatch(titleNode.InnerText))
                     {
-                        var text = titleNode.InnerText;
-                        // カードテキスト
-                        if (Regex_CardText.IsMatch(text))
-                        {
-                            card.Text = BuildCardText(sb, textNode);
-                            continue;
-                        }
-                        // 使用不可カード
-                        if (Regex_Note.IsMatch(text) && Regex_Unusable.IsMatch(textNode.InnerText))
-                        {
-                            card.Unusable = true;
-                            continue;
-                        }
+                        card.Text = BuildCardText(sb, textNode);
+                        continue;
                     }
                 }
                 // モンスター以外
@@ -334,6 +333,11 @@ namespace LivreNoirLibrary.YuGiOh.Scraping
                 }
             }
 
+            // 使用不可
+            if (cardset.SelectSingleNode(Tags.Div, klass: Class_CardText_Note) is { } noteNode && Regex_Unusable.IsMatch(noteNode.InnerText))
+            {
+                card.Unusable = true;
+            }
             // ペンデュラム
             if (cardset.SelectSingleNode(Tags.Div, klass: Class_CardText_Pen) is { } penNode)
             {
@@ -382,77 +386,80 @@ namespace LivreNoirLibrary.YuGiOh.Scraping
 
         private static string BuildCardText(StringBuilder sb, HtmlNode node)
         {
+            var line = node.SelectSingleNode(Tags.Div, klass: Class_Text_LineBreak);
+            var lineText = (line?.InnerText).ToHtmlDecoded().AsSpan();
+            if (lineText.Length is 0)
+            {
+                return "";
+            }
             sb.Length = 0;
             var isNewLine = true;
-            foreach (var n in node.ChildNodes)
+            var index = 0;
+            var segmentStart = 0;
+            var parenCount = 0;
+            for (; index < lineText.Length; index++)
             {
-                if (n.NodeType is HtmlNodeType.Text)
+                switch (lineText[index])
                 {
-                    var decoded = n.InnerText.ToHtmlDecoded();
-                    if (decoded.IsWhiteSpace())
-                    {
-                        continue;
-                    }
-                    var decodedSpan = decoded.AsSpan();
-                    var startIndex = 0;
-                    var i = 0;
-                    var parenCount = 0;
-
-                    for (; i < decodedSpan.Length; i++)
-                    {
-                        switch (decodedSpan[i])
+                    case '●':
+                        if (!isNewLine)
                         {
-                            case '●':
-                                if (!isNewLine)
-                                {
-                                    // ここまでのセクションを追加
-                                    sb.Append(decodedSpan[startIndex..i].ToHalf());
-                                    startIndex = i;
-                                    // 記号の直前で改行する
-                                    sb.AppendLine();
-                                }
-                                break;
-                            case >= '①' and <= '⑨':
-                                if (!isNewLine && i + 1 < decodedSpan.Length && decodedSpan[i + 1] is ':' or '：')
-                                {
-                                    // ここまでのセクションを追加
-                                    sb.Append(decodedSpan[startIndex..i].ToHalf());
-                                    startIndex = i;
-                                    // 記号の直前で改行する
-                                    sb.AppendLine();
-                                }
-                                break;
-                            case '「':
-                                if (parenCount is 0 && i > startIndex)
-                                {
-                                    // ここまでのセクションを追加
-                                    sb.Append(decodedSpan[startIndex..i].ToHalf());
-                                    startIndex = i;
-                                }
-                                parenCount++;
-                                break;
-                            case '」':
-                                parenCount--;
-                                if (parenCount is 0 && i > startIndex)
-                                {
-                                    // 「」の内側は半角化しない(カード名が含まれうるため)
-                                    sb.Append(decodedSpan[startIndex..i]);
-                                    startIndex = i;
-                                }
-                                break;
+                            // ここまでのセクションを追加
+                            sb.Append(lineText[segmentStart..index].ToHalf());
+                            segmentStart = index;
+                            // 記号の直前で改行する
+                            sb.AppendLine();
+                            isNewLine = true;
                         }
-                        isNewLine = false;
-                    }
-                    if (i > startIndex)
-                    {
-                        sb.Append(decodedSpan[startIndex..i].ToHalf());
-                    }
+                        break;
+                    case >= '①' and <= '⑨':
+                        if (!isNewLine && index + 1 < lineText.Length && lineText[index + 1] is ':' or '：')
+                        {
+                            // ここまでのセクションを追加
+                            sb.Append(lineText[segmentStart..index].ToHalf());
+                            segmentStart = index;
+                            // 記号の直前で改行する
+                            sb.AppendLine();
+                            isNewLine = true;
+                        }
+                        break;
+                    case '「':
+                        if (parenCount is 0 && index > segmentStart)
+                        {
+                            // ここまでのセクションを追加
+                            sb.Append(lineText[segmentStart..index].ToHalf());
+                            segmentStart = index;
+                        }
+                        parenCount++;
+                        break;
+                    case '」':
+                        parenCount--;
+                        if (parenCount is 0 && index > segmentStart)
+                        {
+                            // 「」の内側は半角化しない(カード名が含まれうるため)
+                            sb.Append(lineText[segmentStart..index]);
+                            segmentStart = index;
+                        }
+                        break;
+                    case '<': // <br>の可能性がある
+                        if (index + 3 < lineText.Length && lineText[index..(index + 4)].Equals("<br>", StringComparison.OrdinalIgnoreCase))
+                        {
+                            // ここまでのセクションを追加
+                            sb.Append(lineText[segmentStart..index].ToHalf());
+                            segmentStart = index + 4;
+                            // "<br>"をスキップ
+                            index = segmentStart;
+                            // 改行する
+                            sb.AppendLine();
+                            isNewLine = true;
+                        }
+                        break;
                 }
-                else if (n.Name is Tags.Br)
-                {
-                    sb.AppendLine();
-                    isNewLine = true;
-                }
+            }
+            if (index > segmentStart)
+            {
+                // 残りのセクションを追加
+                sb.Append(lineText[segmentStart..index].ToHalf());
             }
             return sb.ToString();
         }
@@ -473,10 +480,7 @@ namespace LivreNoirLibrary.YuGiOh.Scraping
             {
                 DateTime date = default;
                 string? name = null, number = null, pid = null;
-                if (TryGetString(div, Class_Time, out var span))
-                {
-                    date = DateTime.Parse(span);
-                }
+                var dateDetected = TryGetString(div, Class_Time, out var span) && DateTime.TryParse(span, out date);
                 if (TryGetString(div, Class_PackName, out span))
                 {
                     name = new(span);
@@ -488,6 +492,10 @@ namespace LivreNoirLibrary.YuGiOh.Scraping
                 if (Url.TryGetPackId(div.InnerHtml, out span))
                 {
                     pid = Data.CardPack.EnsureTcgSuffix(span, tcg);
+                    if (!dateDetected && CardPack.TryGetFallbackDate(pid, out date))
+                    {
+                        dateDetected = true;
+                    }
                 }
                 if (pid is not null && number is not null)
                 {

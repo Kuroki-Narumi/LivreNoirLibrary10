@@ -111,10 +111,13 @@ namespace LivreNoirLibrary.Windows.Controls
         {
             if (value is not null)
             {
-                _image.Source = value;
-                OriginalWidth = value.PixelWidth;
-                OriginalHeight = value.PixelHeight;
-                AutoScale(true);
+                if (!ReferenceEquals(value, _image.Source))
+                {
+                    _image.Source = value;
+                    OriginalWidth = value.PixelWidth;
+                    OriginalHeight = value.PixelHeight;
+                    AutoScale(true);
+                }
             }
             else
             {

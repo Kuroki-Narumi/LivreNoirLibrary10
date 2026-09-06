@@ -306,7 +306,8 @@ namespace LivreNoirLibrary.YuGiOh.Search
             {
                 return true;
             }
-            var buffer = StringBuffer.Get();
+            using var o = ArrayPool.Rent<char>(1024);
+            var buffer = o.Array.AsSpan();
             var converter1 = _textConverter;
             var converter2 = _converterForText;
             if (_regex is { } regex1)

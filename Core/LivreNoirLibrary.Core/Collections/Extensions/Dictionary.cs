@@ -331,11 +331,10 @@ namespace LivreNoirLibrary.Collections
             where TValue : new() => GetOrAdd(dic, key, key => new());
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static Dictionary<TValue, TKey> Invert<TKey, TValue>(this Dictionary<TKey, TValue> dic)
+        public static Dictionary<string, TKey> Invert<TKey>(this Dictionary<TKey, string> dic, StringComparer? comparer = null)
             where TKey : notnull
-            where TValue : notnull
         {
-            Dictionary<TValue, TKey> result = [];
+            Dictionary<string, TKey> result = new(comparer);
             foreach (var (key, value) in dic)
             {
                 result.TryAdd(value, key);
@@ -344,11 +343,37 @@ namespace LivreNoirLibrary.Collections
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static Dictionary<TValue, TKey> Invert<TKey, TValue>(this SortedDictionary<TKey, TValue> dic)
+        public static Dictionary<TValue, TKey> Invert<TKey, TValue>(this Dictionary<TKey, TValue> dic, IEqualityComparer<TValue>? comparer = null)
             where TKey : notnull
             where TValue : notnull
         {
-            Dictionary<TValue, TKey> result = [];
+            Dictionary<TValue, TKey> result = new(comparer);
+            foreach (var (key, value) in dic)
+            {
+                result.TryAdd(value, key);
+            }
+            return result;
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static Dictionary<string, TKey> Invert<TKey>(this SortedDictionary<TKey, string> dic, StringComparer? comparer = null)
+            where TKey : notnull
+        {
+            Dictionary<string, TKey> result = new(comparer);
+            foreach (var (key, value) in dic)
+            {
+                result.TryAdd(value, key);
+            }
+            return result;
+        }
+
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static Dictionary<TValue, TKey> Invert<TKey, TValue>(this SortedDictionary<TKey, TValue> dic, IEqualityComparer<TValue>? comparer = null)
+            where TKey : notnull
+            where TValue : notnull
+        {
+            Dictionary<TValue, TKey> result = new(comparer);
             foreach (var (key, value) in dic)
             {
                 result.TryAdd(value, key);

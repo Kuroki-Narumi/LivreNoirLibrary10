@@ -39,7 +39,7 @@ namespace LivreNoirLibrary.Media.Bms
     public sealed class DefaultBarPositionProvider : IBarPositionProvider
     {
         public double GetBarLength(int number) => 1;
-        public double GetAbsolutePosition(BarPosition position) => (double)position;
-        public BarPosition GetBarPosition(double absolutePosition) => new(absolutePosition);
+        public double GetAbsolutePosition(BarPosition position) => position.Bar + position.Offset;
+        public BarPosition GetBarPosition(double absolutePosition) => new((int)absolutePosition, absolutePosition % 1);
     }
 }

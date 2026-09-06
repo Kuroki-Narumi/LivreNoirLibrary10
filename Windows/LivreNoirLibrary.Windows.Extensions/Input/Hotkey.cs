@@ -6,95 +6,148 @@ using LivreNoirLibrary.Win32Api;
 
 namespace LivreNoirLibrary.Windows.Input
 {
-    public static partial class Hotkey
+    public static partial class InputManager
     {
-        private static readonly Dictionary<int, KeyBindInfo> _key_binds = [];
+        private static readonly Dictionary<nint, HotKeyHandler> _hotKeyInfos = [];
+        private static nint _hotKeyHwnd;
         private static bool _stopped;
 
-        public static void Start()
+        /// <summary>
+        /// Attempts to register a hotkey for the specified window using the Win32Api and returns the hotkey ID.
+        /// </summary>
+        /// <remarks>
+        /// Only the main window can register hotkeys. If the specified window is not the main window, an <see cref="ArgumentException"/> will be thrown.
+        /// </remarks>
+        /// <param name="window">The window for which to register the hotkey.</param>
+        /// <param name="key">The key to register.</param>
+        /// <param name="modifier">The modifier keys.</param>
+        /// <param name="action">The action to execute when the hotkey is pressed.</param>
+        /// <param name="setHandled">Indicates whether the hotkey message should be marked as handled.</param>
+        /// <param name="noRepeat">Indicates whether the hotkey should not repeat when held down.</param>
+        /// <returns>The hotkey ID if successful, otherwise -1.</returns>
+        /// <exception cref="ArgumentException"></exception>
+        public static int RegisterHotKey(this Window window, Key key, ModifierKeys modifier, Action action, bool setHandled = true, bool noRepeat = false)
         {
-            if (_stopped)
+            if (Application.Current.MainWindow != window)
             {
-                _stopped = false;
-                foreach (var (_, info) in _key_binds)
-                {
-                    TryRegister(info.Id, info.Key, info.Modifier, info.NoRepeat, false);
-                }
+                throw new ArgumentException("Only the main window can register hotkeys.");
+            }
+            if (_hotKeyHwnd == 0)
+            {
+                _hotKeyHwnd = window.GetHandle();
+                window.Closed += OnMainWindowClosed;
+            }
+            var id = GetHotKeyIdFromKey(key, modifier, out var mod, out var vk);
+            if (noRepeat)
+            {
+                mod |= 0x4000;
+            }
+            if (NativeMethods.RegisterHotKey(_hotKeyHwnd, id, mod, vk))
+            {
+                HotKeyHandler info = new(action, id, mod, vk, setHandled);
+                _hotKeyInfos[id] = info;
+                return id;
+            }
+            else
+            {
+                return -1;
             }
         }
 
-        public static void Stop()
+        /// <summary>
+        /// Unregisters a hotkey with the specified key and modifier for the main window.
+        /// </summary>
+        /// <param name="key">The key to unregister.</param>
+        /// <param name="modifier">The modifier keys.</param>
+        /// <returns><see langword="true"/> if the hotkey was successfully unregistered; otherwise, <see langword="false"/>.</returns>
+        public static bool UnregisterHotKey(Key key, ModifierKeys modifier)
         {
-            if (!_stopped)
-            {
-                foreach (var (id, _) in _key_binds)
-                {
-                    _ = NativeMethods.UnregisterHotKey(0, id);
-                }
-                _stopped = true;
-            }
+            var id = GetHotKeyIdFromKey(key, modifier, out _, out _);
+            return UnregisterHotKey(id);
         }
 
-        internal static void HandleMessage(nint wParam, ref bool handled)
+        /// <summary>
+        /// Unregisters a hotkey with the specified ID for the main window.
+        /// </summary>
+        /// <param name="id">The hotkey ID to unregister.</param>
+        /// <returns><see langword="true"/> if the hotkey was successfully unregistered; otherwise, <see langword="false"/>.</returns>
+        public static bool UnregisterHotKey(int id)
         {
-            if (_key_binds.TryGetValue(unchecked((int)wParam), out var info))
+            if (_hotKeyInfos.Remove(id) && _hotKeyHwnd is not 0)
             {
-                info.Handler();
-                handled = true;
-            }
-        }
-
-        public static bool Register(int id, Action action, Key key, ModifierKeys modifier = 0, bool noRepeat = false)
-        {
-            if (id is < 0 or >= 0xC000)
-            {
-                throw new ArgumentOutOfRangeException($"id must be >= 0 and < 0xC000 (given: {id:X4}");
-            }
-            InputManager.Initialize();
-            if (IsFreeCore(key, modifier))
-            {
-                _key_binds[id] = new(id, key, modifier, noRepeat, action);
-                return TryRegister(id, key, modifier, noRepeat, _stopped);
+                return NativeMethods.UnregisterHotKey(_hotKeyHwnd, id);
             }
             return false;
         }
 
-        public static bool IsFree(Key key, ModifierKeys modifier = 0) => IsFreeCore(key, modifier) && TryRegister(0, key, modifier, false, true);
-
-        private static bool IsFreeCore(Key key, ModifierKeys modifier)
+        /// <summary>
+        /// Unregisters all hotkeys for the main window.
+        /// </summary>
+        public static void UnregisterAllHotKeys()
         {
-            foreach (var (_, info) in _key_binds)
+            UnregisterAllHotKeyImpl();
+            _hotKeyInfos.Clear();
+        }
+
+        public static int GetHotKeyIdFromKey(Key key, ModifierKeys modifier, out int mod, out int vk)
+        {
+            mod = (int)modifier;
+            vk = KeyInterop.VirtualKeyFromKey(key);
+            return (mod << 8) | vk;
+        }
+
+        public static void StopHotKey()
+        {
+            if (_hotKeyHwnd is not 0 && !_stopped)
             {
-                if (info.Key == key && info.Modifier == modifier)
+                _stopped = true;
+                UnregisterAllHotKeyImpl();
+            }
+        }
+
+        public static void RestartHotKey()
+        {
+            var hwnd = _hotKeyHwnd;
+            if (hwnd is not 0 && _stopped)
+            {
+                _stopped = false;
+                foreach (var (_, info) in _hotKeyInfos)
                 {
-                    return false;
+                    _ = NativeMethods.RegisterHotKey(hwnd, info.Id, info.ModKey, info.Key);
                 }
             }
-            return true;
         }
 
-        private static bool TryRegister(int id, Key key, ModifierKeys modifier, bool noRepeat, bool unregister)
+        private static void UnregisterAllHotKeyImpl()
         {
-            var m = (int)modifier;
-            if (noRepeat)
+            var hwnd = _hotKeyHwnd;
+            foreach (var (_, info) in _hotKeyInfos)
             {
-                m |= 0x4000;
+                _ = NativeMethods.UnregisterHotKey(hwnd, info.Id);
             }
-            var vk = KeyInterop.VirtualKeyFromKey(key);
-            var result = NativeMethods.RegisterHotKey(0, id, m, vk);
-            if (unregister)
-            {
-                _ = NativeMethods.UnregisterHotKey(0, id);
-            }
-            return result;
         }
 
-        public static bool Remove(int id)
+        private static void HandleHotKeyMessage(nint hwnd, nint wParam, ref bool handled)
         {
-            _key_binds.Remove(id);
-            return NativeMethods.UnregisterHotKey(0, id);
+            if (hwnd == _hotKeyHwnd && _hotKeyInfos.TryGetValue(wParam, out var info))
+            {
+                info.Handler();
+                if (info.SetHandled)
+                {
+                    handled = true;
+                }
+            }
         }
 
-        private record KeyBindInfo(int Id, Key Key, ModifierKeys Modifier, bool NoRepeat, Action Handler);
+        private static void OnMainWindowClosed(object? sender, EventArgs e)
+        {
+            UnregisterAllHotKeys();
+            if (sender is Window window)
+            {
+                window.Closed -= OnMainWindowClosed;
+            }
+        }
+
+        private record struct HotKeyHandler(Action Handler, int Id, int ModKey, int Key, bool SetHandled);
     }
 }

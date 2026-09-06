@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 using System.Windows;
+using System.Windows.Media.Imaging;
 
 namespace LivreNoirLibrary.Windows.YuGiOh
 {
@@ -26,5 +27,10 @@ namespace LivreNoirLibrary.Windows.YuGiOh
             => new((int)Math.Floor(width * ratio.X), (int)Math.Floor(height * ratio.Y), (int)Math.Ceiling(width * ratio.Width), (int)Math.Ceiling(height * ratio.Height));
 
         public static bool IsMasterDuelApp(WindowInfo info) => info.ExeFileName.Equals("masterduel.exe", StringComparison.OrdinalIgnoreCase);
+
+
+        public const string CardMaskPath = "/LivreNoirLibrary.Windows.YuGiOh;component/Resources/mask_card.png";
+
+        public static BitmapImage CardImageMask { get; } = new(new Uri(CardMaskPath, UriKind.Relative));
     }
 }

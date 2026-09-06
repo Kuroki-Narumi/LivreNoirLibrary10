@@ -96,14 +96,10 @@ namespace LivreNoirLibrary.Media.Midi
 
         public static bool TryParse(ReadOnlySpan<char> s, IFormatProvider? provider, out BarPosition result)
         {
-            if (Bms.BarPosition.TryParseCore(s, provider, out var bar, out var offsetNum, out var offsetDen) && bar is <= MaxNumber)
+            if (Bms.BarPosition.TryParseCore(s, provider, out var bar, out var offset) && bar is <= MaxNumber)
             {
-                var offset = offsetNum / offsetDen;
-                if (offset is >= 0)
-                {
-                    result = new((int)bar, offset.ToRational());
-                    return true;
-                }
+                result = new(bar, offset.ToRational());
+                return true;
             }
             result = default;
             return false;

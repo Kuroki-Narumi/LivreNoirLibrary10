@@ -1,6 +1,8 @@
 ﻿using BenchmarkDotNet.Attributes;
 using LivreNoirLibrary.Collections;
 using System.Numerics;
+using System.Runtime.CompilerServices;
+using System.Runtime.InteropServices;
 
 namespace LivreNoirLibrary.Benchmark
 {
@@ -8,6 +10,7 @@ namespace LivreNoirLibrary.Benchmark
     {
         public const float InvertFactor = 1f / 255f;
         private static readonly float[] _scRgbTable = CreateScRgbTable();
+        private static readonly float[] _linearTable = CreateLinearTable();
         const int RgbTableSize = 65536;
         const float RgbScale = 65535;
         private static readonly byte[] _rgbTable = CreateRgbTable();
@@ -29,6 +32,16 @@ namespace LivreNoirLibrary.Benchmark
             return table;
         }
 
+        static float[] CreateLinearTable()
+        {
+            var table = new float[256];
+            for (var i = 0; i < 256; i++)
+            {
+                table[i] = i * InvertFactor;
+            }
+            return table;
+        }
+
         public static float RgbToScRgbImpl(byte value) => value switch
         {
             0 => 0,
@@ -39,6 +52,20 @@ namespace LivreNoirLibrary.Benchmark
 
         public static float RgbToScRgb(byte value) => _scRgbTable[value];
         public static float GetFloat(byte value) => value * InvertFactor;
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static float RgbToScRgbByStack(byte value)
+        {
+            ref var first = ref MemoryMarshal.GetArrayDataReference(_scRgbTable);
+            return Unsafe.Add(ref first, value);
+        }
+
+        public static float ToFloat(byte value) => value * InvertFactor;
+        public static float ToFloatByTable(byte value)
+        {
+            ref var first = ref MemoryMarshal.GetArrayDataReference(_linearTable);
+            return Unsafe.Add(ref first, value);
+        }
 
         static byte[] CreateRgbTable()
         {
@@ -60,34 +87,49 @@ namespace LivreNoirLibrary.Benchmark
 
         public static byte ScRgbToRgb(float value)
         {
-            var index = Math.Clamp((int)(value * RgbScale), 0, RgbTableSize - 1);
+            var index = Math.Clamp((int)(value * RgbScale + 0.5f), 0, RgbTableSize - 1);
             return _rgbTable[index];
         }
 
         public static byte ScRgbToRgb2(float value)
         {
-            var index = _scRgbTable.BinarySearch(Math.Min(value, 1));
-            return (byte)(index is >= 0 ? index : ~index);
+            var index = Math.Clamp((int)(value * RgbScale + 0.5f), 0, RgbTableSize - 1);
+            ref var first = ref MemoryMarshal.GetArrayDataReference(_rgbTable);
+            return Unsafe.Add(ref first, index);
         }
 
         public static byte GetByte(float value) => (byte)Math.Clamp(value * 255f, 0, 255);
 
         public static float ConvertByIf(byte value, int index) => index % 4 is 3 ? GetFloat(value): RgbToScRgb(value);
+        public static float ConvertByIf_Stack(byte value, int index) => index % 4 is 3 ? GetFloat(value): RgbToScRgbByStack(value);
         public static byte ConvertBackByIf(float value, int index) => index % 4 is 3 ? GetByte(value) : ScRgbToRgb(value);
 
-        static readonly Func<byte, float>[] _rgbFuncs = CreateRgbFuncs();
-        static readonly Func<float, byte>[] _scRgbFuncs = CreateScRgbFuncs();
+        static readonly float[] _bgra_table = CreateBgraTable();
 
-        static Func<byte, float>[] CreateRgbFuncs()
+        static float[] CreateBgraTable()
         {
             var count = Vector<float>.Count;
-            var ary = new Func<byte, float>[count];
-            for (var i = 0; i <  count; i++)
+            var source = _scRgbTable.AsSpan();
+            float[] result = new float[256 * count];
+            for (var c = 0; c < count; c++)
             {
-                ary[i] = i % 4 is 3 ? GetFloat : RgbToScRgb;
+                var offset = 256 * c;
+                if (c % 4 is 3)
+                {
+                    for (var i = 0; i < 256; i++)
+                    {
+                        result[offset + i] = GetFloat((byte)i);
+                    }
+                }
+                else
+                {
+                    source.CopyTo(result.AsSpan(offset));
+                }
             }
-            return ary;
+            return result;
         }
+
+        static readonly Func<float, byte>[] _scRgbFuncs = CreateScRgbFuncs();
 
         static Func<float, byte>[] CreateScRgbFuncs()
         {
@@ -100,7 +142,12 @@ namespace LivreNoirLibrary.Benchmark
             return ary;
         }
 
-        public static float ConvertByTable(byte value, int index) => _rgbFuncs[index](value);
+        public static float ConvertByTable(byte value, int index)
+        {
+            ref var first = ref MemoryMarshal.GetArrayDataReference(_bgra_table);
+            return Unsafe.Add(ref first, value + index * 256);
+        }
+
         public static byte ConvertBackByTable(float value, int index) => _scRgbFuncs[index](value);
 
         public const int Count = 1000;
@@ -119,54 +166,27 @@ namespace LivreNoirLibrary.Benchmark
             }
         }
 
-        /*
-        [Benchmark]
-        public void Convert_Calculation()
+        //[Benchmark]
+        public void ToFloat_Calc()
         {
+            ref var value = ref MemoryMarshal.GetArrayDataReference(_base);
             for (var i = 0; i < Count; i++)
             {
-                _convert[i] = RgbToScRgbImpl(_base[i]);
+                _convert[i] = ToFloat(Unsafe.Add(ref value, i));
             }
         }
 
-        [Benchmark]
-        public void Convert_Table()
+        //[Benchmark]
+        public void ToFloat_Table()
         {
+            ref var value = ref MemoryMarshal.GetArrayDataReference(_base);
             for (var i = 0; i < Count; i++)
             {
-                _convert[i] = _scRgbTable[_base[i]];
+                _convert[i] = ToFloatByTable(Unsafe.Add(ref value, i));
             }
         }
 
-        [Benchmark]
-        public void ConvertBack_Calculation()
-        {
-            for (var i = 0; i < Count; i++)
-            {
-                _convertBack[i] = ScRgbToRgbImpl(_convert[i]);
-            }
-        }
-
-        [Benchmark]
-        public void ConvertBack_Table()
-        {
-            for (var i = 0; i < Count; i++)
-            {
-                _convertBack[i] = ScRgbToRgb(_convert[i]);
-            }
-        }
-
-        [Benchmark]
-        public void ConvertBack_BinarySearch()
-        {
-            for (var i = 0; i < Count; i++)
-            {
-                _convertBack[i] = ScRgbToRgb2(_convert[i]);
-            }
-        }
-        */
-
-        [Benchmark]
+        //[Benchmark]
         public void Convert_If()
         {
             var count = Vector<float>.Count;
@@ -176,7 +196,17 @@ namespace LivreNoirLibrary.Benchmark
             }
         }
 
-        [Benchmark]
+        //[Benchmark]
+        public void Convert_If_Stack()
+        {
+            var count = Vector<float>.Count;
+            for (var i = 0; i < Count; i++)
+            {
+                _convert[i] = ConvertByIf_Stack(_base[i], i % count);
+            }
+        }
+
+        //[Benchmark]
         public void Convert_Table()
         {
             var count = Vector<float>.Count;
@@ -187,23 +217,48 @@ namespace LivreNoirLibrary.Benchmark
         }
 
         [Benchmark]
-        public void ConvertBack_If()
+        public void ConvertBack_Direct()
         {
-            var count = Vector<float>.Count;
+            ref var value = ref MemoryMarshal.GetArrayDataReference(_convert);
             for (var i = 0; i < Count; i++)
             {
-                _convertBack[i] = ConvertBackByIf(_convert[i], i % count);
+                _convertBack[i] = ScRgbToRgbImpl(Unsafe.Add(ref value, i));
             }
         }
 
         [Benchmark]
         public void ConvertBack_Table()
         {
-            var count = Vector<float>.Count;
+            ref var value = ref MemoryMarshal.GetArrayDataReference(_convert);
             for (var i = 0; i < Count; i++)
             {
-                _convertBack[i] = ConvertBackByTable(_convert[i], i % count);
+                _convertBack[i] = ScRgbToRgb(Unsafe.Add(ref value, i));
             }
+        }
+
+        [Benchmark]
+        public void ConvertBack_Table2()
+        {
+            ref var value = ref MemoryMarshal.GetArrayDataReference(_convert);
+            for (var i = 0; i < Count; i++)
+            {
+                _convertBack[i] = ScRgbToRgb2(Unsafe.Add(ref value, i));
+            }
+        }
+
+        public static void Validate()
+        {
+            var c1 = new ColorTest();
+            c1.Setup();
+            c1.Convert_If();
+            var c2 = new ColorTest();
+            c1._base.CopyTo(c2._base);
+            c2.Convert_Table();
+            Console.WriteLine(c1._convert.SequenceEqual(c2._convert));
+
+            c1.ConvertBack_Direct();
+            c2.ConvertBack_Table();
+            Console.WriteLine(c1._convertBack.SequenceEqual(c2._convertBack));
         }
     }
 }

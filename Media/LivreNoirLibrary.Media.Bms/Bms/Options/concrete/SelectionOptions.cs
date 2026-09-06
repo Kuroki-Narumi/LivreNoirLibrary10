@@ -129,7 +129,7 @@ namespace LivreNoirLibrary.Media.Bms
 
         public string GetReplaceText(int radix) => GetReplaceText(ReplaceMode, ReplaceValue, radix);
 
-        public bool TrySetReplace(string? text, int radix)
+        public bool TrySetReplace(ReadOnlySpan<char> text, int radix)
         {
             if (TryParseReplaceText(text, radix, out var mode, out var value))
             {
@@ -165,39 +165,30 @@ namespace LivreNoirLibrary.Media.Bms
             }
         }
 
-        public static bool TryParseReplaceText(string? text, int radix, out ValueOperationMode mode, out double value)
+        public static bool TryParseReplaceText(ReadOnlySpan<char> text, int radix, out ValueOperationMode mode, out double value)
         {
-            if (!string.IsNullOrEmpty(text))
+            text = text.Trim();
+            if (text.Length is > 0)
             {
-                var match = GR_Replace.Match(text);
-                var op = match.Groups["op"];
-                if (op.Success)
+                if (ValueOperation.TryGetMode(text[0], out mode))
                 {
-                    mode = ValueOperation.GetMode(op.Value);
-                    var val = match.Groups["val"];
-                    if (Rational.TryParse(val.Value, out var v))
+                    text = text[1..].Trim();
+                    if (Rational.TryParse(text, out var ratValue))
                     {
-                        value = (double)v;
+                        value = (double)ratValue;
                         return true;
                     }
                 }
-                else
+                else if (BasedNumber.TryParseToInt(text, radix, out var intVal) && intVal is > 0 && intVal < radix * radix)
                 {
-                    var id = match.Groups["id"];
-                    if (id.Success && BasedNumber.TryParseToInt(id.Value, radix, out var intVal) && intVal is > 0 && intVal < radix * radix)
-                    {
-                        mode = ValueOperationMode.Set;
-                        value = intVal;
-                        return true;
-                    }
+                    mode = ValueOperationMode.Set;
+                    value = intVal;
+                    return true;
                 }
             }
             mode = default;
             value = default;
             return false;
         }
-
-        [GeneratedRegex(@"(?:(?:(?<op>[+\-/*%<>])(?<val>\d+(?:[,./]\d+)?)?)|(?<id>[0-9A-Za-z]+))")]
-        private static partial Regex GR_Replace { get; }
     }
 }

@@ -10,7 +10,7 @@ namespace LivreNoirLibrary.Media.Bms
     public class BarPositionTypeConverter : TypeConverter
     {
         private static readonly HashSet<Type> _source = [typeof(byte), typeof(sbyte), typeof(short), typeof(ushort), typeof(int), typeof(float), typeof(double), typeof(decimal), typeof(BarPosition), typeof(string)];
-        private static readonly HashSet<Type?> _dest = [typeof(double), typeof(float), typeof(BarPosition), typeof(string)];
+        private static readonly HashSet<Type?> _dest = [typeof(BarPosition), typeof(string)];
 
         public override bool CanConvertFrom(ITypeDescriptorContext? context, Type sourceType)
         {
@@ -26,16 +26,16 @@ namespace LivreNoirLibrary.Media.Bms
         {
             return value switch
             {
+                string v => BarPosition.Parse(v),
+                BarPosition v => v,
+                double v => new BarPosition(v),
+                int v => new BarPosition(v),
                 byte v => new BarPosition(v),
                 sbyte v => new BarPosition(v),
                 short v => new BarPosition(v),
                 ushort v => new BarPosition(v),
-                int v => new BarPosition(v),
-                double v => new BarPosition(v),
-                float v => new BarPosition(v),
+                float v => new BarPosition((double)v),
                 decimal v => new BarPosition((double)v),
-                BarPosition v => v,
-                string v => BarPosition.Parse(v),
                 _ => base.ConvertFrom(context, culture, value)
             };
         }
@@ -47,14 +47,6 @@ namespace LivreNoirLibrary.Media.Bms
                 if (destinationType == typeof(BarPosition))
                 {
                     return v;
-                }
-                else if (destinationType == typeof(double))
-                {
-                    return (double)v;
-                }
-                else if (destinationType == typeof(float))
-                {
-                    return (float)v;
                 }
                 else if (destinationType == typeof(string))
                 {

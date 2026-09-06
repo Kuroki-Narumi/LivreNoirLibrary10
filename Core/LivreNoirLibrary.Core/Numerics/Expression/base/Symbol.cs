@@ -79,13 +79,5 @@ namespace LivreNoirLibrary.Numerics
 
         public const string PiSymbol = "PI";
         public const string NapierSymbol = "E";
-
-        public virtual bool IsWhiteSpace(char c) => char.IsWhiteSpace(c);
-        public virtual bool IsOpenBracket(char c) => c is '(' or '[' or '{';
-        public virtual bool IsCloseBracket(char c) => c is ')' or ']' or '}';
-        public virtual bool IsArgumentDelimiter(char c) => c is ',';
-        public virtual bool IsNumberCharacter(char c) => c is '.' or (>= '0' and <= '9');
-        public virtual bool IsIdentifierCharacter(char c) => c is '.' or (>= '0' and <= '9') or (>= 'A' and <= 'Z') or '_' or (>= 'a' and <= 'z');
-        public virtual bool IsOperatorCharacter(char c) => c is '!' or '"' or '#' or '$' or '%' or '&' or '\'' or '+' or '*' or '-' or '/' or ':' or ';' or '<' or '=' or '>' or '?' or '@' or '\\' or '^' or '`' or '|' or '~';
     }
 }

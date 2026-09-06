@@ -55,7 +55,13 @@ namespace LivreNoirLibrary.Windows.YuGiOh.Controls
             this.RegisterCommand(Commands.ItemsFilter, OnExecuted_ItemsFilter);
             this.RegisterCommand(Commands.ItemsFilterClear, OnExecuted_ItemsFilterClear);
             _items.CollectionChanged += Items_CollectionChanged;
+            _items.CheckedItemChanged += Items_CheckedItemChanged;
             _buttonCache = new(() => new(this));
+        }
+
+        private void Items_CheckedItemChanged(object? sender, EventArgs e)
+        {
+            UpdateValueText(true);
         }
 
         public void SetFlags(IEnumerable<string> source)
@@ -67,7 +73,6 @@ namespace LivreNoirLibrary.Windows.YuGiOh.Controls
         public void ClearFlags()
         {
             _items.ClearFlags();
-            UpdateValueText(true);
         }
 
         private void OnItemsSourceChanged(DeckTagCollection? oldValue, DeckTagCollection? newValue)
@@ -111,13 +116,12 @@ namespace LivreNoirLibrary.Windows.YuGiOh.Controls
         {
             e.Handled = true;
             _items.ClearFlags();
-            UpdateValueText(true);
         }
 
         private void UpdateValueText(bool notify)
         {
             var enumer = _items.EnumerateCheckedKeys();
-            ValueText = DuelLog.GetTagText(enumer, "(none)");
+            ValueText = DuelLog.GetTagText(enumer, "(none)").Text;
             if (notify)
             {
                 RaiseEvent(new RoutedEventArgs<IEnumerable<string>>(enumer, SelectedItemChangedEvent, this));

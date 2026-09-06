@@ -241,7 +241,7 @@ namespace LivreNoirLibrary.Media.Bms
                         {
                             if (BasedNumber.TryParseToShort(span[..2], radix, out var key) && TryGetConductorDef(state, defType, key, out var value))
                             {
-                                tl.Add(new(number + (double)i / den), new Note(channel, value));
+                                tl.Add(new(number, (double)i / den), new Note(channel, value));
                             }
                             span = span[2..];
                         }
@@ -365,7 +365,7 @@ namespace LivreNoirLibrary.Media.Bms
             {
                 if (BasedNumber.TryParseToShort(value[..2], radix, out var v) && v is not 0)
                 {
-                    tl.Add(new(number + (double)i / den), noteCreator(v));
+                    tl.Add(new(number, (double)i / den), noteCreator(v));
                 }
                 value = value[2..];
             }

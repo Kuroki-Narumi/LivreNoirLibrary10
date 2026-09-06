@@ -1,0 +1,24 @@
+﻿<Application x:Class="LivreNoir.WinCapture.App"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:local="clr-namespace:LivreNoir.WinCapture"
+             StartupUri="MainWindow.xaml">
+    <Application.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="/LivreNoirLibrary.Windows.Controls;component/Themes/Generic.xaml"/>
+            </ResourceDictionary.MergedDictionaries>
+
+            <Style TargetType="TabControl">
+                <Setter Property="ItemContainerStyle" Value="{StaticResource TabItem_Cornered}"/>
+                <EventSetter Event="MouseWheel" Handler="TabControl_PreviewMouseWheel"/>
+            </Style>
+
+            <Style x:Key="RadioContainerBase" TargetType="Panel">
+                <Setter Property="Background" Value="Transparent"/>
+                <EventSetter Event="PreviewMouseWheel" Handler="RadioContainer_MouseWheel"/>
+            </Style>
+            
+        </ResourceDictionary>
+    </Application.Resources>
+</Application>

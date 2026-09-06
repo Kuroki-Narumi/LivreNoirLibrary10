@@ -4,7 +4,7 @@ using System.Numerics;
 
 namespace LivreNoirLibrary.Media
 {
-    public static unsafe partial class BitmapOperation
+    public static partial class BitmapOperation
     {
         public const int BytesPerUIntPixel = sizeof(uint);
         public const int BytesPerFloatPixel = sizeof(float) * 4;
@@ -27,7 +27,7 @@ namespace LivreNoirLibrary.Media
             public LineEnumerator<T> EnumerateLines() => new(bitmap, bitmap.Rect);
             public LineEnumerator<T> EnumerateLines(in Rectangle rect) => new(bitmap, rect);
 
-            public Rectangle GetOpaqueRect(int margin = 0, byte transparentAlpha = 0)
+            public unsafe Rectangle GetOpaqueRect(int margin = 0, byte transparentAlpha = 0)
             {
                 if (!bitmap.IsValid || transparentAlpha is 255)
                 {
@@ -69,7 +69,7 @@ namespace LivreNoirLibrary.Media
                 }
             }
 
-            public Rectangle GetOpaqueRect(int margin = 0, float transparentAlpha = 0)
+            public unsafe Rectangle GetOpaqueRect(int margin = 0, float transparentAlpha = 0)
             {
                 if (!bitmap.IsValid || transparentAlpha is >= 1)
                 {
@@ -135,9 +135,9 @@ namespace LivreNoirLibrary.Media
                 Structs.AdjustStretch(source.DoubleRect, sourceRect, destValidRect, destRect, out actualSourceRect, out actualDestRect);
         }
 
-        private delegate bool CheckLine<T>(T* p, out int left, out int right) where T : unmanaged;
+        private unsafe delegate bool CheckLine<T>(T* p, out int left, out int right) where T : unmanaged;
 
-        private static Rectangle GetOpaqueCore<T>(CheckLine<T> check, T* pointer, int w, int h, int stride, int margin)
+        private static unsafe Rectangle GetOpaqueCore<T>(CheckLine<T> check, T* pointer, int w, int h, int stride, int margin)
             where T : unmanaged, INumber<T>
         {
             var left = w;
@@ -171,7 +171,7 @@ namespace LivreNoirLibrary.Media
             }
         }
 
-        public unsafe struct LineEnumerator<T>
+        public struct LineEnumerator<T>
             where T : IBitmap
         {
             private readonly int _stride;

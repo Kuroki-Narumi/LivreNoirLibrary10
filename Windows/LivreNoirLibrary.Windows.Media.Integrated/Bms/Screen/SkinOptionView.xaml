@@ -56,14 +56,6 @@
                 <Setter Property="IsTextEditable" Value="True"/>
                 <Setter Property="TextWidth" Value="48"/>
             </Style>
-            <Style TargetType="Border" x:Key="Separator">
-                <Setter Property="Margin" Value="4,2"/>
-                <Setter Property="Height" Value="1"/>
-                <Setter Property="Background" Value="Gray"/>
-                <Setter Property="BorderThickness" Value="0"/>
-                <Setter Property="Grid.ColumnSpan" Value="3"/>
-                <Setter Property="Opacity" Value="0.5"/>
-            </Style>
         </ResourceDictionary>
     </Control.Resources>
     <Grid RowDefinitions="Auto, Auto, *" Background="White">
@@ -71,7 +63,7 @@
             <TextBlock Text="Skin Options" Margin="4,0" VerticalAlignment="Center" HorizontalAlignment="Center"/>
             <ct:Button Grid.Column="1" Icon="{x:Static media:Icons.Update_Mono}" Content="Default" Click="OnClick_Default"/>
         </Grid>
-        <Border Grid.Row="1" Style="{StaticResource Separator}"/>
+        <Border Grid.Row="1" Style="{StaticResource HorizontalSeparator}"/>
         <ScrollViewer Padding="4,2,4,4" Grid.Row="2" HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto">
             <StackPanel x:Name="MainPanel" Grid.IsSharedSizeScope="True">
             </StackPanel>

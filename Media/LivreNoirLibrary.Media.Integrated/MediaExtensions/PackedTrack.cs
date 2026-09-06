@@ -164,7 +164,7 @@ namespace LivreNoirLibrary.Media.Integrated
                     }
                     else
                     {
-                        Bms.BarPosition p = new(number + (double)(pos - head) / len);
+                        Bms.BarPosition p = new(number, (double)(pos - head) / len);
                         target.Timeline.Add(p, new(Channel.Bpm, bpm));
                     }
                     exists = enumer.MoveNext();
@@ -205,7 +205,7 @@ namespace LivreNoirLibrary.Media.Integrated
                     {
                         actualLane += maxLane - c;
                     }
-                    timeline.Add(new(bPos.Bar + (double)bPos.Offset), new(Channel.Bgm_Start + (short)actualLane, id));
+                    timeline.Add(new(bPos.Bar, bPos.Offset), new(Channel.Bgm_Start + (short)actualLane, id));
                 }
             }
             lane += maxLane;

@@ -18,6 +18,11 @@ namespace LivreNoirLibrary.Media.Capture
         private readonly SynchronizationContext? _syncContext = SynchronizationContext.Current;
 
         private Timer? _timer;
+        private Action? _searchFunc;
+        private WindowInfo? _captureTarget;
+        private readonly Func<WindowInfo, bool> _checkTitleMatch;
+        private readonly Func<WindowInfo, bool> _checkFileMatch;
+        private readonly Func<WindowInfo, bool> _checkTitleAndFileMatch;
 
         public IImageAdapter Adapter { get => _capturer.Adapter; set => _capturer.Adapter = value; }
 
@@ -29,18 +34,19 @@ namespace LivreNoirLibrary.Media.Capture
         public nint CapturingMonitorHandle => _capturer.CapturingMonitorHandle;
 
         /// <summary>
-        /// キャプチャ対象のウィンドウであるかどうかを判別するためのデリゲート。
+        /// キャプチャ候補のウィンドウタイトル
         /// </summary>
-        public WindowSelector? Selector
-        {
-            get;
-            set
-            {
-                _capturer.Stop();
-                field = value;
-                RefreshTimer();
-            }
-        }
+        public string? SearchingTitle { get; private set; }
+
+        /// <summary>
+        /// キャプチャ候補の実行ファイル名
+        /// </summary>
+        public string? SearchingFile { get; private set; }
+
+        /// <summary>
+        /// キャプチャ候補の検出方法
+        /// </summary>
+        public WindowSearchMode SearchMode { get; private set; } = WindowSearchMode.TitleAndFile;
 
         /// <summary>
         /// キャプチャ対象が存在しない場合に探す間隔。
@@ -59,6 +65,9 @@ namespace LivreNoirLibrary.Media.Capture
         {
             _capturer = new(adapter);
             _capturer.CaptureTargetClosed += OnCaptureTargetClosed;
+            _checkTitleMatch = CheckTitleMatch;
+            _checkFileMatch = CheckFileMatch;
+            _checkTitleAndFileMatch = CheckTitleAndFileMatch;
         }
 
         private void StopTimer()
@@ -67,10 +76,49 @@ namespace LivreNoirLibrary.Media.Capture
             _timer = null;
         }
 
+        public void SetSearchTarget(string? title, string? file, WindowSearchMode mode = WindowSearchMode.TitleAndFile)
+        {
+            if (TextEquals(SearchingTitle, title) && TextEquals(SearchingFile, file) && SearchMode == mode)
+            {
+                return;
+            }
+
+            _capturer.Stop();
+            SearchingTitle = title;
+            SearchingFile = file;
+            SearchMode = mode;
+
+            Action? searchFunc = null;
+            if (!string.IsNullOrEmpty(title) && (mode & WindowSearchMode.Title) is not 0)
+            {
+                if (!string.IsNullOrEmpty(file) && (mode & WindowSearchMode.File) is not 0)
+                {
+                    if ((mode & WindowSearchMode.Complete) is not 0)
+                    {
+                        searchFunc = SearchByTitleAndName;
+                    }
+                    else
+                    {
+                        searchFunc = SearchByTitleOrName;
+                    }
+                }
+                else
+                {
+                    searchFunc = SearchByTitle;
+                }
+            }
+            else if (!string.IsNullOrEmpty(file) && (mode & WindowSearchMode.File) is not 0)
+            {
+                searchFunc = SearchByFile;
+            }
+            _searchFunc = searchFunc;
+            RefreshTimer();
+        }
+
         private void RefreshTimer()
         {
             StopTimer();
-            if (!_capturer.IsActive && Selector is { } selector)
+            if (!_capturer.IsActive && _searchFunc is { } func)
             {
                 OnTick(null);
                 var interval = SearchInterval;
@@ -83,15 +131,9 @@ namespace LivreNoirLibrary.Media.Capture
 
         private void OnTick(object? state)
         {
-            if (Selector is not null)
-            {
-                NativeMethods.EnumerateWindowInfo(CheckWindowInfo);
-            }
-        }
-
-        private bool CheckWindowInfo(WindowInfo info)
-        {
-            if (Selector!(info))
+            _captureTarget = null;
+            _searchFunc?.Invoke();
+            if (_captureTarget is { } info)
             {
                 if (_syncContext is { } ctx)
                 {
@@ -101,9 +143,51 @@ namespace LivreNoirLibrary.Media.Capture
                 {
                     StartCapture(info.Handle);
                 }
+            }
+        }
+
+        private static bool TextEquals(string? left, string? right) => left.AsSpan().Equals(right, StringComparison.OrdinalIgnoreCase);
+
+        private bool CheckTitleMatch(WindowInfo info)
+        {
+            if (TextEquals(info.Title, SearchingTitle!))
+            {
+                _captureTarget = info;
                 return false;
             }
             return true;
+        }
+
+        private bool CheckFileMatch(WindowInfo info)
+        {
+            if (TextEquals(info.ExeFileName, SearchingFile!))
+            {
+                _captureTarget = info;
+                return false;
+            }
+            return true;
+        }
+
+        private bool CheckTitleAndFileMatch(WindowInfo info)
+        {
+            if (TextEquals(info.Title, SearchingTitle!) && TextEquals(info.ExeFileName, SearchingFile!))
+            {
+                _captureTarget = info;
+                return false;
+            }
+            return true;
+        }
+
+        private void SearchByTitle() => NativeMethods.EnumerateWindowInfo(_checkTitleMatch);
+        private void SearchByFile() => NativeMethods.EnumerateWindowInfo(_checkFileMatch);
+        private void SearchByTitleAndName() => NativeMethods.EnumerateWindowInfo(_checkTitleAndFileMatch);
+        private void SearchByTitleOrName()
+        {
+            NativeMethods.EnumerateWindowInfo(_checkTitleMatch);
+            if (_captureTarget is null)
+            {
+                NativeMethods.EnumerateWindowInfo(_checkFileMatch);
+            }
         }
 
         private void StartCapture(object? state)

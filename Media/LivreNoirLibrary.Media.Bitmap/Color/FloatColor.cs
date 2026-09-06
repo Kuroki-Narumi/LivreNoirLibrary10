@@ -122,30 +122,121 @@ namespace LivreNoirLibrary.Media
             return value;
         }
 
-        static readonly Vector128<int> _shuffle128 = Vector128.Create(3, 3, 3, 3);
-        static readonly Vector256<int> _shuffle256 = Vector256.Create(3, 3, 3, 3, 7, 7, 7, 7);
-        static readonly Vector512<int> _shuffle512 = Vector512.Create(3, 3, 3, 3, 7, 7, 7, 7, 11, 11, 11, 11, 15, 15, 15, 15);
+        static readonly Vector128<int> _shuffle_b_128 = Vector128.Create(0, 0, 0, 0);
+        static readonly Vector256<int> _shuffle_b_256 = Vector256.Create(0, 0, 0, 0, 4, 4, 4, 4);
+        static readonly Vector512<int> _shuffle_b_512 = Vector512.Create(0, 0, 0, 0, 4, 4, 4, 4, 8, 8, 8, 8, 12, 12, 12, 12);
+
+        static readonly Vector128<int> _shuffle_g_128 = _shuffle_b_128 + Vector128.Create(1);
+        static readonly Vector256<int> _shuffle_g_256 = _shuffle_b_256 + Vector256.Create(1);
+        static readonly Vector512<int> _shuffle_g_512 = _shuffle_b_512 + Vector512.Create(1);
+
+        static readonly Vector128<int> _shuffle_r_128 = _shuffle_b_128 + Vector128.Create(2);
+        static readonly Vector256<int> _shuffle_r_256 = _shuffle_b_256 + Vector256.Create(2);
+        static readonly Vector512<int> _shuffle_r_512 = _shuffle_b_512 + Vector512.Create(2);
+
+        static readonly Vector128<int> _shuffle_a_128 = _shuffle_b_128 + Vector128.Create(3);
+        static readonly Vector256<int> _shuffle_a_256 = _shuffle_b_256 + Vector256.Create(3);
+        static readonly Vector512<int> _shuffle_a_512 = _shuffle_b_512 + Vector512.Create(3);
+
+        public static Func<Vector<float>, Vector<float>> GetFillSingleElementFunc(ColorIndex colorIndex)
+        {
+            var count = Vector<float>.Count;
+            if (count == Vector128<float>.Count)
+            {
+                return colorIndex switch
+                {
+                    ColorIndex.A => vector => Vector128.ShuffleNative(vector.AsVector128(), _shuffle_a_128).AsVector(),
+                    ColorIndex.R => vector => Vector128.ShuffleNative(vector.AsVector128(), _shuffle_r_128).AsVector(),
+                    ColorIndex.G => vector => Vector128.ShuffleNative(vector.AsVector128(), _shuffle_g_128).AsVector(),
+                    ColorIndex.B => vector => Vector128.ShuffleNative(vector.AsVector128(), _shuffle_b_128).AsVector(),
+                    _ => vector => vector,
+                };
+            }
+            else if (count == Vector256<float>.Count)
+            {
+                return colorIndex switch
+                {
+                    ColorIndex.A => vector => Vector256.ShuffleNative(vector.AsVector256(), _shuffle_a_256).AsVector(),
+                    ColorIndex.R => vector => Vector256.ShuffleNative(vector.AsVector256(), _shuffle_r_256).AsVector(),
+                    ColorIndex.G => vector => Vector256.ShuffleNative(vector.AsVector256(), _shuffle_g_256).AsVector(),
+                    ColorIndex.B => vector => Vector256.ShuffleNative(vector.AsVector256(), _shuffle_b_256).AsVector(),
+                    _ => vector => vector,
+                };
+            }
+            else if (count == Vector512<float>.Count)
+            {
+                return colorIndex switch
+                {
+                    ColorIndex.A => vector => Vector512.ShuffleNative(vector.AsVector512(), _shuffle_a_512).AsVector(),
+                    ColorIndex.R => vector => Vector512.ShuffleNative(vector.AsVector512(), _shuffle_r_512).AsVector(),
+                    ColorIndex.G => vector => Vector512.ShuffleNative(vector.AsVector512(), _shuffle_g_512).AsVector(),
+                    ColorIndex.B => vector => Vector512.ShuffleNative(vector.AsVector512(), _shuffle_b_512).AsVector(),
+                    _ => vector => vector,
+                };
+            }
+            return vector => vector;
+        }
+
+        public static Vector<float> FillSingleElement(Vector<float> vector, ColorIndex colorIndex)
+        {
+            var count = Vector<float>.Count;
+            if (count == Vector128<float>.Count)
+            {
+                var shuffle = colorIndex switch
+                {
+                    ColorIndex.A => _shuffle_a_128,
+                    ColorIndex.R => _shuffle_r_128,
+                    ColorIndex.G => _shuffle_g_128,
+                    ColorIndex.B => _shuffle_b_128,
+                    _ => default,
+                };
+                return Vector128.ShuffleNative(vector.AsVector128(), shuffle).AsVector();
+            }
+            else if (count == Vector256<float>.Count)
+            {
+                var shuffle = colorIndex switch
+                {
+                    ColorIndex.A => _shuffle_a_256,
+                    ColorIndex.R => _shuffle_r_256,
+                    ColorIndex.G => _shuffle_g_256,
+                    ColorIndex.B => _shuffle_b_256,
+                    _ => default,
+                };
+                return Vector256.ShuffleNative(vector.AsVector256(), shuffle).AsVector();
+            }
+            else if (count == Vector512<float>.Count)
+            {
+                var shuffle = colorIndex switch
+                {
+                    ColorIndex.A => _shuffle_a_512,
+                    ColorIndex.R => _shuffle_r_512,
+                    ColorIndex.G => _shuffle_g_512,
+                    ColorIndex.B => _shuffle_b_512,
+                    _ => default,
+                };
+                return Vector512.ShuffleNative(vector.AsVector512(), shuffle).AsVector();
+            }
+            return vector;
+        }
 
         public static Vector<float> FillAlphaToAll(Vector<float> vector)
         {
             var count = Vector<float>.Count;
             if (count == Vector128<float>.Count)
             {
-                return Vector128.ShuffleNative(vector.AsVector128(), _shuffle128).AsVector();
+                return Vector128.ShuffleNative(vector.AsVector128(), _shuffle_a_128).AsVector();
             }
             else if (count == Vector256<float>.Count)
             {
-                return Vector256.ShuffleNative(vector.AsVector256(), _shuffle256).AsVector();
+                return Vector256.ShuffleNative(vector.AsVector256(), _shuffle_a_256).AsVector();
             }
             else if (count == Vector512<float>.Count)
             {
-                return Vector512.ShuffleNative(vector.AsVector512(), _shuffle512).AsVector();
+                return Vector512.ShuffleNative(vector.AsVector512(), _shuffle_a_512).AsVector();
             }
             return vector;
         }
 
-        public static Vector128<float> FillAlphaToAll(Vector128<float> vector) => Vector128.ShuffleNative(vector, _shuffle128);
-        public static Vector256<float> FillAlphaToAll(Vector256<float> vector) => Vector256.ShuffleNative(vector, _shuffle256);
-        public static Vector512<float> FillAlphaToAll(Vector512<float> vector) => Vector512.ShuffleNative(vector, _shuffle512);
+        public static Vector128<float> FillAlphaToAll(Vector128<float> vector) => Vector128.ShuffleNative(vector, _shuffle_a_128);
     }
 }

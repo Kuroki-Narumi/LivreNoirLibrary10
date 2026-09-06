@@ -15,13 +15,13 @@ namespace LivreNoirLibrary.Windows.YuGiOh.Controls
 
         public bool Contains(NumbersKey obj)
         {
-            var set = _checkedItems;
+            var set = CheckedItems;
             return set.Count is 0 || set.Contains(obj.Value1) || set.Contains(obj.Value2) || set.Contains(obj.Value3) || set.Contains(obj.Value4);
         }
 
         public bool IsMatch(NumbersKey obj, MatchType type)
         {
-            var set = _checkedItems;
+            var set = CheckedItems;
             var setCount = set.Count;
             if (setCount is 0)
             {

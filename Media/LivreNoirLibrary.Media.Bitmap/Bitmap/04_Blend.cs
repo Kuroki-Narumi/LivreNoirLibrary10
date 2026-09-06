@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace LivreNoirLibrary.Media
 {
-    public static unsafe partial class BitmapOperation
+    partial class BitmapOperation
     {
         extension<T> (T bitmap) where T : IBitmap
         {
@@ -182,7 +182,7 @@ namespace LivreNoirLibrary.Media
             }
         }
 
-        static void BlendCore(nint bitmap, int stride, bool isFloat, int width, int height, BlendFunc blend, Vector<float> color)
+        static unsafe void BlendCore(nint bitmap, int stride, bool isFloat, int width, int height, BlendFunc blend, Vector<float> color)
         {
             var count = Vector<float>.Count;
             var frontAlpha = FloatColor.FillAlphaToAll(color);
@@ -241,7 +241,7 @@ namespace LivreNoirLibrary.Media
             }
         }
 
-        static void BlendToWithoutScaleCore(
+        static unsafe void BlendToWithoutScaleCore(
             nint source, int sourceStride, bool sourceIsFloat, 
             nint destination, int destStride, bool destIsFloat, 
             int width, int height, BlendFunc blend, Vector<float> colorCorrection)
@@ -424,7 +424,7 @@ namespace LivreNoirLibrary.Media
         }
         #endregion
 
-        static void StretchCopy_Horizontal<T>(T source, int srcX, int srcY, int srcW, int srcH, FloatBitmap destination, int destW)
+        static unsafe void StretchCopy_Horizontal<T>(T source, int srcX, int srcY, int srcW, int srcH, FloatBitmap destination, int destW)
             where T : IBitmap
         {
             // 拡大率
@@ -536,7 +536,7 @@ namespace LivreNoirLibrary.Media
             }
         }
 
-        internal static void StretchCopy_Vertical<T>(FloatBitmap source, int sourceHeight, T destination, int destX, int destY, int destW, int destH, BlendMode blend, Vector<float> colorCorrection)
+        internal static unsafe void StretchCopy_Vertical<T>(FloatBitmap source, int sourceHeight, T destination, int destX, int destY, int destW, int destH, BlendMode blend, Vector<float> colorCorrection)
             where T : IBitmap
         {
             var scaleY = (float)sourceHeight / destH;

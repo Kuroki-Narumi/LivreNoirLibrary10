@@ -23,7 +23,8 @@ namespace LivreNoirLibrary.Benchmark
             base.OnStartup(e);
             //PointerTest.Run();
 
-            //BenchmarkRunner.Run<ColorTest>();
+            BenchmarkRunner.Run<ColorTest>();
+            ColorTest.Validate();
 
             //JsonTest.Test();
             //BenchmarkRunner.Run<VectorTest>();
@@ -146,7 +147,7 @@ namespace LivreNoirLibrary.Benchmark
             }
             //*/
 
-            ///*
+            /*
             var source = "あ・いう・・え/お";
             var reg = new Regex("[・/]");
             foreach (var range in reg.EnumerateSplits(source))

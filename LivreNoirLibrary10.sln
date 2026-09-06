@@ -71,6 +71,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LivreNoirLibrary.Core.Windo
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LivreNoirLibrary.Windows.Capture", "Windows\LivreNoirLibrary.Windows.Capture\LivreNoirLibrary.Windows.Capture.csproj", "{A259B4CD-1CFE-4454-A792-D680CED52DB1}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LN-WinCapture", "Applications\LN-WinCapture\LN-WinCapture.csproj", "{943DF0CF-3283-47A4-846F-1B3D4212AE21}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -189,6 +191,10 @@ Global
 		{A259B4CD-1CFE-4454-A792-D680CED52DB1}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{A259B4CD-1CFE-4454-A792-D680CED52DB1}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{A259B4CD-1CFE-4454-A792-D680CED52DB1}.Release|Any CPU.Build.0 = Release|Any CPU
+		{943DF0CF-3283-47A4-846F-1B3D4212AE21}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{943DF0CF-3283-47A4-846F-1B3D4212AE21}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{943DF0CF-3283-47A4-846F-1B3D4212AE21}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{943DF0CF-3283-47A4-846F-1B3D4212AE21}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -222,6 +228,7 @@ Global
 		{DE223893-AB7C-4FF0-A5F7-FD72D2D16C36} = {9988BB93-A6E1-413D-9F5C-BCA51090B754}
 		{30E2690D-EF43-48F6-91A0-4D24421207D2} = {DDB4EF12-CC4E-5E88-E6FC-71A802F4DE97}
 		{A259B4CD-1CFE-4454-A792-D680CED52DB1} = {FAE50CAA-58F4-4889-8A49-AF066B7E3E20}
+		{943DF0CF-3283-47A4-846F-1B3D4212AE21} = {91D8486E-F2AC-455C-BB54-37AA9D6AFC42}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {E9E77D05-4DB4-4801-B31A-B18084065C39}

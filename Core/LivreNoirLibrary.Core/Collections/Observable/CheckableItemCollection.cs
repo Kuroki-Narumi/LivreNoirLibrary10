@@ -13,27 +13,19 @@ namespace LivreNoirLibrary.Collections
     {
         public event PropertyChangedEventHandler? PropertyChanged;
         public event NotifyCollectionChangedEventHandler? CollectionChanged;
+        public event EventHandler? CheckedItemChanged;
 
         private readonly ObjectCache<TValue> _cache;
 
         protected readonly List<TValue> _items = [];
-        protected readonly HashSet<TKey> _checkedItems = [];
-
-        private static readonly ThreadLocal<HashSet<TKey>> _checkedBuffer = new(() => []);
+        private HashSet<TKey> _checkedItems = [];
+        private HashSet<TKey> _checkedBuffer = [];
+        private bool _isCheckedChanging;
 
         public int Count => _items.Count;
-        public int CheckedCount
-        {
-            get;
-            private set
-            {
-                if (field != value)
-                {
-                    field = value;
-                    this.NotifyPropertyChanged(nameof(CheckedCount));
-                }
-            }
-        }
+        public int CheckedCount => _checkedItems.Count;
+
+        protected HashSet<TKey> CheckedItems => _checkedItems;
 
         public CheckableItemCollection()
         {
@@ -42,20 +34,25 @@ namespace LivreNoirLibrary.Collections
 
         public void Clear()
         {
+            _isCheckedChanging = true;
             _cache.Clear();
             _items.Clear();
             _checkedItems.Clear();
-            CheckedCount = 0;
+            _isCheckedChanging = false;
             this.NotifyCollectionReset();
+            NotifyCheckedItemChanged();
         }
 
         public void ClearFlags()
         {
+            _isCheckedChanging = true;
             foreach (var item in _items.AsSpan())
             {
                 item.IsChecked = false;
             }
-            CheckedCount = 0;
+            _checkedItems.Clear();
+            _isCheckedChanging = false;
+            NotifyCheckedItemChanged();
         }
 
         private TValue CreateNewItem()
@@ -67,45 +64,65 @@ namespace LivreNoirLibrary.Collections
 
         private void Item_IsCheckedChanged(object? sender, bool value)
         {
-            if (sender is not TValue item)
+            if (_isCheckedChanging || sender is not TValue item)
             {
                 return;
             }
             if (item.IsChecked)
             {
                 _checkedItems.Add(GetKey(item));
-                CheckedCount++;
             }
             else
             {
                 _checkedItems.Remove(GetKey(item));
-                CheckedCount--;
             }
+            NotifyCheckedItemChanged();
         }
 
-        protected void RefreshItems<T>(IEnumerable<T> source, Action<TValue, T> initializer)
+        protected void RefreshItems<T>(IEnumerable<T> source, Action<TValue, T>? initializer = null)
         {
+            // チェック済みだったアイテムset
             var @checked = _checkedItems;
-            var buffer = _checkedBuffer.Value!;
-            buffer.UnionWith(@checked);
-            @checked.Clear();
+            // sourceに含まれるチェック済みアイテムset
+            var buffer = _checkedBuffer;
 
+            _isCheckedChanging = true;
             var cache = _cache;
             var items = _items;
+            // ここで全てのアイテムについて IsChecked = false となる
             cache.Clear();
             items.Clear();
             foreach (var obj in source)
             {
                 var item = cache.GetNext();
-                initializer(item, obj);
-                item.IsChecked = @checked.Contains(GetKey(item));
+                initializer?.Invoke(item, obj);
+                var key = GetKey(item);
+                // チェックアイテムsetに含まれる場合
+                if (@checked.Contains(key))
+                {
+                    item.IsChecked = true;
+                    buffer.Add(key);
+                }
                 items.Add(item);
             }
+            // バッファ(現在チェック済みのアイテム)setと以前のチェック済みアイテムsetを交換
+            _checkedItems = buffer;
+            _checkedBuffer = @checked;
+            @checked.Clear();
+
+            _isCheckedChanging = false;
             this.NotifyCollectionReset();
+            NotifyCheckedItemChanged();
         }
 
         protected abstract TValue CreateItem();
         protected abstract TKey GetKey(TValue item);
+
+        protected void NotifyCheckedItemChanged()
+        {
+            this.NotifyPropertyChanged(nameof(CheckedCount));
+            CheckedItemChanged?.Invoke(this, EventArgs.Empty);
+        }
 
         public IEnumerator<TValue> GetEnumerator() => _items.GetEnumerator();
         void IObservableCollection.RaiseCollectionChanged(object sender, NotifyCollectionChangedEventArgs e) => CollectionChanged?.Invoke(sender, e);

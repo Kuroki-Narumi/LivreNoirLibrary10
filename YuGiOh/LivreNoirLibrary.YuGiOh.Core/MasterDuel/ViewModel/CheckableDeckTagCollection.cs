@@ -9,7 +9,7 @@ namespace LivreNoirLibrary.YuGiOh.MasterDuel.ViewModel
     public class CheckableDeckTagCollection : CheckableItemCollection<string, CheckableDeckTag>
     {
         protected override CheckableDeckTag CreateItem() => new();
-        protected override string GetKey(CheckableDeckTag item) => item.Name;
+        protected override string GetKey(CheckableDeckTag item) => item.Name ?? "";
 
         public void LoadFlags(IEnumerable<string> tags)
         {
@@ -17,7 +17,7 @@ namespace LivreNoirLibrary.YuGiOh.MasterDuel.ViewModel
             set.UnionWith(tags);
             foreach (var item in _items.AsSpan())
             {
-                item.IsChecked = set.Contains(item.Name);
+                item.IsChecked = set.Contains(item.Name ?? "");
             }
         }
 

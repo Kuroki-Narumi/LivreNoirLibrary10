@@ -98,7 +98,7 @@ namespace LivreNoirLibrary.Windows.Media
             _clipboard.SetLength(0);
             encoder.Save(_clipboard);
             _clipboard.Position = 0;
-            obj.SetData("PNG", _clipboard, false);
+            obj.SetData("PNG", _clipboard.ToArray(), false);
             AddData(obj, DataFormats.Bitmap);
             return obj;
         }

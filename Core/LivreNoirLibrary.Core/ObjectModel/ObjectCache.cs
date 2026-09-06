@@ -5,11 +5,12 @@ using System.Text;
 
 namespace LivreNoirLibrary.ObjectModel
 {
-    public class ObjectCache<T>(Func<T> factory) : IClear
+    public class ObjectCache<T>(Func<T> factory, Action<T>? initializeFunc = null) : IClear
         where T : IClear
     {
         private readonly List<T> _data = [];
         private readonly Func<T> _factory = factory;
+        private readonly Action<T>? _initializeFunc = initializeFunc;
         private int _index;
 
         protected ReadOnlySpan<T> ActiveElements => _data.AsSpan(0, _index);
@@ -34,7 +35,9 @@ namespace LivreNoirLibrary.ObjectModel
                 {
                     data.Add(factory());
                 }
-                return data[index];
+                var item = data[index];
+                _initializeFunc?.Invoke(item);
+                return item;
             }
             finally
             {

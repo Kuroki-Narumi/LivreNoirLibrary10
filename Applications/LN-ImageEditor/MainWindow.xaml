@@ -8,7 +8,7 @@
         xmlns:md="clr-namespace:LivreNoirLibrary.Windows.Media;assembly=LivreNoirLibrary.Windows.Media"
         xmlns:conv="clr-namespace:LivreNoirLibrary.Windows.Converters;assembly=LivreNoirLibrary.Windows.Controls"
         mc:Ignorable="d" d:DataContext="{d:DesignInstance Type=local:MainWindow}"
-        Title="LN Image Editor" Height="720" Width="1280" FontSize="14" AllowDrop="True" UseLayoutRounding="True">
+        Title="LN Image Editor" Height="800" Width="1280" FontSize="14" AllowDrop="True" UseLayoutRounding="True">
     <TabControl MouseWheel="OnMouseWheel_Tab">
         <TabItem Header="Main">
             <Grid>
@@ -38,7 +38,7 @@
                                         <TextBlock Grid.Column="0" Text="{Binding Filename}" FontWeight="Bold"/>
                                         <TextBlock Grid.Column="2" Text="{Binding Size}" HorizontalAlignment="Right" FontSize="12" FontFamily="Consolas"/>
                                     </Grid>
-                                    <Image Grid.Row="1" Source="{Binding Image}" MaxHeight="128" Stretch="Uniform" RenderOptions.BitmapScalingMode="HighQuality" HorizontalAlignment="Center"/>
+                                    <Image Grid.Row="1" Source="{Binding Image}" MaxHeight="80" Stretch="Uniform" RenderOptions.BitmapScalingMode="HighQuality" HorizontalAlignment="Center"/>
                                 </Grid>
                             </DataTemplate>
                         </ListView.ItemTemplate>

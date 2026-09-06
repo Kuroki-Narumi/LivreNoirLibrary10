@@ -34,7 +34,7 @@ namespace LivreNoirLibrary.Windows.Media
 
         public static WriteableBitmap CreateFromClipboard()
         {
-            if (Clipboard.GetImage() is BitmapSource source)
+            if (GetSourceFromClipboard() is { } source)
             {
                 return Create(source);
             }
@@ -71,21 +71,30 @@ namespace LivreNoirLibrary.Windows.Media
                 src.EndInit();
                 return src;
             }
-            catch
+            catch (Exception e)
             {
+                Console.WriteLine(e);
                 return null;
             }
         }
 
         public static BitmapImage? GetSourceFromStream(Stream stream)
         {
-            BitmapImage src = new();
-            src.BeginInit();
-            src.CacheOption = BitmapCacheOption.OnLoad;
-            src.CreateOptions = BitmapCreateOptions.None;
-            src.StreamSource = stream;
-            src.EndInit();
-            return src;
+            try
+            {
+                BitmapImage src = new();
+                src.BeginInit();
+                src.CacheOption = BitmapCacheOption.OnLoad;
+                src.CreateOptions = BitmapCreateOptions.None;
+                src.StreamSource = stream;
+                src.EndInit();
+                return src;
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+                return null;
+            }
         }
 
         public static BitmapImage? GetSourceFromFile(string path)
@@ -94,6 +103,37 @@ namespace LivreNoirLibrary.Windows.Media
             {
                 using var fs = File.OpenRead(path);
                 return GetSourceFromStream(fs);
+            }
+            return null;
+        }
+
+        public static BitmapSource? GetSourceFromClipboard()
+        {
+            if (Clipboard.GetData("PNG") is { } obj)
+            {
+                var ms = obj as MemoryStream;
+                if (obj is byte[] bytes)
+                {
+                    ms = new(bytes);
+                }
+                if (ms is not null)
+                {
+                    return GetSourceFromStream(ms);
+                }
+            }
+            if (Clipboard.GetImage() is BitmapSource source)
+            {
+                return source;
+            }
+            if (Clipboard.GetData("FileNameW") is string[] names)
+            {
+                foreach (var name in names)
+                {
+                    if (GetSourceFromFile(name) is { } bitmap)
+                    {
+                        return bitmap;
+                    }
+                }
             }
             return null;
         }

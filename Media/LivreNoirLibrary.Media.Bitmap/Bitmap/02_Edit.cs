@@ -6,18 +6,18 @@ using System.Runtime.CompilerServices;
 
 namespace LivreNoirLibrary.Media
 {
-    public static unsafe partial class BitmapOperation
+    partial class BitmapOperation
     {
         extension<T>(T bitmap) where T : IBitmap
         {
-            public Span<byte> AsByteSpan() => new((byte*)bitmap.Pointer, bitmap.Height * bitmap.Stride);
+            public unsafe Span<byte> AsByteSpan() => new((byte*)bitmap.Pointer, bitmap.Height * bitmap.Stride);
 
-            public void Clear()
+            public unsafe void Clear()
             {
                 SimdOperations.Clear((byte*)bitmap.Pointer, (nuint)(bitmap.Height * bitmap.Stride));
             }
 
-            public void Clear(Rectangle rect)
+            public unsafe void Clear(Rectangle rect)
             {
                 foreach (var (p, len) in bitmap.EnumerateLines(rect))
                 {
@@ -25,7 +25,7 @@ namespace LivreNoirLibrary.Media
                 }
             }
 
-            public void InvertColor(ColorFlags flags = ColorFlags.RGB)
+            public unsafe void InvertColor(ColorFlags flags = ColorFlags.RGB)
             {
                 if (bitmap.IsValid)
                 {
@@ -42,7 +42,7 @@ namespace LivreNoirLibrary.Media
                 }
             }
 
-            public void InvertColor(Rectangle rect, ColorFlags flags = ColorFlags.RGB)
+            public unsafe void InvertColor(Rectangle rect, ColorFlags flags = ColorFlags.RGB)
             {
                 if (bitmap.Adjust(ref rect))
                 {
@@ -67,7 +67,7 @@ namespace LivreNoirLibrary.Media
                 }
             }
 
-            public void SetColor(ColorFlags flags, byte value)
+            public unsafe void SetColor(ColorFlags flags, byte value)
             {
                 if (bitmap.IsValid)
                 {
@@ -77,7 +77,7 @@ namespace LivreNoirLibrary.Media
                 }
             }
 
-            public void SetColor(Rectangle rect, ColorFlags flags, byte value)
+            public unsafe void SetColor(Rectangle rect, ColorFlags flags, byte value)
             {
                 if (bitmap.Adjust(ref rect))
                 {
@@ -91,7 +91,7 @@ namespace LivreNoirLibrary.Media
                 }
             }
 
-            public void SetColor(ColorIndex from, ColorIndex to)
+            public unsafe void SetColor(ColorIndex from, ColorIndex to)
             {
                 if (from != to && bitmap.IsValid)
                 {
@@ -101,7 +101,7 @@ namespace LivreNoirLibrary.Media
                 }
             }
 
-            public void SetColor(Rectangle rect, ColorIndex from, ColorIndex to)
+            public unsafe void SetColor(Rectangle rect, ColorIndex from, ColorIndex to)
             {
                 if (from != to && bitmap.Adjust(ref rect))
                 {
@@ -116,7 +116,7 @@ namespace LivreNoirLibrary.Media
                 }
             }
 
-            public void SwapColor(ColorIndex from, ColorIndex to)
+            public unsafe void SwapColor(ColorIndex from, ColorIndex to)
             {
                 if (from != to && bitmap.IsValid)
                 {
@@ -126,7 +126,7 @@ namespace LivreNoirLibrary.Media
                 }
             }
 
-            public void SwapColor(Rectangle rect, ColorIndex from, ColorIndex to)
+            public unsafe void SwapColor(Rectangle rect, ColorIndex from, ColorIndex to)
             {
                 if (from != to && bitmap.Adjust(ref rect))
                 {
@@ -140,7 +140,7 @@ namespace LivreNoirLibrary.Media
                 }
             }
 
-            public void SetTransparent(LnColor color, ColorFlags compareFlags = ColorFlags.RGB)
+            public unsafe void SetTransparent(LnColor color, ColorFlags compareFlags = ColorFlags.RGB)
             {
                 if (bitmap.IsValid)
                 {
@@ -151,7 +151,7 @@ namespace LivreNoirLibrary.Media
                 }
             }
 
-            public void SetTransparent(Rectangle rect, LnColor color, ColorFlags compareFlags = ColorFlags.RGB)
+            public unsafe void SetTransparent(Rectangle rect, LnColor color, ColorFlags compareFlags = ColorFlags.RGB)
             {
                 AssertType(bitmap, false);
                 if (bitmap.Adjust(ref rect))
@@ -166,7 +166,7 @@ namespace LivreNoirLibrary.Media
                 }
             }
 
-            public void SetColor(ColorFlags flags, float value)
+            public unsafe void SetColor(ColorFlags flags, float value)
             {
                 if (bitmap.IsValid)
                 {
@@ -176,7 +176,7 @@ namespace LivreNoirLibrary.Media
                 }
             }
 
-            public void SetColor(Rectangle rect, ColorFlags flags, float value)
+            public unsafe void SetColor(Rectangle rect, ColorFlags flags, float value)
             {
                 AssertType(bitmap, true);
                 var (clear, set) = GetClearSetMask(flags, value);
@@ -197,7 +197,7 @@ namespace LivreNoirLibrary.Media
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private static void SetColorCore(uint* pointer, int elementCount, uint clearMask, uint setMask)
+        private static unsafe void SetColorCore(uint* pointer, int elementCount, uint clearMask, uint setMask)
         {
             var count = Vector<uint>.Count;
             var vector = (Vector<uint>*)pointer;
@@ -225,7 +225,7 @@ namespace LivreNoirLibrary.Media
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private static void SetColorCore(uint* pointer, int elementCount, int fromBits, int toBits, uint fromExtractMask, uint toClearMask)
+        private static unsafe void SetColorCore(uint* pointer, int elementCount, int fromBits, int toBits, uint fromExtractMask, uint toClearMask)
         {
             var count = Vector<uint>.Count;
             var vector = (Vector<uint>*)pointer;
@@ -255,7 +255,7 @@ namespace LivreNoirLibrary.Media
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private static void SwapColorCore(uint* pointer, int elementCount, int fromBits, int toBits, uint fromMask, uint toMask)
+        private static unsafe void SwapColorCore(uint* pointer, int elementCount, int fromBits, int toBits, uint fromMask, uint toMask)
         {
             var count = Vector<uint>.Count;
             var vector = (Vector<uint>*)pointer;
@@ -293,7 +293,7 @@ namespace LivreNoirLibrary.Media
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private static void InvertColorCore(uint* pointer, int elementCount, uint mask)
+        private static unsafe void InvertColorCore(uint* pointer, int elementCount, uint mask)
         {
             var count = Vector<uint>.Count;
             var vector = (Vector<uint>*)pointer;
@@ -318,7 +318,7 @@ namespace LivreNoirLibrary.Media
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private static void SetTransparentCore(uint* pointer, int elementCount, uint color, uint compareMask)
+        private static unsafe void SetTransparentCore(uint* pointer, int elementCount, uint color, uint compareMask)
         {
             var count = Vector<uint>.Count;
             var vector = (Vector<uint>*)pointer;
@@ -355,7 +355,7 @@ namespace LivreNoirLibrary.Media
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private static void SetColorCore(float* pointer, int elementCount, Vector<float> clearMask, Vector<float> setMask)
+        private static unsafe void SetColorCore(float* pointer, int elementCount, Vector<float> clearMask, Vector<float> setMask)
         {
             var count = Vector<float>.Count;
             var vector = (Vector<float>*)pointer;
@@ -371,7 +371,7 @@ namespace LivreNoirLibrary.Media
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private static void InvertColorCore(float* pointer, int elementCount, Vector<float> mask)
+        private static unsafe void InvertColorCore(float* pointer, int elementCount, Vector<float> mask)
         {
             var count = Vector<float>.Count;
             var vector = (Vector<float>*)pointer;
