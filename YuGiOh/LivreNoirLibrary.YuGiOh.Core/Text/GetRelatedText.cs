@@ -21,7 +21,7 @@ namespace LivreNoirLibrary.YuGiOh
             CreateRelatedText(set, card.PendulumText, stack);
         }
 
-        [GeneratedRegex(@"(?:(?:(?:そ|ー|ド|手)の|した)効果は|持つ、|効果は、)「$")]
+        [GeneratedRegex(@"(?:(?:(?:そ|ー|ド|手)の|した)効果[はを]|持つ、|効果は、)「$")]
         private static partial Regex Regex_EffectExpr { get; }
 
         [GeneratedRegex(@"属性(?:は|を)「$")]

@@ -32,6 +32,13 @@
             <Style x:Key="CopyButton" TargetType="ct:Button" BasedOn="{StaticResource CardInfo_CopyButton}">
                 <EventSetter Event="Click" Handler="OnClick_Copy"/>
             </Style>
+            <ContextMenu x:Key="ContextMenu_Image">
+                <MenuItem Header="{Binding CInfo.Image_SelectFile.Value, Source={x:Static ygo:Vocab.Current}}" Command="ygo:YgoCommands.CardImage_File" CommandTarget="{Binding PlacementTarget, RelativeSource={RelativeSource AncestorType=ContextMenu}}"/>
+                <MenuItem Header="{Binding CInfo.Image_Paste.Value, Source={x:Static ygo:Vocab.Current}}" Command="ygo:YgoCommands.CardImage_Paste" CommandTarget="{Binding PlacementTarget, RelativeSource={RelativeSource AncestorType=ContextMenu}}"/>
+                <Separator/>
+                <MenuItem Header="{Binding CInfo.Image_Copy.Value, Source={x:Static ygo:Vocab.Current}}" Command="ygo:YgoCommands.CardImage_Copy" CommandTarget="{Binding PlacementTarget, RelativeSource={RelativeSource AncestorType=ContextMenu}}"/>
+                <MenuItem Header="{Binding Delete.Value, Source={x:Static ygo:Vocab.Current}}" Command="ygo:YgoCommands.CardImage_Delete" CommandTarget="{Binding PlacementTarget, RelativeSource={RelativeSource AncestorType=ContextMenu}}"/>
+            </ContextMenu>
         </ResourceDictionary>
     </UserControl.Resources>
     <Grid RowDefinitions="Auto, *, 6, Auto" x:Name="MainGrid" d:DataContext="{d:DesignInstance Type=local:CardInfoViewModel}">
@@ -50,7 +57,7 @@
             <TextBox Grid.Row="2" x:Name="TextBox_EnName" Text="{Binding Card.EnName, Mode=OneWay}"/>
         </Grid>
         <Grid Height="{Binding ActualHeight, ElementName=Grid_Name}" ColumnDefinitions="*, Auto, Auto">
-            <Image x:Name="CardImage" Grid.Column="1" Source="{Binding Source.Id, Converter={StaticResource CardImageConv}}" Margin="0,4" Cursor="Hand" MouseLeftButtonDown="OnMouseDown_CardImage"/>
+            <Image x:Name="CardImage" Grid.Column="1" Margin="0,4" Cursor="Hand" MouseLeftButtonDown="OnMouseDown_CardImage" ContextMenu="{StaticResource ContextMenu_Image}"/>
             <ct:Button Grid.Column="2" Style="{StaticResource IconButtonBase}" Content="{Binding Detach.Value, Source={x:Static ygo:Vocab.Current}}" Icon="{x:Static md:Icons.NewWindow}" Background="Transparent" HorizontalAlignment="Right" VerticalAlignment="Top" Command="ygo:YgoCommands.DetachCardInfo" CommandParameter="{Binding Source}" Visibility="{Binding IsEnabled, RelativeSource={RelativeSource Mode=Self}, Converter={StaticResource BVConv}}" Margin="1,4" Padding="3,0"/>
         </Grid>
         <!-- card info -->
@@ -211,7 +218,7 @@
         </Grid>
         <ct:CenteringPanel Grid.RowSpan="4" CloseByClick="True" CloseByKey="True">
             <ct:CenteringPanelChild x:Name="CardImage_Large" AllowDrop="True" DragOver="CardImage_DragOver" Drop="CardImage_Drop">
-                <ct:IconPresenter Margin="8" Source="{Binding ElementName=CardImage}" Height="NaN" IsHitTestVisible="True" Cursor="Hand" MouseLeftButtonDown="OnClick_CardImage"/>
+                <ct:IconPresenter Margin="8" Source="{Binding ElementName=CardImage}" Height="NaN" IsHitTestVisible="True" Cursor="Hand" ContextMenu="{StaticResource ContextMenu_Image}"/>
             </ct:CenteringPanelChild>
         </ct:CenteringPanel>
     </Grid>

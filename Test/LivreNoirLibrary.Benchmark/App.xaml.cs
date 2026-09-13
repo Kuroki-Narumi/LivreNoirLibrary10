@@ -23,8 +23,10 @@ namespace LivreNoirLibrary.Benchmark
             base.OnStartup(e);
             //PointerTest.Run();
 
+            /*
             BenchmarkRunner.Run<ColorTest>();
             ColorTest.Validate();
+            //*/
 
             //JsonTest.Test();
             //BenchmarkRunner.Run<VectorTest>();
@@ -92,10 +94,55 @@ namespace LivreNoirLibrary.Benchmark
             Console.WriteLine("Finished.");
             //*/
 
+            //*
+            const long firstLimit = Rational.DoubleDenominatorLimit;
+            var minLimit = firstLimit;
+            for (var den = 2L; den <= 10000000L; den++)
+            {
+                var value = 999d + 1d / den;
+                // ラウンドトリップ可能な分母上限の探索
+                var high = firstLimit * 2 - 1;
+                var low = 1L;
+                while (low < high)
+                {
+                    var limit = (high + low) / 2;
+                    var (n, d) = Rational.Rationalize(value, limit);
+                    if (n - 999 * d == 1 && d == den)
+                    {
+                        low = limit + 1;
+                        if (limit >= firstLimit)
+                        {
+                            high = low;
+                            break;
+                        }
+                    }
+                    else
+                    {
+                        high = limit;
+                    }
+                }
+                high--;
+                if (high > 0)
+                {
+                    if (high < minLimit)
+                    {
+                        minLimit = high;
+                        Console.WriteLine($"minLimit updated: den={den}, limit={high}");
+                    }
+                }
+                else
+                {
+                    var (n, d) = Rational.Rationalize(value, firstLimit);
+                    Console.WriteLine($"convert failed: den={den}, value={value}, n/d={n - 999 * d}/{d}");
+                    break;
+                }
+            }
+            //*/
+
             /*
             // 357686312646216567629137
-            const long origNum = 629137;
-            const long origDen = 1209600;
+            const long origNum = 100;
+            const long origDen = 300;
             const long offset = 999;
             var maxMaxDen = long.MaxValue;
 

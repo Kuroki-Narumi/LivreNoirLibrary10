@@ -34,6 +34,10 @@ namespace LivreNoirLibrary.Windows.YuGiOh.Vocabulary
 
         public VocabData LevelSymbol { get => GetData(); set => SetData(value); }
 
+        public VocabData Image_SelectFile { get => GetData(); set => SetData(value); }
+        public VocabData Image_Paste { get => GetData(); set => SetData(value); }
+        public VocabData Image_Copy { get => GetData(); set => SetData(value); }
+
         [JsonIgnore]
         public MergedVocabData LevelRankLink { get; }
 
@@ -69,6 +73,10 @@ namespace LivreNoirLibrary.Windows.YuGiOh.Vocabulary
             SetData(nameof(RelatedList), "関連ワード");
 
             SetData(nameof(LevelSymbol), "★");
+
+            SetData(nameof(Image_SelectFile), "ファイルを選択");
+            SetData(nameof(Image_Paste), "貼り付け");
+            SetData(nameof(Image_Copy), "コピー");
         }
     }
 }

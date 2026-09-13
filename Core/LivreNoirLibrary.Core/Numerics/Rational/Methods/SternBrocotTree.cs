@@ -46,8 +46,8 @@ namespace LivreNoirLibrary.Numerics
                 denominator = 1;
                 return true;
             }
-            (var num, denominator) = RationalizeUnsafe(absValue - intPart, denominatorLimit);
-            numerator = sign * (intPart * denominator + num);
+            (var num, denominator) = RationalizeUnsafe(absValue, denominatorLimit);
+            numerator = sign * num;
             return true;
         }
 
@@ -100,8 +100,8 @@ namespace LivreNoirLibrary.Numerics
                 denominator = 1;
                 return true;
             }
-            (var num, denominator) = RationalizeUnsafe(absValue - intPart, denominatorLimit);
-            numerator = sign * (intPart * denominator + num);
+            (var num, denominator) = RationalizeUnsafe(absValue, denominatorLimit);
+            numerator = sign * num;
             return true;
         }
 
@@ -175,7 +175,7 @@ namespace LivreNoirLibrary.Numerics
             var p = 0L;
             var q = 1L;
             var r = 1L;
-            var s = 1L;
+            var s = 0L;
             while (true)
             {
                 checked
@@ -222,9 +222,17 @@ namespace LivreNoirLibrary.Numerics
                     }
                     else
                     {
-                        var x = Math.Max(1, (long)Math.Min((qp / rs) - 1, (denominatorLimit - q) / s));
-                        p += r * x;
-                        q += s * x;
+                        if (s is 0)
+                        {
+                            p += r;
+                            q += s;
+                        }
+                        else
+                        {
+                            var x = Math.Max(1, (long)Math.Min((qp / rs) - 1, (denominatorLimit - q) / s));
+                            p += r * x;
+                            q += s * x;
+                        }
                     }
                 }
             }
@@ -302,13 +310,13 @@ namespace LivreNoirLibrary.Numerics
                     var qp = value * q - p;
                     if (diff is < 0)
                     {
-                        var x = Math.Max(1, Math.Min((long)(rs / qp) - 1, (denominatorLimit - s) / q));
+                        var x = Math.Max(1, (long)Math.Min((rs / qp) - 1, (denominatorLimit - s) / q));
                         r += p * x;
                         s += q * x;
                     }
                     else
                     {
-                        var x = Math.Max(1, Math.Min((long)(qp / rs) - 1, (denominatorLimit - q) / s));
+                        var x = Math.Max(1, (long)Math.Min((qp / rs) - 1, (denominatorLimit - q) / s));
                         p += r * x;
                         q += s * x;
                     }

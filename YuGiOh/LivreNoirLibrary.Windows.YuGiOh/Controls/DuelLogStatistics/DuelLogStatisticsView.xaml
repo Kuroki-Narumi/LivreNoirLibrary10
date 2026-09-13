@@ -48,9 +48,9 @@
                         <ColumnDefinition Width="Auto"/>
                     </Grid.ColumnDefinitions>
                     <Label Style="{StaticResource Label_Header}" Content="{Binding DLog.DateTime.Value, Source={x:Static yw:Vocab.Current}}"/>
-                    <ct:DateTimePicker Grid.Column="1" SelectedDate="{Binding SearchConditions.DateStart}"/>
+                    <ct:DateTimePicker Grid.Column="1" SelectedDateTime="{Binding SearchConditions.DateStart}"/>
                     <TextBlock Grid.Column="2" Text="～" Margin="4,0" VerticalAlignment="Center"/>
-                    <ct:DateTimePicker Grid.Column="3" SelectedDate="{Binding SearchConditions.DateEnd}"/>
+                    <ct:DateTimePicker Grid.Column="3" SelectedDateTime="{Binding SearchConditions.DateEnd}"/>
                     <ct:Button Grid.Column="5" Style="{StaticResource IconButton_AllClear}" Icon="{x:Static media:Icons.Cross_Red}"/>
                 </Grid>
                 <Grid Grid.Row="1">

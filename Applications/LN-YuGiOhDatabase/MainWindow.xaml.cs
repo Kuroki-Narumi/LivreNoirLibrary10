@@ -158,6 +158,10 @@ namespace LivreNoir.YuGiOhDatabase
             {
                 this.StartTask(asyncProcess: UpdateDatabase, isAbortable: false);
             }
+            else
+            {
+                NotifyUpdateResult(0);
+            }
         }
 
         private async Task UpdateDatabase(ProgressReporter p, CancellationToken c)
@@ -168,13 +172,15 @@ namespace LivreNoir.YuGiOhDatabase
             database.LastUpdate = DateTime.Now;
             Json.Save(CardPool.ResourceFilePath, database);
 
-            await Dispatcher.BeginInvoke(() =>
-            {
-                TextBlock_Info.Text = ids.Count is 0
-                    ? Vocab.Current.Message_NoUpdate
-                    : string.Format(Vocab.Current.Message_CardUpdateComplete, ids.Count);
-                Area_UpdateInfo.Open(true);
-            });
+            await Dispatcher.BeginInvoke(() => NotifyUpdateResult(ids.Count));
+        }
+
+        private void NotifyUpdateResult(int count)
+        {
+            TextBlock_Info.Text = count is 0
+                ? Vocab.Current.Message_NoUpdate
+                : string.Format(Vocab.Current.Message_CardUpdateComplete, count);
+            Area_UpdateInfo.Open(true);
         }
 
         private bool _regulation_tcg;

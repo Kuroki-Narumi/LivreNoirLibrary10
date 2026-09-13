@@ -25,7 +25,6 @@
     <conv:LineFeedConverter x:Key="LFConv"/>
     <conv:ComboItemConverter x:Key="CIConv"/>
     <local:ExpanderStateConverter x:Key="ExpConv"/>
-    <conv:IdToCardImageConverter x:Key="CardImageConv"/>
 
     <Style TargetType="Control" x:Key="ControlBase">
         <Setter Property="FontFamily" Value="Meiryo"/>

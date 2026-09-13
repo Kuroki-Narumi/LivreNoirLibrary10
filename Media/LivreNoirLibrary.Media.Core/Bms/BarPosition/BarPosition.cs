@@ -3,6 +3,7 @@ using LivreNoirLibrary.Numerics;
 using System;
 using System.ComponentModel;
 using System.Diagnostics.CodeAnalysis;
+using System.Globalization;
 using System.IO;
 using System.Numerics;
 using System.Runtime.CompilerServices;
@@ -146,12 +147,19 @@ namespace LivreNoirLibrary.Media.Bms
             // 分割無し: [番号].[オフセット]
             if (count is 1)
             {
-                // 精度確保のためdoubleではなくdecimalとしてパース
-                if (decimal.TryParse(barExpr, provider, out var decValue) && decValue is >= 0)
+                var index = barExpr.IndexOf('.');
+                if (index is -1)
                 {
-                    bar = (int)decValue;
-                    offset = (double)(decValue - bar);
-                    return bar is >= 0;
+                    index = barExpr.Length;
+                }
+                // 整数部分と小数部分を個別にパース
+                var intExists = int.TryParse(barExpr[..index], provider, out var intPart);
+                var fracExists = double.TryParse(barExpr[index..], provider, out var fracPart);
+                if (intExists || fracExists)
+                {
+                    bar = Math.Max(intPart, 0);
+                    offset = Math.Max(fracPart.Validate(0), 0);
+                    return true;
                 }
                 else
                 {

@@ -1,3 +1,4 @@
+using LivreNoirLibrary.Debug;
 using System;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
@@ -105,6 +106,11 @@ namespace LivreNoirLibrary.Windows.Media
                 return GetSourceFromStream(fs);
             }
             return null;
+        }
+
+        public static bool CanCreateFromClipboard()
+        {
+            return Clipboard.ContainsData("PNG") || Clipboard.ContainsImage() || Clipboard.ContainsData("FileNameW");
         }
 
         public static BitmapSource? GetSourceFromClipboard()

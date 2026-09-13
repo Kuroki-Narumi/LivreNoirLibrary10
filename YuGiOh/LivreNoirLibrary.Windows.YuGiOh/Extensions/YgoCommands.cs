@@ -15,6 +15,11 @@ namespace LivreNoirLibrary.Windows.YuGiOh
         public static RoutedCommand PackLink { get; } = Commands.Create();
         public static RoutedCommand RelatedText { get; } = Commands.Create();
 
+        public static RoutedCommand CardImage_File { get; } = Commands.Create();
+        public static RoutedCommand CardImage_Paste { get; } = Commands.Create();
+        public static RoutedCommand CardImage_Copy { get; } = Commands.Create();
+        public static RoutedCommand CardImage_Delete { get; } = Commands.Create();
+
         public static RoutedCommand UpdateDatabase { get; } = Commands.Create();
         public static RoutedCommand LoadOcgRegulation { get; } = Commands.Create();
         public static RoutedCommand LoadTcgRegulation { get; } = Commands.Create();

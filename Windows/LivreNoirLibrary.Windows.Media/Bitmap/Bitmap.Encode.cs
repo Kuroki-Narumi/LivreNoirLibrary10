@@ -11,7 +11,7 @@ namespace LivreNoirLibrary.Windows.Media
 {
     public static partial class Bitmap
     {
-        public static bool SaveImage(this BitmapSource source, string path, BitmapEncodeType encoder = BitmapEncodeType.PNG)
+        public static bool SaveImage(this BitmapSource source, string path, BitmapEncodeType encoder = BitmapEncodeType.Auto)
         {
             BitmapEncoder? e = null;
             switch (encoder)
